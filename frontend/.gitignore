@@ -6,6 +6,10 @@ bun.lockb
 dist/
 build/
 
+# TypeScript build info
+*.tsbuildinfo
+**/*.tsbuildinfo
+
 # Environment files
 .env
 .env.local

@@ -16,7 +16,10 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css}\"",
-    "build": "cd packages/common && bun run build && bun run --filter './apps/*' build"
+    "build:common": "cd packages/common && bun run build",
+    "build:user": "cd apps/user && bun run build",
+    "build:owner": "cd apps/owner && bun run build",
+    "build": "bun run build:common && bun run build:user && bun run build:owner"
   },
   "dependencies": {
     "@sentry/react": "^9.40.0",
