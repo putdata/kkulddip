@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 // 필수: Meta 설정 (default export)
 const meta = {
