@@ -1,14 +1,13 @@
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./index.css";
-import { useCounter } from "common";
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import { useCounter } from 'common';
 
 function App() {
   const { count, increment, decrement } = useCounter();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-      <div className="flex space-x-6 mb-6">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
+      <div className="mb-6 flex space-x-6">
         <a href="https://vite.dev" target="_blank" rel="noreferrer">
           <img src={viteLogo} className="h-16 w-16" alt="Vite logo" />
         </a>
@@ -17,24 +16,24 @@ function App() {
         </a>
       </div>
 
-      <h1 className="text-4xl font-bold mb-8">User App</h1>
+      <h1 className="mb-8 text-4xl font-bold">User App</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center space-y-4">
+      <div className="flex flex-col items-center space-y-4 rounded-lg bg-white p-6 shadow-md">
         <p className="text-2xl font-semibold">count is {count}</p>
         <button
           onClick={increment}
-          className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          className="rounded-md bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
         >
           Increment
         </button>
         <button
           onClick={decrement}
-          className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+          className="rounded-md bg-red-600 px-6 py-3 text-white transition hover:bg-red-700"
         >
           Decrement
         </button>
-        <p className="text-gray-600 text-center">
-          Edit <code className="bg-gray-200 px-1 rounded">src/App.tsx</code> and
+        <p className="text-center text-gray-600">
+          Edit <code className="rounded bg-gray-200 px-1">src/App.tsx</code> and
           save to test HMR
         </p>
       </div>

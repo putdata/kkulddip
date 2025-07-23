@@ -1,0 +1,9 @@
+# 자동 생성
+**/dist
+**/build
+**/node_modules
+**/.next
+**/coverage
+
+# shadcn/ui
+**/components/ui/**
