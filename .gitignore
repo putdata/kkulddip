@@ -1,0 +1,12 @@
+# IDE
+.idea/
+
+# OS
+.DS_Store
+
+# env
+.env
+
+# temp
+*.log
+temp/
