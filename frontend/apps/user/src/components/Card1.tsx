@@ -9,22 +9,21 @@ import {
 import { DiscountBadge } from './Badge';
 
 export interface Card1Props {
-  storeName: string;
-  menuDescription: string[];
-  menuPrice: number;
-  menuDiscountPrice: number;
-  pickupTimeFrom: string;
-  pickupTimeTo: string;
+  storeInfo: {
+    name: string;
+    menu: string[];
+  };
+  price: {
+    original: number;
+    discount: number;
+  };
+  pickupTime: {
+    from: string;
+    to: string;
+  };
 }
 
-export const Card1 = ({
-  storeName,
-  menuDescription,
-  menuPrice,
-  menuDiscountPrice,
-  pickupTimeFrom,
-  pickupTimeTo,
-}: Card1Props) => {
+export const Card1 = ({ storeInfo, price, pickupTime }: Card1Props) => {
   return (
     <Card className="w-72 overflow-hidden p-0">
       <CardContent className="flex flex-col p-0">
@@ -36,11 +35,13 @@ export const Card1 = ({
         {/* 아래쪽: 정보 영역 */}
         <div className="bg-white p-4">
           {/* 가게명 */}
-          <CardTitle className="mb-1 text-lg font-bold">{storeName}</CardTitle>
+          <CardTitle className="mb-1 text-lg font-bold">
+            {storeInfo.name}
+          </CardTitle>
 
           {/* 품목 */}
           <CardDescription className="mb-3 text-sm text-gray-500">
-            {menuDescription.join(', ')}
+            {storeInfo.menu.join(', ')}
           </CardDescription>
 
           {/* 가격 | 픽업 시간 */}
@@ -49,23 +50,23 @@ export const Card1 = ({
               {/* 가격 정보 */}
               <div className="mb-2">
                 <div className="mb-1 text-sm text-gray-400 line-through">
-                  {menuPrice.toLocaleString()}원
+                  {price.original.toLocaleString()}원
                 </div>
                 <div className="text-2xl font-bold text-green-600">
-                  {menuDiscountPrice.toLocaleString()}원
+                  {price.discount.toLocaleString()}원
                 </div>
               </div>
 
               {/* 할인율 */}
               <DiscountBadge
-                originalPrice={menuPrice}
-                discountPrice={menuDiscountPrice}
+                originalPrice={price.original}
+                discountPrice={price.discount}
               />
             </div>
             <div className="flex flex-col items-end justify-end text-gray-400">
               <p>픽업 가능 시간</p>
               <p>
-                {pickupTimeFrom} ~ {pickupTimeTo}
+                {pickupTime.from} ~ {pickupTime.to}
               </p>
             </div>
           </CardContent>

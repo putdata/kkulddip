@@ -18,11 +18,17 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   // 현재 Card1 컴포넌트는 props가 없으므로 args는 비어있음
   args: {
-    storeName: '아우어 베이커리 강남점',
-    menuDescription: ['더티초코', '빨미까레'],
-    menuPrice: 15000,
-    menuDiscountPrice: 4500,
-    pickupTimeFrom: '18:00',
-    pickupTimeTo: '20:00',
+    storeInfo: {
+      name: '아우어 베이커리 강남점',
+      menu: ['더티초코', '빨미까레'],
+    },
+    price: {
+      original: 15000,
+      discount: 4500,
+    },
+    pickupTime: {
+      from: '18:00',
+      to: '20:00',
+    },
   },
 };
