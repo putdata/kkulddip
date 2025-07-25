@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# Build outputs
+dist/
+build/
+
+# TypeScript build info
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.DS_Store
+
+# Logs
+*.log
