@@ -2,8 +2,11 @@ import React from 'react';
 
 // 음식 카드 데이터 타입 정의
 export interface FoodItem {
-  storeName: string;
-  description: string;
+  storeInfo: {
+    storeName: string;
+    description: string;
+    ratingAverage: number;
+  };
   img: {
     src: string;
     alt: string;
@@ -12,7 +15,6 @@ export interface FoodItem {
     original: number;
     discount: number;
   };
-  ratingAverage: number;
   distance: number;
   timeLeftHour?: number;
   remainingQuantity: number;
@@ -48,9 +50,11 @@ const FoodCard = ({ food, onClick }: FoodCardProps) => {
         <div className="flex justify-between">
           <div className="flex-1">
             <h3 className="mb-1 text-lg font-bold text-gray-900">
-              {food.storeName}
+              {food.storeInfo.storeName}
             </h3>
-            <p className="mb-3 text-sm text-gray-500">{food.description}</p>
+            <p className="mb-3 text-sm text-gray-500">
+              {food.storeInfo.description}
+            </p>
 
             {/* 가격 정보 */}
             <div className="mb-0.5">
@@ -85,7 +89,7 @@ const FoodCard = ({ food, onClick }: FoodCardProps) => {
             {/* 별점 */}
             <span className="text-gray-600">★</span>
             <span className="text-sm font-medium text-gray-700">
-              {food.ratingAverage}
+              {food.storeInfo.ratingAverage}
             </span>
 
             {/* 거리 */}

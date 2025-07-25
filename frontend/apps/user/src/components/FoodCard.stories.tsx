@@ -21,8 +21,12 @@ type Story = StoryObj<typeof FoodCard>;
 export const Default: Story = {
   args: {
     food: {
-      storeName: '맛있는 김밥천국',
-      description: '신선한 재료로 만든 김밥과 분식',
+      storeInfo: {
+        storeName: '맛있는 김밥천국',
+        description: '신선한 재료로 만든 김밥과 분식',
+        ratingAverage: 4.5,
+      },
+
       img: {
         src: 'https://images.unsplash.com/photo-1553909489-cd47e0ef937f?w=400&h=300&fit=crop&crop=center',
         alt: '김밥 이미지',
@@ -31,7 +35,6 @@ export const Default: Story = {
         original: 5000,
         discount: 3500,
       },
-      ratingAverage: 4.5,
       distance: 0.8,
       timeLeftHour: 2,
       remainingQuantity: 5,
@@ -43,8 +46,12 @@ export const Default: Story = {
 export const NoTimeLimit: Story = {
   args: {
     food: {
-      storeName: '24시 편의점',
-      description: '언제나 신선한 도시락과 간편식',
+      storeInfo: {
+        storeName: '24시 편의점',
+        description: '언제나 신선한 도시락과 간편식',
+        ratingAverage: 4.2,
+      },
+
       img: {
         src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center',
         alt: '편의점 도시락',
@@ -53,7 +60,6 @@ export const NoTimeLimit: Story = {
         original: 8000,
         discount: 6000,
       },
-      ratingAverage: 4.2,
       distance: 1.5,
       remainingQuantity: 10,
     },
