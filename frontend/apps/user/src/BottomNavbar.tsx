@@ -1,22 +1,6 @@
 import { Heart, Package, User, Home, Search } from 'lucide-react';
 import type { ReactElement } from 'react';
-//import { useNavigate } from 'react-router-dom';
-
-const onSearchClickHandler = () => {
-  // TODO: 검색 페이지 이동 로직
-};
-const onHomeClickHandler = () => {
-  // TODO: 홈 페이지 이동 로직
-};
-const onMyPageClickHandler = () => {
-  // TODO: 마이 페이지 이동 로직
-};
-const onLikeClickHandler = () => {
-  // TODO: 찜 페이지 이동 로직
-};
-const onOrderClickHandler = () => {
-  // TODO: 주문내역 페이지 이동 로직
-};
+import { useNavigate } from 'react-router-dom';
 
 interface GnbPropsInterface {
   icon: ReactElement;
@@ -24,36 +8,41 @@ interface GnbPropsInterface {
   label: string;
 }
 
-const gnbProps: GnbPropsInterface[] = [
-  {
-    icon: <Home />,
-    onClick: onHomeClickHandler,
-    label: '홈',
-  },
-  {
-    icon: <Search />,
-    onClick: onSearchClickHandler,
-    label: '검색',
-  },
-  {
-    icon: <Heart />,
-    onClick: onLikeClickHandler,
-    label: '찜',
-  },
-  {
-    icon: <Package />,
-    onClick: onOrderClickHandler,
-    label: '주문내역',
-  },
-  {
-    icon: <User />,
-    onClick: onMyPageClickHandler,
-    label: '마이',
-  },
-];
-
 function BottomNavbar() {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
+  const onSearchClickHandler = () => navigate('/search');
+  const onHomeClickHandler = () => navigate('/');
+  const onMyPageClickHandler = () => navigate('/my');
+  const onLikeClickHandler = () => navigate('/like');
+  const onOrderClickHandler = () => navigate('/order');
+
+  const gnbProps: GnbPropsInterface[] = [
+    {
+      icon: <Home />,
+      onClick: onHomeClickHandler,
+      label: '홈',
+    },
+    {
+      icon: <Search />,
+      onClick: onSearchClickHandler,
+      label: '검색',
+    },
+    {
+      icon: <Heart />,
+      onClick: onLikeClickHandler,
+      label: '찜',
+    },
+    {
+      icon: <Package />,
+      onClick: onOrderClickHandler,
+      label: '주문내역',
+    },
+    {
+      icon: <User />,
+      onClick: onMyPageClickHandler,
+      label: '마이',
+    },
+  ];
 
   return (
     <div className="border-t-1 rounded-t-lg border-t-gray-300 bg-gray-100 p-1.5">
