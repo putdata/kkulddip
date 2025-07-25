@@ -9,26 +9,34 @@ import {
 import { DiscountBadge } from './Badge';
 
 export interface Card1Props {
+  img: {
+    src: string;
+    alt: string;
+  };
+
   storeInfo: {
     name: string;
-    menu: string[];
+    menus: string[];
   };
+
   price: {
     original: number;
     discount: number;
   };
+
   pickupTime: {
     from: string;
     to: string;
   };
 }
 
-export const Card1 = ({ storeInfo, price, pickupTime }: Card1Props) => {
+export const Card1 = ({ img, storeInfo, price, pickupTime }: Card1Props) => {
   return (
     <Card className="w-72 overflow-hidden p-0">
       <CardContent className="flex flex-col p-0">
-        {/* 위쪽: 이미지 영역 */}
+        {/* 위쪽: 이미지 */}
         <div className="h-32 w-full bg-gray-200">
+          <img src={img.src} alt={img.alt} className="w-full" />
           <p className="p-4 text-sm text-gray-600">이미지 영역</p>
         </div>
 
@@ -41,7 +49,7 @@ export const Card1 = ({ storeInfo, price, pickupTime }: Card1Props) => {
 
           {/* 품목 */}
           <CardDescription className="mb-3 text-sm text-gray-500">
-            {storeInfo.menu.join(', ')}
+            {storeInfo.menus.join(', ')}
           </CardDescription>
 
           {/* 가격 | 픽업 시간 */}

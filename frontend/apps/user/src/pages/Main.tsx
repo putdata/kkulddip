@@ -33,8 +33,9 @@ export default function Main() {
           Decrement
         </button>
         <p className="text-center text-gray-600">
-          Edit <code className="rounded bg-gray-200 px-1">src/pages/Main.tsx</code> and
-          save to test HMR
+          Edit{' '}
+          <code className="rounded bg-gray-200 px-1">src/pages/Main.tsx</code>{' '}
+          and save to test HMR
         </p>
       </div>
 

@@ -18,9 +18,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   // 현재 Card1 컴포넌트는 props가 없으므로 args는 비어있음
   args: {
+    img: {
+      src: 'https://picsum.photos/id/237/200/300',
+      alt: '가게 이미지',
+    },
     storeInfo: {
       name: '아우어 베이커리 강남점',
-      menu: ['더티초코', '빨미까레'],
+      menus: ['더티초코', '빨미까레'],
     },
     price: {
       original: 15000,
