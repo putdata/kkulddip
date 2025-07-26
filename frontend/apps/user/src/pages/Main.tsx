@@ -1,9 +1,13 @@
 import reactLogo from '../assets/react.svg';
 import viteLogo from '/vite.svg';
-import { useCounter } from 'common';
+import { useErrorBoundary } from 'react-error-boundary';
+import { useCounter, ApiError } from 'common';
+import { useRegisterMutation } from '@/services/userService';
 
 export default function Main() {
   const { count, increment, decrement } = useCounter();
+  const { showBoundary } = useErrorBoundary();
+  const registerMutation = useRegisterMutation();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
@@ -27,14 +31,52 @@ export default function Main() {
           Increment
         </button>
         <button
+          onClick={() => {
+            showBoundary(
+              new Error(
+                'Event handler error - this will trigger error boundary!',
+              ),
+            );
+          }}
+          className="rounded-md bg-red-500 px-6 py-3 text-white transition hover:bg-red-600"
+        >
+          Test Error Boundary (Event)
+        </button>
+        <button
+          onClick={() => {
+            registerMutation.mutate(
+              { phoneNumber: '010-1234-5678' },
+              {
+                onError: error => {
+                  if (error instanceof ApiError) {
+                    console.log('API Error:', {
+                      message: error.message,
+                      response: error.response,
+                      axiosError: error.axiosError,
+                    });
+                    showBoundary(error);
+                  } else {
+                    console.log('Generic Error:', error);
+                  }
+                },
+              },
+            );
+          }}
+          disabled={registerMutation.isPending}
+          className="rounded-md bg-green-600 px-6 py-3 text-white transition hover:bg-green-700 disabled:opacity-50"
+        >
+          {registerMutation.isPending ? '등록 중...' : 'Test Register Mutation'}
+        </button>
+
+        <button
           onClick={decrement}
           className="rounded-md bg-red-600 px-6 py-3 text-white transition hover:bg-red-700"
         >
           Decrement
         </button>
         <p className="text-center text-gray-600">
-          Edit{' '}
-          <code className="rounded bg-gray-200 px-1">src/pages/Main.tsx</code>{' '}
+          Edit
+          <code className="rounded bg-gray-200 px-1">src/pages/Main.tsx</code>
           and save to test HMR
         </p>
       </div>
