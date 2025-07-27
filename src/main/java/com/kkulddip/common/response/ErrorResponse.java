@@ -2,6 +2,7 @@ package com.kkulddip.common.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kkulddip.common.exception.ErrorCode;
 
 import java.time.LocalDateTime;
 
@@ -22,5 +23,16 @@ public record ErrorResponse<T>(
     
     public static ErrorResponse<Void> of(String status, String code, String message) {
         return new ErrorResponse<>(false, status, code, message, LocalDateTime.now(), null);
+    }
+
+    public static ErrorResponse<Void> of(ErrorCode errorCode) {
+        return new ErrorResponse<>(
+                false,
+                errorCode.getStatus().name(),
+                errorCode.getCode(),
+                errorCode.getMessage(),
+                LocalDateTime.now(),
+                null
+        );
     }
 }
