@@ -31,9 +31,8 @@ public class GlobalExceptionHandler {
         
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponse<Void> response = ErrorResponse.of(
-                String.valueOf(errorCode.getStatus().value()),
-                errorCode.getCode(),
-                e.getMessage()
+            errorCode,
+            e.getMessage()
         );
         
         return ResponseEntity.status(errorCode.getStatus()).body(response);
@@ -47,18 +46,16 @@ public class GlobalExceptionHandler {
         log.warn("MethodArgumentNotValidException: {}", e.getMessage());
         
         List<ValidationError> errors = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> ValidationError.of(
-                        error.getField(),
-                        error.getDefaultMessage(),
-                        error.getRejectedValue()
-                ))
-                .toList();
+            .map(error -> ValidationError.of(
+                error.getField(),
+                error.getDefaultMessage(),
+                error.getRejectedValue()
+            ))
+            .toList();
         
         ErrorResponse<List<ValidationError>> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.BAD_REQUEST.value()),
-                ErrorCode.COMMON_INVALID_INPUT.getCode(),
-                "입력값이 올바르지 않습니다.",
-                errors
+            ErrorCode.COMMON_INVALID_INPUT,
+            errors
         );
         
         return ResponseEntity.badRequest().body(response);
@@ -72,18 +69,16 @@ public class GlobalExceptionHandler {
         log.warn("BindException: {}", e.getMessage());
         
         List<ValidationError> errors = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> ValidationError.of(
-                        error.getField(),
-                        error.getDefaultMessage(),
-                        error.getRejectedValue()
-                ))
-                .toList();
+            .map(error -> ValidationError.of(
+                error.getField(),
+                error.getDefaultMessage(),
+                error.getRejectedValue()
+            ))
+            .toList();
         
         ErrorResponse<List<ValidationError>> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.BAD_REQUEST.value()),
-                ErrorCode.COMMON_INVALID_INPUT.getCode(),
-                "입력값이 올바르지 않습니다.",
-                errors
+            ErrorCode.COMMON_INVALID_INPUT,
+            errors
         );
         
         return ResponseEntity.badRequest().body(response);
@@ -97,9 +92,8 @@ public class GlobalExceptionHandler {
         log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
         
         ErrorResponse<Void> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.BAD_REQUEST.value()),
-                ErrorCode.COMMON_INVALID_TYPE.getCode(),
-                e.getValue() + "의 타입이 올바르지 않습니다."
+            ErrorCode.COMMON_INVALID_TYPE,
+            e.getValue() + "의 타입이 올바르지 않습니다."
         );
         
         return ResponseEntity.badRequest().body(response);
@@ -113,9 +107,8 @@ public class GlobalExceptionHandler {
         log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
         
         ErrorResponse<Void> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.METHOD_NOT_ALLOWED.value()),
-                ErrorCode.COMMON_METHOD_NOT_ALLOWED.getCode(),
-                e.getMethod() + " 메서드는 지원하지 않습니다."
+            ErrorCode.COMMON_METHOD_NOT_ALLOWED,
+            e.getMethod() + " 메서드는 지원하지 않습니다."
         );
         
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
@@ -129,9 +122,8 @@ public class GlobalExceptionHandler {
         log.warn("HttpMessageNotReadableException: {}", e.getMessage());
         
         ErrorResponse<Void> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.BAD_REQUEST.value()),
-                ErrorCode.COMMON_INVALID_INPUT.getCode(),
-                "요청 본문을 읽을 수 없습니다."
+            ErrorCode.COMMON_INVALID_INPUT,
+            "요청 본문을 읽을 수 없습니다."
         );
         
         return ResponseEntity.badRequest().body(response);
@@ -144,11 +136,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse<Void>> handleNoResourceFoundException(NoResourceFoundException e) {
         log.warn("NoResourceFoundException: {}", e.getMessage());
         
-        ErrorResponse<Void> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.NOT_FOUND.value()),
-                ErrorCode.COMMON_NOT_FOUND.getCode(),
-                "요청한 리소스를 찾을 수 없습니다."
-        );
+        ErrorResponse<Void> response = ErrorResponse.of(ErrorCode.COMMON_NOT_FOUND);
         
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
@@ -160,11 +148,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse<Void>> handleException(Exception e) {
         log.error("Unexpected exception: ", e);
         
-        ErrorResponse<Void> response = ErrorResponse.of(
-                String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),
-                ErrorCode.COMMON_INTERNAL_SERVER_ERROR.getCode(),
-                "서버에 오류가 발생했습니다."
-        );
+        ErrorResponse<Void> response = ErrorResponse.of(ErrorCode.COMMON_INTERNAL_SERVER_ERROR);
         
         return ResponseEntity.internalServerError().body(response);
     }

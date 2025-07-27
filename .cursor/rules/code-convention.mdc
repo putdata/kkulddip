@@ -25,6 +25,7 @@ alwaysApply: true
 ### 인덴테이션
 - 인덴테이션은 스페이스바 사용 (not tabs)
 - 들여쓰기는 4개의 빈 칸 단위
+  - Continuation indent도 4칸으로 통일한다.
 - 뒤에 있는 whitespaces들은 제거
 
 ### 중괄호 스타일
