@@ -6,7 +6,7 @@ build-job:
   image: gradle:8.14.3-jdk21
   script:
     - chmod +x ./gradlew
-    - ./gradlew clean build
+    - ./gradlew clean build --refresh-dependencies --no-build-cache --rerun-tasks
   artifacts:
     paths:
       - build/libs/*.jar
