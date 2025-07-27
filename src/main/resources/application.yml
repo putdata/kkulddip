@@ -33,6 +33,11 @@ springdoc:
     default-consumes-media-type: application/json
     default-produces-media-type: application/json
 
+jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600}
+    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400}
+
 logging:
     level:
         web: INFO
