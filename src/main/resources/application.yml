@@ -23,6 +23,36 @@ spring:
                 dialect: org.hibernate.dialect.MySQLDialect
         open-in-view: false
 
+    security:
+        oauth2:
+            client:
+                registration:
+                    google-customer:
+                        provider: google
+                        client-id: ${GOOGLE_OAUTH2_CLIENT_ID}
+                        client-secret: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+                        scope:
+                            - email
+                            - profile
+                        redirect-uri: ${GOOGLE_OAUTH2_REDIRECT_URI}
+                        client-name: Google Customer Login
+                    google-owner:
+                        provider: google
+                        client-id: ${GOOGLE_OAUTH2_CLIENT_ID}
+                        client-secret: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+                        scope:
+                            - email
+                            - profile
+                        redirect-uri: ${GOOGLE_OAUTH2_REDIRECT_URI_OWNER}
+                        client-name: Google Owner Login
+                provider:
+                    google:
+                        authorization-uri: https://accounts.google.com/o/oauth2/auth
+                        token-uri: https://oauth2.googleapis.com/token
+                        user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+                        user-name-attribute: id
+
+
 springdoc:
     swagger-ui:
         path: /swagger-ui.html

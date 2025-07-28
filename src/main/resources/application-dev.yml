@@ -21,6 +21,29 @@ spring:
             hibernate:
                 format_sql: true
                 use_sql_comments: true
+    security:
+        oauth2:
+            client:
+                registration:
+                    google-customer:
+                        provider: google
+                        client-id: your-google-client-id
+                        client-secret: your-google-client-secret
+                        scope:
+                            - email
+                            - profile
+                        redirect-uri: http://localhost:8080/login/oauth2/code/google-customer
+                        client-name: Google Customer Login
+                    google-owner:
+                        provider: google
+                        client-id: your-google-client-id
+                        client-secret: your-google-client-secret
+                        scope:
+                            - email
+                            - profile
+                        redirect-uri: http://localhost:8080/login/oauth2/code/google-owner
+                        client-name: Google Owner Login
+
 
 jwt:
     secret-key: mySecretKeyForJwtTokenGenerationMustBe256BitsLongForHS256Algorithm
