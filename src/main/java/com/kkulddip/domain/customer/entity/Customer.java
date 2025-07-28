@@ -1,5 +1,6 @@
 package com.kkulddip.domain.customer.entity;
 
+import com.kkulddip.common.entity.User;
 import com.kkulddip.common.enums.OAuth2Provider;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +29,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Customer {
+public class Customer extends User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,8 +63,8 @@ public class Customer {
     @Column(name = "total_co2_saved")
     private Double totalCo2Saved;
 
-    @Column(name = "lasted_active_at")
-    private LocalDateTime lastedActiveAt;
+    @Column(name = "last_active_at")
+    private LocalDateTime lastActiveAt;
 
     @Column(name = "profile_image_url")
     private String profileImageUrl;
@@ -86,7 +87,7 @@ public class Customer {
     @Builder
     public Customer(String email, String name, String address,
                    Double latitude, Double longitude, Integer level, Integer totalOrder,
-                   Long totalMoneySaved, Double totalCo2Saved, LocalDateTime lastedActiveAt,
+                   Long totalMoneySaved, Double totalCo2Saved, LocalDateTime lastActiveAt,
                    String profileImageUrl, OAuth2Provider oauth2Provider, String oauth2ProviderId) {
         this.email = email;
         this.name = name;
@@ -97,7 +98,7 @@ public class Customer {
         this.totalOrder = totalOrder;
         this.totalMoneySaved = totalMoneySaved;
         this.totalCo2Saved = totalCo2Saved;
-        this.lastedActiveAt = lastedActiveAt;
+        this.lastActiveAt = lastActiveAt;
         this.profileImageUrl = profileImageUrl;
         this.oauth2Provider = oauth2Provider;
         this.oauth2ProviderId = oauth2ProviderId;

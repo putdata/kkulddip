@@ -1,5 +1,6 @@
 package com.kkulddip.domain.owner.entity;
 
+import com.kkulddip.common.entity.User;
 import com.kkulddip.common.enums.OAuth2Provider;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +29,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Owner {
+public class Owner extends User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +45,8 @@ public class Owner {
     @Column
     private String profileImageUrl;
 
-    @Column(name = "lasted_active_at")
-    private LocalDateTime lastedActiveAt;
+    @Column(name = "last_active_at")
+    private LocalDateTime lastActiveAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "oauth2_provider")
@@ -63,12 +64,12 @@ public class Owner {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Owner(String email, String name, String profileImageUrl, LocalDateTime lastedActiveAt,
+    public Owner(String email, String name, String profileImageUrl, LocalDateTime lastActiveAt,
                 OAuth2Provider oauth2Provider, String oauth2ProviderId) {
         this.email = email;
         this.name = name;
         this.profileImageUrl = profileImageUrl;
-        this.lastedActiveAt = lastedActiveAt;
+        this.lastActiveAt = lastActiveAt;
         this.oauth2Provider = oauth2Provider;
         this.oauth2ProviderId = oauth2ProviderId;
     }

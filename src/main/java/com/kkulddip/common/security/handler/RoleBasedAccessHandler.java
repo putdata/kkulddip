@@ -1,7 +1,10 @@
 package com.kkulddip.common.security.handler;
 
 import com.kkulddip.common.enums.UserRole;
+import com.kkulddip.common.exception.BusinessException;
+import com.kkulddip.common.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,7 +30,7 @@ public class RoleBasedAccessHandler {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
+            throw new BusinessException(ErrorCode.AUTH_UNAUTHENTICATED_USER);
         }
         
         return authentication.getAuthorities().stream()
@@ -36,7 +39,7 @@ public class RoleBasedAccessHandler {
             .map(role -> role.substring(5)) // "ROLE_" 제거
             .map(UserRole::valueOf)
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("유효하지 않은 사용자 역할입니다."));
+            .orElseThrow(() -> new BusinessException(ErrorCode.AUTH_INVALID_USER_ROLE));
     }
     
     /**
@@ -93,7 +96,7 @@ public class RoleBasedAccessHandler {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
+            throw new BusinessException(ErrorCode.AUTH_UNAUTHENTICATED_USER);
         }
         
         return authentication.getName();
@@ -110,7 +113,7 @@ public class RoleBasedAccessHandler {
         UserRole currentRole = getCurrentUserRole();
         
         if (currentRole != requiredRole) {
-            throw new SecurityException(
+            throw new AccessDeniedException(
                 String.format("접근 권한이 없습니다. 필요한 역할: %s, 현재 역할: %s", 
                     requiredRole.getDescription(), currentRole.getDescription())
             );
@@ -127,7 +130,7 @@ public class RoleBasedAccessHandler {
         UserRole currentRole = getCurrentUserRole();
         
         if (currentRole != UserRole.CUSTOMER && currentRole != UserRole.OWNER) {
-            throw new SecurityException("고객 또는 사장 권한이 필요합니다.");
+            throw new AccessDeniedException("고객 또는 사장 권한이 필요합니다.");
         }
     }
 }

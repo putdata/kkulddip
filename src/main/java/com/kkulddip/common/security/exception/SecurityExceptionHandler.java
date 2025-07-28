@@ -48,7 +48,7 @@ public class SecurityExceptionHandler {
         log.warn("AccessDeniedException: {}", e.getMessage());
         
         ErrorCode errorCode = ErrorCode.AUTH_ACCESS_DENIED;
-        ErrorResponse<Void> response = ErrorResponse.of(ErrorCode.AUTH_ACCESS_DENIED);
+        ErrorResponse<Void> response = ErrorResponse.of(errorCode);
         
         return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
