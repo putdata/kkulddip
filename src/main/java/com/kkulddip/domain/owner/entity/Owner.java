@@ -1,12 +1,10 @@
 package com.kkulddip.domain.owner.entity;
 
-import com.kkulddip.common.entity.User;
+import com.kkulddip.domain.user.entity.User;
 import com.kkulddip.common.enums.OAuth2Provider;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,24 +34,10 @@ public class Owner extends User {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column
-    private String name;
-
-    @Column
-    private String profileImageUrl;
 
     @Column(name = "last_active_at")
     private LocalDateTime lastActiveAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "oauth2_provider")
-    private OAuth2Provider oauth2Provider;
-
-    @Column(name = "oauth2_provider_id")
-    private String oauth2ProviderId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -69,11 +53,16 @@ public class Owner extends User {
         this.email = email;
         this.name = name;
         this.profileImageUrl = profileImageUrl;
-        this.lastActiveAt = lastActiveAt;
         this.oauth2Provider = oauth2Provider;
         this.oauth2ProviderId = oauth2ProviderId;
+        this.lastActiveAt = lastActiveAt;
     }
 
+    @Override
+    public Long getId() {
+        return ownerId;
+    }
+    
     public void updateName(String name) {
         this.name = name;
     }

@@ -2,6 +2,7 @@ package com.kkulddip.domain.customer.service;
 
 import com.kkulddip.domain.customer.entity.Customer;
 import com.kkulddip.domain.customer.repository.CustomerRepository;
+import com.kkulddip.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class CustomerService {
      * 고객 프로필 업데이트
      */
     public Customer updateProfile(Customer customer, String name, String profileImageUrl) {
+        User.validateProfileUpdate(name, profileImageUrl);
 
         customer.updateName(name);
         customer.updateProfileImageUrl(profileImageUrl);
