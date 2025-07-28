@@ -31,6 +31,11 @@ public class JwtUtil {
         @Value("${jwt.access-token-expiration}") long accessTokenExpiration,
         @Value("${jwt.refresh-token-expiration}") long refreshTokenExpiration
     ) {
+
+        if (secretKey == null || secretKey.getBytes().length < 32) {
+            throw new IllegalArgumentException("JWT secret key must be at least 256 bits (32 bytes)");
+        }
+
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
@@ -39,23 +44,27 @@ public class JwtUtil {
     /**
      * 액세스 토큰 생성
      *
-     * @param username 사용자명 (토큰의 subject로 사용)
-     * @param role 사용자 권한 (ADMIN, CUSTOMER, OWNER 중 하나)
+     * @param username 사용자명
+     * @param role 사용자 권한
+     * @param provider OAuth2 제공자 (null일 수 있음)
+     * @param providerId OAuth2 제공자 ID (null일 수 있음)
      * @return 생성된 액세스 토큰
      */
-    public String generateAccessToken(String username, String role) {
-        return generateToken(username, role, accessTokenExpiration);
+    public String generateAccessToken(String username, String role, String provider, String providerId) {
+        return generateToken(username, role, provider, providerId, accessTokenExpiration);
     }
 
     /**
      * 리프레시 토큰 생성
      *
-     * @param username 사용자명 (토큰의 subject로 사용)
-     * @param role 사용자 권한 (ADMIN, CUSTOMER, OWNER 중 하나)
+     * @param username 사용자명
+     * @param role 사용자 권한
+     * @param provider OAuth2 제공자 (null일 수 있음)
+     * @param providerId OAuth2 제공자 ID (null일 수 있음)
      * @return 생성된 리프레시 토큰
      */
-    public String generateRefreshToken(String username, String role) {
-        return generateToken(username, role, refreshTokenExpiration);
+    public String generateRefreshToken(String username, String role, String provider, String providerId) {
+        return generateToken(username, role, provider, providerId, refreshTokenExpiration);
     }
 
     /**
@@ -64,19 +73,28 @@ public class JwtUtil {
      * 
      * @param username 사용자명
      * @param role 사용자 권한
+     * @param provider OAuth2 제공자 (nullable)
+     * @param providerId OAuth2 제공자 ID (nullable)
      * @param expiration 토큰 만료 시간 (초 단위)
      * @return 생성된 JWT 토큰
      */
-    private String generateToken(String username, String role, long expiration) {
+    private String generateToken(String username, String role, String provider, String providerId, long expiration) {
         Instant now = Instant.now();
         
-        return Jwts.builder()
+        var builder = Jwts.builder()
             .subject(username)
             .claim("role", role)
             .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plus(expiration, ChronoUnit.SECONDS)))
-            .signWith(secretKey)
-            .compact();
+            .expiration(Date.from(now.plus(expiration, ChronoUnit.SECONDS)));
+            
+        if (provider != null) {
+            builder.claim("oauth2_provider", provider);
+        }
+        if (providerId != null) {
+            builder.claim("oauth2_provider_id", providerId);
+        }
+        
+        return builder.signWith(secretKey).compact();
     }
 
     /**
@@ -119,19 +137,26 @@ public class JwtUtil {
     public String extractRole(String token) {
         return validateToken(token).get("role", String.class);
     }
-
+    
     /**
-     * JWT 토큰 만료 여부 확인
-     * 토큰의 만료 시간을 현재 시간과 비교하여 만료 여부를 판단합니다.
+     * JWT 토큰에서 OAuth2 제공자 추출
+     * 토큰의 oauth2_provider 클레임에서 OAuth2 제공자를 반환합니다.
      * 
      * @param token JWT 토큰
-     * @return 만료된 경우 true, 유효한 경우 false
+     * @return OAuth2 제공자 (google, kakao 등), OAuth2가 아닌 경우 null
      */
-    public boolean isTokenExpired(String token) {
-        try {
-            return validateToken(token).getExpiration().before(new Date());
-        } catch (JwtException e) {
-            return true;
-        }
+    public String extractOAuth2Provider(String token) {
+        return validateToken(token).get("oauth2_provider", String.class);
+    }
+    
+    /**
+     * JWT 토큰에서 OAuth2 제공자 ID 추출
+     * 토큰의 oauth2_provider_id 클레임에서 OAuth2 제공자 ID를 반환합니다.
+     * 
+     * @param token JWT 토큰
+     * @return OAuth2 제공자 ID, OAuth2가 아닌 경우 null
+     */
+    public String extractOAuth2ProviderId(String token) {
+        return validateToken(token).get("oauth2_provider_id", String.class);
     }
 }

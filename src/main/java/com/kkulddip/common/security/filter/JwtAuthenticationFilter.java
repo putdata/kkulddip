@@ -14,6 +14,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -59,6 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String username = jwtUtil.extractUsername(token);
             String role = jwtUtil.extractRole(token);
+            String oauth2Provider = jwtUtil.extractOAuth2Provider(token);
+            String oauth2ProviderId = jwtUtil.extractOAuth2ProviderId(token);
 
             // 인증 정보 설정
             UsernamePasswordAuthenticationToken authentication =
@@ -66,9 +70,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             username, null,
                             Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
                     );
+            
+            // OAuth2 제공자 정보를 details에 추가
+            if (oauth2Provider != null) {
+                Map<String, Object> details = Map.of(
+                    "oauth2_provider", oauth2Provider,
+                    "oauth2_provider_id", oauth2ProviderId != null ? oauth2ProviderId : ""
+                );
+                authentication.setDetails(details);
+                log.debug("JWT OAuth2 authentication successful for user: {} from provider: {} (ID: {})", 
+                         username, oauth2Provider, oauth2ProviderId);
+            } else {
+                log.debug("JWT authentication successful for user: {}", username);
+            }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("JWT authentication successful for user: {}", username);
+
 
         } catch (ExpiredJwtException e) {
             errorHandler.handleExpiredToken(response, e.getMessage());

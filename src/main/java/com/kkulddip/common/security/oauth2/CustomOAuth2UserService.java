@@ -1,5 +1,6 @@
 package com.kkulddip.common.security.oauth2;
 
+import com.kkulddip.common.entity.User;
 import com.kkulddip.common.enums.OAuth2Provider;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.oauth2.exception.OAuth2AuthenticationException;
@@ -18,6 +19,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 /**
  * OAuth2 사용자 정보를 처리하는 커스텀 서비스
  * Google OAuth2 로그인 시 사용자 정보를 데이터베이스에 저장하거나 업데이트합니다.
@@ -28,9 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final CustomerRepository customerRepository;
-    private final CustomerService customerService;
     private final OwnerRepository ownerRepository;
-    private final OwnerService ownerService;
     private final OAuth2UserInfoFactory oauth2UserInfoFactory;
 
     /**
@@ -62,10 +64,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 );
             }
             
-            // 데이터베이스에 사용자 저장 또는 업데이트
-            Object user = saveOrUpdateUser(userInfo, registrationId);
+            // OAuth2 제공자 정보 추출 (google-customer -> google)
+            String provider = registrationId.contains("-") ? 
+                registrationId.substring(0, registrationId.indexOf("-")) : registrationId;
             
-            return OAuth2UserPrincipal.create(user, oauth2User.getAttributes());
+            // 데이터베이스에 사용자 저장 또는 업데이트
+            User user = saveOrUpdateUser(userInfo, registrationId, provider);
+            
+            return OAuth2UserPrincipal.create(user, oauth2User.getAttributes(), provider);
             
         } catch (Exception ex) {
             log.error("OAuth2 사용자 로드 실패 - RegistrationId: {}", 
@@ -82,160 +88,126 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      *
      * @param userInfo OAuth2 사용자 정보
      * @param registrationId OAuth2 제공자 등록 ID
+     * @param provider OAuth2 제공자 (google, kakao 등)
      * @return 저장된 사용자 엔티티 (Customer 또는 Owner)
      */
-    private Object saveOrUpdateUser(OAuth2UserInfo userInfo, String registrationId) {
-        try {
-            if (registrationId.contains("-customer")) {
-                return handleCustomerLogin(userInfo, registrationId);
-            } else if (registrationId.contains("-owner")) {
-                return handleOwnerLogin(userInfo, registrationId);
-            } else {
-                // 기본값 설정
-                log.info("Registration ID에 사용자 타입이 명시되지 않아 기본값 사용: customer");
-                
-                if (true) { // 기본값은 customer
-                    return handleCustomerLogin(userInfo, registrationId);
-                } else {
-                    return handleOwnerLogin(userInfo, registrationId);
-                }
-            }
-        } catch (Exception ex) {
-            log.error("OAuth2 사용자 저장/업데이트 실패 - Email: {}, RegistrationId: {}", 
-                     userInfo.getEmail(), registrationId, ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_CREATION_FAILED
-            );
+    private User saveOrUpdateUser(OAuth2UserInfo userInfo, String registrationId, String provider) {
+        if (registrationId.contains("-customer")) {
+            return handleCustomerLogin(userInfo, provider);
+        } else if (registrationId.contains("-owner")) {
+            return handleOwnerLogin(userInfo, provider);
+        } else {
+            return handleCustomerLogin(userInfo, provider);
         }
+    }
+
+    /**
+     * 공통 OAuth2 로그인 처리
+     * 
+     * @param userInfo OAuth2 사용자 정보
+     * @param providerString OAuth2 제공자 문자열
+     * @param findByProviderAndId 기존 사용자 검색 함수
+     * @param updateUser 기존 사용자 업데이트 함수
+     * @param createUser 새 사용자 생성 함수
+     * @return 처리된 사용자 객체
+     */
+    private <T> T handleOAuth2Login(
+            OAuth2UserInfo userInfo, 
+            String providerString,
+            Function<OAuth2Provider, Optional<T>> findByProviderAndId,
+            Function<T, T> updateUser,
+            Function<OAuth2Provider, T> createUser) {
+        
+        OAuth2Provider provider = OAuth2Provider.fromRegistrationId(providerString);
+        
+        return findByProviderAndId.apply(provider)
+            .map(updateUser)
+            .orElseGet(() -> createUser.apply(provider));
     }
 
     /**
      * Customer 로그인 처리
      */
-    private Customer handleCustomerLogin(OAuth2UserInfo userInfo, String registrationId) {
-        try {
-            OAuth2Provider provider = OAuth2Provider.fromRegistrationId(
-                registrationId.replace("-customer", ""));
-            
-            return customerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId())
-                .map(existingCustomer -> updateExistingCustomer(existingCustomer, userInfo))
-                .orElseGet(() -> createNewCustomer(userInfo, provider));
-                
-        } catch (Exception ex) {
-            log.error("Customer 로그인 처리 실패 - Email: {}, RegistrationId: {}", 
-                     userInfo.getEmail(), registrationId, ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_CREATION_FAILED
-            );
-        }
+    private Customer handleCustomerLogin(OAuth2UserInfo userInfo, String providerString) {
+        return handleOAuth2Login(
+            userInfo,
+            providerString,
+            provider -> customerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId()),
+            existingCustomer -> updateExistingCustomer(existingCustomer, userInfo),
+            provider -> createNewCustomer(userInfo, provider)
+        );
     }
 
     /**
      * Owner 로그인 처리
      */
-    private Owner handleOwnerLogin(OAuth2UserInfo userInfo, String registrationId) {
-        try {
-            OAuth2Provider provider = OAuth2Provider.fromRegistrationId(
-                registrationId.replace("-owner", ""));
-            
-            return ownerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId())
-                .map(existingOwner -> updateExistingOwner(existingOwner, userInfo))
-                .orElseGet(() -> createNewOwner(userInfo, provider));
-                
-        } catch (Exception ex) {
-            log.error("Owner 로그인 처리 실패 - Email: {}, RegistrationId: {}", 
-                     userInfo.getEmail(), registrationId, ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_CREATION_FAILED
-            );
-        }
+    private Owner handleOwnerLogin(OAuth2UserInfo userInfo, String providerString) {
+        return handleOAuth2Login(
+            userInfo,
+            providerString,
+            provider -> ownerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId()),
+            existingOwner -> updateExistingOwner(existingOwner, userInfo),
+            provider -> createNewOwner(userInfo, provider)
+        );
     }
 
     /**
      * 기존 Customer 정보 업데이트
      */
     private Customer updateExistingCustomer(Customer customer, OAuth2UserInfo userInfo) {
-        try {
-            return customerService.updateProfile(customer, userInfo.getName(), userInfo.getImageUrl());
-        } catch (Exception ex) {
-            log.error("Customer 업데이트 실패 - Customer ID: {}, Email: {}", 
-                     customer.getCustomerId(), customer.getEmail(), ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_UPDATE_FAILED
-            );
-        }
+        customer.updateName(userInfo.getName());
+        customer.updateProfileImageUrl(userInfo.getImageUrl());
+        log.info("Customer 정보 업데이트 - ID: {}, Email: {}", 
+                 customer.getCustomerId(), customer.getEmail());
+        return customer;
     }
 
     /**
      * 기존 Owner 정보 업데이트
      */
     private Owner updateExistingOwner(Owner owner, OAuth2UserInfo userInfo) {
-        try {
-            return ownerService.updateProfile(owner, userInfo.getName(), userInfo.getImageUrl());
-        } catch (Exception ex) {
-            log.error("Owner 업데이트 실패 - Owner ID: {}, Email: {}", 
-                     owner.getOwnerId(), owner.getEmail(), ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_UPDATE_FAILED
-            );
-        }
+        owner.updateName(userInfo.getName());
+        owner.updateProfileImageUrl(userInfo.getImageUrl());
+        log.info("Owner 정보 업데이트 - ID: {}, Email: {}", 
+                 owner.getOwnerId(), owner.getEmail());
+        return owner;
     }
 
     /**
-     * 새로운 Customer 생성 (기본값)
+     * 새로운 Customer 생성
      */
     private Customer createNewCustomer(OAuth2UserInfo userInfo, OAuth2Provider provider) {
-        try {
-            Customer newCustomer = Customer.builder()
-                .email(userInfo.getEmail())
-                .name(userInfo.getName())
-                .profileImageUrl(userInfo.getImageUrl())
-                .oauth2Provider(provider)
-                .oauth2ProviderId(userInfo.getId())
-                .build();
-            
-            Customer savedCustomer = customerRepository.save(newCustomer);
-            
-            log.info("새로운 Customer가 생성되었습니다. ID: {}, 이메일: {}", 
-                     savedCustomer.getCustomerId(), savedCustomer.getEmail());
-            
-            return savedCustomer;
-            
-        } catch (Exception ex) {
-            log.error("Customer 생성 실패 - Email: {}, Provider: {}", 
-                     userInfo.getEmail(), provider, ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_CREATION_FAILED
-            );
-        }
+        Customer newCustomer = Customer.builder()
+            .email(userInfo.getEmail())
+            .name(userInfo.getName())
+            .profileImageUrl(userInfo.getImageUrl())
+            .oauth2Provider(provider)
+            .oauth2ProviderId(userInfo.getId())
+            .build();
+        
+        Customer savedCustomer = customerRepository.save(newCustomer);
+        log.info("새로운 Customer 생성 - ID: {}, Email: {}", 
+                 savedCustomer.getCustomerId(), savedCustomer.getEmail());
+        
+        return savedCustomer;
     }
 
     /**
      * 새로운 Owner 생성
      */
     private Owner createNewOwner(OAuth2UserInfo userInfo, OAuth2Provider provider) {
-        try {
-            Owner newOwner = Owner.builder()
-                .email(userInfo.getEmail())
-                .name(userInfo.getName())
-                .profileImageUrl(userInfo.getImageUrl())
-                .oauth2Provider(provider)
-                .oauth2ProviderId(userInfo.getId())
-                .build();
-            
-            Owner savedOwner = ownerRepository.save(newOwner);
-            
-            log.info("새로운 Owner가 생성되었습니다. ID: {}, 이메일: {}", 
-                     savedOwner.getOwnerId(), savedOwner.getEmail());
-            
-            return savedOwner;
-            
-        } catch (Exception ex) {
-            log.error("Owner 생성 실패 - Email: {}, Provider: {}", 
-                     userInfo.getEmail(), provider, ex);
-            throw new OAuth2AuthenticationException(
-                ErrorCode.AUTH_OAUTH2_USER_CREATION_FAILED
-            );
-        }
+        Owner newOwner = Owner.builder()
+            .email(userInfo.getEmail())
+            .name(userInfo.getName())
+            .profileImageUrl(userInfo.getImageUrl())
+            .oauth2Provider(provider)
+            .oauth2ProviderId(userInfo.getId())
+            .build();
+        
+        Owner savedOwner = ownerRepository.save(newOwner);
+        log.info("새로운 Owner 생성 - ID: {}, Email: {}", 
+                 savedOwner.getOwnerId(), savedOwner.getEmail());
+        
+        return savedOwner;
     }
 }

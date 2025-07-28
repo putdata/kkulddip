@@ -21,8 +21,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OAuth2UserPrincipal implements OAuth2User {
     
-    private final Object user; // Customer 또는 Owner
+    private final Object user;
     private final Map<String, Object> attributes;
+    private final String provider;
     
     @Override
     public String getName() {
@@ -50,6 +51,18 @@ public class OAuth2UserPrincipal implements OAuth2User {
             return ((Customer) user).getCustomerId();
         } else if (user instanceof Owner) {
             return ((Owner) user).getOwnerId();
+        }
+        throw new IllegalStateException("Unknown user type");
+    }
+    
+    /**
+     * OAuth2 제공자 ID 반환
+     */
+    public String getProviderId() {
+        if (user instanceof Customer) {
+            return ((Customer) user).getOauth2ProviderId();
+        } else if (user instanceof Owner) {
+            return ((Owner) user).getOauth2ProviderId();
         }
         throw new IllegalStateException("Unknown user type");
     }
@@ -110,11 +123,11 @@ public class OAuth2UserPrincipal implements OAuth2User {
     public boolean isOwner() {
         return user instanceof Owner;
     }
-    
+
     /**
      * OAuth2UserPrincipal 생성
      */
-    public static OAuth2UserPrincipal create(Object user, Map<String, Object> attributes) {
-        return new OAuth2UserPrincipal(user, attributes);
+    public static OAuth2UserPrincipal create(Object user, Map<String, Object> attributes, String provider) {
+        return new OAuth2UserPrincipal(user, attributes, provider);
     }
 }

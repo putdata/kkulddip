@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -45,12 +44,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String email = userPrincipal.getEmail();
         String role = userPrincipal.getRole();
+        String provider = userPrincipal.getProvider();
+        String providerId = userPrincipal.getProviderId();
 
         // JWT 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(email, role);
-        String refreshToken = jwtUtil.generateRefreshToken(email, role);
+        String accessToken = jwtUtil.generateAccessToken(email, role, provider, providerId);
+        String refreshToken = jwtUtil.generateRefreshToken(email, role, provider, providerId);
 
-        log.info("OAuth2 로그인 성공 - 사용자: {}, 역할: {}", email, role);
+        log.info("OAuth2 로그인 성공 - 사용자: {}, 역할: {}, 제공자: {}, 제공자ID: {}", email, role, provider, providerId);
 
         // 프론트엔드로 리다이렉트 (토큰을 쿼리 파라미터로 전달)
         String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/login-success")
