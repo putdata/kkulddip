@@ -1,11 +1,20 @@
 package com.kkulddip.common.security.oauth2;
 
+import com.kkulddip.common.enums.OAuth2Provider;
+import com.kkulddip.common.security.oauth2.exception.OAuth2UserInfoException;
+import com.kkulddip.common.security.oauth2.exception.UnsupportedOAuth2ProviderException;
+import com.kkulddip.common.exception.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 /**
  * OAuth2 사용자 정보 팩토리
  * OAuth2 제공자에 따라 적절한 사용자 정보 객체를 생성합니다.
  */
+@Slf4j
+@Component
 public class OAuth2UserInfoFactory {
 
     /**
@@ -16,51 +25,74 @@ public class OAuth2UserInfoFactory {
      * @return OAuth2UserInfo 구현체
      * @throws IllegalArgumentException 지원하지 않는 제공자인 경우
      */
-    public static OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {
-        // registrationId에서 실제 provider 추출
-        String provider = extractProvider(registrationId);
+    public OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {
+        try {
+            // registrationId에서 실제 provider 추출
+            OAuth2Provider provider = extractProvider(registrationId);
+            
+            log.debug("OAuth2 사용자 정보 생성 - Provider: {}, RegistrationId: {}", provider, registrationId);
 
-        switch (provider.toLowerCase()) {
-            case "google":
-                return new GoogleOAuth2UserInfo(attributes);
-            case "kakao":
-                // TODO: 향후 카카오 지원 시 구현
-                throw new IllegalArgumentException("카카오 OAuth2는 아직 지원하지 않습니다: " + registrationId);
-            case "naver":
-                // TODO: 향후 네이버 지원 시 구현
-                throw new IllegalArgumentException("네이버 OAuth2는 아직 지원하지 않습니다: " + registrationId);
-            default:
-                throw new IllegalArgumentException("지원하지 않는 OAuth2 제공자입니다: " + registrationId);
+            switch (provider) {
+                case GOOGLE:
+                    return createGoogleUserInfo(attributes);
+                case KAKAO:
+                    throw new UnsupportedOAuth2ProviderException(
+                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
+                    );
+                case NAVER:
+                    throw new UnsupportedOAuth2ProviderException(
+                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
+                    );
+                default:
+                    throw new UnsupportedOAuth2ProviderException(
+                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
+                    );
+            }
+        } catch (Exception ex) {
+            log.error("OAuth2 사용자 정보 생성 실패 - RegistrationId: {}", registrationId, ex);
+            if (ex instanceof UnsupportedOAuth2ProviderException) {
+                throw ex;
+            }
+            throw new OAuth2UserInfoException(
+                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
+            );
         }
+    }
+    
+    /**
+     * Google OAuth2 사용자 정보 생성
+     */
+    private OAuth2UserInfo createGoogleUserInfo(Map<String, Object> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
+            throw new OAuth2UserInfoException(
+                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
+            );
+        }
+        return new GoogleOAuth2UserInfo(attributes);
     }
 
     /**
-     * registrationId에서 실제 provider 이름을 추출합니다.
+     * registrationId에서 실제 provider를 추출합니다.
      *
      * @param registrationId 등록 ID (예: google-customer, google-owner)
-     * @return provider 이름 (예: google)
+     * @return OAuth2Provider enum
      */
-    private static String extractProvider(String registrationId) {
+    private OAuth2Provider extractProvider(String registrationId) {
         if (registrationId == null) {
-            return registrationId;
+            throw new OAuth2UserInfoException(
+                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
+            );
         }
 
-        // google-customer, google-owner -> google
-        if (registrationId.startsWith("google")) {
-            return "google";
+        // OAuth2Provider enum에서 직접 매칭 확인
+        for (OAuth2Provider provider : OAuth2Provider.values()) {
+            if (registrationId.toLowerCase().startsWith(provider.getRegistrationId().toLowerCase())) {
+                return provider;
+            }
         }
 
-        // kakao-customer, kakao-owner -> kakao (향후 지원)
-        if (registrationId.startsWith("kakao")) {
-            return "kakao";
-        }
-
-        // naver-customer, naver-owner -> naver (향후 지원)
-        if (registrationId.startsWith("naver")) {
-            return "naver";
-        }
-
-        // 기타 경우 그대로 반환
-        return registrationId;
+        throw new UnsupportedOAuth2ProviderException(
+            ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
+        );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,32 +39,32 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
      */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                      Authentication authentication) throws IOException {
-        
+                                        Authentication authentication) throws IOException {
+
         OAuth2UserPrincipal userPrincipal = (OAuth2UserPrincipal) authentication.getPrincipal();
-        
+
         String email = userPrincipal.getEmail();
         String role = userPrincipal.getRole();
-        
+
         // JWT 토큰 생성
         String accessToken = jwtUtil.generateAccessToken(email, role);
         String refreshToken = jwtUtil.generateRefreshToken(email, role);
-        
+
         log.info("OAuth2 로그인 성공 - 사용자: {}, 역할: {}", email, role);
-        
-        // JSON 응답 생성
-        Map<String, Object> tokenResponse = new HashMap<>();
-        tokenResponse.put("success", true);
-        tokenResponse.put("message", "OAuth2 로그인 성공");
-        tokenResponse.put("data", createTokenData(accessToken, refreshToken, userPrincipal));
-        
-        // 응답 설정
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        
-        // JSON 응답 작성
-        response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
+
+        // 프론트엔드로 리다이렉트 (토큰을 쿼리 파라미터로 전달)
+        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/login-success")
+                .queryParam("accessToken", accessToken)
+                .queryParam("refreshToken", refreshToken)
+                .queryParam("tokenType", "Bearer")
+                .queryParam("expiresIn", 3600)
+                .queryParam("userId", userPrincipal.getUserId())
+                .queryParam("email", userPrincipal.getEmail())
+                .queryParam("name", userPrincipal.getUserName())
+                .queryParam("role", userPrincipal.getRole())
+                .build().toUriString();
+
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
     
     /**

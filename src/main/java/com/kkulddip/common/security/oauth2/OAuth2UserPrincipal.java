@@ -47,9 +47,9 @@ public class OAuth2UserPrincipal implements OAuth2User {
      */
     public Long getUserId() {
         if (user instanceof Customer) {
-            return ((Customer) user).getId();
+            return ((Customer) user).getCustomerId();
         } else if (user instanceof Owner) {
-            return ((Owner) user).getId();
+            return ((Owner) user).getOwnerId();
         }
         throw new IllegalStateException("Unknown user type");
     }
@@ -109,5 +109,12 @@ public class OAuth2UserPrincipal implements OAuth2User {
      */
     public boolean isOwner() {
         return user instanceof Owner;
+    }
+    
+    /**
+     * OAuth2UserPrincipal 생성
+     */
+    public static OAuth2UserPrincipal create(Object user, Map<String, Object> attributes) {
+        return new OAuth2UserPrincipal(user, attributes);
     }
 }
