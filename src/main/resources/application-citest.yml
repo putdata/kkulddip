@@ -24,3 +24,39 @@ spring:
                 format_sql: true
                 highlight_sql: true
                 use_sql_comments: true
+                dialect: org.hibernate.dialect.H2Dialect
+        open-in-view: false
+
+    security:
+        oauth2:
+            client:
+                registration:
+                    google-customer:
+                        provider: google
+                        client-id: ci-test-client-id
+                        client-secret: ci-test-client-secret
+                        scope:
+                            - email
+                            - profile
+                        redirect-uri: http://localhost:8080/login/oauth2/code/google
+                        client-name: Google Customer Login
+                    google-owner:
+                        provider: google
+                        client-id: ci-test-client-id
+                        client-secret: ci-test-client-secret
+                        scope:
+                            - email
+                            - profile
+                        redirect-uri: http://localhost:8080/login/oauth2/code/google-owner
+                        client-name: Google Owner Login
+                provider:
+                    google:
+                        authorization-uri: https://accounts.google.com/o/oauth2/auth
+                        token-uri: https://oauth2.googleapis.com/token
+                        user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+                        user-name-attribute: id
+
+jwt:
+    secret-key: ci-test-secret-key-for-jwt-token-signing-minimum-256-bits-required-for-hmac-sha256-algorithm
+    access-token-expiration: 3600
+    refresh-token-expiration: 86400
