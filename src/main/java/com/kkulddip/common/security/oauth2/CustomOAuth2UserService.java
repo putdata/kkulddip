@@ -18,11 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * OAuth2 사용자 정보를 처리하는 커스텀 서비스
- * Google OAuth2 로그인 시 사용자 정보를 데이터베이스에 저장하거나 업데이트합니다.
+ * Google OAuth2 로그인 시 사용자 정보를 데이터베이스에 처리합니다.
+ * 로그인과 회원가입을 명확히 구분하여 처리합니다.
  */
 @Slf4j
 @Service
@@ -56,18 +56,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 registrationId, oauth2User.getAttributes());
             
             // 이메일 검증
-            if (userInfo.getEmail() == null || userInfo.getEmail().isEmpty()) {
-                throw new OAuth2AuthenticationException(
-                    ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
-                );
-            }
+            validateUserInfo(userInfo);
             
             // OAuth2 제공자 정보 추출 (google-customer -> google)
-            String provider = registrationId.contains("-") ? 
-                registrationId.substring(0, registrationId.indexOf("-")) : registrationId;
+            String provider = extractProvider(registrationId);
             
-            // 데이터베이스에 사용자 저장 또는 업데이트
-            User user = saveOrUpdateUser(userInfo, registrationId, provider);
+            // 사용자 타입 결정 및 처리
+            User user = processUserAuthentication(userInfo, registrationId, provider);
             
             return OAuth2UserPrincipal.create(user, oauth2User.getAttributes(), provider);
             
@@ -82,99 +77,92 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     /**
-     * 사용자 정보를 데이터베이스에 저장하거나 업데이트
-     *
-     * @param userInfo OAuth2 사용자 정보
-     * @param registrationId OAuth2 제공자 등록 ID
-     * @param provider OAuth2 제공자 (google, kakao 등)
-     * @return 저장된 사용자 엔티티 (Customer 또는 Owner)
+     * 사용자 정보 검증
      */
-    private User saveOrUpdateUser(OAuth2UserInfo userInfo, String registrationId, String provider) {
-        if (registrationId.contains("-customer")) {
-            return handleCustomerLogin(userInfo, provider);
-        } else if (registrationId.contains("-owner")) {
-            return handleOwnerLogin(userInfo, provider);
-        } else {
-            return handleCustomerLogin(userInfo, provider);
+    private void validateUserInfo(OAuth2UserInfo userInfo) {
+        if (userInfo.getEmail() == null || userInfo.getEmail().isEmpty()) {
+            throw new OAuth2AuthenticationException(ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED);
         }
     }
 
     /**
-     * 공통 OAuth2 로그인 처리
-     * 
-     * @param userInfo OAuth2 사용자 정보
-     * @param providerString OAuth2 제공자 문자열
-     * @param findByProviderAndId 기존 사용자 검색 함수
-     * @param updateUser 기존 사용자 업데이트 함수
-     * @param createUser 새 사용자 생성 함수
-     * @return 처리된 사용자 객체
+     * OAuth2 제공자 추출
      */
-    private <T> T handleOAuth2Login(
-            OAuth2UserInfo userInfo, 
-            String providerString,
-            Function<OAuth2Provider, Optional<T>> findByProviderAndId,
-            Function<T, T> updateUser,
-            Function<OAuth2Provider, T> createUser) {
+    private String extractProvider(String registrationId) {
+        return registrationId.contains("-") ? 
+            registrationId.substring(0, registrationId.indexOf("-")) : registrationId;
+    }
+
+    /**
+     * 사용자 인증 처리 - 로그인과 회원가입을 구분하여 처리
+     */
+    private User processUserAuthentication(OAuth2UserInfo userInfo, String registrationId, String provider) {
+        OAuth2Provider oauth2Provider = OAuth2Provider.fromRegistrationId(provider);
         
-        OAuth2Provider provider = OAuth2Provider.fromRegistrationId(providerString);
+        if (isCustomerRegistration(registrationId)) {
+            return processCustomerAuthentication(userInfo, oauth2Provider);
+        } else if (isOwnerRegistration(registrationId)) {
+            return processOwnerAuthentication(userInfo, oauth2Provider);
+        } else {
+            // 기본값은 Customer로 처리
+            return processCustomerAuthentication(userInfo, oauth2Provider);
+        }
+    }
+
+    /**
+     * Customer 인증 처리
+     */
+    private Customer processCustomerAuthentication(OAuth2UserInfo userInfo, OAuth2Provider provider) {
+        Optional<Customer> existingCustomer = customerRepository
+            .findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId());
         
-        return findByProviderAndId.apply(provider)
-            .map(updateUser)
-            .orElseGet(() -> createUser.apply(provider));
+        if (existingCustomer.isPresent()) {
+            return loginExistingCustomer(existingCustomer.get());
+        } else {
+            return registerNewCustomer(userInfo, provider);
+        }
     }
 
     /**
-     * Customer 로그인 처리
+     * Owner 인증 처리
      */
-    private Customer handleCustomerLogin(OAuth2UserInfo userInfo, String providerString) {
-        return handleOAuth2Login(
-            userInfo,
-            providerString,
-            provider -> customerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId()),
-            existingCustomer -> updateExistingCustomer(existingCustomer, userInfo),
-            provider -> createNewCustomer(userInfo, provider)
-        );
+    private Owner processOwnerAuthentication(OAuth2UserInfo userInfo, OAuth2Provider provider) {
+        Optional<Owner> existingOwner = ownerRepository
+            .findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId());
+        
+        if (existingOwner.isPresent()) {
+            return loginExistingOwner(existingOwner.get());
+        } else {
+            return registerNewOwner(userInfo, provider);
+        }
     }
 
     /**
-     * Owner 로그인 처리
+     * 기존 Customer 로그인 처리
      */
-    private Owner handleOwnerLogin(OAuth2UserInfo userInfo, String providerString) {
-        return handleOAuth2Login(
-            userInfo,
-            providerString,
-            provider -> ownerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.getId()),
-            existingOwner -> updateExistingOwner(existingOwner, userInfo),
-            provider -> createNewOwner(userInfo, provider)
-        );
-    }
-
-    /**
-     * 기존 Customer 정보 업데이트
-     */
-    private Customer updateExistingCustomer(Customer customer, OAuth2UserInfo userInfo) {
-        customer.updateName(userInfo.getName());
-        customer.updateProfileImageUrl(userInfo.getImageUrl());
-        log.info("Customer 정보 업데이트 - ID: {}, Email: {}", 
+    private Customer loginExistingCustomer(Customer customer) {
+        log.info("기존 Customer 로그인 - ID: {}, Email: {}", 
                  customer.getCustomerId(), customer.getEmail());
+        
         return customer;
     }
 
     /**
-     * 기존 Owner 정보 업데이트
+     * 기존 Owner 로그인 처리
      */
-    private Owner updateExistingOwner(Owner owner, OAuth2UserInfo userInfo) {
-        owner.updateName(userInfo.getName());
-        owner.updateProfileImageUrl(userInfo.getImageUrl());
-        log.info("Owner 정보 업데이트 - ID: {}, Email: {}", 
+    private Owner loginExistingOwner(Owner owner) {
+        log.info("기존 Owner 로그인 - ID: {}, Email: {}", 
                  owner.getOwnerId(), owner.getEmail());
+        
         return owner;
     }
 
     /**
-     * 새로운 Customer 생성
+     * 새로운 Customer 회원가입 처리
      */
-    private Customer createNewCustomer(OAuth2UserInfo userInfo, OAuth2Provider provider) {
+    private Customer registerNewCustomer(OAuth2UserInfo userInfo, OAuth2Provider provider) {
+        log.info("새로운 Customer 회원가입 시작 - Email: {}", userInfo.getEmail());
+        
         Customer newCustomer = Customer.builder()
             .email(userInfo.getEmail())
             .name(userInfo.getName())
@@ -184,16 +172,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             .build();
         
         Customer savedCustomer = customerRepository.save(newCustomer);
-        log.info("새로운 Customer 생성 - ID: {}, Email: {}", 
+        
+        log.info("새로운 Customer 회원가입 완료 - ID: {}, Email: {}", 
                  savedCustomer.getCustomerId(), savedCustomer.getEmail());
         
         return savedCustomer;
     }
 
     /**
-     * 새로운 Owner 생성
+     * 새로운 Owner 회원가입 처리
      */
-    private Owner createNewOwner(OAuth2UserInfo userInfo, OAuth2Provider provider) {
+    private Owner registerNewOwner(OAuth2UserInfo userInfo, OAuth2Provider provider) {
+        log.info("새로운 Owner 회원가입 시작 - Email: {}", userInfo.getEmail());
+        
         Owner newOwner = Owner.builder()
             .email(userInfo.getEmail())
             .name(userInfo.getName())
@@ -203,9 +194,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             .build();
         
         Owner savedOwner = ownerRepository.save(newOwner);
-        log.info("새로운 Owner 생성 - ID: {}, Email: {}", 
+        
+        log.info("새로운 Owner 회원가입 완료 - ID: {}, Email: {}", 
                  savedOwner.getOwnerId(), savedOwner.getEmail());
         
         return savedOwner;
+    }
+
+    /**
+     * Customer 등록인지 확인
+     */
+    private boolean isCustomerRegistration(String registrationId) {
+        return registrationId.contains("-customer");
+    }
+
+    /**
+     * Owner 등록인지 확인
+     */
+    private boolean isOwnerRegistration(String registrationId) {
+        return registrationId.contains("-owner");
     }
 }

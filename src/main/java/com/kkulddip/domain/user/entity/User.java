@@ -58,4 +58,38 @@ public abstract class User {
             throw new IllegalArgumentException("프로필 이미지 URL은 500자를 초과할 수 없습니다.");
         }
     }
+
+    /**
+     * OAuth2 프로필 정보 업데이트 공통 로직
+     * @param newName 새로운 이름
+     * @param newProfileImageUrl 새로운 프로필 이미지 URL
+     * @return 업데이트 여부
+     */
+    public boolean updateOAuth2Profile(String newName, String newProfileImageUrl) {
+        boolean updated = false;
+        
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            updated = true;
+        }
+        
+        if (newProfileImageUrl != null && !newProfileImageUrl.equals(this.profileImageUrl)) {
+            this.profileImageUrl = newProfileImageUrl;
+            updated = true;
+        }
+        
+        return updated;
+    }
+
+    /**
+     * 프로필 업데이트 (검증 포함)
+     * @param newName 새로운 이름
+     * @param newProfileImageUrl 새로운 프로필 이미지 URL
+     */
+    public void updateProfile(String newName, String newProfileImageUrl) {
+        validateProfileUpdate(newName, newProfileImageUrl);
+        
+        this.name = newName;
+        this.profileImageUrl = newProfileImageUrl;
+    }
 }

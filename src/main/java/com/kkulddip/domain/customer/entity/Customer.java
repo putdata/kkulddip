@@ -98,12 +98,4 @@ public class Customer extends User {
     public Long getId() {
         return customerId;
     }
-    
-    public void updateName(String name) {
-        this.name = name;
-    }
-
-    public void updateProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
 }

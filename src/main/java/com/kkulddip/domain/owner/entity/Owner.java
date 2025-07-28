@@ -62,13 +62,5 @@ public class Owner extends User {
     public Long getId() {
         return ownerId;
     }
-    
-    public void updateName(String name) {
-        this.name = name;
-    }
-
-    public void updateProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
 
 }
