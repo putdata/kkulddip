@@ -1,16 +1,14 @@
 package com.kkulddip.common.security.oauth2;
 
-import com.kkulddip.common.entity.User;
+import com.kkulddip.domain.user.entity.User;
 import com.kkulddip.common.enums.OAuth2Provider;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.oauth2.exception.OAuth2AuthenticationException;
 
 import com.kkulddip.domain.customer.entity.Customer;
 import com.kkulddip.domain.customer.repository.CustomerRepository;
-import com.kkulddip.domain.customer.service.CustomerService;
 import com.kkulddip.domain.owner.entity.Owner;
 import com.kkulddip.domain.owner.repository.OwnerRepository;
-import com.kkulddip.domain.owner.service.OwnerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

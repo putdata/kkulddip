@@ -71,6 +71,11 @@ jwt:
     access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600}
     refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400}
 
+app:
+    oauth2:
+        success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL:http://localhost:5173/login-success}
+        cors-max-age-seconds: ${OAUTH2_CORS_MAX_AGE_SECONDS:3600}
+
 logging:
     level:
         web: INFO

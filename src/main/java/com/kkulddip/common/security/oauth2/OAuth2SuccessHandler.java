@@ -1,11 +1,11 @@
 package com.kkulddip.common.security.oauth2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kkulddip.common.security.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,10 @@ import java.util.Map;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
-    private final ObjectMapper objectMapper;
+    @Value("${app.oauth2.success-redirect-url}")
+    private String successRedirectUrl;
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpiration;
 
     /**
      * OAuth2 로그인 성공 시 호출되는 메서드
@@ -54,11 +57,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("OAuth2 로그인 성공 - 사용자: {}, 역할: {}, 제공자: {}, 제공자ID: {}", email, role, provider, providerId);
 
         // 프론트엔드로 리다이렉트 (토큰을 쿼리 파라미터로 전달)
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/login-success")
+        String redirectUrl = UriComponentsBuilder.fromUriString(successRedirectUrl)
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .queryParam("tokenType", "Bearer")
-                .queryParam("expiresIn", 3600)
+                .queryParam("expiresIn", accessTokenExpiration)
                 .queryParam("userId", userPrincipal.getUserId())
                 .queryParam("email", userPrincipal.getEmail())
                 .queryParam("name", userPrincipal.getUserName())
@@ -82,7 +85,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         tokenData.put("accessToken", accessToken);
         tokenData.put("refreshToken", refreshToken);
         tokenData.put("tokenType", "Bearer");
-        tokenData.put("expiresIn", 3600); // 1시간 (설정에서 가져올 수 있도록 개선)
+        tokenData.put("expiresIn", accessTokenExpiration);
         
         // 사용자 정보 추가
         Map<String, Object> userInfo = new HashMap<>();

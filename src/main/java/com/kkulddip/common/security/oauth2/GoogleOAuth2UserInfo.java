@@ -13,24 +13,29 @@ public class GoogleOAuth2UserInfo implements OAuth2UserInfo {
     public GoogleOAuth2UserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
-    
+
     @Override
     public String getId() {
-        return (String) attributes.get("id");
+        Object sub = attributes.get("sub");
+        return sub != null ? sub.toString() : null;
     }
-    
+
     @Override
     public String getEmail() {
-        return (String) attributes.get("email");
+        Object email = attributes.get("email");
+        return email != null ? email.toString() : null;
     }
-    
+
     @Override
     public String getName() {
-        return (String) attributes.get("name");
+        Object name = attributes.get("name");
+        return name != null ? name.toString() : null;
     }
-    
+
+
     @Override
     public String getImageUrl() {
-        return (String) attributes.get("picture");
+        Object picture = attributes.get("picture");
+        return picture != null ? picture.toString() : null;
     }
 }
