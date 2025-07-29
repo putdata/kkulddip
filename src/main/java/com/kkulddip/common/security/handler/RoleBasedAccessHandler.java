@@ -104,10 +104,10 @@ public class RoleBasedAccessHandler {
     
     /**
      * 특정 역할이 필요한 작업 수행 전 권한 검증
-     * 현재 사용자의 역할이 요구되는 역할과 일치하지 않으면 SecurityException을 발생시킵니다.
+     * 현재 사용자의 역할이 요구되는 역할과 일치하지 않으면 AccessDeniedException을 발생시킵니다.
      * 
      * @param requiredRole 필요한 사용자 역할
-     * @throws SecurityException 현재 사용자가 요구되는 역할을 가지지 않은 경우
+     * @throws AccessDeniedException 현재 사용자가 요구되는 역할을 가지지 않은 경우
      */
     public void requireRole(UserRole requiredRole) {
         UserRole currentRole = getCurrentUserRole();
@@ -124,7 +124,7 @@ public class RoleBasedAccessHandler {
      * 고객 또는 사장 역할이 필요한 작업 수행 전 권한 검증
      * 주문 관련 기능 등에서 고객과 사장 모두 접근 가능한 경우 사용합니다.
      * 
-     * @throws SecurityException 현재 사용자가 고객이나 사장 역할이 아닌 경우
+     * @throws AccessDeniedException 현재 사용자가 고객이나 사장 역할이 아닌 경우
      */
     public void requireCustomerOrOwner() {
         UserRole currentRole = getCurrentUserRole();

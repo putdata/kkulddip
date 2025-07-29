@@ -2,8 +2,6 @@ package com.kkulddip.domain.user.entity;
 
 import com.kkulddip.common.enums.OAuth2Provider;
 import com.kkulddip.common.enums.UserRole;
-import com.kkulddip.domain.customer.entity.Customer;
-import com.kkulddip.domain.owner.entity.Owner;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -33,13 +31,11 @@ public abstract class User {
     public abstract Long getId();
 
     public UserRole getRole() {
-        if (this instanceof Customer) {
-            return UserRole.CUSTOMER;
-        }
-        if (this instanceof Owner) {
-            return UserRole.OWNER;
-        }
-        throw new IllegalStateException("Unknown user type: " + this.getClass().getName());
+        return switch (this.getClass().getSimpleName()) {
+            case "Customer" -> UserRole.CUSTOMER;
+            case "Owner" -> UserRole.OWNER;
+            default -> throw new IllegalStateException("Unknown user type: " + this.getClass().getName());
+        };
     }
 
     /**

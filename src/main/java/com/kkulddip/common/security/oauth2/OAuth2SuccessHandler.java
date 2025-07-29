@@ -73,13 +73,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     
     /**
      * 토큰 응답 데이터 생성
-     * 
+     *
      * @param accessToken JWT 액세스 토큰
      * @param refreshToken JWT 리프레시 토큰
      * @param userPrincipal 사용자 정보
      * @return 토큰 응답 데이터
      */
-    private Map<String, Object> createTokenData(String accessToken, String refreshToken, 
+    private Map<String, Object> createTokenData(String accessToken, String refreshToken,
                                               OAuth2UserPrincipal userPrincipal) {
         Map<String, Object> tokenData = new HashMap<>();
         tokenData.put("accessToken", accessToken);
@@ -94,7 +94,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         userInfo.put("name", userPrincipal.getUserName());
         userInfo.put("role", userPrincipal.getRole());
         userInfo.put("profileImageUrl", userPrincipal.getProfileImageUrl());
-        userInfo.put("userType", userPrincipal.isCustomer() ? "CUSTOMER" : "OWNER");
+        userInfo.put("userType", userPrincipal.getRole());
         
         tokenData.put("user", userInfo);
         
