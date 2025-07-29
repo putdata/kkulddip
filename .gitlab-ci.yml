@@ -6,7 +6,7 @@ cache:
   key: "${CI_COMMIT_REF_SLUG}"
   paths:
     - frontend/node_modules/
-    - frontend/apps/user/node_modules/
+    - frontend/apps/customer/node_modules/
     - frontend/apps/owner/node_modules/
     - frontend/packages/common/node_modules/
 
@@ -16,6 +16,7 @@ stages:
   - lint
   - format
   - build
+  - deploy
 
 # 의존성 설치
 install_dependencies:
@@ -26,7 +27,7 @@ install_dependencies:
   artifacts:
     paths:
       - frontend/node_modules/
-      - frontend/apps/user/node_modules/
+      - frontend/apps/customer/node_modules/
       - frontend/apps/owner/node_modules/
       - frontend/packages/common/node_modules/
     expire_in: 1 hour
@@ -66,7 +67,7 @@ build_project:
     - bun run build
   artifacts:
     paths:
-      - frontend/apps/user/dist/
+      - frontend/apps/customer/dist/
       - frontend/apps/owner/dist/
       - frontend/packages/common/dist/
     expire_in: 1 week
@@ -75,3 +76,20 @@ build_project:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# 배포
+deploy_to_server:
+  stage: deploy
+  script:
+    - cp -r frontend/apps/customer/dist/* /var/www/kkulddip/customer/
+    - cp -r frontend/apps/owner/dist/* /var/www/kkulddip/owner/
+    
+    - sudo chown -R www-data:www-data /var/www/kkulddip
+  dependencies:
+    - build_project
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+  environment:
+    name: production
+    url: https://kkulddip.store
