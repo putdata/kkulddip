@@ -81,8 +81,8 @@ build_project:
 deploy_to_server:
   stage: deploy
   script:
-    - cp -r frontend/apps/customer/dist/* /var/www/kkulddip/customer/
-    - cp -r frontend/apps/owner/dist/* /var/www/kkulddip/owner/
+    - rsync -av --delete frontend/apps/customer/dist/ /var/www/kkulddip/customer/
+    - rsync -av --delete frontend/apps/owner/dist/ /var/www/kkulddip/owner/
     
     - sudo chown -R www-data:www-data /var/www/kkulddip
   dependencies:
