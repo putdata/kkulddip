@@ -7,19 +7,19 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n 'user,owner' -c '#007755,#550077' 'bun user' 'bun owner'",
-    "user": "cd apps/user && bun dev",
+    "dev": "concurrently -n 'customer,owner' -c '#007755,#550077' 'bun customer' 'bun owner'",
+    "customer": "cd apps/customer && bun dev",
     "owner": "cd apps/owner && bun dev",
-    "storybook": "concurrently -n 'user,owner' -c 'cyan,magenta' \"cd apps/user && bun run storybook\" \"cd apps/owner && bun run storybook\"",
-    "storybook:user": "cd apps/user && bun run storybook",
+    "storybook": "concurrently -n 'customer,owner' -c 'cyan,magenta' \"cd apps/customer && bun run storybook\" \"cd apps/owner && bun run storybook\"",
+    "storybook:customer": "cd apps/customer && bun run storybook",
     "storybook:owner": "cd apps/owner && bun run storybook",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css}\"",
     "build:common": "cd packages/common && bun run build",
-    "build:user": "cd apps/user && bun run build",
+    "build:customer": "cd apps/customer && bun run build",
     "build:owner": "cd apps/owner && bun run build",
-    "build": "bun run build:common && bun run build:user && bun run build:owner"
+    "build": "bun run build:common && bun run build:customer && bun run build:owner"
   },
   "dependencies": {
     "@sentry/react": "^9.40.0",

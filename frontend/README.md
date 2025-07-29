@@ -7,7 +7,7 @@ React + TypeScript 기반의 모노레포 프로젝트입니다.
 ```
 frontend/
 ├── apps/
-│   ├── user/     # 사용자 앱
+│   ├── customer/     # 사용자 앱
 │   └── owner/    # 관리자 앱
 ├── packages/
 │   └── common/   # 공통 컴포넌트/유틸리티
@@ -29,7 +29,7 @@ bun install
 bun run dev
 
 # 개별 앱 실행
-bun run user    # 사용자 앱
+bun run customer    # 사용자 앱
 bun run owner   # 사업자 앱
 ```
 
@@ -40,7 +40,7 @@ bun run owner   # 사업자 앱
 bun run storybook
 
 # 개별 Storybook 실행
-bun run storybook:user   # http://localhost:6006
+bun run storybook:customer   # http://localhost:6006
 bun run storybook:owner  # http://localhost:6007
 ```
 
@@ -62,12 +62,12 @@ bun run format:check
 ### 빌드
 
 ```bash
-# 전체 빌드 (common → user → owner 순서)
+# 전체 빌드 (common → customer → owner 순서)
 bun run build
 
 # 개별 빌드
 bun run build:common
-bun run build:user
+bun run build:customer
 bun run build:owner
 ```
 
