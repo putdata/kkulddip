@@ -1,4 +1,4 @@
-const Main = () => {
+const Home = () => {
   return (
     <div className="flex flex-col items-center justify-between bg-orange-50 p-0">
       <div>메인 화면</div>
@@ -6,4 +6,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Home;
