@@ -23,6 +23,7 @@ install_dependencies:
   stage: install
   script:
     - cd frontend
+    - rm -rf node_modules/
     - bun install
   artifacts:
     paths:
@@ -33,7 +34,8 @@ install_dependencies:
     expire_in: 1 hour
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # 린트 검사
 lint_check:
@@ -45,7 +47,8 @@ lint_check:
     - install_dependencies
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # 포맷팅 검사
 format_check:
@@ -57,7 +60,8 @@ format_check:
     - install_dependencies
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # 빌드 테스트
 build_project:
@@ -75,11 +79,14 @@ build_project:
     - install_dependencies
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # 배포
 deploy_to_server:
   stage: deploy
+  before_script:
+    - apt-get update && apt-get install -y sudo
   script:
     - rm -rf /var/www/kkulddip/customer/*
     - rm -rf /var/www/kkulddip/owner/*
