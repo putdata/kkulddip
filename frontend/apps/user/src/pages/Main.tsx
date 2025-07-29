@@ -86,6 +86,4 @@ export default function Main() {
       </p>
     </div>
   );
-};
-
-export default Main;
+}
