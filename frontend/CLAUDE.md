@@ -17,7 +17,7 @@ bun install
 bun run dev
 
 # Run individual apps
-bun run user    # User app on default port
+bun run customer    # Customer app on default port
 bun run owner   # Owner app on default port
 ```
 
@@ -37,12 +37,12 @@ bun run format:check
 ### Building
 
 ```bash
-# Build all packages and apps (common → user → owner)
+# Build all packages and apps (common → customer → owner)
 bun run build
 
 # Build individual components
 bun run build:common   # Build shared package first
-bun run build:user     # Build user app
+bun run build:customer     # Build customer app
 bun run build:owner    # Build owner app
 ```
 
@@ -53,7 +53,7 @@ bun run build:owner    # Build owner app
 bun run storybook
 
 # Run individual Storybooks
-bun run storybook:user   # http://localhost:6006
+bun run storybook:customer   # http://localhost:6006
 bun run storybook:owner  # http://localhost:6007
 ```
 
@@ -62,7 +62,7 @@ bun run storybook:owner  # http://localhost:6007
 Individual app test commands:
 
 ```bash
-cd apps/user && bun test    # User app tests
+cd apps/customer && bun test    # Customer app tests
 cd apps/owner && bun test   # Owner app tests (if available)
 ```
 
@@ -72,7 +72,7 @@ This is a **TypeScript React monorepo** using **Bun** as the runtime and package
 
 ### Monorepo Structure
 
-- **`apps/user/`** - Customer-facing React application with mobile-first responsive design
+- **`apps/customer/`** - Customer-facing React application with mobile-first responsive design
 - **`apps/owner/`** - Business owner/admin dashboard application
 - **`packages/common/`** - Shared utilities, hooks, and components used across apps
 
@@ -159,7 +159,7 @@ ESLint ignores these paths to avoid linting generated or configuration files:
 
 ### Code Organization Patterns
 
-**User App Structure** (`apps/user/src/`):
+**Customer App Structure** (`apps/customer/src/`):
 
 - `components/` - UI components organized by feature
 - `pages/` - Route-level page components
