@@ -22,23 +22,21 @@ import java.time.LocalDateTime;
 /**
  * 사장 엔티티
  */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "owners")
 @EntityListeners(AuditingEntityListener.class)
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Owner extends User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
-
-
+    
     @Column(name = "last_active_at")
     private LocalDateTime lastActiveAt;
-
-
+    
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -49,7 +47,7 @@ public class Owner extends User {
 
     @Builder
     public Owner(String email, String name, String profileImageUrl, LocalDateTime lastActiveAt,
-                OAuth2Provider oauth2Provider, String oauth2ProviderId) {
+                 OAuth2Provider oauth2Provider, String oauth2ProviderId) {
         this.email = email;
         this.name = name;
         this.profileImageUrl = profileImageUrl;
@@ -62,5 +60,4 @@ public class Owner extends User {
     public Long getId() {
         return ownerId;
     }
-
 }

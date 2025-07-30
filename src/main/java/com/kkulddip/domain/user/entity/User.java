@@ -8,8 +8,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 
-@MappedSuperclass
 @Getter
+@MappedSuperclass
 public abstract class User {
 
     @Column(nullable = false, unique = true)

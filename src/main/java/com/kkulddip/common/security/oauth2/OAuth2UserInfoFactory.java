@@ -2,7 +2,7 @@ package com.kkulddip.common.security.oauth2;
 
 import com.kkulddip.common.enums.OAuth2Provider;
 import com.kkulddip.common.security.oauth2.exception.OAuth2UserInfoException;
-import com.kkulddip.common.security.oauth2.exception.UnsupportedOAuth2ProviderException;
+import com.kkulddip.common.security.oauth2.exception.OAuth2UnsupportedProviderException;
 import com.kkulddip.common.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,25 +32,13 @@ public class OAuth2UserInfoFactory {
             
             log.debug("OAuth2 사용자 정보 생성 - Provider: {}, RegistrationId: {}", provider, registrationId);
 
-            switch (provider) {
-                case GOOGLE:
-                    return createGoogleUserInfo(attributes);
-                case KAKAO:
-                    throw new UnsupportedOAuth2ProviderException(
-                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-                    );
-                case NAVER:
-                    throw new UnsupportedOAuth2ProviderException(
-                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-                    );
-                default:
-                    throw new UnsupportedOAuth2ProviderException(
-                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-                    );
-            }
+            return switch (provider) {
+                case GOOGLE -> createGoogleUserInfo(attributes);
+                default -> throw new OAuth2UnsupportedProviderException(ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER);
+            };
         } catch (Exception ex) {
             log.error("OAuth2 사용자 정보 생성 실패 - RegistrationId: {}", registrationId, ex);
-            if (ex instanceof UnsupportedOAuth2ProviderException) {
+            if (ex instanceof OAuth2UnsupportedProviderException) {
                 throw ex;
             }
             throw new OAuth2UserInfoException(
@@ -65,7 +53,7 @@ public class OAuth2UserInfoFactory {
     private OAuth2UserInfo createGoogleUserInfo(Map<String, Object> attributes) {
         if (attributes == null || attributes.isEmpty()) {
             throw new OAuth2UserInfoException(
-                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
+                    ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
             );
         }
         return new GoogleOAuth2UserInfo(attributes);
@@ -91,7 +79,7 @@ public class OAuth2UserInfoFactory {
             }
         }
 
-        throw new UnsupportedOAuth2ProviderException(
+        throw new OAuth2UnsupportedProviderException(
             ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
         );
     }

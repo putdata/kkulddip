@@ -27,18 +27,17 @@ import static com.kkulddip.domain.customer.enums.CustomerLevel.SPROUT_BEE;
 /**
  * 고객 엔티티
  */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "customers")
 @EntityListeners(AuditingEntityListener.class)
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer extends User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id", nullable = false)
     private Long customerId;
-
 
     @Column
     private String address;
@@ -64,8 +63,7 @@ public class Customer extends User {
 
     @Column(name = "last_active_at")
     private LocalDateTime lastActiveAt;
-
-
+    
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -76,9 +74,9 @@ public class Customer extends User {
 
     @Builder
     public Customer(String email, String name, String address,
-                   Double latitude, Double longitude, CustomerLevel level, Integer totalOrder,
-                   Long totalMoneySaved, Double totalCo2Saved, LocalDateTime lastActiveAt,
-                   String profileImageUrl, OAuth2Provider oauth2Provider, String oauth2ProviderId) {
+                    Double latitude, Double longitude, CustomerLevel level, Integer totalOrder,
+                    Long totalMoneySaved, Double totalCo2Saved, LocalDateTime lastActiveAt,
+                    String profileImageUrl, OAuth2Provider oauth2Provider, String oauth2ProviderId) {
         this.email = email;
         this.name = name;
         this.profileImageUrl = profileImageUrl;

@@ -10,10 +10,6 @@ import java.util.Optional;
 @Repository
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
-    Optional<Owner> findByEmail(String email);
-
     Optional<Owner> findByOauth2ProviderAndOauth2ProviderId(
         OAuth2Provider provider, String providerId);
-
-    boolean existsByEmail(String email);
 }

@@ -30,12 +30,41 @@ import java.util.Collections;
  * OncePerRequestFilter를 상속하여 요청당 한 번만 실행됩니다.
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final JwtAuthenticationErrorHandler errorHandler;
+
+    /**
+     * 특정 경로에 대해 JWT 필터를 제외하는 메서드
+     * OAuth2 인증, API 문서, 헬스체크 등의 경로는 JWT 검증을 하지 않습니다.
+     *
+     * @param request HTTP 요청 객체
+     * @return true면 필터 제외, false면 필터 적용
+     * @throws ServletException 서블릿 예외 발생 시
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+
+        log.debug("JWT 필터 경로 체크: {}", path);
+
+        // JWT 필터를 제외할 경로들
+        boolean shouldSkip = path.startsWith("/api/v1/auth/") ||           // OAuth2 인증
+                path.startsWith("/swagger-ui/") ||              // Swagger UI
+                path.startsWith("/api-docs/") ||                // API 문서
+                path.startsWith("/actuator/") ||                // 액추에이터
+                path.equals("/swagger-ui.html") ||              // Swagger HTML
+                path.startsWith("/v3/api-docs");                // OpenAPI 문서
+
+        if (shouldSkip) {
+            log.debug("JWT 필터 제외 경로: {}", path);
+        }
+
+        return shouldSkip;
+    }
 
     /**
      * 각 HTTP 요청에 대해 JWT 인증을 처리하는 메인 메서드
@@ -65,27 +94,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String oauth2ProviderId = jwtUtil.extractOAuth2ProviderId(token);
 
             // 인증 정보 설정
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            username, null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-            
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    username, null,
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+            );
+
             // OAuth2 제공자 정보를 details에 추가
             if (oauth2Provider != null) {
                 Map<String, Object> details = Map.of(
-                    "oauth2_provider", oauth2Provider,
-                    "oauth2_provider_id", oauth2ProviderId != null ? oauth2ProviderId : ""
+                        "oauth2_provider", oauth2Provider,
+                        "oauth2_provider_id", oauth2ProviderId != null ? oauth2ProviderId : ""
                 );
                 authentication.setDetails(details);
-                log.debug("JWT OAuth2 authentication successful for user: {} from provider: {} (ID: {})", 
-                         username, oauth2Provider, oauth2ProviderId);
+                log.debug("JWT OAuth2 authentication successful for user: {} from provider: {} (ID: {})",
+                        username, oauth2Provider, oauth2ProviderId);
             } else {
                 log.debug("JWT authentication successful for user: {}", username);
             }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
 
         } catch (ExpiredJwtException e) {
             errorHandler.handleExpiredToken(response, e.getMessage());
@@ -101,17 +128,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * HTTP 요청의 Authorization 헤더에서 JWT 토큰을 추출
      * Bearer 토큰 형식("Bearer <token>")에서 실제 토큰 부분만 반환합니다.
-     * 
+     *
      * @param request HTTP 요청 객체
      * @return 추출된 JWT 토큰 또는 null (토큰이 없거나 형식이 잘못된 경우)
      */
     private String extractTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        
+
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-        
+
         return null;
     }
 }

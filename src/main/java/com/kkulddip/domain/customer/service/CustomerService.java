@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
  * 고객 서비스
  */
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 @Transactional
 public class CustomerService {
 
@@ -25,7 +25,7 @@ public class CustomerService {
         customer.updateProfile(name, profileImageUrl);
         
         Customer updatedCustomer = customerRepository.save(customer);
-
+        
         return updatedCustomer;
     }
 }

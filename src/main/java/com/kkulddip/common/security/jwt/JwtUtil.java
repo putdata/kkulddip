@@ -51,7 +51,7 @@ public class JwtUtil {
      * @return 생성된 액세스 토큰
      */
     public String generateAccessToken(String username, String role, String provider, String providerId) {
-        return generateToken(username, role, provider, providerId, accessTokenExpiration);
+        return generateToken(username, role, "ACCESS", provider, providerId, accessTokenExpiration);
     }
 
     /**
@@ -64,7 +64,7 @@ public class JwtUtil {
      * @return 생성된 리프레시 토큰
      */
     public String generateRefreshToken(String username, String role, String provider, String providerId) {
-        return generateToken(username, role, provider, providerId, refreshTokenExpiration);
+        return generateToken(username, role, "REFRESH", provider, providerId, refreshTokenExpiration);
     }
 
     /**
@@ -78,12 +78,13 @@ public class JwtUtil {
      * @param expiration 토큰 만료 시간 (초 단위)
      * @return 생성된 JWT 토큰
      */
-    private String generateToken(String username, String role, String provider, String providerId, long expiration) {
+    private String generateToken(String username, String role, String tokenType, String provider, String providerId, long expiration) {
         Instant now = Instant.now();
         
         var builder = Jwts.builder()
             .subject(username)
             .claim("role", role)
+            .claim("token_type", tokenType)
             .issuedAt(Date.from(now))
             .expiration(Date.from(now.plus(expiration, ChronoUnit.SECONDS)));
             

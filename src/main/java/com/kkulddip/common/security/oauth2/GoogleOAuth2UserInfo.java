@@ -1,11 +1,14 @@
 package com.kkulddip.common.security.oauth2;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
 /**
  * Google OAuth2 사용자 정보 구현체
  * Google에서 제공하는 사용자 정보 형식에 맞춰 구현합니다.
  */
+@Slf4j
 public class GoogleOAuth2UserInfo implements OAuth2UserInfo {
     
     private final Map<String, Object> attributes;
@@ -16,7 +19,7 @@ public class GoogleOAuth2UserInfo implements OAuth2UserInfo {
 
     @Override
     public String getId() {
-        Object sub = attributes.get("sub");
+        Object sub = attributes.get("id");
         return sub != null ? sub.toString() : null;
     }
 
@@ -31,7 +34,6 @@ public class GoogleOAuth2UserInfo implements OAuth2UserInfo {
         Object name = attributes.get("name");
         return name != null ? name.toString() : null;
     }
-
 
     @Override
     public String getImageUrl() {

@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
  * 사장 서비스
  */
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 @Transactional
 public class OwnerService {
 
@@ -25,7 +25,7 @@ public class OwnerService {
         owner.updateProfile(name, profileImageUrl);
         
         Owner updatedOwner = ownerRepository.save(owner);
-
+        
         return updatedOwner;
     }
 }
