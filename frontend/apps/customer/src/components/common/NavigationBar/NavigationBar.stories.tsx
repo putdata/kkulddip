@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import NavigationBar from './NavigationBar';
+import NavigationBar from '@/components/common/NavigationBar/NavigationBar';
 import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof NavigationBar> = {
-  title: 'Components/NavigationBar',
+  title: 'Components/common/NavigationBar',
   component: NavigationBar,
   decorators: [
     Story => (

@@ -3,7 +3,7 @@ import SignupCard from './SignupCard';
 import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof SignupCard> = {
-  title: 'Components/SignupCard',
+  title: 'Components/pages/SignupCard',
   component: SignupCard,
   decorators: [
     Story => (

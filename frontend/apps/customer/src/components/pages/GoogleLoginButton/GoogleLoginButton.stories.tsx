@@ -1,10 +1,10 @@
 // GoogleLoginButton.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react';
-import GoogleLoginButton from './GoogleLoginButton';
+import GoogleLoginButton from '@/components/pages/GoogleLoginButton/GoogleLoginButton';
 import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof GoogleLoginButton> = {
-  title: 'Components/GoogleLoginButton',
+  title: 'Components/pages/GoogleLoginButton',
   component: GoogleLoginButton,
   decorators: [
     Story => (

@@ -1,7 +1,7 @@
 import { Heart, Package, User, Home, Search } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from './router/route-path';
+import { ROUTE_PATH } from '../../../router/route-path';
 
 interface GnbPropsInterface {
   icon: ReactElement;

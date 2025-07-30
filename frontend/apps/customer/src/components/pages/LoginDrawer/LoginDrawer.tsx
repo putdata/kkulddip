@@ -1,4 +1,4 @@
-import GoogleLoginButton from '@/components/GoogleLoginButton';
+import GoogleLoginButton from '@/components/pages/GoogleLoginButton/GoogleLoginButton';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,

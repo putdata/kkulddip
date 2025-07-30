@@ -3,7 +3,7 @@ import { Card1 } from './Card1';
 
 // 메타 정보: 스토리북에서 이 컴포넌트를 어떻게 표시할지 설정
 const meta: Meta<typeof Card1> = {
-  title: 'Components/Card1', // 스토리북 사이드바에서 보일 이름
+  title: 'Components/common/Card1', // 스토리북 사이드바에서 보일 이름
   component: Card1, // 사용할 컴포넌트
   parameters: {
     layout: 'centered', // 컴포넌트를 화면 중앙에 배치

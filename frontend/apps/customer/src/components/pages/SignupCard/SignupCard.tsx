@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import GoogleLoginButton from './GoogleLoginButton';
+import GoogleLoginButton from '@/components/pages/GoogleLoginButton/GoogleLoginButton';
 import {
   Card,
   CardContent,
