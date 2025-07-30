@@ -1,6 +1,7 @@
 import { Heart, Package, User, Home, Search } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '../../../router/route-path';
 
 interface GnbPropsInterface {
   icon: ReactElement;
@@ -10,11 +11,11 @@ interface GnbPropsInterface {
 
 function BottomNavbar() {
   const navigate = useNavigate();
-  const onSearchClickHandler = () => navigate('/search');
-  const onHomeClickHandler = () => navigate('/');
-  const onMyPageClickHandler = () => navigate('/my');
-  const onLikeClickHandler = () => navigate('/like');
-  const onOrderClickHandler = () => navigate('/order');
+  const onSearchClickHandler = () => navigate(ROUTE_PATH.SEARCH);
+  const onHomeClickHandler = () => navigate(ROUTE_PATH.HOME);
+  const onMyPageClickHandler = () => navigate(ROUTE_PATH.MY);
+  const onLikeClickHandler = () => navigate(ROUTE_PATH.LIKE);
+  const onOrderClickHandler = () => navigate(ROUTE_PATH.ORDER);
 
   const gnbProps: GnbPropsInterface[] = [
     {

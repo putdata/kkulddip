@@ -1,4 +1,4 @@
-import BottomNavbar from '@/BottomNavbar';
+import BottomNavbar from '@/components/common/BottomNavbar/BottomNavbar';
 import { Outlet } from 'react-router-dom';
 
 export default function MobileLayout() {
