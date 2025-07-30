@@ -3,7 +3,6 @@ package com.kkulddip.common.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kkulddip.common.exception.ErrorCode;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
