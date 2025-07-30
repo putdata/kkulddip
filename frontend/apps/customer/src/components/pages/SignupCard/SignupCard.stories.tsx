@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import SignupCard from './SignupCard';
 import { MemoryRouter } from 'react-router-dom';
 

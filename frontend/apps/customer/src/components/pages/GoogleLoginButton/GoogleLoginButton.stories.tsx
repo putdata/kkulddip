@@ -1,5 +1,5 @@
 // GoogleLoginButton.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import GoogleLoginButton from '@/components/pages/GoogleLoginButton/GoogleLoginButton';
 import { MemoryRouter } from 'react-router-dom';
 
