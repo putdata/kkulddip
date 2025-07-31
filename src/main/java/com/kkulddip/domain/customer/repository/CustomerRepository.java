@@ -10,10 +10,6 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    Optional<Customer> findByEmail(String email);
-
     Optional<Customer> findByOauth2ProviderAndOauth2ProviderId(
         OAuth2Provider provider, String providerId);
-
-    boolean existsByEmail(String email);
 }

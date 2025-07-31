@@ -17,24 +17,4 @@ public enum CustomerLevel {
         this.levelValue = levelValue;
         this.description = description;
     }
-
-    public int getLevelValue() {
-        return levelValue;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * 레벨 값으로 CustomerLevel 찾기
-     */
-    public static CustomerLevel fromLevelValue(int levelValue) {
-        for (CustomerLevel level : values()) {
-            if (level.levelValue == levelValue) {
-                return level;
-            }
-        }
-        throw new IllegalArgumentException("Invalid level value: " + levelValue);
-    }
 }

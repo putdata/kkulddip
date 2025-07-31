@@ -2,12 +2,14 @@ package com.kkulddip.common.security.oauth2;
 
 import com.kkulddip.common.enums.OAuth2Provider;
 import com.kkulddip.common.security.oauth2.exception.OAuth2UserInfoException;
-import com.kkulddip.common.security.oauth2.exception.UnsupportedOAuth2ProviderException;
+import com.kkulddip.common.security.oauth2.exception.OAuth2UnsupportedProviderException;
 import com.kkulddip.common.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * OAuth2 사용자 정보 팩토리
@@ -23,76 +25,92 @@ public class OAuth2UserInfoFactory {
      * @param registrationId OAuth2 제공자 등록 ID
      * @param attributes 사용자 속성 정보
      * @return OAuth2UserInfo 구현체
-     * @throws IllegalArgumentException 지원하지 않는 제공자인 경우
      */
     public OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {
-        try {
-            // registrationId에서 실제 provider 추출
-            OAuth2Provider provider = extractProvider(registrationId);
-            
-            log.debug("OAuth2 사용자 정보 생성 - Provider: {}, RegistrationId: {}", provider, registrationId);
 
-            switch (provider) {
-                case GOOGLE:
-                    return createGoogleUserInfo(attributes);
-                case KAKAO:
-                    throw new UnsupportedOAuth2ProviderException(
-                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-                    );
-                case NAVER:
-                    throw new UnsupportedOAuth2ProviderException(
-                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-                    );
-                default:
-                    throw new UnsupportedOAuth2ProviderException(
-                        ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-                    );
-            }
-        } catch (Exception ex) {
-            log.error("OAuth2 사용자 정보 생성 실패 - RegistrationId: {}", registrationId, ex);
-            if (ex instanceof UnsupportedOAuth2ProviderException) {
-                throw ex;
-            }
-            throw new OAuth2UserInfoException(
-                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
-            );
-        }
-    }
-    
-    /**
-     * Google OAuth2 사용자 정보 생성
-     */
-    private OAuth2UserInfo createGoogleUserInfo(Map<String, Object> attributes) {
-        if (attributes == null || attributes.isEmpty()) {
-            throw new OAuth2UserInfoException(
-                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
-            );
-        }
-        return new GoogleOAuth2UserInfo(attributes);
+        // 1. 입력값 검증
+        validateInputs(registrationId, attributes);
+
+        // 2. 제공자 추출
+        OAuth2Provider provider = extractProvider(registrationId);
+        log.debug("OAuth2 제공자 추출 완료 - Provider: {}", provider);
+
+        // 3. 사용자 정보 생성
+        OAuth2UserInfo userInfo = createUserInfo(provider, attributes);
+        log.debug("OAuth2 사용자 정보 생성 완료 - Provider: {}", provider);
+
+        return userInfo;
     }
 
     /**
-     * registrationId에서 실제 provider를 추출합니다.
+     * 입력값 검증
+     * registrationId와 사용자 속성 정보의 유효성을 검증합니다.
      *
-     * @param registrationId 등록 ID (예: google-customer, google-owner)
+     * @param registrationId OAuth2 제공자 등록 ID
+     * @param attributes 사용자 속성 정보
+     * @throws OAuth2UserInfoException 입력값이 유효하지 않은 경우
+     */
+    private void validateInputs(String registrationId, Map<String, Object> attributes) {
+        Optional.ofNullable(registrationId)
+            .filter(id -> !id.trim().isEmpty())
+            .orElseThrow(() -> {
+                log.error("OAuth2 registrationId가 비어있습니다");
+                return new OAuth2UserInfoException(ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED);
+            });
+
+        Optional.ofNullable(attributes)
+            .filter(attr -> !attr.isEmpty())
+            .orElseThrow(() -> {
+                log.error("OAuth2 사용자 속성이 비어있습니다 - RegistrationId: {}", registrationId);
+                return new OAuth2UserInfoException(ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED);
+            });
+    }
+
+    /**
+     * registrationId에서 OAuth2 제공자를 추출합니다
+     *
+     * @param registrationId 등록 ID
      * @return OAuth2Provider enum
      */
     private OAuth2Provider extractProvider(String registrationId) {
-        if (registrationId == null) {
-            throw new OAuth2UserInfoException(
-                ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
-            );
-        }
+        String normalizedRegistrationId = registrationId.toLowerCase().trim();
 
-        // OAuth2Provider enum에서 직접 매칭 확인
-        for (OAuth2Provider provider : OAuth2Provider.values()) {
-            if (registrationId.toLowerCase().startsWith(provider.getRegistrationId().toLowerCase())) {
-                return provider;
-            }
-        }
+        return Arrays.stream(OAuth2Provider.values())
+            .filter(provider -> normalizedRegistrationId.startsWith(provider.getRegistrationId().toLowerCase()))
+            .findFirst()
+            .orElseThrow(() -> {
+                log.error("지원하지 않는 OAuth2 제공자입니다 - RegistrationId: {}", registrationId);
+                return new OAuth2UnsupportedProviderException(ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER);
+            });
+    }
 
-        throw new UnsupportedOAuth2ProviderException(
-            ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
-        );
+    /**
+     * 제공자에 따른 사용자 정보 객체 생성
+     * OAuth2 제공자별로 적절한 사용자 정보 구현체를 생성합니다.
+     *
+     * @param provider OAuth2 제공자
+     * @param attributes 사용자 속성 정보
+     * @return OAuth2UserInfo 구현체
+     * @throws OAuth2UnsupportedProviderException 지원하지 않는 제공자인 경우
+     */
+    private OAuth2UserInfo createUserInfo(OAuth2Provider provider, Map<String, Object> attributes) {
+        return switch (provider) {
+            case GOOGLE -> createGoogleUserInfo(attributes);
+            default -> throw new OAuth2UnsupportedProviderException(ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER);
+        };
+    }
+
+    /**
+     * Google OAuth2 사용자 정보 생성
+     * Google OAuth2 응답 속성을 Google 사용자 정보 객체로 변환합니다.
+     *
+     * @param attributes Google OAuth2 사용자 속성
+     * @return GoogleOAuth2UserInfo 객체
+     * @throws OAuth2UserInfoException 사용자 정보 생성 실패 시
+     */
+    private OAuth2UserInfo createGoogleUserInfo(Map<String, Object> attributes) {
+        return Optional.ofNullable(attributes)
+            .map(GoogleOAuth2UserInfo::new)
+            .orElseThrow(() -> new OAuth2UserInfoException(ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED));
     }
 }
