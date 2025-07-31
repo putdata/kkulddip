@@ -1,17 +1,9 @@
 # GitLab CI/CD 파이프라인 설정
 image: oven/bun:1
 
-# 캐시 설정으로 빌드 속도 향상
-cache:
-  key: "${CI_COMMIT_REF_SLUG}"
-  paths:
-    - frontend/node_modules/
-    - frontend/apps/customer/node_modules/
-    - frontend/apps/owner/node_modules/
-    - frontend/packages/common/node_modules/
-
 # 파이프라인 단계 정의
 stages:
+  - env
   - install
   - lint
   - format
@@ -23,7 +15,6 @@ install_dependencies:
   stage: install
   script:
     - cd frontend
-    - rm -rf node_modules/
     - bun install
   artifacts:
     paths:
@@ -31,6 +22,40 @@ install_dependencies:
       - frontend/apps/customer/node_modules/
       - frontend/apps/owner/node_modules/
       - frontend/packages/common/node_modules/
+    expire_in: 1 hour
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# 환경 변수 설정
+setup_environment:
+  stage: env
+  script:
+    # 공통 환경 변수
+    - |
+      cat > frontend/.env << EOF
+      VITE_API_BASE_URL=${API_SERVER_ADDRESS}
+      VITE_GOOGLE_OAUTH2_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
+      VITE_OAUTH2_SUCCESS_REDIRECT_URL=${OAUTH2_SUCCESS_REDIRECT_URL}
+      EOF
+    
+    # Customer 앱 .env
+    - |
+      cat > frontend/apps/customer/.env << EOF
+      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI}
+      EOF
+    
+    # Owner 앱 .env
+    - |
+      cat > frontend/apps/owner/.env << EOF
+      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI_OWNER}
+      EOF
+  artifacts:
+    paths:
+      - frontend/.env
+      - frontend/apps/customer/.env
+      - frontend/apps/owner/.env
     expire_in: 1 hour
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -76,6 +101,7 @@ build_project:
       - frontend/packages/common/dist/
     expire_in: 1 week
   dependencies:
+    - setup_environment
     - install_dependencies
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -86,16 +112,15 @@ build_project:
 deploy_to_server:
   stage: deploy
   before_script:
-    - apt-get update && apt-get install -y sudo
+    - apt-get update && apt-get install -y rsync
   script:
-    - rm -rf /var/www/kkulddip/customer/*
-    - rm -rf /var/www/kkulddip/owner/*
-    - cp -r frontend/apps/customer/dist/* /var/www/kkulddip/customer/
-    - cp -r frontend/apps/owner/dist/* /var/www/kkulddip/owner/
-    - sudo chown -R www-data:www-data /var/www/kkulddip
+    - rsync -av --delete frontend/apps/customer/dist/ /var/www/kkulddip/customer/
+    - rsync -av --delete frontend/apps/owner/dist/ /var/www/kkulddip/owner/
+    - chown -R www-data:www-data /var/www/kkulddip || true
   dependencies:
     - build_project
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
   environment:
