@@ -11,7 +11,7 @@ interface LoginFoodCardProps {
 
 const LoginFoodCard = ({ item }: LoginFoodCardProps) => {
   return (
-    <div className="overflow-hidden rounded-xl shadow-md">
+    <div className="overflow-hidden rounded-xl bg-white shadow-md">
       <img
         src={item.imageUrl}
         alt={item.name}
