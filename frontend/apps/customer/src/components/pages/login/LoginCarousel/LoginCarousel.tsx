@@ -5,37 +5,9 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
-
-export interface FoodItem {
-  id: number;
-  name: string;
-  imageUrl: string;
-  description: string;
-}
-
-interface LoginFoodCardProps {
-  item: FoodItem;
-}
-
-const LoginFoodCard = ({ item }: LoginFoodCardProps) => {
-  return (
-    <div className="w-full overflow-hidden rounded-xl bg-white shadow-md">
-      <div className="flex aspect-[4/3] w-full items-center justify-center bg-gray-200">
-        <img
-          src={item.imageUrl}
-          alt={item.name}
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <div className="p-4">
-        <h2 className="mb-1 text-base font-semibold text-gray-800">
-          {item.description}
-        </h2>
-        <p className="text-sm text-gray-500">{item.name} 어때요?</p>
-      </div>
-    </div>
-  );
-};
+import LoginFoodCard, {
+  type FoodItem,
+} from '@/components/pages/login/LoginFoodCard';
 
 const foodItems: FoodItem[] = [
   {
