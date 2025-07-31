@@ -10,6 +10,7 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
+import Reviews from '@/pages/review/Reviews';
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,14 @@ export const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFound />,
+      },
+      {
+        path: ROUTE_PATH.NOTIFICATIONS,
+      },
+      // 임시 - 상점 상세 페이지
+      {
+        path: ROUTE_PATH.REVIEWS,
+        element: <Reviews />,
       },
     ],
   },
