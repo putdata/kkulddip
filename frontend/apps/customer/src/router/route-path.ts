@@ -7,4 +7,5 @@ export const ROUTE_PATH = {
   ORDER: '/order',
   NOTIFICATIONS: '/notifications',
   NOT_FOUND: '*',
+  REVIEWS: '/reviews',
 } as const;
