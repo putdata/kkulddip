@@ -3,7 +3,7 @@ import BottomNavbar from './BottomNavbar';
 import { Heart } from 'lucide-react';
 
 const meta = {
-  title: 'Components/BottomNavbar',
+  title: 'Components/common/BottomNavbar',
   component: BottomNavbar,
   parameters: {
     layout: 'fullscreen',

@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { DiscountBadge } from './Badge';
+import { DiscountBadge } from '@/components/Badge';
 
 export interface Card1Props {
   img: {
