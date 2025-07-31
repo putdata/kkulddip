@@ -73,8 +73,9 @@ jwt:
 
 app:
     oauth2:
-        success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL:http://localhost:5173/login-success}
-        cors-max-age-seconds: ${OAUTH2_CORS_MAX_AGE_SECONDS:3600}
+        success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL}
+    cors:
+        max-age-seconds: ${CORS_MAX_AGE_SECONDS}
 
 logging:
     level:

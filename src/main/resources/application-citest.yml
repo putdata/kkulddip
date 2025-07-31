@@ -60,3 +60,9 @@ jwt:
     secret-key: ci-test-secret-key-for-jwt-token-signing-minimum-256-bits-required-for-hmac-sha256-algorithm
     access-token-expiration: 3600
     refresh-token-expiration: 86400
+
+app:
+    oauth2:
+        success-redirect-url: http://localhost:5173/login-success
+    cors:
+        max-age-seconds: 3600

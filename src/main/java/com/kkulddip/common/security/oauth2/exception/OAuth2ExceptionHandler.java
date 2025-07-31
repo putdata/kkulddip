@@ -20,13 +20,12 @@ public class OAuth2ExceptionHandler {
      */
     @ExceptionHandler(OAuth2AuthenticationException.class)
     public ResponseEntity<ErrorResponse<Void>> handleOAuth2AuthenticationException(OAuth2AuthenticationException ex) {
-
         ErrorResponse<Void> errorResponse = ErrorResponse.of(
             ErrorCode.AUTH_OAUTH2_AUTHENTICATION_FAILED
         );
 
         log.warn("OAuth2 인증 실패: {}", ex.getMessage(), ex);
-        
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                            .body(errorResponse);
     }
@@ -36,13 +35,12 @@ public class OAuth2ExceptionHandler {
      */
     @ExceptionHandler(OAuth2UserInfoException.class)
     public ResponseEntity<ErrorResponse<Void>> handleOAuth2UserInfoException(OAuth2UserInfoException ex) {
-
         ErrorResponse<Void> errorResponse = ErrorResponse.of(
             ErrorCode.AUTH_OAUTH2_USER_INFO_FAILED
         );
 
         log.warn("OAuth2 사용자 정보 처리 실패: {}", ex.getMessage(), ex);
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                            .body(errorResponse);
     }
@@ -50,9 +48,8 @@ public class OAuth2ExceptionHandler {
     /**
      * OAuth2 제공자 지원 안함 예외
      */
-    @ExceptionHandler(UnsupportedOAuth2ProviderException.class)
-    public ResponseEntity<ErrorResponse<Void>> handleUnsupportedOAuth2ProviderException(UnsupportedOAuth2ProviderException ex) {
-
+    @ExceptionHandler(OAuth2UnsupportedProviderException.class)
+    public ResponseEntity<ErrorResponse<Void>> handleUnsupportedOAuth2ProviderException(OAuth2UnsupportedProviderException ex) {
         ErrorResponse<Void> errorResponse = ErrorResponse.of(
             ErrorCode.AUTH_OAUTH2_UNSUPPORTED_PROVIDER
         );
@@ -62,4 +59,15 @@ public class OAuth2ExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                            .body(errorResponse);
     }
+
+    /**
+     * OAuth2 정보로 JWT 토큰 생성 실패
+     */
+    @ExceptionHandler(OAuth2JwtTokenCreationException.class)
+    public ResponseEntity<ErrorResponse<Void>> handleJwtTokenCreationException(OAuth2JwtTokenCreationException ex) {
+        ErrorResponse<Void> errorResponse = ErrorResponse.of(ErrorCode.AUTH_MISSING_REQUIRED_CLAIM);
+        log.warn("JWT 토큰 생성 실패: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
 }
