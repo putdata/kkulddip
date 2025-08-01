@@ -8,6 +8,7 @@ import MyPage from '@/pages/MyPage';
 import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import Reviews from '@/pages/review/Reviews';
+import ReviewCreate from '@/pages/review/ReviewCreate';
 
 const routes: RouteObject[] = [
   {
@@ -45,6 +46,11 @@ const routes: RouteObject[] = [
       {
         path: ROUTE_PATH.REVIEWS,
         element: <Reviews />,
+      },
+      // 임시 - 리뷰 작성 페이지
+      {
+        path: ROUTE_PATH.REVIEW_CREATE,
+        element: <ReviewCreate />,
       },
     ],
   },
