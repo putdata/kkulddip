@@ -9,4 +9,5 @@ export const ROUTE_PATH = {
   LOGIN: '/login',
   NOT_FOUND: '*',
   REVIEWS: '/reviews',
+  REVIEW_CREATE: '/review/create',
 } as const;
