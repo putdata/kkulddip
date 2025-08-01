@@ -41,7 +41,7 @@ const routes: RouteObject[] = [
       {
         path: ROUTE_PATH.NOTIFICATIONS,
       },
-      // 임시 - 상점 상세 페이지
+      // 임시 - 리뷰 전체 페이지
       {
         path: ROUTE_PATH.REVIEWS,
         element: <Reviews />,
