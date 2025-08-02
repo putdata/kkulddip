@@ -48,8 +48,13 @@ public enum ErrorCode {
     ORDER_CANNOT_BE_CONFIRMED(BAD_REQUEST, "ORDER_CANNOT_BE_CONFIRMED", "주문을 확인할 수 없습니다."),
     ORDER_CANNOT_BE_DELIVERED(BAD_REQUEST, "ORDER_CANNOT_BE_DELIVERED", "주문을 배송 완료 처리할 수 없습니다."),
     ORDER_INVALID_STATUS(BAD_REQUEST, "ORDER_INVALID_STATUS", "잘못된 주문 상태입니다."),
-    ORDER_EMPTY_ITEMS(BAD_REQUEST, "ORDER_EMPTY_ITEMS", "주문 항목이 비어있습니다.");
-    
+    ORDER_EMPTY_ITEMS(BAD_REQUEST, "ORDER_EMPTY_ITEMS", "주문 항목이 비어있습니다."),
+
+    // FCM 토큰 관련 에러
+    FCM_TOKEN_INVALID(BAD_REQUEST, "FCM_TOKEN_INVALID", "유효하지 않은 FCM 토큰입니다."),
+    FCM_TOKEN_NOT_FOUND(NOT_FOUND, "FCM_TOKEN_NOT_FOUND", "FCM 토큰을 찾을 수 없습니다."),
+    FCM_TOKEN_REGISTRATION_FAILED(INTERNAL_SERVER_ERROR, "FCM_TOKEN_REGISTRATION_FAILED", "FCM 토큰 등록에 실패했습니다.");
+
     private final HttpStatus status;
     private final String code;
     private final String message;
