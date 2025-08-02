@@ -1,33 +1,21 @@
 import { useEffect } from 'react';
-import { useAuthStore, useUserStore, apiClient } from 'common';
+import { useAuthStore, useUserStore } from 'common';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-
-interface GoogleAuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-  user: {
-    email: string;
-    name: string;
-    role: string;
-    profileImageUrl: string;
-  };
-}
+import { ROUTE_PATH } from '@/router';
+import { AuthService } from '@/services/authService';
 
 export const useGoogleLogin = () => {
   const setAccessToken = useAuthStore(state => state.setAccessToken);
-  const redirectUri = import.meta.env.VITE_OAUTH2_SUCCESS_REDIRECT_URL;
   const setUser = useUserStore(state => state.setUser);
   const navigate = useNavigate();
 
   const { mutate: exchangeCodeForToken } = useMutation({
-    mutationFn: (code: string) =>
-      apiClient.post<GoogleAuthResponse>('/auth/customer/token', { code }),
+    mutationFn: AuthService.exchangeCodeForToken,
     onSuccess: data => {
       setAccessToken(data.accessToken);
       setUser(data.user);
-      navigate('/');
+      navigate(ROUTE_PATH.HOME);
     },
     onError: error => {
       console.error('구글 로그인 실패:', error);
@@ -40,23 +28,13 @@ export const useGoogleLogin = () => {
     const code = urlParams.get('code');
 
     if (code) {
-      window.history.replaceState({}, document.title, '/');
+      window.history.replaceState({}, document.title, ROUTE_PATH.HOME);
       exchangeCodeForToken(code);
     }
   }, [exchangeCodeForToken]);
 
   const loginWithGoogle = () => {
-    const clientId = import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID;
-    const scope = 'openid email profile';
-
-    const googleAuthUrl =
-      `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}&` +
-      `redirect_uri=${redirectUri}&` +
-      `response_type=code&` +
-      `scope=${scope}&` +
-      `access_type=offline`;
-
+    const googleAuthUrl = AuthService.generateGoogleAuthUrl();
     window.location.href = googleAuthUrl;
   };
 
