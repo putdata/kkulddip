@@ -9,8 +9,6 @@ public record FcmTokenRequest(
     String fcmToken,
 
     @NotNull(message = "디바이스 타입은 필수입니다.")
-    DeviceType deviceType,
-
-    String deviceId
+    DeviceType deviceType
 ) {
 }

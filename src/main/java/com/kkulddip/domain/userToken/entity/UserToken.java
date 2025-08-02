@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
@@ -19,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 /**
@@ -27,6 +25,8 @@ import java.time.LocalDateTime;
  *
  * <p>사용자별 푸시 알림 토큰과 디바이스 정보를 저장하며,
  * JPA Auditing을 통해 생성/수정 시간을 자동 관리합니다.</p>
+ *
+ * access = AccessLevel 설정 이유 : builder() 사용 유도 및 무분별한 외부 참조 방지
  *
  * @author 이석규
  * @since 1.0
@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@EntityListeners(AuditingEntityListener.class)
 public class UserToken {
 
     /** 토큰 고유 식별자 */
@@ -89,9 +88,8 @@ public class UserToken {
      * FCM 토큰과 디바이스 정보를 업데이트하고 토큰을 활성화합니다.
      *
      * @param fcmToken 새로운 FCM 토큰
-     * @param deviceId 디바이스 식별자
      */
-    public void updateToken(String fcmToken, String deviceId) {
+    public void updateToken(String fcmToken) {
         this.fcmToken = fcmToken;
         this.lastUsedAt = LocalDateTime.now();
         this.isActive = true;

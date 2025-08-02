@@ -8,7 +8,6 @@ import com.kkulddip.domain.owner.repository.OwnerRepository;
 import com.kkulddip.domain.userToken.dto.request.FcmTokenRequest;
 import com.kkulddip.domain.userToken.dto.response.FcmTokenResponse;
 import com.kkulddip.domain.userToken.entity.UserToken;
-import com.kkulddip.domain.userToken.enums.DeviceType;
 import com.kkulddip.domain.userToken.repository.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +17,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * FCM 토큰 관리 서비스 (단순화된 단일 서비스)
+ */
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 @Transactional(readOnly = true)
 public class FcmTokenService {
 
@@ -28,112 +30,106 @@ public class FcmTokenService {
     private final CustomerRepository customerRepository;
     private final OwnerRepository ownerRepository;
 
-    /**
-     * FCM 토큰 등록 또는 업데이트
-     */
-    @Transactional
-    public FcmTokenResponse registerOrUpdateToken(Long userId, UserRole userType, FcmTokenRequest request) {
-        log.info("FCM 토큰 등록/업데이트 요청 - UserId: {}, UserType: {}, DeviceType: {}",
-            userId, userType, request.deviceType());
+    // === 쓰기 작업 ===
 
-        // 사용자 존재 여부 확인
-        validateUserExists(userId, userType);
+    @Transactional
+    public FcmTokenResponse registerOrUpdateToken(Long userId, UserRole userRole, FcmTokenRequest request) {
+        log.info("FCM 토큰 등록/업데이트 - userId: {}, deviceType: {}", userId, request.deviceType());
+
+        validateUserExists(userId, userRole);
 
         // 기존 토큰 확인 (같은 사용자, 같은 디바이스 타입)
         Optional<UserToken> existingToken = userTokenRepository
-            .findByUserIdAndUserTypeAndDeviceType(userId, userType, request.deviceType());
+            .findByUserIdAndUserTypeAndDeviceType(userId, userRole, request.deviceType());
 
         UserToken userToken;
-
         if (existingToken.isPresent()) {
             // 기존 토큰 업데이트
             userToken = existingToken.get();
-            userToken.updateToken(request.fcmToken(), request.deviceId());
-            log.info("기존 FCM 토큰 업데이트 완료 - TokenId: {}", userToken.getTokenId());
+            userToken.updateToken(request.fcmToken());
         } else {
             // 새 토큰 생성
             userToken = UserToken.builder()
                 .userId(userId)
-                .userType(userType)
+                .userType(userRole)
                 .fcmToken(request.fcmToken())
                 .deviceType(request.deviceType())
-                .lastUsedAt(LocalDateTime.now())
                 .build();
-
             userToken = userTokenRepository.save(userToken);
-            log.info("새 FCM 토큰 등록 완료 - TokenId: {}", userToken.getTokenId());
         }
 
-        return FcmTokenResponse.builder()
-            .tokenId(userToken.getTokenId())
-            .fcmToken(userToken.getFcmToken())
-            .deviceType(userToken.getDeviceType())
-            .isActive(userToken.getIsActive())
-            .registeredAt(userToken.getCreatedAt())
-            .build();
+        return toResponse(userToken);
     }
 
-    /**
-     * FCM 토큰 삭제 (비활성화)
-     */
     @Transactional
-    public void deactivateToken(Long userId, UserRole userType, DeviceType deviceType) {
-        log.info("FCM 토큰 비활성화 요청 - UserId: {}, UserType: {}, DeviceType: {}",
-            userId, userType, deviceType);
+    public void deactivateUserTokens(Long userId, UserRole userRole) {
+        log.info("사용자 토큰 비활성화 - userId: {}", userId);
 
-        UserToken userToken = userTokenRepository
-            .findByUserIdAndUserTypeAndDeviceType(userId, userType, deviceType)
-            .orElseThrow(() -> new BusinessException(ErrorCode.COMMON_NOT_FOUND, "토큰을 찾을 수 없습니다."));
+        List<UserToken> activeTokens = userTokenRepository
+            .findByUserIdAndUserTypeAndIsActiveTrue(userId, userRole);
 
-        userToken.deactivate();
-        log.info("FCM 토큰 비활성화 완료 - TokenId: {}", userToken.getTokenId());
+        activeTokens.forEach(UserToken::deactivate);
     }
 
-    /**
-     * 사용자의 모든 활성 토큰 조회
-     */
-    public List<FcmTokenResponse> getUserActiveTokens(Long userId, UserRole userType) {
-        log.debug("사용자 활성 토큰 조회 - UserId: {}, UserType: {}", userId, userType);
-
-        List<UserToken> tokens = userTokenRepository.findByUserIdAndUserTypeAndIsActiveTrue(userId, userType);
-
-        return tokens.stream()
-            .map(token -> FcmTokenResponse.builder()
-                .tokenId(token.getTokenId())
-                .fcmToken(token.getFcmToken())
-                .deviceType(token.getDeviceType())
-                .isActive(token.getIsActive())
-                .registeredAt(token.getCreatedAt())
-                .build())
-            .toList();
-    }
-
-    /**
-     * 사용자 존재 여부 확인
-     */
-    private void validateUserExists(Long userId, UserRole userType) {
-        boolean exists = switch (userType) {
-            case CUSTOMER -> customerRepository.existsById(userId);
-            case OWNER -> ownerRepository.existsById(userId);
-            case ADMIN -> true; // Admin은 별도 검증 로직 필요 시 추가
-        };
-
-        if (!exists) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+    @Transactional
+    public boolean deleteToken(String fcmToken) {
+        Optional<UserToken> token = userTokenRepository.findByFcmToken(fcmToken);
+        if (token.isPresent()) {
+            userTokenRepository.delete(token.get());
+            return true;
         }
+        return false;
     }
 
-    /**
-     * 비활성 토큰 정리 (스케줄러에서 사용)
-     */
     @Transactional
-    public void cleanupInactiveTokens(int daysOld) {
+    public int cleanupInactiveTokens(int daysOld) {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(daysOld);
         List<UserToken> inactiveTokens = userTokenRepository.findInactiveTokens(cutoffDate);
 
         if (!inactiveTokens.isEmpty()) {
             userTokenRepository.deleteAll(inactiveTokens);
-            log.info("비활성 토큰 {}개 정리 완료", inactiveTokens.size());
         }
+        return inactiveTokens.size();
+    }
+
+    // === 읽기 작업 ===
+
+    @Transactional(readOnly = true)
+    public List<FcmTokenResponse> getUserActiveTokens(Long userId, UserRole userRole) {
+        List<UserToken> tokens = userTokenRepository
+            .findByUserIdAndUserTypeAndIsActiveTrue(userId, userRole);
+
+        return tokens.stream()
+            .map(this::toResponse)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserToken> getActiveTokensByUserType(UserRole userRole) {
+        return userTokenRepository.findAllActiveTokensByUserType(userRole);
+    }
+
+    // === 헬퍼 메서드 ===
+
+    private void validateUserExists(Long userId, UserRole userType) {
+        boolean exists = switch (userType) {
+            case CUSTOMER -> customerRepository.existsById(userId);
+            case OWNER -> ownerRepository.existsById(userId);
+            case ADMIN -> true;
+        };
+
+        if (!exists) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+    }
+
+    private FcmTokenResponse toResponse(UserToken token) {
+        return FcmTokenResponse.builder()
+            .tokenId(token.getTokenId())
+            .fcmToken(token.getFcmToken())
+            .deviceType(token.getDeviceType())
+            .isActive(token.getIsActive())
+            .registeredAt(token.getCreatedAt())
+            .build();
     }
 }

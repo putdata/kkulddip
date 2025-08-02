@@ -9,7 +9,6 @@ public record FcmTokenResponse(
     Long tokenId,
     String fcmToken,
     DeviceType deviceType,
-    String deviceId,
     boolean isActive,
     LocalDateTime registeredAt
 ) {

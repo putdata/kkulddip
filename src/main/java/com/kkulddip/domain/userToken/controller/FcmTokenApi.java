@@ -1,6 +1,7 @@
 package com.kkulddip.domain.userToken.controller;
 
 import com.kkulddip.common.response.ApiResponse;
+import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.domain.userToken.dto.request.FcmTokenRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -44,7 +45,9 @@ public interface FcmTokenApi {
             content = @Content(schema = @Schema(implementation = ApiResponse.class))
         )
     })
-    ResponseEntity<ApiResponse<Void>> registerToken(
+    ApiResponse<Void> registerToken(
+        @Parameter(description = "인증된 사용자 정보", hidden = true)
+        @AuthenticationPrincipal JwtUserInfo userInfo,
         @Parameter(description = "FCM 토큰 등록 요청 데이터", required = true)
         @Valid @RequestBody FcmTokenRequest request
     );
@@ -70,7 +73,7 @@ public interface FcmTokenApi {
             content = @Content(schema = @Schema(implementation = ApiResponse.class))
         )
     })
-    ResponseEntity<ApiResponse<Void>> deactivateToken(
+    ApiResponse<Void> deactivateToken(
         @Parameter(description = "사용자 ID", required = true, example = "1")
         @PathVariable Long userId
     );
@@ -96,7 +99,7 @@ public interface FcmTokenApi {
             content = @Content(schema = @Schema(implementation = ApiResponse.class))
         )
     })
-    ResponseEntity<ApiResponse<Void>> deleteToken(
+    ApiResponse<Void> deleteToken(
         @Parameter(description = "FCM 토큰", required = true)
         @PathVariable String fcmToken
     );
