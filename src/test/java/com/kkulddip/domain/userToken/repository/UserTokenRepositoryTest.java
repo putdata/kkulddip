@@ -1,9 +1,8 @@
-package com.kkulddip.fcmToken.repository;
+package com.kkulddip.domain.userToken.repository;
 
 import com.kkulddip.common.enums.UserRole;
 import com.kkulddip.domain.userToken.entity.UserToken;
 import com.kkulddip.domain.userToken.enums.DeviceType;
-import com.kkulddip.domain.userToken.repository.UserTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
