@@ -5,6 +5,7 @@ import { Camera, Star } from 'lucide-react';
 
 import { reviewCreateMessages } from '@/constants/messages';
 import { reviewCreateMockData } from '@/constants/mockData';
+import { useState } from 'react';
 
 // export interface Props {
 //   storeId: number;
@@ -17,9 +18,22 @@ import { reviewCreateMockData } from '@/constants/mockData';
 const ReviewCreate = () => {
   // ui 문구
   const messages = reviewCreateMessages;
-
   // 예시 데이터
   const props = reviewCreateMockData;
+
+  // states
+  // 리뷰 이미지
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  // 별점
+  const [rating, setRating] = useState<number>(0);
+  // 리뷰 내용
+  const [reviewText, setReviewText] = useState<string>('');
+
+  // handler
+  const handleStarClick = (starNumber: number) => {
+    setRating(starNumber);
+    console.log('별점: ', starNumber);
+  };
 
   return (
     // 임시 - div 확인용 스타일
@@ -47,7 +61,11 @@ const ReviewCreate = () => {
             </div>
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map(star => (
-                <Star key={star} className="text-gray-300" />
+                <Star
+                  key={star}
+                  className={`cursor-pointer ${star <= rating ? 'fill-yellow-500 text-yellow-500' : 'text-gray-300'} `}
+                  onClick={() => handleStarClick(star)}
+                />
                 // <div key={star} className="h-6 w-6 text-gray-300">
                 //   ⭐
                 // </div>
