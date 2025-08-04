@@ -10,6 +10,7 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
+import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,12 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
+        ],
+      },
+      {
+        path: '/',
+        element: <MobileLayoutWithPageNavbar />,
+        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
