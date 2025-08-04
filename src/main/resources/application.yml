@@ -80,3 +80,12 @@ app:
 logging:
     level:
         web: INFO
+
+management:
+    server:
+        port: ${API_SERVER_PORT}
+    endpoints:
+        web:
+            base-path: /actuator
+            exposure:
+                include: health, info
