@@ -16,7 +16,8 @@ public final class SecurityPaths {
      */
     public static final String[] PUBLIC_PATHS = {
         "/api/v1/auth/**",
-        "/swagger-ui/**"
+        "/swagger-ui/**",
+        "/api-docs/**"
     };
 
     /**
