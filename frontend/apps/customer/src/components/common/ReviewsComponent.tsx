@@ -9,22 +9,22 @@ import { reviewMessages } from '@/constants/reviewMessages';
 import { useState } from 'react';
 
 interface ReviewsComponentProps {
+  store: {
+    id: number;
+    storeName: string;
+    avgRate: number;
+  };
   reviews: Array<{
     id: number;
     user: {
       name: string;
       usageCount: number;
     };
-    date: string;
     rating: number;
     content: string;
     images: Array<{ emoji: string }>;
+    createDate: string;
   }>;
-  store: {
-    id: number;
-    storeName: string;
-    avgRate: number;
-  };
 }
 
 const ReviewsComponent = ({ reviews, store }: ReviewsComponentProps) => {
@@ -115,7 +115,7 @@ const ReviewsComponent = ({ reviews, store }: ReviewsComponentProps) => {
               </div>
               {/* 리뷰 작성 날짜 */}
               <div className="text-sm font-normal text-gray-400">
-                {review.date}
+                {review.createDate}
               </div>
             </div>
 
