@@ -20,9 +20,9 @@ class ApiClient {
    *
    * @param baseURL - API의 기본 URL (기본값: '/api/v1')
    */
-  constructor(baseURL = '/api/v1') {
+  constructor(baseURL = import.meta.env.VITE_API_BASE_URL) {
     this.instance = axios.create({
-      baseURL,
+      baseURL: `${baseURL}/api/v1`,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
