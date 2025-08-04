@@ -1,0 +1,19 @@
+-- 외래키 제약 조건 비활성화 (H2)
+SET REFERENTIAL_INTEGRITY FALSE;
+
+-- 테이블 데이터 삭제 (역순)
+DELETE FROM notification_log;
+DELETE FROM notification;
+DELETE FROM user_token;
+DELETE FROM customer;
+DELETE FROM owner;
+
+-- 시퀀스 초기화 (H2)
+ALTER SEQUENCE IF EXISTS customer_seq RESTART WITH 1;
+ALTER SEQUENCE IF EXISTS owner_seq RESTART WITH 1;
+ALTER SEQUENCE IF EXISTS user_token_seq RESTART WITH 1;
+ALTER SEQUENCE IF EXISTS notification_seq RESTART WITH 1;
+ALTER SEQUENCE IF EXISTS notification_log_seq RESTART WITH 1;
+
+-- 외래키 제약 조건 활성화
+SET REFERENTIAL_INTEGRITY TRUE;

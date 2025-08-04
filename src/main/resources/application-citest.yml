@@ -24,3 +24,37 @@ spring:
                 format_sql: true
                 highlight_sql: true
                 use_sql_comments: true
+
+    cache:
+        type: simple
+
+    # Redis 설정 추가 (테스트용)
+    data:
+        redis:
+            host: localhost
+            port: 6379
+            timeout: 2000ms
+            lettuce:
+                pool:
+                    max-active: 8
+                    max-idle: 8
+                    min-idle: 0
+
+    # 스케줄러 비활성화 (테스트 중 불필요한 에러 방지)
+    task:
+        scheduling:
+            enabled: false
+    execution:
+        enabled: false
+
+    # 스프링 부트 자동 설정 제외 (스케줄링 관련)
+    autoconfigure:
+        exclude:
+            - org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration
+            - org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+
+# notification 기능 mock 테스트용
+app:
+    notification:
+        mock-mode: true
+        timeout: 5000
