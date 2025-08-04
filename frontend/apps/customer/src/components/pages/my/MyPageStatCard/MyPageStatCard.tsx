@@ -1,18 +1,21 @@
-// MyPageStatCard.tsx
 import { Package, Shield } from 'lucide-react';
-import { useMyPageStats as defaultUseMyPageStats } from '@/hooks/my/useMyPageStats';
+
+type MyPageStatsData = {
+  totalOrder: number;
+  level: string;
+};
 
 type MyPageStatCardProps = {
-  customerId: number;
-  useMyPageStatsHook?: typeof defaultUseMyPageStats;
+  data?: MyPageStatsData;
+  isLoading?: boolean;
+  isError?: boolean;
 };
 
 const MyPageStatCard = ({
-  customerId,
-  useMyPageStatsHook = defaultUseMyPageStats,
+  data,
+  isLoading = false,
+  isError = false,
 }: MyPageStatCardProps) => {
-  const { data, isLoading, isError } = useMyPageStatsHook(customerId);
-
   if (isLoading || isError || !data) {
     return (
       <div className="mx-auto mt-4 w-[90%] rounded-xl border px-4 py-6 text-center text-gray-600 shadow-sm">
@@ -37,7 +40,11 @@ const MyPageStatCard = ({
       value: `${data.totalOrder}회`,
       label: '총 주문 수',
     },
-    { icon: <Shield size={24} />, value: data.level, label: '회원 등급' },
+    {
+      icon: <Shield size={24} />,
+      value: data.level,
+      label: '회원 등급',
+    },
   ];
 
   return (
