@@ -66,6 +66,16 @@ export const router = createBrowserRouter([
       {
         path: ROUTE_PATH.NOTIFICATIONS,
       },
+      // 임시 - 리뷰 전체 페이지
+      {
+        path: ROUTE_PATH.REVIEWS,
+        element: <Reviews />,
+      },
+      // 임시 - 리뷰 작성 페이지
+      {
+        path: ROUTE_PATH.REVIEW_CREATE,
+        element: <ReviewCreate />,
+      },
     ],
   },
 ]);
