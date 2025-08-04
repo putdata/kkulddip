@@ -6,6 +6,7 @@ import Likes from '@/pages/Likes';
 import Orders from '@/pages/Orders';
 import MyPage from '@/pages/MyPage';
 import Login from '@/pages/Login';
+import Reviews from '@/pages/review/Reviews';
 import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
+          },
+          {
+            path: ROUTE_PATH.REVIEW,
+            element: <Reviews />,
           },
         ],
       },
