@@ -26,6 +26,51 @@ spring:
                 dialect: org.hibernate.dialect.MySQLDialect
         open-in-view: false
 
+    # 캐시 설정
+    cache:
+        type: simple
+
+    # 태스크 실행 설정
+    task:
+        execution:
+            pool:
+                core-size: 5
+                max-size: 20
+                queue-capacity: 100
+            thread-name-prefix: notification-task-
+        scheduling:
+            pool:
+                size: 3
+
+    data:
+        redis:
+            host: ${REDIS_SERVER_ADDRESS}
+            port: ${REDIS_SERVER_PORT}
+
+# Firebase 설정
+firebase:
+    service-account-file: classpath:firebase-service-account.json
+
+# 애플리케이션 설정
+app:
+    notification:
+        batch-size: 100
+        retry-count: 3
+        timeout: 30000
+        mock-mode: false  # 개발 시 true, 운영 시 false
+
+# 액추에이터 설정
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info,metrics,caches
+    endpoint:
+        health:
+            show-details: always
+        caches:
+            enabled: true
+
 springdoc:
     swagger-ui:
         path: /swagger-ui.html
@@ -39,3 +84,5 @@ springdoc:
 logging:
     level:
         web: INFO
+        org.springframework.data.redis: WARN
+        org.springframework.scheduling: WARN

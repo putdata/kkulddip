@@ -7,10 +7,6 @@ build-job:
   script:
     - chmod +x ./gradlew
     - ./gradlew clean build --refresh-dependencies --no-build-cache --rerun-tasks
-  artifacts:
-    paths:
-      - build/libs/*.jar
-    expire_in: 1 day
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: '$CI_COMMIT_BRANCH =~ /^(master|develop|S13P11A701-\d+)$/'

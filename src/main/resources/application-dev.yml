@@ -1,31 +1,94 @@
 server:
-    address: 127.0.0.1
-    port: 8080
+    address: ${API_SERVER_ADDRESS}
+    port: ${API_SERVER_PORT}
 
 spring:
-    devtools:
-        livereload:
-            enabled: true
-        restart:
-            enabled: true
+    application:
+        name: kkulddip
+
+    config:
+        import: optional:file:.env[.properties]
 
     datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
         url: ${DB_URL}
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
-        driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
-        show-sql: true
+        hibernate:
+            ddl-auto: update
+        show-sql: false
         properties:
             hibernate:
-                format_sql: true
-                highlight_sql: true
-                use_sql_comments: true
+                format_sql: false
+                use_sql_comments: false
+                dialect: org.hibernate.dialect.MySQLDialect
+        open-in-view: false
+
+    # 캐시 설정
+    cache:
+        type: simple
+
+    # 태스크 실행 설정
+    task:
+        execution:
+            pool:
+                core-size: ${TASK_CORE_SIZE}
+                max-size: ${TASK_MAX_SIZE}
+                queue-capacity: ${TASK_QUEUE_CAPACITY}
+            thread-name-prefix: notification-task-
+        scheduling:
+            pool:
+                size: ${SCHEDULING_POOL_SIZE}
+
+    data:
+        redis:
+            host: ${REDIS_SERVER_ADDRESS}
+            port: ${REDIS_SERVER_PORT}
+
+# Firebase 설정
+firebase:
+    service-account-file: classpath:firebase-service-account.json
+
+scheduler:
+    process-rate: ${SCHEDULER_PROCESS_RATE:1000}
+    monitor-rate: ${SCHEDULER_MONITOR_RATE:6000}
+    statistics-rate: ${SCHEDULER_STATISTICS_RATE:60000}
+    healthcheck-rate: ${SCHEDULER_HEALTHCHECK_RATE:30000}
+
+# 애플리케이션 설정
+app:
+    notification:
+        batch-size: ${NOTI_BATCH_SIZE}
+        retry-count: ${NOTI_RETRY_CNT}
+        timeout: 30000
+        mock-mode: false  # 개발 시 true, 운영 시 false
+
+# 액추에이터 설정
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info,metrics,caches
+    endpoint:
+        health:
+            show-details: always
+        caches:
+            enabled: true
+
+springdoc:
+    swagger-ui:
+        path: /swagger-ui.html
+        tags-sorter: alpha
+        operations-sorter: alpha
+    api-docs:
+        path: /api-docs
+    default-consumes-media-type: application/json
+    default-produces-media-type: application/json
 
 logging:
     level:
-        web: DEBUG
-
-
-
+        web: INFO
+        org.springframework.data.redis: WARN
+        org.springframework.scheduling: WARN

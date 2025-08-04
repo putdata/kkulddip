@@ -36,3 +36,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### pem, json 키 ###
+# Firebase 서비스 계정 파일들
+firebase-service-account.json
+firebase-service.account.json
+*firebase*service*account*.json
+**/firebase*.json

@@ -33,8 +33,11 @@ public enum ErrorCode {
     ORDER_CANNOT_BE_CONFIRMED(BAD_REQUEST, "ORDER_CANNOT_BE_CONFIRMED", "주문을 확인할 수 없습니다."),
     ORDER_CANNOT_BE_DELIVERED(BAD_REQUEST, "ORDER_CANNOT_BE_DELIVERED", "주문을 배송 완료 처리할 수 없습니다."),
     ORDER_INVALID_STATUS(BAD_REQUEST, "ORDER_INVALID_STATUS", "잘못된 주문 상태입니다."),
-    ORDER_EMPTY_ITEMS(BAD_REQUEST, "ORDER_EMPTY_ITEMS", "주문 항목이 비어있습니다.");
-    
+    ORDER_EMPTY_ITEMS(BAD_REQUEST, "ORDER_EMPTY_ITEMS", "주문 항목이 비어있습니다."),
+
+    // 알림 도메인 에러
+    NOTIFICATION_NOT_FOUND(NOT_FOUND, "NOTIFICATION_NOT_FOUND", "알림을 찾을 수 없습니다.");
+
     private final HttpStatus status;
     private final String code;
     private final String message;
