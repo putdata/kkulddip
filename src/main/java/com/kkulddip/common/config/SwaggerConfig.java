@@ -24,7 +24,8 @@ public class SwaggerConfig {
                     .email("contact@kkulddip.com"))
             )
             .servers(List.of(
-                new Server().url("http://localhost:8080").description("개발 서버")
+                new Server().url("http://localhost:8080").description("개발 서버"),
+                new Server().url("https://api.kkulddip.store").description("배포 서버")
             ));
     }
 } 
