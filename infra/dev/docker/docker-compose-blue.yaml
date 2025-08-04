@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app-blue:
+    image: kkulddip-app:latest
+    container_name: kkulddip-app-blue
+    ports:
+      - "8081:8080"
+    env_file:
+      - ../.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

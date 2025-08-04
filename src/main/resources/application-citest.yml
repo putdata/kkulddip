@@ -66,3 +66,7 @@ app:
         success-redirect-url: http://localhost:5173/login-success
     cors:
         max-age-seconds: 3600
+
+management:
+    server:
+        port: 8080
