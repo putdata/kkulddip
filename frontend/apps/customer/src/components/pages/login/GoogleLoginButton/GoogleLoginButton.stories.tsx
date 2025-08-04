@@ -4,7 +4,7 @@ import GoogleLoginButton from './GoogleLoginButton';
 import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof GoogleLoginButton> = {
-  title: 'Components/pages/GoogleLoginButton',
+  title: 'Components/pages/Login/GoogleLoginButton',
   component: GoogleLoginButton,
   decorators: [
     Story => (
