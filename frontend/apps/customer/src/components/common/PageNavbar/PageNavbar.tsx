@@ -21,16 +21,18 @@ const PageNavbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between bg-white px-4 py-3 shadow-md">
-      <div className="flex items-center space-x-2">
-        <span className="text-lg font-semibold text-amber-600">
-          {getPageTitle()}
-        </span>
-      </div>
-      <div className="flex items-center space-x-4">
-        <Bell className="mr-1 h-5 w-5" />
-      </div>
-    </nav>
+    <div className="fixed left-0 right-0 top-0 z-50 border-t bg-white">
+      <nav className="flex items-center justify-between bg-white px-4 py-3 shadow-md">
+        <div className="flex items-center space-x-2">
+          <span className="text-lg font-semibold text-amber-600">
+            {getPageTitle()}
+          </span>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Bell className="mr-1 h-5 w-5" />
+        </div>
+      </nav>
+    </div>
   );
 };
 
