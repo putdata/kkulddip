@@ -1,6 +1,7 @@
 import { Heart, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/utils/priceFormat';
+import { ROUTE_PATH } from '@/router';
 
 export interface OrderFoodItem {
   storeInfo: {
@@ -31,7 +32,7 @@ export interface OrderCardProps {
 }
 
 const OrderCard = ({ item }: OrderCardProps) => {
-  const { date, storeInfo, img, price, items, isFavorited, orderId } = item;
+  const { date, storeInfo, img, price, items, isFavorited } = item;
   const navigate = useNavigate();
   return (
     <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow">
@@ -40,7 +41,7 @@ const OrderCard = ({ item }: OrderCardProps) => {
         <span className="text-xs font-medium text-gray-600">{date}</span>
         <button
           className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          onClick={() => navigate(`/order/${orderId}`)}
+          onClick={() => navigate(ROUTE_PATH.ORDER_DETAIL)}
         >
           주문상세
         </button>
