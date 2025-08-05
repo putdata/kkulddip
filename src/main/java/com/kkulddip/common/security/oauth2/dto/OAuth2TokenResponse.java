@@ -11,13 +11,13 @@ import lombok.Builder;
  */
 @Builder
 public record OAuth2TokenResponse(
-    @JsonProperty("access_token")
+    @JsonProperty("accessToken")
     String accessToken,
     
-    @JsonProperty("refresh_token")
+    @JsonProperty("refreshToken")
     String refreshToken,
 
-    @JsonProperty("expires_in")
+    @JsonProperty("expiresIn")
     long expiresIn,
     
     UserInfo user
