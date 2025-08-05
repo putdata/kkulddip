@@ -10,6 +10,7 @@ import {
 
 /**
  * 마이페이지 메뉴 섹션 상수
+ * TODO: ROUTE_PATH 수정 후 연결
  */
 export const MENU_SECTIONS = [
   {
