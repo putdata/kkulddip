@@ -1,4 +1,6 @@
 import { ChevronUp } from 'lucide-react';
+import { getDiscountDisplayName, DISCOUNT_TYPES } from '@/constants/discount';
+import { formatPrice } from '@/utils/priceFormat';
 
 export interface PaymentInfo {
   totalOriginalPrice: number;
@@ -15,18 +17,6 @@ export interface PaymentInfo {
 export interface PaymentInfoCardProps {
   paymentInfo: PaymentInfo;
 }
-
-const formatPrice = (price: number) => `${price.toLocaleString()}원`;
-
-const getDiscountDisplayName = (discountType: string) => {
-  const displayNames: { [key: string]: string } = {
-    MEMBERSHIP: '꿀띱클럽 할인',
-    IMMEDIATE: '즉시할인',
-    COUPON: '쿠폰할인',
-    // 필요에 따라 더 추가 가능
-  };
-  return displayNames[discountType] || discountType;
-};
 
 const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
   const {
@@ -78,7 +68,7 @@ const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
                 <span className="text-xs text-gray-600">
                   {getDiscountDisplayName(discount.discountType)}
                 </span>
-                {discount.discountType === '꿀띱 MEMBERSHIP' && (
+                {discount.discountType === DISCOUNT_TYPES.MEMBERSHIP && (
                   <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700">
                     🏷️
                   </span>
