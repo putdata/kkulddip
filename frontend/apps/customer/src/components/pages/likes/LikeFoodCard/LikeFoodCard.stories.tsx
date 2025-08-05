@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import LikeFoodCard from './LikeFoodCard';
-import type { CardItemProps } from './LikeFoodCard';
+import type { CardItemProps } from '@/types/likeFoodCard';
 
 const meta: Meta<typeof LikeFoodCard> = {
   title: 'Components/pages/Likes/LikeFoodCard',
