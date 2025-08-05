@@ -1,5 +1,6 @@
 import { Heart, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { formatPrice } from '@/utils/priceFormat';
 
 export interface OrderFoodItem {
   storeInfo: {
@@ -28,9 +29,6 @@ export interface OrderFoodItem {
 export interface OrderCardProps {
   item: OrderFoodItem;
 }
-
-const formatPrice = (price?: number) =>
-  price !== undefined ? `${price.toLocaleString()}원` : '';
 
 const OrderCard = ({ item }: OrderCardProps) => {
   const { date, storeInfo, img, price, items, isFavorited, orderId } = item;
