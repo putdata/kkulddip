@@ -1,6 +1,7 @@
 import { ChevronUp } from 'lucide-react';
 import { getDiscountDisplayName, DISCOUNT_TYPES } from '@/constants/discount';
 import { formatPrice } from '@/utils/priceFormat';
+import { Separator } from '@/components/ui/separator';
 
 export interface PaymentInfo {
   totalOriginalPrice: number;
@@ -81,7 +82,7 @@ const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
           ))}
 
           {/* 굵은 구분선 */}
-          <div className="my-4 border-t-2 border-gray-300"></div>
+          <Separator className="my-3" />
 
           {/* 결제금액 */}
           <div className="flex items-center justify-between">
