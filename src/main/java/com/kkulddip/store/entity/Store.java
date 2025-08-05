@@ -6,16 +6,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "store")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "store")
 public class Store {
 
     @Id
@@ -42,7 +43,7 @@ public class Store {
     @Builder.Default
     private Boolean isActive = true;
 
-    @Column(name = "rating_average", precision = 3, scale = 1)
+    @Column(name = "rating_average")
     private Double ratingAverage;
 
     @Column(name = "review_count")
