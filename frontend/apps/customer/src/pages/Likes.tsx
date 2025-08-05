@@ -1,7 +1,14 @@
+import LikeFoodCard from '@/components/pages/likes/LikeFoodCard/LikeFoodCard';
+import { dummyLikeFoodData } from '@/dummies/dummyFoodData';
+
 const Likes = () => {
   return (
-    <div className="flex flex-col items-center justify-between bg-orange-50 p-0">
-      <div>찜한 가게들 리스트</div>
+    <div>
+      <div className="space-y-2 px-2 pb-16 pt-16">
+        {dummyLikeFoodData.map((item, idx) => (
+          <LikeFoodCard key={idx} item={item} />
+        ))}
+      </div>
     </div>
   );
 };
