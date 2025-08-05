@@ -15,13 +15,13 @@ const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
           className="h-full w-full object-cover"
         />
         {item.price.discount > 0 && (
-          <div className="absolute bottom-1 left-1 rounded bg-blue-600 px-1 py-[2px] text-[10px] font-medium text-white">
+          <div className="absolute bottom-1 left-1 rounded bg-blue-600 px-1 py-1 text-[0.6rem] font-medium text-white">
             {formatPrice(item.price.discount)} 할인
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-[4px]">
+      <div className="flex flex-1 flex-col gap-2">
         <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-gray-900">
           {item.storeInfo.storeName}
         </h3>
@@ -41,27 +41,27 @@ const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-1 text-[10px]">
+        <div className="flex flex-wrap gap-1 text-xs">
           {item.timeLeftHour && (
-            <span className="rounded-full bg-red-500 px-1.5 py-[2px] font-semibold text-white">
+            <span className="rounded-full bg-red-500 px-1.5 py-1 font-semibold text-white">
               {item.timeLeftHour}시간
             </span>
           )}
           {item.discountRate && (
-            <span className="rounded bg-yellow-100 px-1.5 py-[2px] font-semibold text-yellow-800">
+            <span className="rounded bg-yellow-100 px-1.5 py-1 font-semibold text-yellow-800">
               {item.discountRate}% 할인
             </span>
           )}
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-gray-600">
+        <div className="flex items-center justify-between text-xs text-gray-600">
           <div className="flex items-center gap-1">
             <span>⭐ {item.storeInfo.ratingAverage.toFixed(1)}</span>
             <span>📍 {item.distance}km</span>
           </div>
 
           {item.remainingQuantity !== undefined && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-1.5 py-[2px] text-[10px] text-red-500">
+            <div className="rounded-md border border-red-200 bg-red-50 px-1.5 py-1 text-xs text-red-500">
               남은 수량 {item.remainingQuantity}개
             </div>
           )}

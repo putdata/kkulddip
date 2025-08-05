@@ -37,12 +37,12 @@ const ProfileCard = ({
           <div className="flex flex-col items-center p-1">
             <PiggyBank className="mb-1" />
             <div className="font-bold">{savedAmount.toLocaleString()}원</div>
-            <div className="text-[11px] text-gray-500">아낀 금액</div>
+            <div className="text-[0.6rem] text-gray-500">아낀 금액</div>
           </div>
           <div className="flex flex-col items-center p-1">
             <Cloudy className="mb-1" />
             <div className="font-bold">{savedCO2}kg</div>
-            <div className="text-[11px] text-gray-500">아낀 CO₂</div>
+            <div className="text-[0.6rem] text-gray-500">아낀 CO₂</div>
           </div>
         </div>
       </div>

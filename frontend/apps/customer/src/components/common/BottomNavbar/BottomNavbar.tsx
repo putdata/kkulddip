@@ -68,7 +68,7 @@ function BottomNavbar() {
             >
               {item.icon}
               <div
-                className={`mt-1 text-[10px] ${isActive ? 'font-semibold text-black' : ''}`}
+                className={`mt-1 text-xs ${isActive ? 'font-semibold text-black' : ''}`}
               >
                 {item.label}
               </div>
