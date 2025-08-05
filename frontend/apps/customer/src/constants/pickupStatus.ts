@@ -31,7 +31,7 @@ export const PICKUP_STATUS_MESSAGES = {
  * 픽업 상태별 텍스트 색상 클래스
  */
 export const PICKUP_STATUS_COLORS = {
-  [PICKUP_STATUS.COMPLETED]: 'text-green-600',
+  [PICKUP_STATUS.COMPLETED]: 'text-gray-600',
   [PICKUP_STATUS.IN_PROGRESS]: 'text-blue-600',
   [PICKUP_STATUS.PENDING]: 'text-orange-600',
   [PICKUP_STATUS.CANCELLED]: 'text-red-600',

@@ -33,7 +33,7 @@ const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
   return (
     <div className="space-y-4">
       {/* 결제 정보 카드 */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-md">
         <div className="space-y-3">
           {/* 매뉴금액 */}
           <div className="flex items-center justify-between">
