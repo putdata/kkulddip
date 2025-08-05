@@ -16,7 +16,7 @@ const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
         />
         {item.price.discount > 0 && (
           <div className="absolute bottom-1 left-1 rounded bg-blue-600 px-1 py-[2px] text-[10px] font-medium text-white">
-            {formatPrice(item.price.discount)}원 할인
+            {formatPrice(item.price.discount)} 할인
           </div>
         )}
       </div>
