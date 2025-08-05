@@ -67,6 +67,10 @@ logging:
     level:
         web: DEBUG
 
+openvidu:
+    url: ${OPENVIDU_URL:https://stream.kkulddip.store}
+    secret: ${OPENVIDU_SECRET:MY_SECRET}
+
 
 management:
     health:

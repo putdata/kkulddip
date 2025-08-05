@@ -49,7 +49,10 @@ public class OAuth2TokenService {
     private String googleClientSecret;
 
     @Value("${spring.security.oauth2.client.registration.google-customer.redirect-uri}")
-    private String googleRedirectUri;
+    private String googleCustomerRedirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.google-owner.redirect-uri}")
+    private String googleOwnerRedirectUri;
 
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiration;
@@ -80,7 +83,7 @@ public class OAuth2TokenService {
     @Transactional
     public User exchangeCodeForUser(String authorizationCode, String userType) {
         // 1. Authorization Code를 OAuth2 Access Token으로 교환
-        String oauthAccessToken = exchangeCodeForAccessToken(authorizationCode);
+        String oauthAccessToken = exchangeCodeForAccessToken(authorizationCode, userType);
 
         // 2. OAuth2 Access Token으로 사용자 정보 가져오기
         Map<String, Object> userAttributes = getUserInfo(oauthAccessToken);
@@ -97,16 +100,19 @@ public class OAuth2TokenService {
      * Google의 OAuth2 토큰 엔드포인트에 요청을 보내 Access Token을 획득합니다.
      *
      * @param authorizationCode Google에서 받은 Authorization Code
+     * @param userType 사용자 타입 ("customer" 또는 "owner")
      * @return Google OAuth2 Access Token
      * @throws BusinessException OAuth2 토큰 교환 실패 시
      */
-    private String exchangeCodeForAccessToken(String authorizationCode) {
+    private String exchangeCodeForAccessToken(String authorizationCode, String userType) {
+        String redirectUri = getRedirectUriByUserType(userType);
+        
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("client_id", googleClientId);
         params.add("client_secret", googleClientSecret);
         params.add("code", authorizationCode);
         params.add("grant_type", "authorization_code");
-        params.add("redirect_uri", googleRedirectUri);
+        params.add("redirect_uri", redirectUri);
 
         return Optional.ofNullable(
             webClient.post()
@@ -274,6 +280,7 @@ public class OAuth2TokenService {
      */
     private OAuth2TokenResponse createTokenResponse(User user) {
         JwtUserInfo jwtUserInfo = new JwtUserInfo(
+            user.getId(),
             user.getEmail(),
             user.getRole().name(),
             user.getOauth2Provider().name(),
@@ -295,5 +302,20 @@ public class OAuth2TokenService {
                 .profileImageUrl(user.getProfileImageUrl())
                 .build())
             .build();
+    }
+
+    /**
+     * 사용자 타입에 따른 적절한 redirect URI 반환
+     *
+     * @param userType 사용자 타입 ("customer" 또는 "owner")
+     * @return 해당 사용자 타입에 맞는 redirect URI
+     * @throws BusinessException 지원하지 않는 사용자 타입인 경우
+     */
+    private String getRedirectUriByUserType(String userType) {
+        return switch (userType.toLowerCase()) {
+            case "customer" -> googleCustomerRedirectUri;
+            case "owner" -> googleOwnerRedirectUri;
+            default -> throw new BusinessException(ErrorCode.USER_REGISTER_TYPE_ERROR, "지원하지 않는 사용자 타입입니다: " + userType);
+        };
     }
 }
