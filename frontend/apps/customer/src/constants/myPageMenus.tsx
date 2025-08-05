@@ -18,7 +18,7 @@ export const MENU_SECTIONS = [
       {
         id: 'order-history',
         label: '주문 내역',
-        path: '/orders',
+        path: '/order',
         icon: <ShoppingBag className="h-4 w-4" />,
       },
       {
@@ -69,4 +69,4 @@ export const MENU_SECTIONS = [
       },
     ],
   },
-] as const;
+];
