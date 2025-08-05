@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import LoginFoodCard from './LoginFoodCard';
 
 const meta: Meta<typeof LoginFoodCard> = {
-  title: 'Components/pages/LoginFoodCard',
+  title: 'Components/pages/Login/LoginFoodCard',
   component: LoginFoodCard,
   parameters: {
     layout: 'centered',
