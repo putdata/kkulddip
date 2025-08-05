@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StoreCardViewDto {
+public class StoreCardViewResponse {
     private Long storeId;
     private String storeName;
     private String storeProfileImage;
