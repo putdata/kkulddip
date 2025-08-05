@@ -12,6 +12,7 @@ import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
 import Cart from '@/pages/Cart';
 import Payment from '@/pages/Payment';
+import OrderDetail from '@/pages/OrderDetail';
 import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 
 export const router = createBrowserRouter([
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.CART,
             element: <Cart />,
+          },
+          {
+            path: ROUTE_PATH.ORDER_DETAIL,
+            element: <OrderDetail />,
           },
         ],
       },
