@@ -2,34 +2,7 @@ import { Heart, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/utils/priceFormat';
 import { ROUTE_PATH } from '@/router';
-
-export interface OrderFoodItem {
-  storeInfo: {
-    storeName: string;
-    description: string;
-    ratingAverage?: number;
-  };
-  img: {
-    src: string;
-    alt: string;
-  };
-  price: {
-    original: number;
-    discount: number;
-    discountAmount: number;
-  };
-  date: string;
-  items: {
-    name: string;
-    quantity: number;
-  }[];
-  isFavorited?: boolean;
-  orderId: number;
-}
-
-export interface OrderCardProps {
-  item: OrderFoodItem;
-}
+import { type OrderCardProps } from '@/types/orderFood';
 
 const OrderCard = ({ item }: OrderCardProps) => {
   const { date, storeInfo, img, price, items, isFavorited } = item;
