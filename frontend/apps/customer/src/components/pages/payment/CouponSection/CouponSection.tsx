@@ -1,4 +1,4 @@
-import { Gift } from 'lucide-react';
+import { ChevronRight, Gift } from 'lucide-react';
 
 interface CouponSectionProps {
   discountAmount: number;
@@ -17,7 +17,9 @@ export default function CouponSection({ discountAmount }: CouponSectionProps) {
           <span className="text-sm text-green-600">
             {discountAmount.toLocaleString()}원 할인
           </span>
-          <span className="text-gray-400">{'>'}</span>
+          <span className="text-gray-400">
+            <ChevronRight />
+          </span>
         </div>
       </button>
     </div>
