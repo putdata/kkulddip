@@ -10,6 +10,7 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
+import PaymentRouteWrapper from '@/pages/PaymentRouteWrapper';
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
+          },
+          {
+            path: ROUTE_PATH.PAYMENT,
+            element: <PaymentRouteWrapper />,
           },
         ],
       },
