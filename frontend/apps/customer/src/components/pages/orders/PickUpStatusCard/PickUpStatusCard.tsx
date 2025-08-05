@@ -1,3 +1,8 @@
+import {
+  getPickupStatusMessage,
+  getPickupStatusColor,
+} from '@/constants/pickupStatus';
+
 export interface StatusItem {
   orderId: number;
   status: string;
@@ -12,17 +17,13 @@ export interface StatusProps {
 const PickUpStatusCard = ({ item }: StatusProps) => {
   const { orderId, status, createdAt, pickupCompletedAt } = item;
 
-  const isCompleted = status === 'COMPLETED';
-
   return (
     <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow">
       <div className="space-y-1 p-2">
         {/* 상태 메시지 */}
         <div className="py-2 text-center">
-          <div
-            className={`text-lg font-bold ${isCompleted ? 'text-green-600' : 'text-blue-600'}`}
-          >
-            {isCompleted ? '픽업이 완료된 주문이에요' : '픽업이 진행중이에요'}
+          <div className={`text-lg font-bold ${getPickupStatusColor(status)}`}>
+            {getPickupStatusMessage(status)}{' '}
           </div>
         </div>
 
