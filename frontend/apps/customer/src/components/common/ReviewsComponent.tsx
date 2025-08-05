@@ -14,7 +14,7 @@ interface ReviewsComponentProps {
     storeName: string;
     avgRate: number;
   };
-  reviews: Array<{
+  reviews: {
     id: number;
     user: {
       name: string;
@@ -22,9 +22,9 @@ interface ReviewsComponentProps {
     };
     rating: number;
     content: string;
-    images: Array<{ emoji: string }>;
+    images: { emoji: string }[];
     createDate: string;
-  }>;
+  }[];
 }
 
 const ReviewsComponent = ({ reviews, store }: ReviewsComponentProps) => {
