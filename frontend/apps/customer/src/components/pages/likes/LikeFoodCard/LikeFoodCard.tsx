@@ -1,52 +1,5 @@
-export interface CardItem {
-  storeInfo: {
-    storeName: string;
-    description: string;
-    ratingAverage: number;
-  };
-  img: {
-    src: string;
-    alt: string;
-  };
-  price: {
-    original?: number;
-    discount: number;
-  };
-  timeLeftHour?: number;
-  discountRate?: number;
-  distance: number;
-  remainingQuantity?: number;
-}
-
-export interface CardItemProps {
-  item: CardItem;
-  onClick?: () => void;
-}
-
-export interface CardItem {
-  storeInfo: {
-    storeName: string;
-    description: string;
-    ratingAverage: number;
-  };
-  img: {
-    src: string;
-    alt: string;
-  };
-  price: {
-    original?: number;
-    discount: number;
-  };
-  timeLeftHour?: number;
-  discountRate?: number;
-  distance: number;
-  remainingQuantity?: number;
-}
-
-export interface CardItemProps {
-  item: CardItem;
-  onClick?: () => void;
-}
+import { type CardItemProps } from '@/types/likeFoodCard';
+import { formatPrice } from '@/utils/priceFormat';
 
 const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
   return (
@@ -63,7 +16,7 @@ const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
         />
         {item.price.discount > 0 && (
           <div className="absolute bottom-1 left-1 rounded bg-blue-600 px-1 py-[2px] text-[10px] font-medium text-white">
-            {item.price.discount.toLocaleString()}원 할인
+            {formatPrice(item.price.discount)}원 할인
           </div>
         )}
       </div>
@@ -80,11 +33,11 @@ const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
         <div className="flex items-center gap-1 text-xs">
           {item.price.original && (
             <span className="text-gray-400 line-through">
-              {item.price.original.toLocaleString()}원
+              {formatPrice(item.price.original)}{' '}
             </span>
           )}
           <span className="font-bold text-green-600">
-            {item.price.discount.toLocaleString()}원
+            {formatPrice(item.price.discount)}{' '}
           </span>
         </div>
 
