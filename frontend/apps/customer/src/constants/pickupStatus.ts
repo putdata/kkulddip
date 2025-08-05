@@ -1,4 +1,13 @@
 /**
+ * 픽업 상태 타입 정의
+ */
+export type PickupStatusType =
+  | 'COMPLETED'
+  | 'IN_PROGRESS'
+  | 'PENDING'
+  | 'CANCELLED';
+
+/**
  * 픽업 상태 상수
  */
 export const PICKUP_STATUS = {
@@ -6,7 +15,7 @@ export const PICKUP_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
   PENDING: 'PENDING',
   CANCELLED: 'CANCELLED',
-} as const;
+} as const satisfies Record<string, PickupStatusType>;
 
 /**
  * 픽업 상태별 메시지
@@ -29,13 +38,23 @@ export const PICKUP_STATUS_COLORS = {
 } as const;
 
 /**
+ * 픽업 상태 유효성 검사
+ */
+const isValidPickupStatus = (status: string): status is PickupStatusType => {
+  return Object.values(PICKUP_STATUS).includes(status as PickupStatusType);
+};
+
+/**
  * 픽업 상태 메시지를 반환하는 유틸리티 함수
+ * @throws Error 잘못된 상태값이 전달된 경우
  */
 export const getPickupStatusMessage = (status: string): string => {
-  return (
-    PICKUP_STATUS_MESSAGES[status as keyof typeof PICKUP_STATUS_MESSAGES] ||
-    '상태를 확인할 수 없어요'
-  );
+  if (!isValidPickupStatus(status)) {
+    throw new Error(
+      `Invalid pickup status: ${status}. Please check the API response or contact support.`,
+    );
+  }
+  return PICKUP_STATUS_MESSAGES[status];
 };
 
 /**
