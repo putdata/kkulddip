@@ -22,7 +22,6 @@ const Cart = ({ onNext, onBack, initialQuantity = 1 }: CartProps) => {
     setQuantity(prev => Math.max(CART_CONSTANTS.MIN_QUANTITY, prev + change));
   };
 
-  // ✅ 데이터를 퍼넬에 전달하는 핸들러 함수 추가
   const handleNext = () => {
     const total = dummyCartProduct.price * quantity;
     const cartData: CartData = {

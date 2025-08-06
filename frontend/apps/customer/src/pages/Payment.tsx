@@ -13,7 +13,6 @@ import {
 import { PAYMENT_MESSAGES } from '@/constants/payment';
 import { formatPrice } from '@/utils/priceFormat';
 
-// Payment에서 전달하는 데이터 타입 - 퍼넬 컨테이너와 동일해야 함
 interface PaymentData {
   paymentMethod: string;
   appliedCouponId?: string;
@@ -21,7 +20,6 @@ interface PaymentData {
   finalAmount: number;
 }
 
-// 전체 주문 데이터 타입 - 퍼넬 컨테이너와 동일해야 함
 interface OrderData {
   quantity: number;
   total: number;
@@ -35,26 +33,24 @@ interface OrderData {
 }
 
 interface PaymentProps {
-  onNext: (paymentData: PaymentData) => void; // ✅ PaymentData를 전달하도록 수정
+  onNext: (paymentData: PaymentData) => void;
   onBack: () => void;
-  orderData: OrderData; // ✅ 퍼넬에서 전달받은 주문 데이터
+  orderData: OrderData;
 }
 
 const Payment = ({ onBack, onNext, orderData }: PaymentProps) => {
-  // ✅ 퍼넬에서 전달받은 데이터를 사용하여 최종 금액 계산
   const baseAmount =
     orderData.total || dummyProductData.price * orderData.quantity;
   const finalAmount = baseAmount - dummyDiscountAmount;
 
-  // ✅ 데이터를 퍼넬에 전달하는 핸들러 함수 추가
   const handleNext = () => {
     const paymentData: PaymentData = {
-      paymentMethod: '카드결제', // 실제로는 사용자가 선택한 결제 방법
-      appliedCouponId: 'COUPON123', // 실제로는 사용자가 적용한 쿠폰 ID
+      paymentMethod: '카드결제',
+      appliedCouponId: 'COUPON123',
       discountAmount: dummyDiscountAmount,
       finalAmount: finalAmount,
     };
-    onNext(paymentData); // 퍼넬 컨테이너로 데이터 전달
+    onNext(paymentData);
   };
 
   return (
