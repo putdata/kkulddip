@@ -11,9 +11,9 @@ interface OrderData {
   paymentMethod?: string;
   appliedCouponId?: string;
   discountAmount?: number;
-  finalAmount?: number;
-  orderNumber?: string;
-  orderDate?: Date;
+  finalAmount: number;
+  orderNumber: string;
+  orderDate: Date;
 }
 
 interface OrderCompleteProps {
@@ -121,19 +121,6 @@ const OrderComplete = ({ onBack, orderData }: OrderCompleteProps) => {
           <span className="text-sm font-medium text-amber-800">
             예상 준비 시간: {displayData.estimatedTime}
           </span>
-        </div>
-      </div>
-
-      <div className="rounded-2xl bg-white p-4 shadow-sm">
-        <h3 className="mb-3 font-semibold text-gray-800">주문 요약</h3>
-        <div className="space-y-1 text-xs text-gray-600">
-          <p>
-            • 주문 일시: {orderData.orderDate?.toLocaleString() || '방금 전'}
-          </p>
-          <p>
-            • 할인 금액: {priceUtils.formatPrice(orderData.discountAmount || 0)}
-          </p>
-          <p>• 쿠폰: {orderData.appliedCouponId || '사용 안함'}</p>
         </div>
       </div>
 
