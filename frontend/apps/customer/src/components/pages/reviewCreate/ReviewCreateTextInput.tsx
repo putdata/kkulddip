@@ -1,5 +1,4 @@
 import { Textarea } from '@/components/ui/textarea';
-import { reviewCreateMessages } from '@/constants/messages';
 import { useState } from 'react';
 
 // Props 타입 정의
@@ -13,19 +12,20 @@ const ReviewCreateText = ({
   setReviewText,
 }: ReviewCreateTextProps) => {
   // UI 문구 (프론트엔드에서 관리)
-  const messages = reviewCreateMessages;
 
   const [localText, setLocalText] = useState(reviewText);
 
   return (
     <div className="flex flex-col items-start gap-2 px-5 py-2.5">
       <div className="w-fit whitespace-nowrap text-sm font-bold text-gray-900 [font-family:'Segoe_UI']">
-        {messages.description1}
+        자세한 띱박스 리뷰를 작성해주세요.
       </div>
       <div className="flex w-full items-start gap-1.5 self-stretch">
         <Textarea
           className="h-50 resize-none bg-white p-2.5"
-          placeholder={messages.placeholder1}
+          placeholder={
+            '여러분의 따뜻한 리뷰는\n가게 사장님들에게 큰 도움이 됩니다.'
+          }
           value={localText}
           onChange={e => {
             setLocalText(e.target.value);
