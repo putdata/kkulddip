@@ -8,7 +8,6 @@ export const ROUTE_PATH = {
   ORDER_DETAIL: '/order/:orderId',
   NOTIFICATIONS: '/notifications',
   LOGIN: '/login',
-  PAYMENT: '/payment',
-  CART: '/cart',
+  PAY: '/pay',
   NOT_FOUND: '*',
 } as const;
