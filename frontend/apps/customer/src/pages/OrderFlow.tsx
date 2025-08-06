@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFunnel } from '@/hooks/useFunnel';
 import Cart from '@/pages/Cart';
 import Payment from '@/pages/Payment';
 import OrderComplete from '@/pages/OrderComplete';
+import { ROUTE_PATH } from '@/router';
 
 const steps = ['cart', 'payment', 'complete'] as const;
 
@@ -34,6 +36,7 @@ interface OrderData {
 }
 
 const OrderFunnelContainer = () => {
+  const navigate = useNavigate();
   const { Funnel, Step, nextClickHandler, prevClickHandler } = useFunnel(
     steps,
     'cart',
@@ -71,7 +74,7 @@ const OrderFunnelContainer = () => {
   };
 
   const handleBackToHome = () => {
-    window.history.back();
+    navigate(ROUTE_PATH.HOME);
   };
 
   return (
