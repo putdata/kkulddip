@@ -16,8 +16,8 @@ const ReviewCreateText = ({
   const [localText, setLocalText] = useState(reviewText);
 
   return (
-    <div className="flex flex-col items-start gap-2 px-5 py-2.5">
-      <div className="w-fit whitespace-nowrap text-sm font-bold text-gray-900 [font-family:'Segoe_UI']">
+    <div className="flex w-full flex-col items-start gap-2">
+      <div className="w-full whitespace-nowrap text-sm font-bold text-gray-900 [font-family:'Segoe_UI']">
         자세한 띱박스 리뷰를 작성해주세요.
       </div>
       <div className="flex w-full items-start gap-1.5 self-stretch">

@@ -19,7 +19,7 @@ const ReviewCreateHeader = ({
   setRating,
 }: ReviewCreateHeaderProps) => {
   return (
-    <div className="flex w-full items-center justify-between p-5">
+    <div className="flex w-full items-center justify-between">
       {/* 상단 왼쪽 */}
       <div className="flex flex-col items-start justify-center gap-2">
         <div className="text-xl font-bold text-black [font-family:'Segoe_UI']">

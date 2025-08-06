@@ -67,36 +67,34 @@ const ReviewCreatePhotoInput = ({
   };
 
   return (
-    <div>
-      <div className="flex w-full items-center justify-center gap-2.5 p-5">
-        {selectedImages.length < 3 && (
-          <Button
-            className="flex h-auto w-full flex-1 grow cursor-pointer items-center justify-center border border-dashed border-amber-600 bg-transparent text-amber-600 hover:bg-amber-500 hover:text-white"
-            onClick={openFileDialog}
-          >
-            <input
-              id="imageInput"
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageSelect}
-              className="hidden"
-            />
-            <Camera className="h-6 w-6" />
-            <span className="text-lg font-bold [font-family:'segoe_UI',Helvetica]">
-              사진 추가
-            </span>
-            <span className="text-lg font-bold [font-family:'segoe_UI',Helvetica]">
-              ( {selectedImages.length} / 3 )
-            </span>
-          </Button>
-        )}
-      </div>
+    <div className="flex w-full flex-col">
+      {selectedImages.length < 3 && (
+        <Button
+          className="flex h-auto grow cursor-pointer items-center justify-center border border-dashed border-amber-600 bg-transparent text-amber-600 hover:bg-amber-500 hover:text-white"
+          onClick={openFileDialog}
+        >
+          <input
+            id="imageInput"
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+          />
+          <Camera className="h-6 w-6" />
+          <span className="text-lg font-bold [font-family:'segoe_UI',Helvetica]">
+            사진 추가
+          </span>
+          <span className="text-lg font-bold [font-family:'segoe_UI',Helvetica]">
+            ( {selectedImages.length} / 3 )
+          </span>
+        </Button>
+      )}
 
       {/* 선택된 이미지 미리보기 */}
       {selectedImages.length > 0 && (
-        <div className="flex flex-col gap-2 px-5">
-          <div className="flex gap-2 overflow-x-auto">
+        <div className="flex flex-col items-center gap-2 pt-3">
+          <div className="flex items-center justify-center gap-2 overflow-x-auto">
             {imagePreviewUrls.map((url, index) => (
               <div key={index} className="relative flex-shrink-0">
                 <img

@@ -64,7 +64,7 @@ const ReviewCreate = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-gray-100">
+    <div className="flex h-screen flex-col items-center gap-5 bg-gray-100 p-5">
       {/* 리뷰 작성 페이지 상단 */}
       <ReviewCreateHeader
         store={store}
@@ -84,7 +84,7 @@ const ReviewCreate = () => {
       />
       <Button
         onClick={handleSubmit}
-        className="w-50 m-5 flex cursor-pointer bg-amber-500 text-center font-bold text-white [font-family:Helvetica] hover:bg-amber-600"
+        className="w-50 flex h-10 cursor-pointer bg-amber-500 text-center text-lg font-bold text-white [font-family:Helvetica] hover:bg-amber-600"
       >
         등록하기
       </Button>
