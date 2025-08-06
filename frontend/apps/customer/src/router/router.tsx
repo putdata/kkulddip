@@ -54,10 +54,7 @@ export const router = createBrowserRouter([
             path: ROUTE_PATH.PAYMENT,
             element: <Payment />,
           },
-          {
-            path: ROUTE_PATH.CART,
-            element: <Cart />,
-          },
+
           {
             path: ROUTE_PATH.ORDER_DETAIL,
             element: <OrderDetail />,
@@ -71,6 +68,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Login />,
+          },
+        ],
+      },
+      {
+        path: ROUTE_PATH.CART,
+        element: <MobileLayout />,
+        children: [
+          {
+            index: true,
+            element: <Cart />,
           },
         ],
       },
