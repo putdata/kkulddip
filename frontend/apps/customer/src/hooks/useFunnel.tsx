@@ -1,4 +1,4 @@
-import { type ReactElement, type ReactNode, useState } from 'react';
+import { type ReactElement, type ReactNode, useState, useEffect } from 'react';
 
 export interface StepProps {
   name: string;
@@ -15,6 +15,12 @@ export const useFunnel = <T extends readonly string[]>(
 ) => {
   const [step, setStep] = useState<T[number]>(defaultStep);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+    });
+  }, [step]);
   const Step = (props: StepProps): ReactElement => {
     return <>{props.children}</>;
   };
