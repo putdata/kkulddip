@@ -167,7 +167,7 @@ const OrderComplete = ({ onBack, orderData }: OrderCompleteProps) => {
               <h3 className="mb-3 font-semibold text-gray-800">주문 요약</h3>
               <div className="space-y-1 text-xs text-gray-600">
                 <p>
-                  • 주문 일시:{' '}
+                  • 주문 일시:
                   {orderData.orderDate?.toLocaleString() || '방금 전'}
                 </p>
                 <p>
