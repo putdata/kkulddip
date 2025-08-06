@@ -1,12 +1,13 @@
 import {
-  getPickupStatusMessage,
-  getPickupStatusColor,
+  PICKUP_STATUS_COLORS,
+  PICKUP_STATUS_MESSAGES,
+  type PickupStatusType,
 } from '@/constants/pickupStatus';
 import { Calendar, Clock, Hash } from 'lucide-react';
 
 export interface StatusItem {
   orderId: number;
-  status: string;
+  status: PickupStatusType;
   createdAt: string;
   pickupCompletedAt?: string;
 }
@@ -17,8 +18,8 @@ export interface StatusProps {
 
 const PickUpStatusCard = ({ item }: StatusProps) => {
   const { orderId, status, createdAt, pickupCompletedAt } = item;
-  const statusMessage = getPickupStatusMessage(status);
-  const statusColor = getPickupStatusColor(status);
+  const statusMessage = PICKUP_STATUS_MESSAGES[status];
+  const statusColor = PICKUP_STATUS_COLORS[status];
 
   return (
     <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white shadow-md">
