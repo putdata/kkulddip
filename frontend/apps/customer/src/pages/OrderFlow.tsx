@@ -48,12 +48,12 @@ const OrderFunnelContainer = () => {
     productId: 0,
   });
 
-  const handleCartNext = (cartData: CartData) => {
+  const handleNextToCart = (cartData: CartData) => {
     setOrderData(prev => ({ ...prev, ...cartData }));
     nextClickHandler('payment');
   };
 
-  const handlePaymentNext = (paymentData: PaymentData) => {
+  const handleNextToPayment = (paymentData: PaymentData) => {
     const orderNumber = `ORDER-${Date.now()}`;
     const orderDate = new Date();
     setOrderData(prev => ({
@@ -81,7 +81,7 @@ const OrderFunnelContainer = () => {
     <Funnel>
       <Step name="cart">
         <Cart
-          onNext={handleCartNext}
+          onNext={handleNextToCart}
           onBack={handleBackToHome}
           initialQuantity={orderData.quantity}
         />
@@ -89,7 +89,7 @@ const OrderFunnelContainer = () => {
 
       <Step name="payment">
         <Payment
-          onNext={handlePaymentNext}
+          onNext={handleNextToPayment}
           onBack={handleBackToCart}
           orderData={orderData}
         />
