@@ -5,11 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("StoreValidator 테스트")
+@ActiveProfiles("citest")
 class StoreValidatorTest {
 
     @Test
@@ -27,7 +29,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateStoreId(null))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("유효하지 않은 가게 ID");
+                .hasMessageContaining("가게 ID: null");
     }
 
     @ParameterizedTest
@@ -37,7 +39,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateStoreId(invalidId))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("유효하지 않은 가게 ID");
+                .hasMessageContaining("가게 ID: " + invalidId);
     }
 
     @ParameterizedTest
@@ -54,7 +56,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validatePageSize(null))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("페이지 크기는 1 이상 50 이하");
+                .hasMessageContaining("페이지 크기: null");
     }
 
     @ParameterizedTest
@@ -64,7 +66,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validatePageSize(smallSize))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("페이지 크기는 1 이상 50 이하");
+                .hasMessageContaining("페이지 크기: " + smallSize);
     }
 
     @ParameterizedTest
@@ -74,7 +76,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validatePageSize(largeSize))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("페이지 크기는 1 이상 50 이하");
+                .hasMessageContaining("페이지 크기: " + largeSize);
     }
 
     @ParameterizedTest
@@ -91,7 +93,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateSearchKeyword(null))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("검색 키워드는 필수");
+                .hasMessageContaining("검색 키워드는 필수입니다");
     }
 
     @ParameterizedTest
@@ -101,7 +103,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateSearchKeyword(emptyKeyword))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("검색 키워드는 필수");
+                .hasMessageContaining("검색 키워드는 필수입니다");
     }
 
     @ParameterizedTest
@@ -118,7 +120,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateCategory(null))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("카테고리는 필수");
+                .hasMessageContaining("카테고리는 필수입니다");
     }
 
     @ParameterizedTest
@@ -128,7 +130,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateCategory(emptyCategory))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("카테고리는 필수");
+                .hasMessageContaining("카테고리는 필수입니다");
     }
 
     @ParameterizedTest
@@ -181,7 +183,7 @@ class StoreValidatorTest {
         // when & then
         assertThatThrownBy(() -> StoreValidator.validateAndNormalizeSortBy(unsupportedSortBy))
                 .isInstanceOf(StoreValidationException.class)
-                .hasMessageContaining("지원하지 않는 정렬 타입");
+                .hasMessageContaining("정렬 타입: " + unsupportedSortBy);
     }
 
     @Test

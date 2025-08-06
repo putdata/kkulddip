@@ -5,14 +5,11 @@ import com.kkulddip.store.common.Page;
 import com.kkulddip.store.dto.request.StoreListRequest;
 import com.kkulddip.store.dto.request.StoreSearchRequest;
 import com.kkulddip.store.dto.response.DdipBoxCardViewDto;
-import com.kkulddip.store.dto.response.DdipBoxItemDto;
 import com.kkulddip.store.dto.response.StoreDetailDto;
 import com.kkulddip.store.dto.response.StoreResponseDto;
 import com.kkulddip.store.entity.DdipBox;
-import com.kkulddip.store.entity.DdipBoxItem;
 import com.kkulddip.store.entity.Store;
 import com.kkulddip.store.exception.StoreNotFoundException;
-import com.kkulddip.store.exception.StoreValidationException;
 import com.kkulddip.store.mapper.StoreMapper;
 import com.kkulddip.store.repository.CursorStoreRepository;
 import com.kkulddip.store.repository.DdipBoxRepository;
@@ -46,32 +43,32 @@ public class StoreService {
      * 가게 목록 조회 (Cursor 기반 페이지네이션)
      */
     public Page<StoreResponseDto> getStores(StoreListRequest request) {
-        StoreValidator.validatePageSize(request.getSize());
+        StoreValidator.validatePageSize(request.size());
         
-        CursorInfo cursorInfo = CursorInfo.decode(request.getCursor());
-        Pageable pageable = PageRequest.of(0, request.getSize() + 1);
+        CursorInfo cursorInfo = CursorInfo.decode(request.cursor());
+        Pageable pageable = PageRequest.of(0, request.size() + 1);
 
         List<Store> stores = fetchStoresBySortType(request, cursorInfo, pageable);
         
-        boolean hasMore = stores.size() > request.getSize();
+        boolean hasMore = stores.size() > request.size();
         if (hasMore) {
-            stores = stores.subList(0, request.getSize());
+            stores = stores.subList(0, request.size());
         }
 
         List<StoreResponseDto> storeResponses = stores.stream()
-                .map(store -> storeMapper.toStoreResponseDto(store, request.getUserLatitude(), request.getUserLongitude()))
+                .map(store -> storeMapper.toStoreResponseDto(store, request.userLatitude(), request.userLongitude()))
                 .collect(Collectors.toList());
 
-        String nextCursor = createNextCursor(stores, request.getSortBy(), hasMore);
-        boolean isFirstPage = request.getCursor() == null;
+        String nextCursor = createNextCursor(stores, request.sortBy(), hasMore);
+        boolean isFirstPage = request.cursor() == null;
 
         Page.PageMetadata metadata = Page.PageMetadata.builder()
-                .sortBy(request.getSortBy())
+                .sortBy(request.sortBy())
                 .build();
 
         Page<StoreResponseDto> page = Page.of(
                 storeResponses, 
-                request.getSize(), 
+                request.size(), 
                 hasMore, 
                 nextCursor, 
                 isFirstPage
@@ -85,35 +82,35 @@ public class StoreService {
      * 가게 검색 (Cursor 기반 페이지네이션)
      */
     public Page<StoreResponseDto> searchStores(StoreSearchRequest request) {
-        StoreValidator.validatePageSize(request.getSize());
+        StoreValidator.validatePageSize(request.size());
         
-        CursorInfo cursorInfo = CursorInfo.decode(request.getCursor());
-        Pageable pageable = PageRequest.of(0, request.getSize() + 1);
+        CursorInfo cursorInfo = CursorInfo.decode(request.cursor());
+        Pageable pageable = PageRequest.of(0, request.size() + 1);
 
         Long cursor = cursorInfo != null ? cursorInfo.getId() : null;
         List<Store> stores = cursorStoreRepository.findStoresWithCursorBySearch(
-                request.getKeyword(), cursor, pageable);
+                request.keyword(), cursor, pageable);
 
-        boolean hasMore = stores.size() > request.getSize();
+        boolean hasMore = stores.size() > request.size();
         if (hasMore) {
-            stores = stores.subList(0, request.getSize());
+            stores = stores.subList(0, request.size());
         }
 
         List<StoreResponseDto> storeResponses = stores.stream()
-                .map(store -> storeMapper.toStoreResponseDto(store, request.getUserLatitude(), request.getUserLongitude()))
+                .map(store -> storeMapper.toStoreResponseDto(store, request.userLatitude(), request.userLongitude()))
                 .collect(Collectors.toList());
 
-        String nextCursor = createNextCursor(stores, request.getSortBy(), hasMore);
-        boolean isFirstPage = request.getCursor() == null;
+        String nextCursor = createNextCursor(stores, request.sortBy(), hasMore);
+        boolean isFirstPage = request.cursor() == null;
 
         Page.PageMetadata metadata = Page.PageMetadata.builder()
-                .sortBy(request.getSortBy())
-                .searchKeyword(request.getKeyword())
+                .sortBy(request.sortBy())
+                .searchKeyword(request.keyword())
                 .build();
 
         Page<StoreResponseDto> page = Page.of(
                 storeResponses, 
-                request.getSize(), 
+                request.size(), 
                 hasMore, 
                 nextCursor, 
                 isFirstPage
@@ -127,35 +124,35 @@ public class StoreService {
      * 카테고리별 가게 조회 (Cursor 기반 페이지네이션)
      */
     public Page<StoreResponseDto> getStoresByCategory(String category, StoreListRequest request) {
-        StoreValidator.validatePageSize(request.getSize());
+        StoreValidator.validatePageSize(request.size());
         
-        CursorInfo cursorInfo = CursorInfo.decode(request.getCursor());
-        Pageable pageable = PageRequest.of(0, request.getSize() + 1);
+        CursorInfo cursorInfo = CursorInfo.decode(request.cursor());
+        Pageable pageable = PageRequest.of(0, request.size() + 1);
 
         Long cursor = cursorInfo != null ? cursorInfo.getId() : null;
         List<Store> stores = cursorStoreRepository.findStoresWithCursorByCategory(
                 category, cursor, pageable);
 
-        boolean hasMore = stores.size() > request.getSize();
+        boolean hasMore = stores.size() > request.size();
         if (hasMore) {
-            stores = stores.subList(0, request.getSize());
+            stores = stores.subList(0, request.size());
         }
 
         List<StoreResponseDto> storeResponses = stores.stream()
-                .map(store -> storeMapper.toStoreResponseDto(store, request.getUserLatitude(), request.getUserLongitude()))
+                .map(store -> storeMapper.toStoreResponseDto(store, request.userLatitude(), request.userLongitude()))
                 .collect(Collectors.toList());
 
-        String nextCursor = createNextCursor(stores, request.getSortBy(), hasMore);
-        boolean isFirstPage = request.getCursor() == null;
+        String nextCursor = createNextCursor(stores, request.sortBy(), hasMore);
+        boolean isFirstPage = request.cursor() == null;
 
         Page.PageMetadata metadata = Page.PageMetadata.builder()
-                .sortBy(request.getSortBy())
+                .sortBy(request.sortBy())
                 .category(category)
                 .build();
 
         Page<StoreResponseDto> page = Page.of(
                 storeResponses, 
-                request.getSize(), 
+                request.size(), 
                 hasMore, 
                 nextCursor, 
                 isFirstPage
@@ -198,7 +195,7 @@ public class StoreService {
      * 정렬 타입에 따른 가게 조회
      */
     private List<Store> fetchStoresBySortType(StoreListRequest request, CursorInfo cursorInfo, Pageable pageable) {
-        switch (request.getSortBy().toLowerCase()) {
+        switch (request.sortBy().toLowerCase()) {
             case "id":
                 return fetchStoresById(cursorInfo, pageable);
             case "created_at":
@@ -207,9 +204,9 @@ public class StoreService {
             case "rating":
                 return fetchStoresByRating(cursorInfo, pageable);
             case "distance":
-                if (request.getUserLatitude() != null && request.getUserLongitude() != null) {
-                    return fetchStoresByDistance(cursorInfo, request.getUserLatitude(), 
-                            request.getUserLongitude(), request.getSize() + 1);
+                if (request.userLatitude() != null && request.userLongitude() != null) {
+                    return fetchStoresByDistance(cursorInfo, request.userLatitude(), 
+                            request.userLongitude(), request.size() + 1);
                 }
                 return fetchStoresById(cursorInfo, pageable);
             default:

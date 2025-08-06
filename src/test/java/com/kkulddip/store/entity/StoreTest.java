@@ -2,6 +2,7 @@ package com.kkulddip.store.entity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Store 엔티티 테스트")
+@ActiveProfiles("citest")
 class StoreTest {
 
     @Test

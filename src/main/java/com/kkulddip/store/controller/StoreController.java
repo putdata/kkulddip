@@ -50,13 +50,13 @@ public class StoreController implements StoreControllerInterface {
         log.info("가게 목록 조회 요청 - sortBy: {}, size: {}, userLocation: {},{}", 
                 sortBy, size, userLatitude, userLongitude);
 
-        StoreListRequest request = StoreListRequest.builder()
-                .userLatitude(userLatitude)
-                .userLongitude(userLongitude)
-                .sortBy(sortBy)
-                .size(size)
-                .cursor(cursor)
-                .build();
+        StoreListRequest request = StoreListRequest.of(
+                userLatitude,
+                userLongitude,
+                sortBy,
+                size,
+                cursor
+        );
 
         Page<StoreResponseDto> result = storeService.getStores(request);
         
@@ -87,14 +87,14 @@ public class StoreController implements StoreControllerInterface {
 
         StoreValidator.validateSearchKeyword(keyword);
 
-        StoreSearchRequest request = StoreSearchRequest.builder()
-                .keyword(keyword.trim())
-                .userLatitude(userLatitude)
-                .userLongitude(userLongitude)
-                .sortBy(sortBy)
-                .size(size)
-                .cursor(cursor)
-                .build();
+        StoreSearchRequest request = StoreSearchRequest.of(
+                keyword.trim(),
+                userLatitude,
+                userLongitude,
+                sortBy,
+                size,
+                cursor
+        );
 
         Page<StoreResponseDto> result = storeService.searchStores(request);
         
@@ -124,13 +124,13 @@ public class StoreController implements StoreControllerInterface {
 
         StoreValidator.validateCategory(category);
 
-        StoreListRequest request = StoreListRequest.builder()
-                .userLatitude(userLatitude)
-                .userLongitude(userLongitude)
-                .sortBy(sortBy)
-                .size(size)
-                .cursor(cursor)
-                .build();
+        StoreListRequest request = StoreListRequest.of(
+                userLatitude,
+                userLongitude,
+                sortBy,
+                size,
+                cursor
+        );
 
         Page<StoreResponseDto> result = storeService.getStoresByCategory(category.trim(), request);
         
@@ -152,7 +152,7 @@ public class StoreController implements StoreControllerInterface {
 
         StoreDetailDto result = storeService.getStoreDetail(storeId);
         
-        log.info("가게 상세 조회 완료 - storeId: {}, storeName: {}", storeId, result.getStoreName());
+        log.info("가게 상세 조회 완료 - storeId: {}, storeName: {}", storeId, result.storeName());
 
         return ApiResponse.of(result);
     }

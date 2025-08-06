@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -32,8 +33,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(StoreController.class)
+@WebMvcTest(controllers = StoreController.class, excludeAutoConfiguration = {
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class
+})
 @DisplayName("StoreController 테스트")
+@ActiveProfiles("citest")
 class StoreControllerTest {
 
     @Autowired
@@ -51,11 +56,7 @@ class StoreControllerTest {
 
     @BeforeEach
     void setUp() {
-        StoreResponseDto storeDto = StoreResponseDto.builder()
-                .storeId(1L)
-                .storeName("테스트 마트")
-                .storeAddress("서울시 강남구")
-                .build();
+        StoreResponseDto storeDto = StoreResponseDto.of(1L, "테스트 마트", "서울시 강남구");
 
         testStorePage = Page.of(
                 Arrays.asList(storeDto), 
@@ -65,16 +66,9 @@ class StoreControllerTest {
                 true
         );
 
-        testStoreDetail = StoreDetailDto.builder()
-                .storeId(1L)
-                .storeName("테스트 마트")
-                .storeAddress("서울시 강남구")
-                .build();
+        testStoreDetail = StoreDetailDto.of(1L, "테스트 마트", "서울시 강남구");
 
-        DdipBoxCardViewDto ddipBoxDto = DdipBoxCardViewDto.builder()
-                .ddipboxId(1L)
-                .ddipboxName("테스트 띱박스")
-                .build();
+        DdipBoxCardViewDto ddipBoxDto = DdipBoxCardViewDto.of(1L, "테스트 띱박스");
 
         testDdipBoxes = Arrays.asList(ddipBoxDto);
     }

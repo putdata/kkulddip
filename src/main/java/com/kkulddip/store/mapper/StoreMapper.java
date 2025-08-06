@@ -37,28 +37,29 @@ public class StoreMapper {
             distance = DistanceCalculator.calculateDistance(userLat, userLng, store.getLatitude(), store.getLongitude());
         }
 
-        StoreResponseDto.StoreResponseDtoBuilder builder = StoreResponseDto.builder()
-                .storeId(store.getStoreId())
-                .ownerId(store.getOwnerId())
-                .storeName(store.getStoreName())
-                .storeAddress(store.getStoreAddress())
-                .description(store.getDescription())
-                .operatingHours(store.getOperatingHours())
-                .phoneNumber(store.getPhone())
-                .ratingAverage(store.getRatingAverage())
-                .reviewNum(store.getReviewCount())
-                .storeProfileImage(store.getStoreProfileImage())
-                .isActive(store.getIsActive())
-                .distanceFromUser(distance);
+        // 대표 띱박스 정보
+        Optional<DdipBox> representativeDdipBox = findRepresentativeDdipBox(store);
+        String representativeDdipboxName = representativeDdipBox.map(DdipBox::getDdipboxName).orElse(null);
+        Long representativeOriginalPrice = representativeDdipBox.map(DdipBox::getOriginalPrice).orElse(null);
+        Long representativeSalePrice = representativeDdipBox.map(DdipBox::getSalePrice).orElse(null);
 
-        // 대표 띱박스 정보 추가
-        findRepresentativeDdipBox(store).ifPresent(ddipBox -> {
-            builder.representativeDdipboxName(ddipBox.getDdipboxName())
-                    .representativeOriginalPrice(ddipBox.getOriginalPrice())
-                    .representativeSalePrice(ddipBox.getSalePrice());
-        });
-
-        return builder.build();
+        return StoreResponseDto.of(
+                store.getStoreId(),
+                store.getOwnerId(),
+                store.getStoreName(),
+                store.getStoreAddress(),
+                store.getDescription(),
+                store.getOperatingHours(),
+                store.getPhone(),
+                store.getRatingAverage(),
+                store.getReviewCount(),
+                distance,
+                representativeDdipboxName,
+                representativeOriginalPrice,
+                representativeSalePrice,
+                store.getStoreProfileImage(),
+                store.getIsActive()
+        );
     }
 
     /**
@@ -70,36 +71,36 @@ public class StoreMapper {
     public StoreDetailDto toStoreDetailDto(Store store) {
         List<StoreDetailDto.DdipBoxSummaryDto> ddipBoxSummaries = store.getDdipBoxes().stream()
                 .filter(DdipBox::getIsActive)
-                .map(ddipBox -> StoreDetailDto.DdipBoxSummaryDto.builder()
-                        .ddipboxId(ddipBox.getDdipboxId())
-                        .ddipboxName(ddipBox.getDdipboxName())
-                        .category(ddipBox.getCategory())
-                        .originalPrice(ddipBox.getOriginalPrice())
-                        .salePrice(ddipBox.getSalePrice())
-                        .remainingQuantity(ddipBox.getRemainingQuantity())
-                        .isActive(ddipBox.getIsActive())
-                        .build())
+                .map(ddipBox -> StoreDetailDto.DdipBoxSummaryDto.of(
+                        ddipBox.getDdipboxId(),
+                        ddipBox.getDdipboxName(),
+                        ddipBox.getCategory(),
+                        ddipBox.getOriginalPrice(),
+                        ddipBox.getSalePrice(),
+                        ddipBox.getRemainingQuantity(),
+                        ddipBox.getIsActive()
+                ))
                 .collect(Collectors.toList());
 
-        return StoreDetailDto.builder()
-                .storeId(store.getStoreId())
-                .ownerId(store.getOwnerId())
-                .storeName(store.getStoreName())
-                .storeAddress(store.getStoreAddress())
-                .description(store.getDescription())
-                .operatingHours(store.getOperatingHours())
-                .phoneNumber(store.getPhone())
-                .ratingAverage(store.getRatingAverage())
-                .reviewCount(store.getReviewCount())
-                .businessNumber(store.getBusinessNumber())
-                .storeProfileImage(store.getStoreProfileImage())
-                .latitude(store.getLatitude())
-                .longitude(store.getLongitude())
-                .isActive(store.getIsActive())
-                .createdAt(store.getCreatedAt())
-                .updatedAt(store.getUpdatedAt())
-                .ddipBoxes(ddipBoxSummaries)
-                .build();
+        return StoreDetailDto.of(
+                store.getStoreId(),
+                store.getOwnerId(),
+                store.getStoreName(),
+                store.getStoreAddress(),
+                store.getDescription(),
+                store.getOperatingHours(),
+                store.getPhone(),
+                store.getRatingAverage(),
+                store.getReviewCount(),
+                store.getBusinessNumber(),
+                store.getStoreProfileImage(),
+                store.getLatitude(),
+                store.getLongitude(),
+                store.getIsActive(),
+                store.getCreatedAt(),
+                store.getUpdatedAt(),
+                ddipBoxSummaries
+        );
     }
 
     /**
@@ -113,20 +114,40 @@ public class StoreMapper {
                 .map(this::toDdipBoxItemDto)
                 .collect(Collectors.toList());
 
-        return DdipBoxCardViewDto.builder()
-                .ddipboxId(ddipBox.getDdipboxId())
-                .storeId(ddipBox.getStore().getStoreId())
-                .ddipboxName(ddipBox.getDdipboxName())
-                .description(ddipBox.getDescription())
-                .category(ddipBox.getCategory())
-                .originalPrice(ddipBox.getOriginalPrice())
-                .salePrice(ddipBox.getSalePrice())
-                .dailyQuantity(ddipBox.getDailyQuantity())
-                .remainingQuantity(ddipBox.getRemainingQuantity())
-                .maxPerCustomer(ddipBox.getMaxPerCustomer())
-                .isActive(ddipBox.getIsActive())
-                .items(items)
-                .build();
+        DdipBoxCardViewDto dto = DdipBoxCardViewDto.of(
+                ddipBox.getDdipboxId(),
+                ddipBox.getStore().getStoreId(),
+                ddipBox.getDdipboxName(),
+                ddipBox.getDescription(),
+                ddipBox.getCategory(),
+                ddipBox.getOriginalPrice(),
+                ddipBox.getSalePrice(),
+                null, // discountRate - will be calculated
+                ddipBox.getDailyQuantity(),
+                ddipBox.getRemainingQuantity(),
+                ddipBox.getMaxPerCustomer(),
+                ddipBox.getIsActive(),
+                null, // soldOut - will be calculated
+                items
+        );
+
+        // Create a new record with calculated values
+        return DdipBoxCardViewDto.of(
+                dto.ddipboxId(),
+                dto.storeId(),
+                dto.ddipboxName(),
+                dto.description(),
+                dto.category(),
+                dto.originalPrice(),
+                dto.salePrice(),
+                dto.calculateDiscountRate(),
+                dto.dailyQuantity(),
+                dto.remainingQuantity(),
+                dto.maxPerCustomer(),
+                dto.active(),
+                dto.calculateIsSoldOut(),
+                dto.items()
+        );
     }
 
     /**
@@ -136,12 +157,12 @@ public class StoreMapper {
      * @return 변환된 DdipBoxItemDto
      */
     public DdipBoxItemDto toDdipBoxItemDto(DdipBoxItem item) {
-        return DdipBoxItemDto.builder()
-                .itemId(item.getItemId())
-                .ddipboxItemName(item.getDdipboxItemName())
-                .originalPrice(item.getOriginalPrice())
-                .itemQuantity(item.getItemQuantity())
-                .build();
+        return DdipBoxItemDto.of(
+                item.getItemId(),
+                item.getDdipboxItemName(),
+                item.getOriginalPrice(),
+                item.getItemQuantity()
+        );
     }
 
     /**

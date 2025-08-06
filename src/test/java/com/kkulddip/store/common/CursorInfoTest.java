@@ -2,10 +2,12 @@ package com.kkulddip.store.common;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("CursorInfo 테스트")
+@ActiveProfiles("citest")
 class CursorInfoTest {
 
     @Test

@@ -2,7 +2,12 @@ server:
     address: 127.0.0.1
     port: 8080
 
+# Override environment variables for CI/Test
 spring:
+    config:
+        import: ""  # Disable .env import for tests
+    main:
+        allow-bean-definition-overriding: true
     datasource:
         url: jdbc:h2:mem:kkulddip-inmem-db;DATABASE_TO_UPPER=FALSE;mode=mysql
         username: sa

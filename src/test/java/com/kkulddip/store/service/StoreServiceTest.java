@@ -24,8 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDateTime;
+import org.springframework.test.context.ActiveProfiles;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +38,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("StoreService 테스트")
+@ActiveProfiles("citest")
 class StoreServiceTest {
 
     @Mock
@@ -71,17 +71,9 @@ class StoreServiceTest {
                 .isActive(true)
                 .build();
 
-        testStoreResponseDto = StoreResponseDto.builder()
-                .storeId(1L)
-                .storeName("테스트 마트")
-                .storeAddress("서울시 강남구")
-                .build();
+        testStoreResponseDto = StoreResponseDto.of(1L, "테스트 마트", "서울시 강남구");
 
-        testStoreDetailDto = StoreDetailDto.builder()
-                .storeId(1L)
-                .storeName("테스트 마트")
-                .storeAddress("서울시 강남구")
-                .build();
+        testStoreDetailDto = StoreDetailDto.of(1L, "테스트 마트", "서울시 강남구");
 
         testDdipBox = DdipBox.builder()
                 .ddipboxId(1L)
@@ -89,21 +81,14 @@ class StoreServiceTest {
                 .isActive(true)
                 .build();
 
-        testDdipBoxCardViewDto = DdipBoxCardViewDto.builder()
-                .ddipboxId(1L)
-                .ddipboxName("테스트 띱박스")
-                .build();
+        testDdipBoxCardViewDto = DdipBoxCardViewDto.of(1L, "테스트 띱박스");
     }
 
     @Test
     @DisplayName("가게 목록을 조회한다")
     void getStores() {
         // given
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("id")
-                .size(10)
-                .cursor(null)
-                .build();
+        StoreListRequest request = StoreListRequest.of();
 
         List<Store> stores = Arrays.asList(testStore);
         given(cursorStoreRepository.findStoresWithCursorById(isNull(), any(Pageable.class)))
@@ -130,10 +115,9 @@ class StoreServiceTest {
     @DisplayName("가게 목록 조회 시 다음 페이지가 있으면 hasNext가 true이다")
     void getStores_HasNextPage() {
         // given
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("id")
-                .size(2)
-                .build();
+        StoreListRequest request = new StoreListRequest(
+                null, null, "id", 2, null
+        );
 
         // 3개의 store를 반환하도록 설정 (size + 1)
         Store store1 = Store.builder().storeId(1L).build();
@@ -160,10 +144,7 @@ class StoreServiceTest {
     @DisplayName("가게 검색을 수행한다")
     void searchStores() {
         // given
-        StoreSearchRequest request = StoreSearchRequest.builder()
-                .keyword("마트")
-                .size(10)
-                .build();
+        StoreSearchRequest request = StoreSearchRequest.of("마트");
 
         List<Store> stores = Arrays.asList(testStore);
         given(cursorStoreRepository.findStoresWithCursorBySearch(eq("마트"), isNull(), any(Pageable.class)))
@@ -179,7 +160,7 @@ class StoreServiceTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getMetadata().getSearchKeyword()).isEqualTo("마트");
 
-        verify(cursorStoreRepository).findStoresWithCursorBySearch("마트", null, PageRequest.of(0, 11));
+        verify(cursorStoreRepository).findStoresWithCursorBySearch(eq("마트"), isNull(), eq(PageRequest.of(0, 11)));
     }
 
     @Test
@@ -187,9 +168,9 @@ class StoreServiceTest {
     void getStoresByCategory() {
         // given
         String category = "유기농";
-        StoreListRequest request = StoreListRequest.builder()
-                .size(10)
-                .build();
+        StoreListRequest request = new StoreListRequest(
+                null, null, null, 10, null
+        );
 
         List<Store> stores = Arrays.asList(testStore);
         given(cursorStoreRepository.findStoresWithCursorByCategory(eq(category), isNull(), any(Pageable.class)))
@@ -205,7 +186,7 @@ class StoreServiceTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getMetadata().getCategory()).isEqualTo(category);
 
-        verify(cursorStoreRepository).findStoresWithCursorByCategory(category, null, PageRequest.of(0, 11));
+        verify(cursorStoreRepository).findStoresWithCursorByCategory(eq(category), isNull(), eq(PageRequest.of(0, 11)));
     }
 
     @Test
@@ -307,9 +288,9 @@ class StoreServiceTest {
     @DisplayName("페이지 크기가 유효하지 않으면 예외가 발생한다")
     void getStores_InvalidPageSize() {
         // given
-        StoreListRequest invalidRequest1 = StoreListRequest.builder().size(0).build();
-        StoreListRequest invalidRequest2 = StoreListRequest.builder().size(51).build();
-        StoreListRequest invalidRequest3 = StoreListRequest.builder().size(null).build();
+        StoreListRequest invalidRequest1 = StoreListRequest.of(null, null, null, 0, null);
+        StoreListRequest invalidRequest2 = StoreListRequest.of(null, null, null, 51, null);
+        StoreListRequest invalidRequest3 = StoreListRequest.of(null, null, null, null, null);
 
         // when & then
         assertThatThrownBy(() -> storeService.getStores(invalidRequest1))
@@ -329,14 +310,12 @@ class StoreServiceTest {
         CursorInfo cursorInfo = CursorInfo.ofId(100L);
         String encodedCursor = cursorInfo.encode();
 
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("id")
-                .size(10)
-                .cursor(encodedCursor)
-                .build();
+        StoreListRequest request = new StoreListRequest(
+                null, null, "id", 10, encodedCursor
+        );
 
         List<Store> stores = Arrays.asList(testStore);
-        given(cursorStoreRepository.findStoresWithCursorById(eq(100L), any(Pageable.class)))
+        given(cursorStoreRepository.findStoresWithCursorById(any(), any(Pageable.class)))
                 .willReturn(stores);
         given(storeMapper.toStoreResponseDto(any(Store.class), isNull(), isNull()))
                 .willReturn(testStoreResponseDto);
@@ -348,17 +327,16 @@ class StoreServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getIsFirst()).isFalse(); // 커서가 있으므로 첫 페이지가 아님
 
-        verify(cursorStoreRepository).findStoresWithCursorById(100L, PageRequest.of(0, 11));
+        verify(cursorStoreRepository).findStoresWithCursorById(any(), eq(PageRequest.of(0, 11)));
     }
 
     @Test
     @DisplayName("평점 기준으로 가게 목록을 조회한다")
     void getStores_SortByRating() {
         // given
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("rating")
-                .size(10)
-                .build();
+        StoreListRequest request = new StoreListRequest(
+                null, null, "rating", 10, null
+        );
 
         List<Store> stores = Arrays.asList(testStore);
         given(cursorStoreRepository.findStoresWithCursorByRatingDesc(isNull(), isNull(), any(Pageable.class)))
@@ -371,19 +349,16 @@ class StoreServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(cursorStoreRepository).findStoresWithCursorByRatingDesc(null, null, PageRequest.of(0, 11));
+        verify(cursorStoreRepository).findStoresWithCursorByRatingDesc(isNull(), isNull(), eq(PageRequest.of(0, 11)));
     }
 
     @Test
     @DisplayName("거리 기준으로 가게 목록을 조회한다")
     void getStores_SortByDistance() {
         // given
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("distance")
-                .userLatitude(37.5665)
-                .userLongitude(126.9780)
-                .size(10)
-                .build();
+        StoreListRequest request = new StoreListRequest(
+                37.5665, 126.9780, "distance", 10, null
+        );
 
         List<Store> stores = Arrays.asList(testStore);
         given(cursorStoreRepository.findStoresWithCursorByDistance(
@@ -397,19 +372,16 @@ class StoreServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(cursorStoreRepository).findStoresWithCursorByDistance(37.5665, 126.9780, null, null, 11);
+        verify(cursorStoreRepository).findStoresWithCursorByDistance(eq(37.5665), eq(126.9780), isNull(), isNull(), eq(11));
     }
 
     @Test
     @DisplayName("거리 기준 정렬이지만 사용자 위치가 없으면 ID 기준으로 조회한다")
     void getStores_SortByDistance_NoUserLocation() {
         // given
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("distance")
-                .userLatitude(null)
-                .userLongitude(null)
-                .size(10)
-                .build();
+        StoreListRequest request = new StoreListRequest(
+                null, null, "distance", 10, null
+        );
 
         List<Store> stores = Arrays.asList(testStore);
         given(cursorStoreRepository.findStoresWithCursorById(isNull(), any(Pageable.class)))
@@ -422,17 +394,14 @@ class StoreServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(cursorStoreRepository).findStoresWithCursorById(null, PageRequest.of(0, 11));
+        verify(cursorStoreRepository).findStoresWithCursorById(isNull(), eq(PageRequest.of(0, 11)));
     }
 
     @Test
     @DisplayName("빈 결과에 대해서도 올바른 페이지를 반환한다")
     void getStores_EmptyResult() {
         // given
-        StoreListRequest request = StoreListRequest.builder()
-                .sortBy("id")
-                .size(10)
-                .build();
+        StoreListRequest request = StoreListRequest.of();
 
         given(cursorStoreRepository.findStoresWithCursorById(isNull(), any(Pageable.class)))
                 .willReturn(Collections.emptyList());

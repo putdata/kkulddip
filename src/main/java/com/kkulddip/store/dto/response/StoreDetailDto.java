@@ -1,12 +1,7 @@
 package com.kkulddip.store.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,113 +9,92 @@ import java.util.List;
  * 가게 상세 조회 응답 DTO
  * 개별 가게의 상세 정보를 제공
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StoreDetailDto {
-
-    /**
-     * 가게 ID
-     */
-    private Long storeId;
-
-    /**
-     * 사업자 ID
-     */
-    private Long ownerId;
-
-    /**
-     * 가게명
-     */
-    private String storeName;
-
-    /**
-     * 가게 주소
-     */
-    private String storeAddress;
-
-    /**
-     * 가게 설명
-     */
-    private String description;
-
-    /**
-     * 운영시간
-     */
-    private String operatingHours;
-
-    /**
-     * 전화번호
-     */
-    private String phoneNumber;
-
-    /**
-     * 평균 평점
-     */
-    private Double ratingAverage;
-
-    /**
-     * 리뷰 수
-     */
-    private Long reviewCount;
-
-    /**
-     * 사업자 등록번호
-     */
-    private String businessNumber;
-
-    /**
-     * 가게 프로필 이미지
-     */
-    private String storeProfileImage;
-
-    /**
-     * 위도
-     */
-    private Double latitude;
-
-    /**
-     * 경도
-     */
-    private Double longitude;
-
-    /**
-     * 가게 활성화 상태
-     */
-    private Boolean isActive;
-
-    /**
-     * 생성일시
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 수정일시
-     */
-    private LocalDateTime updatedAt;
-
-    /**
-     * 띱박스 목록 (간단한 정보만)
-     */
-    private List<DdipBoxSummaryDto> ddipBoxes;
+public record StoreDetailDto(
+    Long storeId,
+    Long ownerId,
+    String storeName,
+    String storeAddress,
+    String description,
+    String operatingHours,
+    String phoneNumber,
+    Double ratingAverage,
+    Long reviewCount,
+    String businessNumber,
+    String storeProfileImage,
+    Double latitude,
+    Double longitude,
+    Boolean active,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    List<DdipBoxSummaryDto> ddipBoxes
+) {
 
     /**
      * 띱박스 요약 정보
      */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class DdipBoxSummaryDto {
-        private Long ddipboxId;
-        private String ddipboxName;
-        private String category;
-        private Long originalPrice;
-        private Long salePrice;
-        private Long remainingQuantity;
-        private Boolean isActive;
+    public record DdipBoxSummaryDto(
+        Long ddipboxId,
+        String ddipboxName,
+        String category,
+        Long originalPrice,
+        Long salePrice,
+        Long remainingQuantity,
+        Boolean active
+    ) {
+        
+        /**
+         * DdipBoxSummaryDto 생성
+         */
+        public static DdipBoxSummaryDto of(
+                Long ddipboxId,
+                String ddipboxName,
+                String category,
+                Long originalPrice,
+                Long salePrice,
+                Long remainingQuantity,
+                Boolean active
+        ) {
+            return new DdipBoxSummaryDto(ddipboxId, ddipboxName, category, originalPrice, salePrice, remainingQuantity, active);
+        }
+    }
+    
+    /**
+     * 기본 필드만으로 StoreDetailDto 생성
+     */
+    public static StoreDetailDto of(Long storeId, String storeName, String storeAddress) {
+        return new StoreDetailDto(
+                storeId, null, storeName, storeAddress, null, null, null, null, null, null, null, null, null, null, null, null, null
+        );
+    }
+    
+    /**
+     * 전체 필드로 StoreDetailDto 생성
+     */
+    public static StoreDetailDto of(
+            Long storeId,
+            Long ownerId,
+            String storeName,
+            String storeAddress,
+            String description,
+            String operatingHours,
+            String phoneNumber,
+            Double ratingAverage,
+            Long reviewCount,
+            String businessNumber,
+            String storeProfileImage,
+            Double latitude,
+            Double longitude,
+            Boolean active,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            List<DdipBoxSummaryDto> ddipBoxes
+    ) {
+        return new StoreDetailDto(
+                storeId, ownerId, storeName, storeAddress, description, operatingHours, phoneNumber,
+                ratingAverage, reviewCount, businessNumber, storeProfileImage, latitude, longitude,
+                active, createdAt, updatedAt, ddipBoxes
+        );
     }
 }
