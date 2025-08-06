@@ -1,9 +1,10 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTE_PATH } from '@/router';
-import { Bell } from 'lucide-react';
+import { Bell, ShoppingCart, ChevronLeft } from 'lucide-react';
 
 const PageNavbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -15,6 +16,8 @@ const PageNavbar = () => {
         return '주문내역';
       case ROUTE_PATH.MY:
         return '마이꿀띱';
+      case ROUTE_PATH.CART:
+        return '장바구니';
       default:
         return '꿀띱';
     }
@@ -24,12 +27,23 @@ const PageNavbar = () => {
     <div className="fixed left-0 right-0 top-0 z-50 border-t bg-white">
       <nav className="flex items-center justify-between bg-white px-4 py-3 shadow-md">
         <div className="flex items-center space-x-2">
+          <ChevronLeft
+            className="mr-2 h-5 w-5"
+            onClick={() => {
+              navigate(-1);
+            }}
+          />
+
           <span className="text-lg font-semibold text-amber-600">
             {getPageTitle()}
           </span>
         </div>
-        <div className="flex items-center space-x-4">
-          <Bell className="mr-1 h-5 w-5" />
+        <div className="flex space-x-4">
+          <Bell className="mr-3 h-5 w-5" />
+          <ShoppingCart
+            className="mr-1 h-5 w-5"
+            onClick={() => navigate(ROUTE_PATH.CART)}
+          />
         </div>
       </nav>
     </div>
