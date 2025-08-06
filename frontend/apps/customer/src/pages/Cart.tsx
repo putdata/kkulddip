@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { dummyCartProduct, dummyRestaurantInfo } from '@/dummies/CartDummy';
+import { dummyCartProduct, dummyStoreInfo } from '@/dummies/CartDummy';
 import { CART_CONSTANTS } from '@/constants/cart';
 import { type CartData } from '@/types/orderflow';
 
-import RestaurantInfo from '@/components/pages/cart/RestaurantInfo/RestaurantInfo';
+import StoreInfo from '@/components/pages/cart/StoreInfo/StoreInfo';
 import ProductCard from '@/components/pages/cart/ProductCard/ProductCard';
 import QuantitySelector from '@/components/pages/cart/QuantitySelector/QuantitySelector';
 import PriceSummary from '@/components/pages/cart/PriceSummary/PriceSummary';
@@ -87,8 +87,8 @@ const Cart = ({ onNext, onBack, initialQuantity = 1 }: CartProps) => {
           <div className="space-y-3">
             {/* 매장 정보 카드 */}
             <div className="rounded-2xl bg-white p-4 shadow-sm">
-              <RestaurantInfo
-                restaurant={dummyRestaurantInfo}
+              <StoreInfo
+                Store={dummyStoreInfo}
                 pickupTimePrefix={CART_CONSTANTS.PICKUP_TIME_PREFIX}
               />
             </div>
