@@ -1,29 +1,36 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { dummyCartProduct, dummyRestaurantInfo } from '@/dummies/CartDummy';
 import { CART_CONSTANTS } from '@/constants/cart';
-import { ROUTE_PATH } from '@/router';
+import { type CartData } from '@/types/orderflow';
 
 import RestaurantInfo from '@/components/pages/cart/RestaurantInfo/RestaurantInfo';
 import ProductCard from '@/components/pages/cart/ProductCard/ProductCard';
 import QuantitySelector from '@/components/pages/cart/QuantitySelector/QuantitySelector';
 import PriceSummary from '@/components/pages/cart/PriceSummary/PriceSummary';
 
-const Cart = () => {
-  const navigate = useNavigate();
-  const [quantity, setQuantity] = useState(1);
+interface CartProps {
+  onNext: (cartData: CartData) => void;
+  onBack: () => void;
+  initialQuantity?: number;
+}
+
+const Cart = ({ onNext, onBack, initialQuantity = 1 }: CartProps) => {
+  const [quantity, setQuantity] = useState(initialQuantity);
 
   const updateQuantity = (change: number) => {
     setQuantity(prev => Math.max(CART_CONSTANTS.MIN_QUANTITY, prev + change));
   };
 
+  // ✅ 데이터를 퍼넬에 전달하는 핸들러 함수 추가
   const handleNext = () => {
-    navigate(ROUTE_PATH.PAYMENT);
-  };
-
-  const handleBack = () => {
-    navigate(-1);
+    const total = dummyCartProduct.price * quantity;
+    const cartData: CartData = {
+      quantity,
+      total,
+      productId: dummyCartProduct.id,
+    };
+    onNext(cartData); // 퍼넬 컨테이너로 데이터 전달
   };
 
   const total = dummyCartProduct.price * quantity;
@@ -32,11 +39,11 @@ const Cart = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-white pb-20">
       {/* 헤더 */}
       <div className="relative flex w-full flex-row items-center p-3">
-        <button onClick={handleBack} className="rounded-full p-2">
+        <button onClick={onBack} className="rounded-full p-2">
           <ArrowLeft className="h-6 w-6 text-gray-700" />
         </button>
         <h1 className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold text-gray-700">
-          주문하기
+          장바구니
         </h1>
       </div>
       {/* 전체 카드 */}
@@ -95,7 +102,7 @@ const Cart = () => {
                 <QuantitySelector
                   quantity={quantity}
                   onQuantityChange={updateQuantity}
-                  minQuantity={CART_CONSTANTS.MIN_QUANTITY}
+                  initialQuantity={initialQuantity}
                   label={CART_CONSTANTS.QUANTITY_LABEL}
                 />
               </div>
