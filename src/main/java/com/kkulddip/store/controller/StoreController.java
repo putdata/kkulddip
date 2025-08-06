@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/store")
+@RequestMapping("/api/v1/stores")
 @Validated
 public class StoreController implements StoreControllerInterface {
 
