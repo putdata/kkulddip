@@ -6,7 +6,7 @@ export interface StepProps {
 }
 
 export interface FunnelProps {
-  children: Array<ReactElement<StepProps>>;
+  children: ReactElement<StepProps>[];
 }
 
 export const useFunnel = <T extends readonly string[]>(
