@@ -4,11 +4,6 @@ import { useState } from 'react';
 import ReviewItem from './ReviewItem';
 
 interface ReviewsComponentProps {
-  store: {
-    id: number;
-    storeName: string;
-    avgRate: number;
-  };
   reviews: {
     id: number;
     user: {
