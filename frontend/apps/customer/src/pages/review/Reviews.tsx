@@ -1,5 +1,5 @@
 import ReviewsContainer from '@/components/pages/review/ReviewsContainer';
-import StoreInfo from '@/components/pages/review/StoreInfo';
+import ReviewStoreInfoCard from '@/components/pages/review/ReviewStoreInfoCard';
 import { reviewMockData, reviewMockStore } from '@/constants/reviewMockData';
 // import { useParams } from 'react-router-dom';
 
@@ -14,7 +14,7 @@ const ReviewsPage = () => {
 
   return (
     <div>
-      <StoreInfo store={store} totalReviews={totalReviews} />
+      <ReviewStoreInfoCard store={store} totalReviews={totalReviews} />
       <ReviewsContainer reviews={reviews} />
     </div>
   );

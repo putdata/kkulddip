@@ -12,7 +12,7 @@ interface StoreInfoProps {
   totalReviews: number;
 }
 
-const StoreInfo = ({ store, totalReviews }: StoreInfoProps) => {
+const ReviewStoreInfoCard = ({ store, totalReviews }: StoreInfoProps) => {
   return (
     <div>
       <Card key={store.id} className="w-full gap-2 rounded-none bg-white p-4">
@@ -42,4 +42,4 @@ const StoreInfo = ({ store, totalReviews }: StoreInfoProps) => {
   );
 };
 
-export default StoreInfo;
+export default ReviewStoreInfoCard;
