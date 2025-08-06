@@ -3,14 +3,14 @@ import { Plus, Minus } from 'lucide-react';
 export interface QuantitySelectorProps {
   quantity: number;
   onQuantityChange: (change: number) => void;
-  minQuantity: number;
+  initialQuantity: number;
   label: string;
 }
 
 const QuantitySelector = ({
   quantity,
   onQuantityChange,
-  minQuantity,
+  initialQuantity,
   label,
 }: QuantitySelectorProps) => {
   return (
@@ -20,7 +20,7 @@ const QuantitySelector = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={() => onQuantityChange(-1)}
-            disabled={quantity <= minQuantity}
+            disabled={quantity <= initialQuantity}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Minus className="h-4 w-4" />
