@@ -1,7 +1,8 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { MessageCircleMore, Star, ThumbsUpIcon } from 'lucide-react';
 
 interface Review {
   id: number;
@@ -36,13 +37,9 @@ const ReviewItem = ({ review }: ReviewProps) => {
             <div className="inline-flex flex-col items-start gap-1">
               <div className="flex items-center gap-2">
                 <div className="font-normal text-gray-700">
-                  {/* TODO: 이름은 맨 첫 글자만 표시되고 그 뒤는 *처리 했는데, 어떤지?  */}
-                  {review.user.name.charAt(0) +
-                    '*'.repeat(review.user.name.length - 1)}
-                  님
+                  {review.user.name}님
                 </div>
 
-                {/* 사진 있을때만 PHOTO 뱃지 표시 */}
                 {review.images.length >= 1 && (
                   <Badge className="py-0.25 rounded bg-amber-500 px-1 text-xs text-white hover:bg-amber-500">
                     PHOTO
@@ -69,14 +66,12 @@ const ReviewItem = ({ review }: ReviewProps) => {
             {review.createDate}
           </div>
         </div>
-
         {/* 리뷰 내용 */}
         <div className="flex w-full flex-col items-start">
           <div className="whitespace-pre-wrap text-sm text-gray-500">
             {review.content}
           </div>
         </div>
-
         {/* 이미지들 */}
         {review.images.length > 0 && (
           <div className="flex w-full gap-2">
@@ -90,6 +85,21 @@ const ReviewItem = ({ review }: ReviewProps) => {
             ))}
           </div>
         )}
+
+        {/* 도움, 사장님 댓글 */}
+        <Separator />
+        <div className="flex h-5 w-full items-center justify-end gap-2 text-sm text-gray-400">
+          <div className="flex">
+            <ThumbsUpIcon className="h-5" />
+            {/* TODO: 도움 수 임시로 rating 사용 - 변경 필요 */}
+            <span>도움돼요 {review.rating}</span>
+          </div>
+          {/* TODO: 사장님 댓글 여부 확인 및 동작 추가 필요 */}
+          <div className="flex">
+            <MessageCircleMore className="h-5" />
+            <span>사장님 댓글</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
