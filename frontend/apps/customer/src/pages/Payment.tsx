@@ -103,7 +103,7 @@ const Payment = ({ onBack, onNext, orderData }: PaymentProps) => {
         </div>
 
         {/* 메인 콘텐츠 스크롤 영역 */}
-        <div className="min-h-[60vh] rounded-t-[2rem] bg-amber-100 p-6">
+        <div className="rounded-t-4xl flex-1 bg-amber-100 p-6">
           <div className="space-y-3">
             {/* 주문 요약 카드 */}
             <div className="rounded-2xl bg-white p-4 shadow-sm">
