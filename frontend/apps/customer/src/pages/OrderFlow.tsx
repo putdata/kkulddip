@@ -25,14 +25,12 @@ interface OrderData {
   quantity: number;
   total: number;
   productId?: number;
-
   paymentMethod?: string;
   appliedCouponId?: string;
   discountAmount?: number;
-  finalAmount?: number;
-
-  orderNumber?: string;
-  orderDate?: Date;
+  finalAmount: number;
+  orderNumber: string;
+  orderDate: Date;
 }
 
 const OrderFunnelContainer = () => {
@@ -46,6 +44,9 @@ const OrderFunnelContainer = () => {
     quantity: 1,
     total: 0,
     productId: 0,
+    finalAmount: 0,
+    orderNumber: '',
+    orderDate: new Date(),
   });
 
   const handleNextToCart = (cartData: CartData) => {
