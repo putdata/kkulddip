@@ -1,7 +1,5 @@
 import { Button } from '@/components/ui/button';
 
-import { reviewMessages } from '@/constants/reviewMessages';
-
 import { useState } from 'react';
 import ReviewItem from './ReviewItem';
 
