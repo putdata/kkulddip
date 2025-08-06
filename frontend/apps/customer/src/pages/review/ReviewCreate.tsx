@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import ReviewCreateTextInput from '@/components/pages/reviewCreate/ReviewCreateTextInput';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
-import ReviewCreateHeader from '@/components/pages/reviewCreate/ReviewCreateHeader';
+
 import { reviewCreateMockData } from '@/constants/mockData';
-// import { reviewCreateMessages } from '@/constants/messages';
+
+import ReviewCreateHeader from '@/components/pages/reviewCreate/ReviewCreateHeader';
+import ReviewCreatePhotoInput from '@/components/pages/reviewCreate/ReviewCreatePhotoInput';
+import ReviewCreateTextInput from '@/components/pages/reviewCreate/ReviewCreateTextInput';
 
 const ReviewCreate = () => {
   // TODO: 일단은 예시 데이터
@@ -23,6 +25,18 @@ const ReviewCreate = () => {
 
   const onSetReviewText = (reviewText: string) => {
     setReviewText(reviewText);
+  };
+
+  // 사진 추가 관련
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+
+  const onImagesChange = (selectedImages: File[]) => {
+    setSelectedImages(selectedImages);
+  };
+
+  const onPreviewUrlsChange = (imagePreviewUrls: string[]) => {
+    setImagePreviewUrls(imagePreviewUrls);
   };
 
   // 전송 부분
@@ -43,7 +57,9 @@ const ReviewCreate = () => {
       return;
     }
 
-    toast(currentValue);
+    toast(
+      `별점: ${rating}\n리뷰: ${currentValue}\n사진 개수:${imagePreviewUrls.length}`,
+    );
     console.log(currentValue);
   };
 
@@ -60,7 +76,18 @@ const ReviewCreate = () => {
         reviewText={reviewText}
         setReviewText={onSetReviewText}
       />
-      <Button onClick={handleSubmit}>등록하기</Button>
+      <ReviewCreatePhotoInput
+        selectedImages={selectedImages}
+        imagePreviewUrls={imagePreviewUrls}
+        setSelectedImages={onImagesChange}
+        setImagePreviewUrls={onPreviewUrlsChange}
+      />
+      <Button
+        onClick={handleSubmit}
+        className="w-50 m-5 flex cursor-pointer bg-amber-500 text-center font-bold text-white [font-family:Helvetica] hover:bg-amber-600"
+      >
+        등록하기
+      </Button>
 
       <Toaster position="top-center" />
     </div>

@@ -1,6 +1,20 @@
+import { Button } from '@/components/ui/button';
 import { Camera, X } from 'lucide-react';
+import { toast } from 'sonner';
 
-const ReviewCreatePhotoInput = () => {
+interface ReviewCreatePhotoInputProps {
+  selectedImages: File[];
+  imagePreviewUrls: string[];
+  setSelectedImages: (images: File[]) => void;
+  setImagePreviewUrls: (urls: string[]) => void;
+}
+
+const ReviewCreatePhotoInput = ({
+  selectedImages,
+  imagePreviewUrls,
+  setSelectedImages,
+  setImagePreviewUrls,
+}: ReviewCreatePhotoInputProps) => {
   // 파일 선택창 열기
   const openFileDialog = () => {
     document.getElementById('imageInput')?.click();
@@ -22,8 +36,6 @@ const ReviewCreatePhotoInput = () => {
     const totalImages = [...selectedImages, ...newImages];
 
     if (totalImages.length > 3) {
-      // toast 로 바꾸기
-      // alert('업로드 가능한 사진은 최대 3개입니다.');
       toast.error('사진 업로드 제한', {
         description: '최대 3개까지만 선택할 수 있습니다.',
       });
@@ -34,7 +46,7 @@ const ReviewCreatePhotoInput = () => {
 
     // 미리보기 URL 생성
     const newPreviewUrls = newImages.map(file => URL.createObjectURL(file));
-    setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
+    setImagePreviewUrls([...imagePreviewUrls, ...newPreviewUrls]);
   };
 
   // 이미지 삭제 핸들러
@@ -72,7 +84,7 @@ const ReviewCreatePhotoInput = () => {
             />
             <Camera className="h-6 w-6" />
             <span className="text-lg font-bold [font-family:'segoe_UI',Helvetica]">
-              {messages.addPicture}
+              사진 추가
             </span>
             <span className="text-lg font-bold [font-family:'segoe_UI',Helvetica]">
               ( {selectedImages.length} / 3 )
@@ -92,11 +104,12 @@ const ReviewCreatePhotoInput = () => {
                   alt={`선택된 이미지 ${index + 1}`}
                   className="h-20 w-20 rounded-lg border border-gray-200 object-cover"
                 />
+                {/* 이미지 삭제 버튼 */}
                 <button
                   onClick={() => handleImageRemove(index)}
                   className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" strokeWidth={5} />
                 </button>
               </div>
             ))}
