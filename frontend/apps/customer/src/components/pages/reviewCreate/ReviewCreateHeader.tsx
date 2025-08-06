@@ -1,29 +1,33 @@
-import { reviewCreateMockData } from '@/constants/mockData';
-import { reviewCreateMessages } from '@/constants/messages';
-import { useState } from 'react';
 import { Star } from 'lucide-react';
 
-const ReviewCreateHeader = () => {
-  const [rating, setRating] = useState<number>(0);
+interface Store {
+  storeId: number;
+  storeName: string;
+  img: string;
+  imgAlt: string;
+}
 
-  // 별점 클릭 핸들러
-  const handleStarClick = (starNumber: number) => {
-    setRating(starNumber);
-    console.log('선택된 별점:', starNumber); // 개발용 로그
-  };
+interface ReviewCreateHeaderProps {
+  store: Store;
+  rating: number;
+  setRating: (rating: number) => void;
+}
 
-  const storeData = reviewCreateMockData;
-  const messages = reviewCreateMessages;
+const ReviewCreateHeader = ({
+  store,
+  rating,
+  setRating,
+}: ReviewCreateHeaderProps) => {
   return (
     <div className="flex w-full items-center justify-between p-5">
       {/* 상단 왼쪽 */}
       <div className="flex flex-col items-start justify-center gap-2">
         <div className="text-xl font-bold text-black [font-family:'Segoe_UI']">
-          {storeData.storeName}
+          {store.storeName}
         </div>
         <div className="inline-flex flex-[0_0_auto] items-end">
           <div className="text-sm font-bold text-gray-900 [font-family:'Segoe_UI']">
-            {messages.question1}
+            이번 띱박스는 어떠셨나요?
           </div>
         </div>
         <div className="flex items-center">
@@ -37,7 +41,10 @@ const ReviewCreateHeader = () => {
                 className={`h-6 w-6 cursor-pointer transition-colors ${
                   isFilled ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
                 }`}
-                onClick={() => handleStarClick(star)}
+                onClick={() => {
+                  setRating(star);
+                  console.log('선택된 별점:', star);
+                }}
               />
             );
           })}
@@ -45,7 +52,7 @@ const ReviewCreateHeader = () => {
       </div>
 
       <div className="flex h-20 w-20 items-center justify-center overflow-hidden bg-amber-100 p-[0.8px]">
-        <img alt={storeData.imgAlt} src={storeData.img} />
+        <img alt={store.imgAlt} src={store.img} />
       </div>
     </div>
   );
