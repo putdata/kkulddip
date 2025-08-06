@@ -16,8 +16,6 @@ const PageNavbar = () => {
         return '주문내역';
       case ROUTE_PATH.MY:
         return '마이꿀띱';
-      case ROUTE_PATH.CART:
-        return '장바구니';
       default:
         return '꿀띱';
     }
@@ -42,7 +40,7 @@ const PageNavbar = () => {
           <Bell className="mr-3 h-5 w-5" />
           <ShoppingCart
             className="mr-1 h-5 w-5"
-            onClick={() => navigate(ROUTE_PATH.CART)}
+            onClick={() => navigate(ROUTE_PATH.PAY)}
           />
         </div>
       </nav>
