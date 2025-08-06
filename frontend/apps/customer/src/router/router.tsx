@@ -10,10 +10,9 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
-import Cart from '@/pages/Cart';
-import Payment from '@/pages/Payment';
 import OrderDetail from '@/pages/OrderDetail';
 import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
+import OrderFunnelContainer from '@/pages/OrderFlow';
 
 export const router = createBrowserRouter([
   {
@@ -51,11 +50,6 @@ export const router = createBrowserRouter([
             element: <Orders />,
           },
           {
-            path: ROUTE_PATH.PAYMENT,
-            element: <Payment />,
-          },
-
-          {
             path: ROUTE_PATH.ORDER_DETAIL,
             element: <OrderDetail />,
           },
@@ -72,12 +66,12 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: ROUTE_PATH.CART,
+        path: ROUTE_PATH.PAY,
         element: <MobileLayout />,
         children: [
           {
             index: true,
-            element: <Cart />,
+            element: <OrderFunnelContainer />,
           },
         ],
       },
