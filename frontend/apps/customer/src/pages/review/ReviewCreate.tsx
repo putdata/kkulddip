@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Toaster } from '@/components/ui/sonner';
 
 import { reviewCreateMockData } from '@/constants/mockData';
 
@@ -9,30 +8,50 @@ import ReviewCreateHeader from '@/components/pages/reviewCreate/ReviewCreateHead
 import ReviewCreatePhotoInput from '@/components/pages/reviewCreate/ReviewCreatePhotoInput';
 import ReviewCreateTextInput from '@/components/pages/reviewCreate/ReviewCreateTextInput';
 
+interface ReviewFormState {
+  rating: number;
+  reviewText: string;
+  selectedImages: File[];
+  imagePreviewUrls: string[];
+}
+
 const ReviewCreate = () => {
   // TODO: 일단은 예시 데이터
   const store = reviewCreateMockData;
 
-  // 별점 관련
-  const [rating, setRating] = useState<number>(0);
-  // 리뷰 작성 관련
-  const [reviewText, setReviewText] = useState<string>('');
-  // 사진 추가 관련
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [reviewForm, setReviewForm] = useState<ReviewFormState>({
+    rating: 0,
+    reviewText: '',
+    selectedImages: [],
+    imagePreviewUrls: [],
+  });
+
+  const onSetRating = (rating: number) => {
+    setReviewForm({
+      ...reviewForm,
+      rating: rating,
+    });
+  };
 
   const onSetReviewText = (reviewText: string) => {
-    setReviewText(reviewText);
+    setReviewForm({
+      ...reviewForm,
+      reviewText: reviewText,
+    });
   };
-  const onSetRating = (rating: number) => {
-    setRating(rating);
-  };
+
   const onImagesChange = (selectedImages: File[]) => {
-    setSelectedImages(selectedImages);
+    setReviewForm({
+      ...reviewForm,
+      selectedImages: selectedImages,
+    });
   };
 
   const onPreviewUrlsChange = (imagePreviewUrls: string[]) => {
-    setImagePreviewUrls(imagePreviewUrls);
+    setReviewForm({
+      ...reviewForm,
+      imagePreviewUrls: imagePreviewUrls,
+    });
   };
 
   // 전송 부분
@@ -40,10 +59,10 @@ const ReviewCreate = () => {
   const handleSubmit = () => {
     // 먼저 최신값 확보
     const textarea = document.querySelector('textarea');
-    const currentValue = textarea?.value || reviewText;
+    const currentValue = textarea?.value || reviewForm.reviewText;
 
     // 유효성 검사
-    if (rating === 0) {
+    if (reviewForm.rating === 0) {
       toast.error('별점을 선택해주세요.');
       return;
     }
@@ -54,7 +73,7 @@ const ReviewCreate = () => {
     }
 
     toast(
-      `별점: ${rating}\n리뷰: ${currentValue}\n사진 개수:${imagePreviewUrls.length}`,
+      `별점: ${reviewForm.rating}\n리뷰: ${currentValue}\n사진 개수:${reviewForm.imagePreviewUrls.length}`,
     );
     console.log(currentValue);
   };
@@ -65,16 +84,16 @@ const ReviewCreate = () => {
       <ReviewCreateHeader
         store={store}
         setRating={onSetRating}
-        rating={rating}
+        rating={reviewForm.rating}
       />
       {/* 리뷰 텍스트 입력 컴포넌트에 필요한 props 전달 */}
       <ReviewCreateTextInput
-        reviewText={reviewText}
+        reviewText={reviewForm.reviewText}
         setReviewText={onSetReviewText}
       />
       <ReviewCreatePhotoInput
-        selectedImages={selectedImages}
-        imagePreviewUrls={imagePreviewUrls}
+        selectedImages={reviewForm.selectedImages}
+        imagePreviewUrls={reviewForm.imagePreviewUrls}
         setSelectedImages={onImagesChange}
         setImagePreviewUrls={onPreviewUrlsChange}
       />
