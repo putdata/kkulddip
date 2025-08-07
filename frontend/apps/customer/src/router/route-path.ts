@@ -5,8 +5,11 @@ export const ROUTE_PATH = {
   SEARCH: '/search',
   MY: '/my',
   ORDER: '/order',
+  ORDER_DETAIL: '/order/:orderId',
   NOTIFICATIONS: '/notifications',
   LOGIN: '/login',
+  PAYMENT: '/payment',
+  CART: '/cart',
   NOT_FOUND: '*',
   REVIEW_CREATE: '/review/create',
 } as const;

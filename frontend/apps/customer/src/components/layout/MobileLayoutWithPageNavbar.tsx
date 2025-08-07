@@ -1,11 +1,11 @@
 import BottomNavbar from '@/components/common/BottomNavbar/BottomNavbar';
-import NavigationBar from '@/components/common/NavigationBar/NavigationBar';
+import PageNavbar from '@/components/common/PageNavbar/PageNavbar';
 import { Outlet } from 'react-router-dom';
 
-export default function MobileLayoutWithNavbar() {
+export default function MobileLayoutWithPageNavbar() {
   return (
     <div className="mx-auto min-h-screen w-full max-w-md bg-white">
-      <NavigationBar />
+      <PageNavbar />
       <Outlet />
       <BottomNavbar />
     </div>

@@ -11,6 +11,10 @@ import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
 import ReviewCreate from '@/pages/review/ReviewCreate';
+import Cart from '@/pages/Cart';
+import Payment from '@/pages/Payment';
+import OrderDetail from '@/pages/OrderDetail';
+import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +29,12 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
+        ],
+      },
+      {
+        path: '/',
+        element: <MobileLayoutWithPageNavbar />,
+        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
@@ -45,6 +55,17 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.REVIEW_CREATE,
             element: <ReviewCreate />,
+          {
+            path: ROUTE_PATH.PAYMENT,
+            element: <Payment />,
+          },
+          {
+            path: ROUTE_PATH.CART,
+            element: <Cart />,
+          },
+          {
+            path: ROUTE_PATH.ORDER_DETAIL,
+            element: <OrderDetail />,
           },
         ],
       },
