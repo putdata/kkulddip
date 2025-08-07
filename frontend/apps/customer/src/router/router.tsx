@@ -6,15 +6,11 @@ import Likes from '@/pages/Likes';
 import Orders from '@/pages/Orders';
 import MyPage from '@/pages/MyPage';
 import Login from '@/pages/Login';
-import Reviews from '@/pages/review/Reviews';
 import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
-import Cart from '@/pages/Cart';
-import Payment from '@/pages/Payment';
-import OrderDetail from '@/pages/OrderDetail';
-import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
+import ReviewsPage from '@/pages/review/Reviews';
 
 export const router = createBrowserRouter([
   {
@@ -29,12 +25,6 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
-        ],
-      },
-      {
-        path: '/',
-        element: <MobileLayoutWithPageNavbar />,
-        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
@@ -53,17 +43,7 @@ export const router = createBrowserRouter([
           },
           {
             path: ROUTE_PATH.REVIEW,
-            element: <Reviews />,
-            path: ROUTE_PATH.PAYMENT,
-            element: <Payment />,
-          },
-          {
-            path: ROUTE_PATH.CART,
-            element: <Cart />,
-          },
-          {
-            path: ROUTE_PATH.ORDER_DETAIL,
-            element: <OrderDetail />,
+            element: <ReviewsPage />,
           },
         ],
       },
