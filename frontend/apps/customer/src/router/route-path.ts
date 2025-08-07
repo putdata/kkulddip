@@ -12,4 +12,5 @@ export const ROUTE_PATH = {
   CART: '/cart',
   NOT_FOUND: '*',
   REVIEW: '/store/:storeId/reviews',
+  REVIEW_CREATE: '/review/create',
 } as const;
