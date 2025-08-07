@@ -12,7 +12,6 @@ export interface PaymentInfo {
     discountType: string;
   }[];
   totalItems: number; // 주문수량
-  paymentMethod: string;
 }
 
 export interface PaymentInfoCardProps {
@@ -20,13 +19,8 @@ export interface PaymentInfoCardProps {
 }
 
 const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
-  const {
-    totalOriginalPrice,
-    totalDiscount,
-    discounts,
-    totalItems,
-    paymentMethod,
-  } = paymentInfo;
+  const { totalOriginalPrice, totalDiscount, discounts, totalItems } =
+    paymentInfo;
 
   const finalAmount = totalOriginalPrice - totalDiscount;
 
@@ -105,9 +99,7 @@ const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
           {/* 결제방법 */}
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-700">결제방법</span>
-            <span className="text-xs font-medium text-gray-900">
-              {paymentMethod}
-            </span>
+            <span className="text-xs font-medium text-gray-900">토스페이</span>
           </div>
         </div>
       </div>

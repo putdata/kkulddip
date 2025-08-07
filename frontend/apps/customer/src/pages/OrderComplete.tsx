@@ -8,7 +8,6 @@ interface OrderData {
   quantity: number;
   total: number;
   productId?: number;
-  paymentMethod?: string;
   appliedCouponId?: string;
   discountAmount?: number;
   finalAmount: number;
@@ -33,7 +32,6 @@ const OrderComplete = ({ onBack, orderData }: OrderCompleteProps) => {
     storeAddress: '서울시 강남구 테헤란로 123',
     pickupTime: '오후 2:30 - 2:40',
     estimatedTime: '15분',
-    paymentMethod: orderData.paymentMethod || '카드결제',
   };
 
   const bottomButton = (
@@ -81,9 +79,7 @@ const OrderComplete = ({ onBack, orderData }: OrderCompleteProps) => {
           </div>
           <div className="flex justify-between">
             <span className="text-xs text-gray-600">결제 방법</span>
-            <span className="text-xs text-gray-800">
-              {displayData.paymentMethod}
-            </span>
+            <span className="text-xs text-gray-800">토스페이</span>
           </div>
           <div className="flex justify-between border-t pt-2">
             <span className="text-sm font-medium text-gray-800">

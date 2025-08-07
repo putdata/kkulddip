@@ -14,7 +14,6 @@ import { formatPrice } from '@/utils/priceFormat';
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
 
 interface PaymentData {
-  paymentMethod: string;
   appliedCouponId?: string;
   discountAmount: number;
   finalAmount: number;
@@ -24,7 +23,6 @@ interface OrderData {
   quantity: number;
   total: number;
   productId?: number;
-  paymentMethod?: string;
   appliedCouponId?: string;
   discountAmount?: number;
   finalAmount?: number;
@@ -45,7 +43,6 @@ const Payment = ({ onBack, onNext, orderData }: PaymentProps) => {
 
   const handleNext = () => {
     const paymentData: PaymentData = {
-      paymentMethod: '카드결제',
       appliedCouponId: 'COUPON123',
       discountAmount: dummyDiscountAmount,
       finalAmount: finalAmount,

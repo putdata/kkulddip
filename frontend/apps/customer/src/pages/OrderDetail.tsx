@@ -33,7 +33,6 @@ const dummyPaymentInfo: PaymentInfo = {
     },
   ],
   totalItems: 3,
-  paymentMethod: '토스페이',
 };
 
 const OrderDetail = () => {

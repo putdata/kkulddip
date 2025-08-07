@@ -36,7 +36,6 @@ export const Default: Story = {
         },
       ],
       totalItems: 3,
-      paymentMethod: '토스페이',
     },
   },
 };
@@ -54,7 +53,6 @@ export const SingleDiscount: Story = {
         },
       ],
       totalItems: 2,
-      paymentMethod: '카카오페이',
     },
   },
 };
@@ -66,7 +64,6 @@ export const NoDiscount: Story = {
       totalDiscount: 0,
       discounts: [],
       totalItems: 1,
-      paymentMethod: '신용카드',
     },
   },
 };
