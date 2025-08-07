@@ -1,7 +1,8 @@
 import { StoreDetailHeader } from '@/components/pages/storeDetail/StoreDetailHeader/StoreDetailHeader';
 import { StoreDetailTab } from '@/components/pages/storeDetail/StoreDetailTab';
 import { mockStoreDetail } from '@/dummies/storeDetailDummy';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
+// 커밋 실수입니다. 집에서 이어서 작업하겠습니다.
 
 const StoreDetail = () => {
   //   const params = useParams();
