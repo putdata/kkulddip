@@ -2,6 +2,7 @@ package com.kkulddip.payment.domain.model.aggregate;
 
 import com.kkulddip.payment.domain.model.vo.Money;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
+import com.kkulddip.payment.domain.model.vo.PaymentOrderId;
 import com.kkulddip.payment.domain.model.status.PaymentMethod;
 import com.kkulddip.payment.domain.model.status.PaymentStatus;
 import lombok.AccessLevel;
@@ -16,58 +17,53 @@ public class Payment {
 
     private PaymentKey paymentKey;
     private Long orderId;
+    private PaymentOrderId paymentOrderId;
     private String orderName;
     private Money amount;
-    private String customerName;
-    private String customerEmail;
+    private Long customerId;
     private PaymentStatus status;
     private PaymentMethod method;
     private LocalDateTime requestedAt;
     private LocalDateTime approvedAt;
-    private String receiptUrl;
-    private String callbackUrl;
-    private String failUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime paymentOrderIdCreatedAt; // PaymentOrderId TTL을 위한 생성 시간
 
-    public Payment(Long orderId, String orderName, Money amount, String customerName, String customerEmail, String callbackUrl, String failUrl) {
+    public Payment(Long orderId, String orderName, Money amount, Long customerId) {
         this.orderId = orderId;
+        this.paymentOrderId = PaymentOrderId.generate(orderId);
         this.orderName = validateOrderName(orderName);
         this.amount = amount;
-        this.customerName = validateCustomerName(customerName);
-        this.customerEmail = customerEmail;
-        this.callbackUrl = callbackUrl;
-        this.failUrl = failUrl;
+        this.customerId = customerId;
         this.status = PaymentStatus.READY;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.paymentOrderIdCreatedAt = LocalDateTime.now(); // PaymentOrderId 생성 시간 기록
     }
 
     // 재구성을 위한 생성자
-    public Payment(PaymentKey paymentKey, Long orderId, String orderName, Money amount,
-        String customerName, String customerEmail, PaymentStatus status, PaymentMethod method,
-        LocalDateTime requestedAt, LocalDateTime approvedAt, String receiptUrl, String callbackUrl, String failUrl,
-        LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Payment(PaymentKey paymentKey, Long orderId, PaymentOrderId paymentOrderId, String orderName, Money amount,
+        Long customerId, PaymentStatus status, PaymentMethod method,
+        LocalDateTime requestedAt, LocalDateTime approvedAt,
+        LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime paymentOrderIdCreatedAt) {
 
         this.paymentKey = paymentKey;
         this.orderId = orderId;
+        this.paymentOrderId = paymentOrderId;
         this.orderName = orderName;
         this.amount = amount;
-        this.customerName = customerName;
-        this.customerEmail = customerEmail;
+        this.customerId = customerId;
         this.status = status;
         this.method = method;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
-        this.receiptUrl = receiptUrl;
-        this.callbackUrl = callbackUrl;
-        this.failUrl = failUrl;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.paymentOrderIdCreatedAt = paymentOrderIdCreatedAt;
     }
 
     public void approve(PaymentKey paymentKey, PaymentMethod method,
-        LocalDateTime requestedAt, LocalDateTime approvedAt, String receiptUrl) {
+        LocalDateTime requestedAt, LocalDateTime approvedAt) {
             
         if (this.status != PaymentStatus.READY) {
             throw new IllegalStateException("준비 상태의 결제만 승인할 수 있습니다.");
@@ -77,7 +73,6 @@ public class Payment {
         this.method = method;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
-        this.receiptUrl = receiptUrl;
         this.status = PaymentStatus.DONE;
         this.updatedAt = LocalDateTime.now();
     }
@@ -107,10 +102,32 @@ public class Payment {
         return orderName;
     }
 
-    private String validateCustomerName(String customerName) {
-        if (customerName == null || customerName.trim().isEmpty()) {
-            throw new IllegalArgumentException("고객명은 필수입니다.");
+    /**
+     * PaymentOrderId TTL 검증 (5분)
+     */
+    public boolean isPaymentOrderIdExpired() {
+        if (paymentOrderIdCreatedAt == null) {
+            return true;
         }
-        return customerName;
+        return paymentOrderIdCreatedAt.isBefore(LocalDateTime.now().minusMinutes(5));
+    }
+
+    /**
+     * 새로운 PaymentOrderId 생성 및 TTL 갱신
+     */
+    public void regeneratePaymentOrderId() {
+        this.paymentOrderId = PaymentOrderId.generate(this.orderId);
+        this.paymentOrderIdCreatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 현재 PaymentOrderId 반환 (TTL 검증 포함)
+     */
+    public String getValidPaymentOrderId() {
+        if (isPaymentOrderIdExpired()) {
+            regeneratePaymentOrderId();
+        }
+        return this.paymentOrderId.value();
     }
 }

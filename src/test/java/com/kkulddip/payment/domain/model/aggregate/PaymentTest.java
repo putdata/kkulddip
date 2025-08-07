@@ -4,6 +4,7 @@ import com.kkulddip.payment.domain.model.status.PaymentMethod;
 import com.kkulddip.payment.domain.model.status.PaymentStatus;
 import com.kkulddip.payment.domain.model.vo.Money;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
+import com.kkulddip.payment.domain.model.vo.PaymentOrderId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,22 +23,18 @@ class PaymentTest {
         Long orderId = 123L;
         String orderName = "테스트 주문";
         Money amount = Money.of(10000);
-        String customerName = "홍길동";
-        String customerEmail = "test@example.com";
-        String callbackUrl = "http://callback.url";
-        String failUrl = "http://fail.url";
+        Long customerId = 1L;
 
         // when
-        Payment payment = new Payment(orderId, orderName, amount, customerName, customerEmail, callbackUrl, failUrl);
+        Payment payment = new Payment(orderId, orderName, amount, customerId);
 
         // then
         assertThat(payment.getOrderId()).isEqualTo(orderId);
+        assertThat(payment.getPaymentOrderId()).isNotNull();
+        assertThat(payment.getPaymentOrderId().value()).startsWith(orderId + "-");
         assertThat(payment.getOrderName()).isEqualTo(orderName);
         assertThat(payment.getAmount()).isEqualTo(amount);
-        assertThat(payment.getCustomerName()).isEqualTo(customerName);
-        assertThat(payment.getCustomerEmail()).isEqualTo(customerEmail);
-        assertThat(payment.getCallbackUrl()).isEqualTo(callbackUrl);
-        assertThat(payment.getFailUrl()).isEqualTo(failUrl);
+        assertThat(payment.getCustomerId()).isEqualTo(customerId);
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.READY);
         assertThat(payment.getCreatedAt()).isNotNull();
         assertThat(payment.getUpdatedAt()).isNotNull();
@@ -50,13 +47,10 @@ class PaymentTest {
         Long orderId = 123L;
         String orderName = null;
         Money amount = Money.of(10000);
-        String customerName = "홍길동";
-        String customerEmail = "test@example.com";
-        String callbackUrl = "http://callback.url";
-        String failUrl = "http://fail.url";
+        Long customerId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> new Payment(orderId, orderName, amount, customerName, customerEmail, callbackUrl, failUrl))
+        assertThatThrownBy(() -> new Payment(orderId, orderName, amount, customerId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("주문명은 필수입니다.");
     }
@@ -68,34 +62,14 @@ class PaymentTest {
         Long orderId = 123L;
         String orderName = "";
         Money amount = Money.of(10000);
-        String customerName = "홍길동";
-        String customerEmail = "test@example.com";
-        String callbackUrl = "http://callback.url";
-        String failUrl = "http://fail.url";
+        Long customerId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> new Payment(orderId, orderName, amount, customerName, customerEmail, callbackUrl, failUrl))
+        assertThatThrownBy(() -> new Payment(orderId, orderName, amount, customerId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("주문명은 필수입니다.");
     }
 
-    @Test
-    @DisplayName("결제 생성 - 고객명이 null이면 예외가 발생한다")
-    void createPayment_NullCustomerName_ThrowsException() {
-        // given
-        Long orderId = 123L;
-        String orderName = "테스트 주문";
-        Money amount = Money.of(10000);
-        String customerName = null;
-        String customerEmail = "test@example.com";
-        String callbackUrl = "http://callback.url";
-        String failUrl = "http://fail.url";
-
-        // when & then
-        assertThatThrownBy(() -> new Payment(orderId, orderName, amount, customerName, customerEmail, callbackUrl, failUrl))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("고객명은 필수입니다.");
-    }
 
     @Test
     @DisplayName("결제 승인 - READY 상태의 결제를 승인할 수 있다")
@@ -109,14 +83,13 @@ class PaymentTest {
         String receiptUrl = "http://receipt.url";
 
         // when
-        payment.approve(paymentKey, method, requestedAt, approvedAt, receiptUrl);
+        payment.approve(paymentKey, method, requestedAt, approvedAt);
 
         // then
         assertThat(payment.getPaymentKey()).isEqualTo(paymentKey);
         assertThat(payment.getMethod()).isEqualTo(method);
         assertThat(payment.getRequestedAt()).isEqualTo(requestedAt);
         assertThat(payment.getApprovedAt()).isEqualTo(approvedAt);
-        assertThat(payment.getReceiptUrl()).isEqualTo(receiptUrl);
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.DONE);
         assertThat(payment.isApproved()).isTrue();
     }
@@ -135,7 +108,7 @@ class PaymentTest {
         String receiptUrl = "http://receipt.url";
 
         // when & then
-        assertThatThrownBy(() -> payment.approve(paymentKey, method, LocalDateTime.now(), LocalDateTime.now(), receiptUrl))
+        assertThatThrownBy(() -> payment.approve(paymentKey, method, LocalDateTime.now(), LocalDateTime.now()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("준비 상태의 결제만 승인할 수 있습니다.");
     }
@@ -182,43 +155,54 @@ class PaymentTest {
     }
 
     @Test
+    @DisplayName("PaymentOrderId 생성 - orderId로 고유한 PaymentOrderId가 생성된다")
+    void createPaymentOrderId_UniqueGeneration_Success() {
+        // given
+        Long orderId = 123L;
+        
+        // when
+        PaymentOrderId paymentOrderId1 = PaymentOrderId.generate(orderId);
+        PaymentOrderId paymentOrderId2 = PaymentOrderId.generate(orderId);
+        
+        // then
+        assertThat(paymentOrderId1.value()).startsWith(orderId + "-");
+        assertThat(paymentOrderId2.value()).startsWith(orderId + "-");
+        assertThat(paymentOrderId1).isNotEqualTo(paymentOrderId2); // 매번 다른 UUID 생성
+    }
+
+    @Test
     @DisplayName("재구성 생성자 - 모든 파라미터로 Payment를 재구성할 수 있다")
     void reconstructorPayment_AllParameters_Success() {
         // given
         PaymentKey paymentKey = PaymentKey.of("payment-key-123");
         Long orderId = 123L;
+        PaymentOrderId paymentOrderId = PaymentOrderId.of("123-abcd1234");
         String orderName = "테스트 주문";
         Money amount = Money.of(10000);
-        String customerName = "홍길동";
-        String customerEmail = "test@example.com";
+        Long customerId = 1L;
         PaymentStatus status = PaymentStatus.DONE;
         PaymentMethod method = PaymentMethod.CARD;
         LocalDateTime requestedAt = OffsetDateTime.parse("2024-02-13T12:17:57+09:00").toLocalDateTime();
         LocalDateTime approvedAt = OffsetDateTime.parse("2024-02-13T12:18:14+09:00").toLocalDateTime();
-        String receiptUrl = "http://receipt.url";
-        String callbackUrl = "http://callback.url";
-        String failUrl = "http://fail.url";
         LocalDateTime createdAt = LocalDateTime.now().minusHours(1);
         LocalDateTime updatedAt = LocalDateTime.now();
 
         // when
-        Payment payment = new Payment(paymentKey, orderId, orderName, amount, customerName, customerEmail,
-                status, method, requestedAt, approvedAt, receiptUrl, callbackUrl, failUrl, createdAt, updatedAt);
+        LocalDateTime paymentOrderIdCreatedAt = LocalDateTime.now().minusMinutes(3);
+        Payment payment = new Payment(paymentKey, orderId, paymentOrderId, orderName, amount, customerId,
+                status, method, requestedAt, approvedAt, createdAt, updatedAt, paymentOrderIdCreatedAt);
 
         // then
         assertThat(payment.getPaymentKey()).isEqualTo(paymentKey);
         assertThat(payment.getOrderId()).isEqualTo(orderId);
+        assertThat(payment.getPaymentOrderId()).isEqualTo(paymentOrderId);
         assertThat(payment.getOrderName()).isEqualTo(orderName);
         assertThat(payment.getAmount()).isEqualTo(amount);
-        assertThat(payment.getCustomerName()).isEqualTo(customerName);
-        assertThat(payment.getCustomerEmail()).isEqualTo(customerEmail);
+        assertThat(payment.getCustomerId()).isEqualTo(customerId);
         assertThat(payment.getStatus()).isEqualTo(status);
         assertThat(payment.getMethod()).isEqualTo(method);
         assertThat(payment.getRequestedAt()).isEqualTo(requestedAt);
         assertThat(payment.getApprovedAt()).isEqualTo(approvedAt);
-        assertThat(payment.getReceiptUrl()).isEqualTo(receiptUrl);
-        assertThat(payment.getCallbackUrl()).isEqualTo(callbackUrl);
-        assertThat(payment.getFailUrl()).isEqualTo(failUrl);
         assertThat(payment.getCreatedAt()).isEqualTo(createdAt);
         assertThat(payment.getUpdatedAt()).isEqualTo(updatedAt);
     }
@@ -228,10 +212,7 @@ class PaymentTest {
                 123L,
                 "테스트 주문",
                 Money.of(10000),
-                "홍길동",
-                "test@example.com",
-                "http://callback.url",
-                "http://fail.url"
+                1L
         );
     }
 
@@ -241,8 +222,7 @@ class PaymentTest {
                 PaymentKey.of("payment-key-123"),
                 PaymentMethod.CARD,
                 OffsetDateTime.parse("2024-02-13T12:17:57+09:00").toLocalDateTime(),
-                OffsetDateTime.parse("2024-02-13T12:18:14+09:00").toLocalDateTime(),
-                "http://receipt.url"
+                OffsetDateTime.parse("2024-02-13T12:18:14+09:00").toLocalDateTime()
         );
         return payment;
     }

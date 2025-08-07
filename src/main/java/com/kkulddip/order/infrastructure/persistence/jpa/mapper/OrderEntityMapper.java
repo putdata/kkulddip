@@ -7,6 +7,7 @@ import com.kkulddip.order.domain.model.aggregate.Order;
 import com.kkulddip.order.domain.model.entity.DiscountInfo;
 import com.kkulddip.order.domain.model.entity.OrderItem;
 import com.kkulddip.order.domain.model.vo.CustomerId;
+import com.kkulddip.order.domain.model.vo.Money;
 import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.infrastructure.persistence.jpa.entity.DiscountInfoEntity;
@@ -43,8 +44,8 @@ public class OrderEntityMapper {
             CustomerId.of(orderEntity.getCustomerId()),
             StoreId.of(orderEntity.getStoreId()),
             new java.util.ArrayList<>(), // OrderItem들은 필요시 별도 로딩
-            com.kkulddip.order.domain.model.vo.Money.of(orderEntity.getOriginalPrice()),
-            com.kkulddip.order.domain.model.vo.Money.of(orderEntity.getFinalPrice()),
+            Money.of(orderEntity.getOriginalPrice()),
+            Money.of(orderEntity.getFinalPrice()),
             orderEntity.getOrderStatus(),
             orderEntity.getOrderDate()
         );

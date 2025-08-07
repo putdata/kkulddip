@@ -5,6 +5,7 @@ import com.kkulddip.payment.domain.model.status.PaymentMethod;
 import com.kkulddip.payment.domain.model.status.PaymentStatus;
 import com.kkulddip.payment.domain.model.vo.Money;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
+import com.kkulddip.payment.domain.model.vo.PaymentOrderId;
 import com.kkulddip.payment.infrastructure.persistence.jpa.entity.PaymentJpaEntity;
 import com.kkulddip.payment.infrastructure.persistence.jpa.repository.PaymentJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,10 +43,7 @@ class PaymentRepositoryImplTest {
                 123L,
                 "테스트 주문",
                 Money.of(10000),
-                "홍길동",
-                "test@example.com",
-                "http://callback.url",
-                "http://fail.url"
+                1L
         );
 
         testPaymentKey = PaymentKey.of("payment-key-123");
@@ -223,19 +221,17 @@ class PaymentRepositoryImplTest {
         Payment approvedPayment = new Payment(
                 testPaymentKey,
                 456L,
+                PaymentOrderId.of("456-test1234"),
                 "승인된 주문",
                 Money.of(15000),
-                "김철수",
-                "approved@example.com",
+                1L,
                 PaymentStatus.DONE,
                 PaymentMethod.CARD,
                 OffsetDateTime.parse("2024-02-13T12:17:57+09:00").toLocalDateTime(),
                 OffsetDateTime.parse("2024-02-13T12:18:14+09:00").toLocalDateTime(),
-                "http://receipt.url",
-                "http://callback.url",
-                "http://fail.url",
                 LocalDateTime.now().minusMinutes(5),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                LocalDateTime.now().minusMinutes(3) // paymentOrderIdCreatedAt 추가
         );
 
         PaymentJpaEntity approvedEntity = PaymentJpaEntity.from(approvedPayment);

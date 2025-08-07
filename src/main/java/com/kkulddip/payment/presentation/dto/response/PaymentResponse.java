@@ -7,44 +7,41 @@ import java.time.LocalDateTime;
 
 public record PaymentResponse(
     String paymentKey,
-    String orderId,
+    String paymentOrderId,
     String orderName,
     long amount,
-    String customerName,
+    Long customerId,
     String status,
     String method,
     LocalDateTime requestedAt,
-    LocalDateTime approvedAt,
-    String receiptUrl
+    LocalDateTime approvedAt
 ) {
 
     public static PaymentResponse from(Payment payment) {
         return new PaymentResponse(
             payment.getPaymentKey() != null ? payment.getPaymentKey().value() : null,
-            payment.getOrderId().toString(),
+            payment.getPaymentOrderId().value(),
             payment.getOrderName(),
             payment.getAmount().value(),
-            payment.getCustomerName(),
+            payment.getCustomerId(),
             payment.getStatus().name(),
             payment.getMethod() != null ? payment.getMethod().name() : null,
             payment.getRequestedAt(),
-            payment.getApprovedAt(),
-            payment.getReceiptUrl()
+            payment.getApprovedAt()
         );
     }
 
     public static PaymentResponse from(Payment payment, TossPaymentResponse tossResponse) {
         return new PaymentResponse(
             payment.getPaymentKey().value(),
-            payment.getOrderId().toString(),
+            payment.getPaymentOrderId().value(),
             payment.getOrderName(),
             payment.getAmount().value(),
-            payment.getCustomerName(),
+            payment.getCustomerId(),
             payment.getStatus().name(),
             payment.getMethod().name(),
             payment.getRequestedAt(),
-            payment.getApprovedAt(),
-            payment.getReceiptUrl()
+            payment.getApprovedAt()
         );
     }
 }

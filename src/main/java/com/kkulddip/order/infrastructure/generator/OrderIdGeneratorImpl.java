@@ -2,18 +2,21 @@ package com.kkulddip.order.infrastructure.generator;
 
 import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.service.OrderIdGenerator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * 주문 ID 생성기 구현체
- * 현재는 persistence 계층에서 자동으로 ID를 생성하도록 null을 반환한다.
- * 향후 UUID, Snowflake ID 등 다른 ID 생성 전략으로 변경 가능하다.
+ * Snowflake 알고리즘을 사용하여 유일한 주문 ID를 생성한다.
  */
 @Component
+@RequiredArgsConstructor
 public class OrderIdGeneratorImpl implements OrderIdGenerator {
+
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     @Override
     public OrderId generate() {
-        return OrderId.of(null); // persistence 계층에서 자동 생성
+        return OrderId.of(snowflakeIdGenerator.generate());
     }
 }

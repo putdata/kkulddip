@@ -66,8 +66,13 @@ public class OrderMapper {
      * Order를 CreateOrderResponse로 변환
      */
     public CreateOrderResponse toCreateOrderResponse(Order order) {
+        log.debug("OrderResponse 변환 - orderId: {}, customerId: {}, storeId: {}, originalPrice: {}, finalPrice: {}, orderStatus: {}, orderDate: {}",
+            order.getOrderId().value(), order.getCustomerId().value(), order.getStoreId().value(),
+            order.getOriginalPrice().amount(), order.getFinalPrice().amount(),
+            order.getOrderStatus().name(), order.getOrderDate());
+            
         return CreateOrderResponse.builder()
-            .orderId(order.getOrderId().value())
+            .orderId(String.valueOf(order.getOrderId().value()))  // Long을 String으로 변환
             .customerId(order.getCustomerId().value())
             .storeId(order.getStoreId().value())
             .originalPrice(order.getOriginalPrice().amount())
