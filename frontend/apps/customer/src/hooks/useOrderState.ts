@@ -1,108 +1,103 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { OrderData, PaymentData, FunnelState } from '@/types/orderflow';
+import { useFunnel } from '@/hooks/useFunnel';
+import { useOrderFlowStore } from '@/store/useOrderFlowStore';
 import { ROUTE_PATH } from '@/router';
+import type { CartData, PaymentData } from '@/types/orderflow';
+
+const steps = ['cart', 'payment', 'pending', 'complete'] as const;
 
 export const useOrderState = () => {
   const navigate = useNavigate();
 
-  const [funnelState, setFunnelState] = useState<FunnelState>('active');
-  const [completedOrderData, setCompletedOrderData] =
-    useState<OrderData | null>(null);
+  // Funnel 관리
+  const { Funnel, Step, nextClickHandler, prevClickHandler, currentStep } =
+    useFunnel(steps, 'cart');
 
-  const [orderData, setOrderData] = useState<OrderData>({
-    quantity: 1,
-    total: 0,
-    productId: 0,
-    finalAmount: 0,
-    orderNumber: '',
-    orderDate: new Date(),
-  });
+  // 주문 상태 관리
+  const {
+    orderData,
+    completedOrderData,
+    isCompleted,
+    updateOrderData,
+    handleOrderComplete: storeHandleOrderComplete,
+    handleNewOrder: storeHandleNewOrder,
+    initializeFromSession,
+  } = useOrderFlowStore();
 
-  useEffect(() => {
-    const completed = sessionStorage.getItem('orderCompleted');
-    const savedOrderData = sessionStorage.getItem('completedOrderData');
+  // pending → complete 자동 처리용
+  const handlePendingToComplete = useCallback(() => {
+    nextClickHandler('complete');
+  }, [nextClickHandler]);
 
-    if (completed === 'true') {
-      setFunnelState('escaped');
+  // pending → payment 복귀용 (실패시)
+  const handlePendingToPayment = useCallback(() => {
+    prevClickHandler('payment');
+  }, [prevClickHandler]);
 
-      if (savedOrderData) {
-        try {
-          setCompletedOrderData(JSON.parse(savedOrderData));
-        } catch (error) {
-          console.error('저장된 주문 데이터 파싱 오류:', error);
-          throw error;
-        }
-      } else {
-        const error = new Error('주문 완료 데이터를 찾을 수 없습니다.');
-        console.error('주문 데이터 누락:', error);
-        throw error;
-      }
-    }
-  }, []);
-
-  const handleOrderComplete = useCallback(
-    (paymentData: PaymentData) => {
-      const orderNumber = `ORDER-${Date.now()}`;
-      const orderDate = new Date();
-
-      const finalOrderData: OrderData = {
-        ...orderData,
-        ...paymentData,
-        orderNumber,
-        orderDate,
-      };
-
-      setCompletedOrderData(finalOrderData);
-      setFunnelState('completed');
-
-      try {
-        sessionStorage.setItem('orderCompleted', 'true');
-        sessionStorage.setItem(
-          'completedOrderData',
-          JSON.stringify(finalOrderData),
-        );
-      } catch (error) {
-        console.error('주문 데이터 저장 실패:', error);
-        throw error;
-      }
-
-      window.history.replaceState(null, '', window.location.pathname);
-
-      setTimeout(() => setFunnelState('escaped'), 100);
+  // 장바구니에서 결제로
+  const handleNextToPayment = useCallback(
+    (cartData: CartData) => {
+      updateOrderData(cartData);
+      nextClickHandler('payment');
     },
-    [orderData],
+    [updateOrderData, nextClickHandler],
   );
 
-  const handleNewOrder = useCallback(() => {
-    sessionStorage.removeItem('orderCompleted');
-    sessionStorage.removeItem('completedOrderData');
+  // 결제에서 대기화면으로 (결제 로직 + pending 이동)
+  const handleNextToPending = useCallback(
+    (paymentData: PaymentData) => {
+      storeHandleOrderComplete(paymentData);
+      nextClickHandler('pending');
 
-    setFunnelState('active');
-    setCompletedOrderData(null);
-    setOrderData({
-      quantity: 1,
-      total: 0,
-      productId: 0,
-      finalAmount: 0,
-      orderNumber: '',
-      orderDate: new Date(),
-    });
+      // Mock 결제 처리
+      // TODO: 실제 토스 API로 교체
+      setTimeout(() => {
+        handlePendingToComplete();
+      }, 3000);
+    },
+    [storeHandleOrderComplete, nextClickHandler, handlePendingToComplete],
+  );
 
+  // 뒤로가기 핸들러들
+  const handleBackToCart = useCallback(() => {
+    prevClickHandler('cart');
+  }, [prevClickHandler]);
+
+  const handleBackToPayment = useCallback(() => {
+    prevClickHandler('payment');
+  }, [prevClickHandler]);
+
+  const handleBackToHome = useCallback(() => {
     navigate(ROUTE_PATH.HOME);
   }, [navigate]);
 
-  const updateOrderData = useCallback((data: Partial<OrderData>) => {
-    setOrderData(prev => ({ ...prev, ...data }));
-  }, []);
+  // 새로운 주문 시작
+  const handleNewOrder = useCallback(() => {
+    storeHandleNewOrder();
+    navigate(ROUTE_PATH.HOME);
+  }, [storeHandleNewOrder, navigate]);
 
   return {
-    funnelState,
+    // Funnel 컴포넌트들
+    Funnel,
+    Step,
+    currentStep,
+
+    // 상태들
     orderData,
     completedOrderData,
+    isCompleted,
 
-    handleOrderComplete,
+    // 액션들
+    handleNextToPayment,
+    handleNextToPending,
+    handlePendingToComplete,
+    handlePendingToPayment,
+    handleBackToCart,
+    handleBackToPayment,
+    handleBackToHome,
     handleNewOrder,
-    updateOrderData,
+    initializeFromSession,
   };
 };

@@ -1,73 +1,72 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFunnel } from '@/hooks/useFunnel';
 import { useOrderState } from '@/hooks/useOrderState';
 import OrderProcessingLoader from '@/components/pages/payment/OrderProcessingLoader/OrderProcessingLoader';
 import Cart from '@/pages/Cart';
 import Payment from '@/pages/Payment';
 import OrderComplete from '@/pages/OrderComplete';
 import { ROUTE_PATH } from '@/router';
-import type { CartData } from '@/types/orderflow';
-
-const steps = ['cart', 'payment'] as const;
 
 const OrderFunnelContainer = () => {
   const navigate = useNavigate();
-
-  const { Funnel, Step, nextClickHandler, prevClickHandler } = useFunnel(
-    steps,
-    'cart',
-  );
-
   const {
-    funnelState,
+    Funnel,
+    Step,
+    currentStep,
     orderData,
     completedOrderData,
-    handleOrderComplete,
+    isCompleted,
+    handleNextToPayment,
+    handleNextToPending,
+    handleBackToCart,
+    handleBackToHome,
     handleNewOrder,
-    updateOrderData,
+    initializeFromSession,
   } = useOrderState();
 
-  const handleNextToCart = (cartData: CartData) => {
-    updateOrderData(cartData);
-    nextClickHandler('payment');
-  };
+  // 세션에서 완료된 주문 복원
+  useEffect(() => {
+    try {
+      initializeFromSession();
 
-  const handleBackToCart = () => {
-    prevClickHandler('cart');
-  };
-
-  const handleBackToHome = () => {
-    navigate(ROUTE_PATH.HOME);
-  };
-
-  if (funnelState === 'active') {
-    return (
-      <Funnel>
-        <Step name="cart">
-          <Cart
-            onNext={handleNextToCart}
-            onBack={handleBackToHome}
-            initialQuantity={orderData.quantity}
-          />
-        </Step>
-
-        <Step name="payment">
-          <Payment
-            onNext={handleOrderComplete}
-            onBack={handleBackToCart}
-            orderData={orderData}
-          />
-        </Step>
-      </Funnel>
-    );
-  }
-
-  if (funnelState === 'completed') {
-    return <OrderProcessingLoader />;
-  }
+      // 완료된 주문 + Cart 스텝이면 재진입으로 판단
+      if (isCompleted && currentStep === 'cart') {
+        navigate(ROUTE_PATH.HOME, { replace: true });
+      }
+    } catch {
+      navigate(ROUTE_PATH.HOME, { replace: true });
+    }
+  }, [initializeFromSession, isCompleted, currentStep, navigate]);
 
   return (
-    <OrderComplete orderData={completedOrderData!} onBack={handleNewOrder} />
+    <Funnel>
+      <Step name="cart">
+        <Cart
+          onNext={handleNextToPayment}
+          onBack={handleBackToHome}
+          initialQuantity={orderData.quantity}
+        />
+      </Step>
+
+      <Step name="payment">
+        <Payment
+          onNext={handleNextToPending}
+          onBack={handleBackToCart}
+          orderData={orderData}
+        />
+      </Step>
+
+      <Step name="pending">
+        <OrderProcessingLoader />
+      </Step>
+
+      <Step name="complete">
+        <OrderComplete
+          orderData={completedOrderData || orderData}
+          onBack={handleNewOrder}
+        />
+      </Step>
+    </Funnel>
   );
 };
 

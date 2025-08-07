@@ -24,5 +24,3 @@ export interface OrderData {
   orderNumber: string;
   orderDate: Date;
 }
-
-export type FunnelState = 'active' | 'completed' | 'escaped';
