@@ -11,7 +11,6 @@ import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
 import OrderDetail from '@/pages/OrderDetail';
-import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
