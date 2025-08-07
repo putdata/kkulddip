@@ -20,8 +20,8 @@ export const useOrderState = () => {
     completedOrderData,
     isCompleted,
     updateOrderData,
-    handleOrderComplete: storeHandleOrderComplete,
-    handleNewOrder: storeHandleNewOrder,
+    completeOrder,
+    createNewOrder,
     initializeFromSession,
   } = useOrderFlowStore();
 
@@ -47,7 +47,7 @@ export const useOrderState = () => {
   // 결제에서 대기화면으로 (결제 로직 + pending 이동)
   const handleNextToPending = useCallback(
     (paymentData: PaymentData) => {
-      storeHandleOrderComplete(paymentData);
+      completeOrder(paymentData);
       nextClickHandler('pending');
 
       // Mock 결제 처리
@@ -56,7 +56,7 @@ export const useOrderState = () => {
         handlePendingToComplete();
       }, 3000);
     },
-    [storeHandleOrderComplete, nextClickHandler, handlePendingToComplete],
+    [completeOrder, nextClickHandler, handlePendingToComplete],
   );
 
   // 뒤로가기 핸들러들
@@ -74,9 +74,9 @@ export const useOrderState = () => {
 
   // 새로운 주문 시작
   const handleNewOrder = useCallback(() => {
-    storeHandleNewOrder();
+    createNewOrder();
     navigate(ROUTE_PATH.HOME);
-  }, [storeHandleNewOrder, navigate]);
+  }, [createNewOrder, navigate]);
 
   return {
     // Funnel 컴포넌트들
