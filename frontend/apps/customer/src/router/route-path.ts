@@ -10,4 +10,6 @@ export const ROUTE_PATH = {
   LOGIN: '/login',
   PAY: '/pay',
   NOT_FOUND: '*',
+  REVIEW: '/store/:storeId/reviews',
+  REVIEW_CREATE: '/review/create',
 } as const;

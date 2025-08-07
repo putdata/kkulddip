@@ -13,6 +13,8 @@ import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
 import OrderDetail from '@/pages/OrderDetail';
 import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 import OrderFunnelContainer from '@/pages/OrderFlow';
+import ReviewsPage from '@/pages/review/Reviews';
+import ReviewCreate from '@/pages/review/ReviewCreate';
 
 export const router = createBrowserRouter([
   {
@@ -27,12 +29,6 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
-        ],
-      },
-      {
-        path: '/',
-        element: <MobileLayoutWithPageNavbar />,
-        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
@@ -49,9 +45,18 @@ export const router = createBrowserRouter([
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
           },
+          // 임시 - 리뷰 작성 페이지
           {
             path: ROUTE_PATH.ORDER_DETAIL,
             element: <OrderDetail />,
+          },
+          {
+            path: ROUTE_PATH.REVIEW_CREATE,
+            element: <ReviewCreate />,
+          },
+          {
+            path: ROUTE_PATH.REVIEW,
+            element: <ReviewsPage />,
           },
         ],
       },
@@ -78,6 +83,14 @@ export const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFound />,
+      },
+      {
+        path: ROUTE_PATH.NOTIFICATIONS,
+      },
+      // 임시 - 리뷰 작성 페이지
+      {
+        path: ROUTE_PATH.REVIEW_CREATE,
+        element: <ReviewCreate />,
       },
     ],
   },
