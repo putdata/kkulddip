@@ -1,6 +1,6 @@
 package com.kkulddip.payment.domain.service;
 
-import com.kkulddip.payment.domain.model.entity.Payment;
+import com.kkulddip.payment.domain.model.aggregate.Payment;
 import com.kkulddip.payment.domain.model.vo.Money;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
 import com.kkulddip.payment.domain.repository.PaymentRepository;

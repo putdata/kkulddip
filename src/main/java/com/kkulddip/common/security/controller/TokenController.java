@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +54,7 @@ public class TokenController {
                     description = "인증 실패 (만료된 코드)"
             )
     })
-    public ResponseEntity<ApiResponse<OAuth2TokenResponse>> exchangeCustomerToken(
+    public ApiResponse<OAuth2TokenResponse> exchangeCustomerToken(
             @Valid @RequestBody OAuth2TokenRequest request) {
         return processTokenExchange(request, "CUSTOMER");
     }
@@ -86,7 +85,7 @@ public class TokenController {
                     description = "인증 실패 (만료된 코드)"
             )
     })
-    public ResponseEntity<ApiResponse<OAuth2TokenResponse>> exchangeOwnerToken(
+    public ApiResponse<OAuth2TokenResponse> exchangeOwnerToken(
             @Valid @RequestBody OAuth2TokenRequest request) {
         return processTokenExchange(request, "OWNER");
     }
@@ -99,7 +98,7 @@ public class TokenController {
      * @param userType 사용자 타입 ("CUSTOMER" 또는 "OWNER")
      * @return JWT 토큰 정보가 담긴 응답 객체
      */
-    private ResponseEntity<ApiResponse<OAuth2TokenResponse>> processTokenExchange(
+    private ApiResponse<OAuth2TokenResponse> processTokenExchange(
             OAuth2TokenRequest request, String userType) {
 
         log.info("{} 토큰 교환 요청 - 코드: {}", userType, request.code());
@@ -108,6 +107,6 @@ public class TokenController {
 
         log.info("{} 토큰 교환 성공", userType);
 
-        return ResponseEntity.ok(ApiResponse.of(tokenResponse));
+        return ApiResponse.of(tokenResponse);
     }
 }

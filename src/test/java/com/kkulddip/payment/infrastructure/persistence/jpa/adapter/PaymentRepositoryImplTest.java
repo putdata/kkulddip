@@ -1,6 +1,6 @@
 package com.kkulddip.payment.infrastructure.persistence.jpa.adapter;
 
-import com.kkulddip.payment.domain.model.entity.Payment;
+import com.kkulddip.payment.domain.model.aggregate.Payment;
 import com.kkulddip.payment.domain.model.status.PaymentMethod;
 import com.kkulddip.payment.domain.model.status.PaymentStatus;
 import com.kkulddip.payment.domain.model.vo.Money;
@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -38,7 +39,7 @@ class PaymentRepositoryImplTest {
     @BeforeEach
     void setUp() {
         testPayment = new Payment(
-                "order-123",
+                123L,
                 "테스트 주문",
                 Money.of(10000),
                 "홍길동",
@@ -95,7 +96,7 @@ class PaymentRepositoryImplTest {
     @DisplayName("주문 ID로 결제 조회 - 결제가 존재하면 반환한다")
     void findByOrderId_ExistingPayment_ReturnsPayment() {
         // given
-        String orderId = "order-123";
+        Long orderId = 123L;
         given(paymentJpaRepository.findByOrderId(orderId)).willReturn(Optional.of(testJpaEntity));
 
         // when
@@ -112,7 +113,7 @@ class PaymentRepositoryImplTest {
     @DisplayName("주문 ID로 결제 조회 - 결제가 존재하지 않으면 빈 Optional 반환")
     void findByOrderId_NonExistingPayment_ReturnsEmpty() {
         // given
-        String orderId = "non-existing-order";
+        Long orderId = 999L;
         given(paymentJpaRepository.findByOrderId(orderId)).willReturn(Optional.empty());
 
         // when
@@ -187,7 +188,7 @@ class PaymentRepositoryImplTest {
     @DisplayName("주문 ID 존재 여부 확인 - 존재하면 true 반환")
     void existsByOrderId_ExistingOrderId_ReturnsTrue() {
         // given
-        String orderId = "existing-order";
+        Long orderId = 123L;
         given(paymentJpaRepository.existsByOrderId(orderId)).willReturn(true);
 
         // when
@@ -203,7 +204,7 @@ class PaymentRepositoryImplTest {
     @DisplayName("주문 ID 존재 여부 확인 - 존재하지 않으면 false 반환")
     void existsByOrderId_NonExistingOrderId_ReturnsFalse() {
         // given
-        String orderId = "non-existing-order";
+        Long orderId = 999L;
         given(paymentJpaRepository.existsByOrderId(orderId)).willReturn(false);
 
         // when
@@ -221,15 +222,15 @@ class PaymentRepositoryImplTest {
         // given
         Payment approvedPayment = new Payment(
                 testPaymentKey,
-                "order-approved",
+                456L,
                 "승인된 주문",
                 Money.of(15000),
                 "김철수",
                 "approved@example.com",
                 PaymentStatus.DONE,
                 PaymentMethod.CARD,
-                "2024-01-01T10:00:00",
-                "2024-01-01T10:01:00",
+                OffsetDateTime.parse("2024-02-13T12:17:57+09:00").toLocalDateTime(),
+                OffsetDateTime.parse("2024-02-13T12:18:14+09:00").toLocalDateTime(),
                 "http://receipt.url",
                 "http://callback.url",
                 "http://fail.url",

@@ -1,10 +1,9 @@
 package com.kkulddip.common.event;
 
+import lombok.Builder;
+
+@Builder
 public record OrderCreatedEvent(
-    String orderId,
-    long amount
-) {
-    public static OrderCreatedEvent of(String orderId, long amount) {
-        return new OrderCreatedEvent(orderId, amount);
-    }
-}
+    Long orderId,
+    Integer amount
+) {}

@@ -17,7 +17,8 @@ public record Money(
     }
     
     public static Money of(Integer amount) {
-        return new Money(amount);
+        Money money = new Money(amount);
+        return money;
     }
     
     public Money add(Money other) {
@@ -35,7 +36,8 @@ public record Money(
         if (multiplier < 0) {
             throw new IllegalArgumentException("곱할 수는 0보다 작을 수 없습니다.");
         }
-        return new Money(this.amount * multiplier);
+        Money result = new Money(this.amount * multiplier);
+        return result;
     }
 
     public boolean isGreaterThan(Money other) {
