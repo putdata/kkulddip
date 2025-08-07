@@ -36,10 +36,7 @@ class PaymentDomainServiceTest {
                 123L,
                 "테스트 주문",
                 Money.of(10000),
-                "홍길동",
-                "test@example.com",
-                "http://callback.url",
-                "http://fail.url"
+                1L
         );
         testPaymentKey = PaymentKey.of("payment-key-123");
     }
@@ -75,10 +72,7 @@ class PaymentDomainServiceTest {
                 0L,
                 "무료 주문",
                 Money.of(0),
-                "홍길동",
-                "test@example.com",
-                "http://callback.url",
-                "http://fail.url"
+                1L
         );
         Money requestAmount = Money.of(0);
 

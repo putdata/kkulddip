@@ -18,9 +18,9 @@ public class PaymentStatusService {
     private final PaymentRepository paymentRepository;
 
     public Payment approvePayment(Payment payment, PaymentKey paymentKey, PaymentMethod method, 
-        LocalDateTime requestedAt, LocalDateTime approvedAt, String receiptUrl) {
+        LocalDateTime requestedAt, LocalDateTime approvedAt) {
             
-        payment.approve(paymentKey, method, requestedAt, approvedAt, receiptUrl);
+        payment.approve(paymentKey, method, requestedAt, approvedAt);
         return paymentRepository.save(payment);
     }
 

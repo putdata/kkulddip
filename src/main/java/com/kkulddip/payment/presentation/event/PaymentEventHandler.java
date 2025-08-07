@@ -26,8 +26,8 @@ public class PaymentEventHandler {
     @Transactional
     public void handleOrderCreated(OrderCreatedEvent event) {
         try {
-            log.info("📥 주문 생성 이벤트 수신: orderId={}, amount={}",
-                event.orderId(), event.amount());
+            log.info("📥 주문 생성 이벤트 수신: orderId={}, amount={}, customerId={}",
+                event.orderId(), event.amount(), event.customerId());
 
             // 중복 처리 방지
             if (paymentRepository.existsByOrderId(event.orderId())) {
@@ -36,39 +36,24 @@ public class PaymentEventHandler {
             }
 
             // Payment 엔티티 생성 (READY 상태)
-            // [orderId, amount]만 사용하여 생성
+            // [orderId, amount, customerId] 사용하여 생성
             Payment payment = new Payment(
                 event.orderId(),           // orderId
                 "띱박스 결제",                // orderName (기본값)
                 Money.of(event.amount()), // amount
-                "고객",                       // customerName (기본값)
-                "customer@example.com",       // customerEmail (기본값)
-                generateCallbackUrl(event.orderId()),  // callbackUrl
-                generateFailUrl(event.orderId())       // failUrl
+                event.customerId()         // customerId
             );
 
             // DB 저장
-            paymentRepository.save(payment);
+            Payment savedPayment = paymentRepository.save(payment);
 
-            log.info("✅ Payment 저장 완료: orderId={}, amount={}, status={}",
-                event.orderId(), event.amount(), PaymentStatus.READY);
+            log.info("✅ Payment 저장 완료: orderId={}, paymentOrderId={}, customerId={}, amount={}, status={}",
+                event.orderId(), savedPayment.getPaymentOrderId().value(), event.customerId(), event.amount(), PaymentStatus.READY);
 
         } catch (Exception e) {
             log.error("❌ Payment 저장 실패: orderId={}, error={}",
                 event.orderId(), e.getMessage(), e);
             throw e;
         }
-    }
-
-    private String generateCallbackUrl(Long orderId) {
-        // 토스페이먼츠 형식의 orderId 사용 (ORDER-{orderId})
-        String tossOrderId = TossOrderIdConverter.toTossOrderId(orderId);
-        return "http://localhost:8080/payment/success?orderId=" + tossOrderId;
-    }
-
-    private String generateFailUrl(Long orderId) {
-        // 토스페이먼츠 형식의 orderId 사용 (ORDER-{orderId})
-        String tossOrderId = TossOrderIdConverter.toTossOrderId(orderId);
-        return "http://localhost:8080/payment/fail?orderId=" + tossOrderId;
     }
 }

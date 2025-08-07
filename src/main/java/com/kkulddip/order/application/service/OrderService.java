@@ -17,7 +17,6 @@ import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.domain.repository.OrderRepository;
 import com.kkulddip.order.domain.service.OrderIdGenerator;
 import com.kkulddip.order.application.exception.OrderException;
-import com.kkulddip.common.exception.ErrorCode;
 
 @RequiredArgsConstructor
 @Service
@@ -50,7 +49,7 @@ public class OrderService {
                 order.addOrderItem(command);
             }
             
-            return orderRepository.save(order);
+            return order;
         } catch (Exception e) {
             if (e instanceof OrderException) {
                 throw e;

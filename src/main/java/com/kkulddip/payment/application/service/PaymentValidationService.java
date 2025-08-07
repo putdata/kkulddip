@@ -9,14 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentValidationService {
 
-    private final OrderIdConversionService orderIdConversionService;
-
     public void validateTossResponse(Payment payment, TossPaymentResponse tossResponse) {
-        Long responseOrderId = orderIdConversionService.extractTossOrderId(tossResponse.orderId());
-        
-        if (!payment.getOrderId().equals(responseOrderId)) {
+        // 토스 응답의 orderId는 이제 paymentOrderId와 비교
+        if (!payment.getPaymentOrderId().value().equals(tossResponse.orderId())) {
             throw new RuntimeException("토스 응답의 orderId가 일치하지 않습니다. 예상: " + 
-                payment.getOrderId() + ", 실제: " + responseOrderId);
+                payment.getPaymentOrderId().value() + ", 실제: " + tossResponse.orderId());
         }
     }
 }

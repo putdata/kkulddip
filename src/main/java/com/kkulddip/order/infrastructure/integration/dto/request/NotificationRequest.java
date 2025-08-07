@@ -57,6 +57,6 @@ public class NotificationRequest {
     // Redis Z-Set score 계산용
     @JsonIgnore
     public long getScoreTimestamp() {
-        return createdAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return createdAt.atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
     }
 }
