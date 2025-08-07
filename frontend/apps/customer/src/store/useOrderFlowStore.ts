@@ -10,8 +10,8 @@ interface OrderFlowState {
 
   // 액션들
   updateOrderData: (data: Partial<OrderData>) => void;
-  handleOrderComplete: (paymentData: PaymentData) => void;
-  handleNewOrder: () => void;
+  completeOrder: (paymentData: PaymentData) => void;
+  createNewOrder: () => void;
   initializeFromSession: () => void;
 }
 
@@ -39,7 +39,7 @@ export const useOrderFlowStore = create<OrderFlowState>()(
         })),
 
       // 주문 완료 처리
-      handleOrderComplete: paymentData => {
+      completeOrder: paymentData => {
         const { orderData } = get();
         const orderNumber = `ORDER-${Date.now()}`;
         const orderDate = new Date();
@@ -61,7 +61,7 @@ export const useOrderFlowStore = create<OrderFlowState>()(
       },
 
       // 새로운 주문 시작
-      handleNewOrder: () => {
+      createNewOrder: () => {
         set({
           orderData: initialOrderData,
           completedOrderData: null,
