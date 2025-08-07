@@ -1,6 +1,9 @@
 package com.kkulddip.common.event;
 
+import lombok.Builder;
+
+@Builder
 public record PaymentResultEvent(
-    String orderId,
+    Long orderId,
     String status
 ) {}

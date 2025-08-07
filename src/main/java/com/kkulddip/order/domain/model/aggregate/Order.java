@@ -59,9 +59,38 @@ public class Order {
     }
 
     /**
+     * 저장된 데이터로부터 Order를 복원할 때 사용
+     * (인프라스트럭처 레이어에서만 사용)
+     * 
+     * @param orderId 주문 ID
+     * @param customerId 고객 ID
+     * @param storeId 매장 ID
+     * @param orderItems 주문 아이템 목록
+     * @param originalPrice 원래 가격
+     * @param finalPrice 최종 가격
+     * @param orderStatus 주문 상태
+     * @param orderDate 주문 날짜
+     * @return 복원된 Order
+     */
+    public static Order restore(OrderId orderId, CustomerId customerId, StoreId storeId,
+                               List<OrderItem> orderItems, Money originalPrice, Money finalPrice,
+                               OrderStatus orderStatus, LocalDateTime orderDate) {
+        Order order = new Order();
+        order.orderId = orderId;
+        order.customerId = customerId;
+        order.storeId = storeId;
+        order.orderItems = orderItems != null ? orderItems : new ArrayList<>();
+        order.originalPrice = originalPrice;
+        order.finalPrice = finalPrice;
+        order.orderStatus = orderStatus;
+        order.orderDate = orderDate;
+        return order;
+    }
+
+    /**
      * 주문 아이템 추가
      * 
-     * @param orderItem 주문 아이템
+     * @param addOrderItemCommand 주문 아이템 추가 명령
      */
     public void addOrderItem(AddOrderItemCommand addOrderItemCommand) {
         if (this.orderStatus != OrderStatus.CREATED) {
@@ -73,8 +102,12 @@ public class Order {
         OrderItem orderItem = OrderItem.create(this, addOrderItemCommand);
 
         this.orderItems.add(orderItem);
-        this.originalPrice = this.originalPrice.add(orderItem.calcBasePrice());
-        this.finalPrice = this.finalPrice.add(orderItem.calcDiscountPrice());
+        
+        Money itemBasePrice = orderItem.calcBasePrice();
+        Money itemDiscountPrice = orderItem.calcDiscountPrice();
+        
+        this.originalPrice = this.originalPrice.add(itemBasePrice);
+        this.finalPrice = this.finalPrice.add(itemDiscountPrice);
     }
 
     /**

@@ -8,12 +8,7 @@ public record OrderId(
 ) {
     
     public OrderId {
-        if (value == null) {
-            throw new IllegalArgumentException("주문 ID는 null일 수 없습니다.");
-        }
-        if (value <= 0) {
-            throw new IllegalArgumentException("주문 ID는 0보다 커야 합니다.");
-        }
+        // JPA value 자동 주입 고려: null 허용
     }
     
     public static OrderId of(Long value) {

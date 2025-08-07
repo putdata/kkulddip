@@ -2,7 +2,7 @@ package com.kkulddip.payment.infrastructure.external.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kkulddip.payment.domain.model.entity.Payment;
+import com.kkulddip.payment.domain.model.aggregate.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -1,6 +1,6 @@
 package com.kkulddip.payment.infrastructure.persistence.jpa.adapter;
 
-import com.kkulddip.payment.domain.model.entity.Payment;
+import com.kkulddip.payment.domain.model.aggregate.Payment;
 import com.kkulddip.payment.domain.repository.PaymentRepository;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
 import com.kkulddip.payment.infrastructure.persistence.jpa.entity.PaymentJpaEntity;
@@ -18,8 +18,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Payment save(Payment payment) {
-        Optional<PaymentJpaEntity> existingEntity =
-                paymentJpaRepository.findByOrderId(payment.getOrderId());
+        Optional<PaymentJpaEntity> existingEntity = paymentJpaRepository.findByOrderId(payment.getOrderId());
 
         if (existingEntity.isPresent()) {
             PaymentJpaEntity entity = existingEntity.get();
@@ -32,26 +31,26 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public Optional<Payment> findByOrderId(String orderId) {
+    public Optional<Payment> findByOrderId(Long orderId) {
         return paymentJpaRepository.findByOrderId(orderId)
-                .map(PaymentJpaEntity::toDomain);
+            .map(PaymentJpaEntity::toDomain);
     }
 
     @Override
     public Optional<Payment> findByPaymentKey(PaymentKey paymentKey) {
         return paymentJpaRepository.findByPaymentKey(paymentKey.value())
-                .map(PaymentJpaEntity::toDomain);
+            .map(PaymentJpaEntity::toDomain);
     }
 
     @Override
     public void delete(Payment payment) {
         paymentJpaRepository.findByOrderId(payment.getOrderId())
-                .ifPresent(paymentJpaRepository::delete);
+            .ifPresent(paymentJpaRepository::delete);
     }
 
     // order id
     @Override
-    public boolean existsByOrderId(String s) {
-        return paymentJpaRepository.existsByOrderId(s);
+    public boolean existsByOrderId(Long orderId) {
+        return paymentJpaRepository.existsByOrderId(orderId);
     }
 }

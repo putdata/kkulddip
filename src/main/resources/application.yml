@@ -2,6 +2,10 @@ server:
     address: ${API_SERVER_ADDRESS}
     port: ${API_SERVER_PORT}
 
+    payment:
+        service:
+            url: ${PAYMENT_SERVICE_URL:http://localhost:8081}
+
 spring:
     application:
         name: kkulddip
@@ -14,6 +18,12 @@ spring:
         url: ${DB_URL}
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
+
+    data:
+        redis:
+            host: ${REDIS_HOST}
+            port: ${REDIS_PORT}
+            password: ${REDIS_PASSWORD:}
 
     jpa:
         hibernate:
@@ -87,4 +97,13 @@ toss:
 
 logging:
     level:
-        web: INFO
+        web: DEBUG
+
+management:
+    server:
+        port: ${API_SERVER_PORT}
+    endpoints:
+        web:
+            base-path: /actuator
+            exposure:
+                include: health, info

@@ -57,7 +57,8 @@ public class OrderItem {
     }
 
     public Money calcBasePrice() {
-        return this.unitPrice.multiply(this.quantity);
+        Money result = this.unitPrice.multiply(this.quantity);
+        return result;
     }
 
     public Money calcDiscountPrice() {
@@ -75,7 +76,9 @@ public class OrderItem {
             .filter(discount -> discount != null)
             .reduce(Money.of(0), Money::add);
         
+        
         // 총 가격 = 기본 가격 - 총 할인 금액
-        return basePrice.subtract(totalDiscount);
+        Money finalPrice = basePrice.subtract(totalDiscount);
+        return finalPrice;
     }
 }

@@ -1,6 +1,6 @@
 package com.kkulddip.payment.domain.service;
 
-import com.kkulddip.payment.domain.model.entity.Payment;
+import com.kkulddip.payment.domain.model.aggregate.Payment;
 import com.kkulddip.payment.domain.model.vo.Money;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
 import com.kkulddip.payment.domain.repository.PaymentRepository;
@@ -33,7 +33,7 @@ class PaymentDomainServiceTest {
     @BeforeEach
     void setUp() {
         testPayment = new Payment(
-                "order-123",
+                123L,
                 "테스트 주문",
                 Money.of(10000),
                 "홍길동",
@@ -72,7 +72,7 @@ class PaymentDomainServiceTest {
     void validatePaymentAmount_ZeroAmount_Success() {
         // given
         Payment zeroPayment = new Payment(
-                "order-zero",
+                0L,
                 "무료 주문",
                 Money.of(0),
                 "홍길동",
