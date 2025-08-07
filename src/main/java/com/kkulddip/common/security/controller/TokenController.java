@@ -5,7 +5,6 @@ import com.kkulddip.common.security.oauth2.OAuth2TokenService;
 import com.kkulddip.common.security.oauth2.dto.OAuth2TokenRequest;
 import com.kkulddip.common.security.oauth2.dto.OAuth2TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @Tag(name = "인증", description = "OAuth2 인증 및 토큰 관리")
-public class TokenController {
+public class TokenController implements TokenApi {
 
     private final OAuth2TokenService oauth2TokenService;
 
@@ -37,25 +36,11 @@ public class TokenController {
      */
     @PostMapping("/customer/token")
     @Operation(
-            summary = "고객 토큰 교환",
-            description = "OAuth2 Authorization Code를 JWT Access Token과 Refresh Token으로 교환합니다. (고객용)"
+        summary = "고객 토큰 교환",
+        description = "OAuth2 Authorization Code를 JWT Access Token과 Refresh Token으로 교환합니다. (고객용)"
     )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "토큰 교환 성공"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청 (유효하지 않은 코드)"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "인증 실패 (만료된 코드)"
-            )
-    })
     public ApiResponse<OAuth2TokenResponse> exchangeCustomerToken(
-            @Valid @RequestBody OAuth2TokenRequest request) {
+        @Valid @RequestBody OAuth2TokenRequest request) {
         return processTokenExchange(request, "CUSTOMER");
     }
 
@@ -68,25 +53,11 @@ public class TokenController {
      */
     @PostMapping("/owner/token")
     @Operation(
-            summary = "사업자 토큰 교환",
-            description = "OAuth2 Authorization Code를 JWT Access Token과 Refresh Token으로 교환합니다. (사업자용)"
+        summary = "사업자 토큰 교환",
+        description = "OAuth2 Authorization Code를 JWT Access Token과 Refresh Token으로 교환합니다. (사업자용)"
     )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "토큰 교환 성공"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청 (유효하지 않은 코드)"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "인증 실패 (만료된 코드)"
-            )
-    })
     public ApiResponse<OAuth2TokenResponse> exchangeOwnerToken(
-            @Valid @RequestBody OAuth2TokenRequest request) {
+        @Valid @RequestBody OAuth2TokenRequest request) {
         return processTokenExchange(request, "OWNER");
     }
 
@@ -99,7 +70,7 @@ public class TokenController {
      * @return JWT 토큰 정보가 담긴 응답 객체
      */
     private ApiResponse<OAuth2TokenResponse> processTokenExchange(
-            OAuth2TokenRequest request, String userType) {
+        OAuth2TokenRequest request, String userType) {
 
         log.info("{} 토큰 교환 요청 - 코드: {}", userType, request.code());
 
