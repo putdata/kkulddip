@@ -3,7 +3,7 @@ import LoginDrawer from './LoginDrawer';
 import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof LoginDrawer> = {
-  title: 'Components/pages/LoginDrawer',
+  title: 'Components/pages/Login/LoginDrawer',
   component: LoginDrawer,
   decorators: [
     Story => (
