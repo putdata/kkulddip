@@ -55,6 +55,7 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.REVIEW_CREATE,
             element: <ReviewCreate />,
+          },
           {
             path: ROUTE_PATH.PAYMENT,
             element: <Payment />,
