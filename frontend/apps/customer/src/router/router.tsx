@@ -12,10 +12,6 @@ import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
-import Cart from '@/pages/Cart';
-import Payment from '@/pages/Payment';
-import OrderDetail from '@/pages/OrderDetail';
-import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 
 export const router = createBrowserRouter([
   {
