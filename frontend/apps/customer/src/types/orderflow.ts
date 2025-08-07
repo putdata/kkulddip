@@ -5,7 +5,6 @@ export interface CartData {
 }
 
 export interface PaymentData {
-  paymentMethod: string;
   appliedCouponId?: string;
   discountAmount: number;
   finalAmount: number;
@@ -16,11 +15,10 @@ export interface OrderData {
   total: number;
   productId: number;
 
-  paymentMethod?: string;
   appliedCouponId?: string;
   discountAmount?: number;
-  finalAmount?: number;
+  finalAmount: number;
 
-  orderNumber?: string;
-  orderDate?: Date;
+  orderNumber: string;
+  orderDate: Date;
 }

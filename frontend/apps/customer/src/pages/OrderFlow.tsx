@@ -1,88 +1,48 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFunnel } from '@/hooks/useFunnel';
+import { useOrderState } from '@/hooks/useOrderState';
+import OrderProcessingLoader from '@/components/pages/payment/OrderProcessingLoader/OrderProcessingLoader';
 import Cart from '@/pages/Cart';
 import Payment from '@/pages/Payment';
 import OrderComplete from '@/pages/OrderComplete';
 import { ROUTE_PATH } from '@/router';
 
-const steps = ['cart', 'payment', 'complete'] as const;
-
-interface CartData {
-  quantity: number;
-  total: number;
-  productId: number;
-}
-
-interface PaymentData {
-  paymentMethod: string;
-  appliedCouponId?: string;
-  discountAmount: number;
-  finalAmount: number;
-}
-
-interface OrderData {
-  quantity: number;
-  total: number;
-  productId?: number;
-  paymentMethod?: string;
-  appliedCouponId?: string;
-  discountAmount?: number;
-  finalAmount: number;
-  orderNumber: string;
-  orderDate: Date;
-}
-
 const OrderFunnelContainer = () => {
   const navigate = useNavigate();
-  const { Funnel, Step, nextClickHandler, prevClickHandler } = useFunnel(
-    steps,
-    'cart',
-  );
+  const {
+    Funnel,
+    Step,
+    currentStep,
+    orderData,
+    completedOrderData,
+    isCompleted,
+    handleNextToPayment,
+    handleNextToPending,
+    handleBackToCart,
+    handleBackToHome,
+    handleNewOrder,
+    initializeFromSession,
+  } = useOrderState();
 
-  const [orderData, setOrderData] = useState<OrderData>({
-    quantity: 1,
-    total: 0,
-    productId: 0,
-    finalAmount: 0,
-    orderNumber: '',
-    orderDate: new Date(),
-  });
+  // 세션에서 완료된 주문 복원
+  useEffect(() => {
+    try {
+      initializeFromSession();
 
-  const handleNextToCart = (cartData: CartData) => {
-    setOrderData(prev => ({ ...prev, ...cartData }));
-    nextClickHandler('payment');
-  };
-
-  const handleNextToPayment = (paymentData: PaymentData) => {
-    const orderNumber = `ORDER-${Date.now()}`;
-    const orderDate = new Date();
-    setOrderData(prev => ({
-      ...prev,
-      ...paymentData,
-      orderNumber,
-      orderDate,
-    }));
-    nextClickHandler('complete');
-  };
-
-  const handleBackToCart = () => {
-    prevClickHandler('cart');
-  };
-
-  const handleBackToPayment = () => {
-    prevClickHandler('payment');
-  };
-
-  const handleBackToHome = () => {
-    navigate(ROUTE_PATH.HOME);
-  };
+      // 완료된 주문 + Cart 스텝이면 재진입으로 판단
+      if (isCompleted && currentStep === 'cart') {
+        navigate(ROUTE_PATH.HOME, { replace: true });
+      }
+    } catch {
+      navigate(ROUTE_PATH.HOME, { replace: true });
+    }
+  }, [initializeFromSession, isCompleted, currentStep, navigate]);
 
   return (
     <Funnel>
       <Step name="cart">
         <Cart
-          onNext={handleNextToCart}
+          onNext={handleNextToPayment}
           onBack={handleBackToHome}
           initialQuantity={orderData.quantity}
         />
@@ -90,14 +50,21 @@ const OrderFunnelContainer = () => {
 
       <Step name="payment">
         <Payment
-          onNext={handleNextToPayment}
+          onNext={handleNextToPending}
           onBack={handleBackToCart}
           orderData={orderData}
         />
       </Step>
 
+      <Step name="pending">
+        <OrderProcessingLoader />
+      </Step>
+
       <Step name="complete">
-        <OrderComplete onBack={handleBackToPayment} orderData={orderData} />
+        <OrderComplete
+          orderData={completedOrderData || orderData}
+          onBack={handleNewOrder}
+        />
       </Step>
     </Funnel>
   );
