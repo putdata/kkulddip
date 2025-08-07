@@ -5,5 +5,6 @@ import lombok.Builder;
 @Builder
 public record OrderCreatedEvent(
     Long orderId,
-    Integer amount
+    long amount,
+    Long customerId
 ) {}

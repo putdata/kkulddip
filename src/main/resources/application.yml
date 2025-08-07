@@ -2,10 +2,6 @@ server:
     address: ${API_SERVER_ADDRESS}
     port: ${API_SERVER_PORT}
 
-    payment:
-        service:
-            url: ${PAYMENT_SERVICE_URL:http://localhost:8081}
-
 spring:
     application:
         name: kkulddip
@@ -97,7 +93,7 @@ toss:
 
 logging:
     level:
-        web: DEBUG
+        web: INFO
 
 management:
     server:

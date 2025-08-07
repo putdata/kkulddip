@@ -3,13 +3,14 @@ package com.kkulddip.payment.presentation.rest;
 import com.kkulddip.common.response.ApiResponse;
 import com.kkulddip.payment.application.facade.PaymentFacade;
 import com.kkulddip.payment.infrastructure.external.toss.dto.TossPaymentConfirmRequest;
+import com.kkulddip.payment.presentation.dto.request.RequestPaymentRequest;
+import com.kkulddip.payment.presentation.dto.response.PaymentResponse;
+import com.kkulddip.payment.presentation.dto.response.PaymentOrderIdResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import com.kkulddip.payment.infrastructure.external.toss.utils.TossOrderIdConverter;
-import com.kkulddip.payment.presentation.dto.response.PaymentResponse;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,50 +27,38 @@ public class PaymentController {
     public ApiResponse<PaymentResponse> confirmPayment(
         @Valid @RequestBody TossPaymentConfirmRequest request) {
 
-        log.info("📝 결제 확정 요청: paymentKey={}, orderId={}",
+        log.info("📝 결제 확정 요청: paymentKey={}, paymentOrderId={}",
             request.paymentKey(), request.orderId());
 
         try {
             PaymentResponse response = paymentFacade.confirmPayment(request);
 
-            log.info("✅ 결제 확정 완료: orderId={}, status={}",
-                response.orderId(), response.status());
+            log.info("✅ 결제 확정 완료: paymentOrderId={}, status={}",
+                response.paymentOrderId(), response.status());
 
             return ApiResponse.of(response);
 
         } catch (Exception e) {
-            log.error("❌ 결제 확정 실패: orderId={}, error={}",
+            log.error("❌ 결제 확정 실패: paymentOrderId={}, error={}",
                 request.orderId(), e.getMessage(), e);
-            return ApiResponse.of(500, null);
+            throw e;
         }
     }
 
-    @GetMapping("/{paymentKey}")
-    public ApiResponse<PaymentResponse> getPayment(@PathVariable String paymentKey) {
+    /**
+     * PaymentOrderId 발급 - TTL 검증 후 유효한 PaymentOrderId 반환
+     */
+    @PostMapping("/payment-order-id")
+    public ApiResponse<PaymentOrderIdResponse> getPaymentOrderId(@RequestBody RequestPaymentRequest request) {
         try {
-            PaymentResponse response = paymentFacade.getPayment(paymentKey);
-            return ApiResponse.of(response);
-        } catch (Exception e) {
-            log.error("결제 조회 실패: paymentKey={}, error={}", paymentKey, e.getMessage());
-            return ApiResponse.of(400, null);
-        }
-    }
-
-    @GetMapping("/orders/{orderId}")
-    public ApiResponse<PaymentResponse> getPaymentByOrderId(@PathVariable String orderId) {
-        try {
-            // 토스페이먼츠 형식의 orderId인 경우 변환하여 조회
-            String queryOrderId = orderId;
-            if (TossOrderIdConverter.isTossOrderIdFormat(orderId)) {
-                Long longOrderId = TossOrderIdConverter.fromTossOrderId(orderId);
-                queryOrderId = longOrderId.toString();
-            }
+            String paymentOrderId = paymentFacade.requestPayment(request.orderId());
+            log.info("PaymentOrderId 발급 성공: orderId={}, paymentOrderId={}", request.orderId(), paymentOrderId);
             
-            PaymentResponse response = paymentFacade.getPaymentByOrderId(queryOrderId);
+            PaymentOrderIdResponse response = new PaymentOrderIdResponse(paymentOrderId);
             return ApiResponse.of(response);
         } catch (Exception e) {
-            log.error("주문별 결제 조회 실패: orderId={}, error={}", orderId, e.getMessage());
-            return ApiResponse.of(400, null);
+            log.error("PaymentOrderId 발급 실패: orderId={}, error={}", request.orderId(), e.getMessage());
+            throw e;
         }
     }
 

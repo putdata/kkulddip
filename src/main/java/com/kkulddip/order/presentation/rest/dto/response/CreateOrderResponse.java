@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record CreateOrderResponse(
-    Long orderId,
+    String orderId,      // Long -> String으로 변경
     Long customerId,
     Long storeId,
     Integer originalPrice,

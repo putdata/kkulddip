@@ -3,6 +3,7 @@ package com.kkulddip.payment.infrastructure.persistence.jpa.entity;
 import com.kkulddip.payment.domain.model.aggregate.Payment;
 import com.kkulddip.payment.domain.model.vo.Money;
 import com.kkulddip.payment.domain.model.vo.PaymentKey;
+import com.kkulddip.payment.domain.model.vo.PaymentOrderId;
 import com.kkulddip.payment.domain.model.status.PaymentMethod;
 import com.kkulddip.payment.domain.model.status.PaymentStatus;
 import jakarta.persistence.*;
@@ -30,23 +31,17 @@ public class PaymentJpaEntity {
     @Column(name = "order_id", unique = true, nullable = false)
     private Long orderId;
 
+    @Column(name = "payment_order_id", unique = true, nullable = false)
+    private String paymentOrderId;
+
     @Column(name = "order_name", nullable = false)
     private String orderName;
 
     @Column(name = "amount", nullable = false)
     private long amount;
 
-    @Column(name = "customer_name", nullable = false)
-    private String customerName;
-
-    @Column(name = "customer_email")
-    private String customerEmail;
-
-    @Column(name = "callback_url")
-    private String callbackUrl;
-
-    @Column(name = "fail_url")
-    private String failUrl;
+    @Column(name = "customer_id", nullable = false)
+    private Long customerId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -62,9 +57,6 @@ public class PaymentJpaEntity {
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
-    @Column(name = "receipt_url")
-    private String receiptUrl;
-
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -73,44 +65,41 @@ public class PaymentJpaEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "payment_order_id_created_at")
+    private LocalDateTime paymentOrderIdCreatedAt;
+
     public PaymentJpaEntity(
-        String paymentKey, Long orderId, String orderName,
-        long amount, String customerName, String customerEmail,
-        String callbackUrl, String failUrl, PaymentStatus status,
-        PaymentMethod method, LocalDateTime requestedAt, LocalDateTime approvedAt,
-        String receiptUrl
+        String paymentKey, Long orderId, String paymentOrderId, String orderName,
+        long amount, Long customerId, PaymentStatus status, PaymentMethod method, 
+        LocalDateTime requestedAt, LocalDateTime approvedAt, LocalDateTime paymentOrderIdCreatedAt
     ) {
 
         this.paymentKey = paymentKey;
         this.orderId = orderId;
+        this.paymentOrderId = paymentOrderId;
         this.orderName = orderName;
         this.amount = amount;
-        this.customerName = customerName;
-        this.customerEmail = customerEmail;
-        this.callbackUrl = callbackUrl;
-        this.failUrl = failUrl;
+        this.customerId = customerId;
         this.status = status;
         this.method = method;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
-        this.receiptUrl = receiptUrl;
+        this.paymentOrderIdCreatedAt = paymentOrderIdCreatedAt;
     }
 
     public static PaymentJpaEntity from(Payment payment) {
         return new PaymentJpaEntity(
             payment.getPaymentKey() != null ? payment.getPaymentKey().value() : null,
             payment.getOrderId(),
+            payment.getPaymentOrderId().value(),
             payment.getOrderName(),
             payment.getAmount().value(),
-            payment.getCustomerName(),
-            payment.getCustomerEmail(),
-            payment.getCallbackUrl(),
-            payment.getFailUrl(),
+            payment.getCustomerId(),
             payment.getStatus(),
             payment.getMethod(),
             payment.getRequestedAt(),
             payment.getApprovedAt(),
-            payment.getReceiptUrl()
+            payment.getPaymentOrderIdCreatedAt()
         );
     }
 
@@ -118,31 +107,30 @@ public class PaymentJpaEntity {
         return new Payment(
             this.paymentKey != null ? PaymentKey.of(this.paymentKey) : null,
             this.orderId,
+            PaymentOrderId.of(this.paymentOrderId),
             this.orderName,
             Money.of(this.amount),
-            this.customerName,
-            this.customerEmail,
+            this.customerId,
             this.status,
             this.method,
             this.requestedAt,
             this.approvedAt,
-            this.receiptUrl,
-            this.callbackUrl,
-            this.failUrl,
             this.createdAt,
-            this.updatedAt
+            this.updatedAt,
+            this.paymentOrderIdCreatedAt
         );
     }
 
     public void updateFrom(Payment payment) {
         this.paymentKey = payment.getPaymentKey() != null ? payment.getPaymentKey().value() : null;
+        this.paymentOrderId = payment.getPaymentOrderId().value();
         this.orderName = payment.getOrderName();
         this.amount = payment.getAmount().value();
-        this.customerName = payment.getCustomerName();
+        this.customerId = payment.getCustomerId();
         this.status = payment.getStatus();
         this.method = payment.getMethod();
         this.requestedAt = payment.getRequestedAt();
         this.approvedAt = payment.getApprovedAt();
-        this.receiptUrl = payment.getReceiptUrl();
+        this.paymentOrderIdCreatedAt = payment.getPaymentOrderIdCreatedAt();
     }
 }

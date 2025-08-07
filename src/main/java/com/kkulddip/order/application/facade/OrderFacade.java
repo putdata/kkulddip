@@ -77,11 +77,12 @@ public class OrderFacade {
             // 6. 주문 생성 이벤트 발행 (결제 서버로 알림)
             OrderCreatedEvent orderCreatedEvent = OrderCreatedEvent.builder()
                 .orderId(savedOrder.getOrderId().value())
-                .amount(order.getFinalPrice().amount())
+                .amount(savedOrder.getFinalPrice().amount())
+                .customerId(savedOrder.getCustomerId().value())
                 .build();
             eventPublisher.publishOrderCreated(orderCreatedEvent);
-            log.info("주문 생성 이벤트 발행 완료 - orderId: {}, amount: {}", 
-                savedOrder.getOrderId().value(), order.getFinalPrice().amount());
+            log.info("주문 생성 이벤트 발행 완료 - orderId: {}, amount: {}, customerId: {}", 
+                savedOrder.getOrderId().value(), savedOrder.getFinalPrice().amount(), savedOrder.getCustomerId().value());
             
             // 7. 응답 반환
             return orderMapper.toCreateOrderResponse(savedOrder);
