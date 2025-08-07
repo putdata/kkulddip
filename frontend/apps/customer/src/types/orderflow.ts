@@ -19,8 +19,10 @@ export interface OrderData {
   paymentMethod?: string;
   appliedCouponId?: string;
   discountAmount?: number;
-  finalAmount?: number;
+  finalAmount: number;
 
-  orderNumber?: string;
-  orderDate?: Date;
+  orderNumber: string;
+  orderDate: Date;
 }
+
+export type FunnelState = 'active' | 'completed' | 'escaped';
