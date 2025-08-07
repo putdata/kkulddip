@@ -15,22 +15,18 @@ const ReviewCreate = () => {
 
   // 별점 관련
   const [rating, setRating] = useState<number>(0);
-
-  const onSetRating = (rating: number) => {
-    setRating(rating);
-  };
-
   // 리뷰 작성 관련
   const [reviewText, setReviewText] = useState<string>('');
-
-  const onSetReviewText = (reviewText: string) => {
-    setReviewText(reviewText);
-  };
-
   // 사진 추가 관련
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
+  const onSetReviewText = (reviewText: string) => {
+    setReviewText(reviewText);
+  };
+  const onSetRating = (rating: number) => {
+    setRating(rating);
+  };
   const onImagesChange = (selectedImages: File[]) => {
     setSelectedImages(selectedImages);
   };
@@ -88,8 +84,6 @@ const ReviewCreate = () => {
       >
         등록하기
       </Button>
-
-      <Toaster position="top-center" />
     </div>
   );
 };
