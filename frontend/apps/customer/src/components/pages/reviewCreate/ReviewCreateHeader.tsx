@@ -25,7 +25,7 @@ const ReviewCreateHeader = ({
         <div className="text-xl font-bold text-black [font-family:'Segoe_UI']">
           {store.storeName}
         </div>
-        <div className="inline-flex flex-[0_0_auto] items-end">
+        <div className="inline-flex items-end">
           <div className="text-sm font-bold text-gray-900 [font-family:'Segoe_UI']">
             이번 띱박스는 어떠셨나요?
           </div>
@@ -51,7 +51,7 @@ const ReviewCreateHeader = ({
         </div>
       </div>
 
-      <div className="flex h-20 w-20 items-center justify-center overflow-hidden bg-amber-100 p-[0.8px]">
+      <div className="flex h-20 w-20 items-center justify-center overflow-hidden bg-amber-100">
         <img alt={store.imgAlt} src={store.img} />
       </div>
     </div>
