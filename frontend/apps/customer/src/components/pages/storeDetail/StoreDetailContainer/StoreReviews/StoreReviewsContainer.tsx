@@ -38,8 +38,9 @@ export const StoreReviewsContainer = ({ reviews }: StoreReviewsProps) => {
     3,
   );
 
+  // TODO: 리뷰 없을 경우 문구 수정 필요
   if (!hasReviews) {
-    return <div>리뷰가 없습니다.</div>;
+    return <div>현재 가게의 리뷰가 아직 없습니다.</div>;
   }
 
   return (
