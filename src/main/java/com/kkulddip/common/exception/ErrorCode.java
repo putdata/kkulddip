@@ -120,8 +120,13 @@ public enum ErrorCode {
     FAVORITE_INVALID_STORE_ID(BAD_REQUEST, "FAVORITE_INVALID_STORE_ID", "유효하지 않은 가게 ID입니다."),
     FAVORITE_INVALID_SORT_TYPE(BAD_REQUEST, "FAVORITE_INVALID_SORT_TYPE", "지원하지 않는 정렬 타입입니다."),
     FAVORITE_INVALID_PAGE_SIZE(BAD_REQUEST, "FAVORITE_INVALID_PAGE_SIZE", "페이지 크기는 1 이상 100 이하여야 합니다."),
-    FAVORITE_CURSOR_DECODE_FAILED(BAD_REQUEST, "FAVORITE_CURSOR_DECODE_FAILED", "커서 디코딩에 실패했습니다.");
-    
+    FAVORITE_CURSOR_DECODE_FAILED(BAD_REQUEST, "FAVORITE_CURSOR_DECODE_FAILED", "커서 디코딩에 실패했습니다."),
+
+    // FCM 토큰 관련 에러
+    FCM_TOKEN_INVALID(BAD_REQUEST, "FCM_TOKEN_INVALID", "유효하지 않은 FCM 토큰입니다."),
+    FCM_TOKEN_NOT_FOUND(NOT_FOUND, "FCM_TOKEN_NOT_FOUND", "FCM 토큰을 찾을 수 없습니다."),
+    FCM_TOKEN_REGISTRATION_FAILED(INTERNAL_SERVER_ERROR, "FCM_TOKEN_REGISTRATION_FAILED", "FCM 토큰 등록에 실패했습니다.");
+
     private final HttpStatus status;
     private final String code;
     private final String message;
