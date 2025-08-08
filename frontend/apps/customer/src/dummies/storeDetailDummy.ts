@@ -1,5 +1,12 @@
 // 가게 상세 페이지 Mock Data
 
+export interface DdipBoxItem {
+  itemId: number;
+  ddipboxItemName: string;
+  originalPrice: number;
+  itemQuantity: number;
+}
+
 export interface DdipBoxSummaryDto {
   ddipboxId: number;
   ddipboxName: string;
@@ -8,6 +15,8 @@ export interface DdipBoxSummaryDto {
   salePrice: number;
   remainingQuantity: number;
   active: boolean;
+  isRandom: boolean;
+  ddipBoxItem: DdipBoxItem[]; // isRandom이 True면 약 8~10개, False 면 약 2~3개
 }
 
 export interface StoreDetailDto {
@@ -59,6 +68,39 @@ export const mockStoreDetail: StoreDetailDto = {
       salePrice: 8000,
       remainingQuantity: 5,
       active: true,
+      isRandom: false,
+      ddipBoxItem: [
+        {
+          itemId: 120,
+          ddipboxItemName: '통밀 바게트',
+          originalPrice: 9000,
+          itemQuantity: 2,
+        },
+        {
+          itemId: 121,
+          ddipboxItemName: '크로와상',
+          originalPrice: 3500,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 121,
+          ddipboxItemName: '크로와상',
+          originalPrice: 3500,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 121,
+          ddipboxItemName: '크로와상',
+          originalPrice: 3500,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 121,
+          ddipboxItemName: '크로와상',
+          originalPrice: 3500,
+          itemQuantity: 1,
+        },
+      ],
     },
     {
       ddipboxId: 1002,
@@ -68,6 +110,21 @@ export const mockStoreDetail: StoreDetailDto = {
       salePrice: 10000,
       remainingQuantity: 3,
       active: true,
+      isRandom: false,
+      ddipBoxItem: [
+        {
+          itemId: 122,
+          ddipboxItemName: '치킨 시저 샐러드',
+          originalPrice: 8500,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 123,
+          ddipboxItemName: 'BLT 샌드위치',
+          originalPrice: 6500,
+          itemQuantity: 1,
+        },
+      ],
     },
     {
       ddipboxId: 1003,
@@ -77,6 +134,57 @@ export const mockStoreDetail: StoreDetailDto = {
       salePrice: 12000,
       remainingQuantity: 0,
       active: false,
+      isRandom: true,
+      ddipBoxItem: [
+        {
+          itemId: 124,
+          ddipboxItemName: '티라미수',
+          originalPrice: 4500,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 125,
+          ddipboxItemName: '마카롱',
+          originalPrice: 2500,
+          itemQuantity: 3,
+        },
+        {
+          itemId: 126,
+          ddipboxItemName: '초콜릿 케이크',
+          originalPrice: 5000,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 127,
+          ddipboxItemName: '에클레어',
+          originalPrice: 3500,
+          itemQuantity: 2,
+        },
+        {
+          itemId: 128,
+          ddipboxItemName: '바닐라 푸딩',
+          originalPrice: 2000,
+          itemQuantity: 2,
+        },
+        {
+          itemId: 129,
+          ddipboxItemName: '프루트 타르트',
+          originalPrice: 4000,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 130,
+          ddipboxItemName: '치즈케이크',
+          originalPrice: 4500,
+          itemQuantity: 1,
+        },
+        {
+          itemId: 131,
+          ddipboxItemName: '브라우니',
+          originalPrice: 3000,
+          itemQuantity: 2,
+        },
+      ],
     },
   ],
 };
@@ -111,6 +219,27 @@ export const mockStoreDetailList: StoreDetailDto[] = [
         salePrice: 5000,
         remainingQuantity: 12,
         active: true,
+        isRandom: false,
+        ddipBoxItem: [
+          {
+            itemId: 200,
+            ddipboxItemName: '유기농 상추',
+            originalPrice: 3000,
+            itemQuantity: 1,
+          },
+          {
+            itemId: 201,
+            ddipboxItemName: '신선한 양배추',
+            originalPrice: 2500,
+            itemQuantity: 1,
+          },
+          {
+            itemId: 202,
+            ddipboxItemName: '당근',
+            originalPrice: 2500,
+            itemQuantity: 2,
+          },
+        ],
       },
       {
         ddipboxId: 2002,
@@ -120,6 +249,57 @@ export const mockStoreDetailList: StoreDetailDto[] = [
         salePrice: 14000,
         remainingQuantity: 7,
         active: true,
+        isRandom: true,
+        ddipBoxItem: [
+          {
+            itemId: 203,
+            ddipboxItemName: '홍로 사과',
+            originalPrice: 3000,
+            itemQuantity: 3,
+          },
+          {
+            itemId: 204,
+            ddipboxItemName: '바나나',
+            originalPrice: 2000,
+            itemQuantity: 5,
+          },
+          {
+            itemId: 205,
+            ddipboxItemName: '딸기',
+            originalPrice: 5000,
+            itemQuantity: 1,
+          },
+          {
+            itemId: 206,
+            ddipboxItemName: '키위',
+            originalPrice: 1500,
+            itemQuantity: 4,
+          },
+          {
+            itemId: 207,
+            ddipboxItemName: '오렌지',
+            originalPrice: 2500,
+            itemQuantity: 3,
+          },
+          {
+            itemId: 208,
+            ddipboxItemName: '포도',
+            originalPrice: 4500,
+            itemQuantity: 1,
+          },
+          {
+            itemId: 209,
+            ddipboxItemName: '배',
+            originalPrice: 3500,
+            itemQuantity: 2,
+          },
+          {
+            itemId: 210,
+            ddipboxItemName: '감',
+            originalPrice: 2000,
+            itemQuantity: 4,
+          },
+        ],
       },
     ],
   },
@@ -149,6 +329,27 @@ export const mockStoreDetailList: StoreDetailDto[] = [
         salePrice: 18000,
         remainingQuantity: 2,
         active: true,
+        isRandom: false,
+        ddipBoxItem: [
+          {
+            itemId: 300,
+            ddipboxItemName: '후라이드 치킨 반마리',
+            originalPrice: 16000,
+            itemQuantity: 1,
+          },
+          {
+            itemId: 301,
+            ddipboxItemName: '양념치킨 반마리',
+            originalPrice: 17000,
+            itemQuantity: 1,
+          },
+          {
+            itemId: 302,
+            ddipboxItemName: '감자튀김 대',
+            originalPrice: 4000,
+            itemQuantity: 1,
+          },
+        ],
       },
     ],
   },

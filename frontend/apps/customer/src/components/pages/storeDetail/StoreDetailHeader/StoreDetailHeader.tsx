@@ -1,4 +1,7 @@
-import { type StoreDetailDto } from '@/dummies/storeDetailDummy';
+import {
+  type DdipBoxSummaryDto,
+  type StoreDetailDto,
+} from '@/dummies/storeDetailDummy';
 import { OperatingHours, OutOfStockBadge } from './StockStatusBadge';
 import { ChevronRight } from 'lucide-react';
 
@@ -7,8 +10,20 @@ interface StoreDetailHeaderProps {
 }
 
 export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
+  const ddipboxes = store.ddipBoxes;
+
+  const outOfStockCheck = (ddipboxes: DdipBoxSummaryDto[]) => {
+    let quantity = 0;
+    ddipboxes.forEach(item => {
+      quantity += item.remainingQuantity;
+    });
+    return quantity === 0;
+  };
+
+  const stockAvailablity = outOfStockCheck(ddipboxes);
+
   return (
-    <div className="flex flex-col font-['segoe_ui']">
+    <div className="flex flex-col">
       <img className="h-60 w-full object-cover" src={store.storeProfileImage} />
       <div className="flex w-full flex-col items-start justify-start bg-white">
         {/* 가게 이름, 주소, 별점 */}
@@ -29,8 +44,8 @@ export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
             <ChevronRight className="w-5" />
           </div>
         </div>
-        <div className="flex flex-col items-start justify-start gap-2 self-stretch p-2">
-          <OutOfStockBadge />
+        <div className="flex w-full flex-col items-start justify-start gap-2 p-2">
+          {stockAvailablity ? <OutOfStockBadge /> : null}
           <OperatingHours />
         </div>
       </div>
