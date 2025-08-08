@@ -17,7 +17,6 @@ const OrderFunnelContainer = () => {
     completedOrderData,
     isCompleted,
     handleNextToPayment,
-    handleNextToPending,
     handleBackToCart,
     handleBackToHome,
     handleNewOrder,
@@ -49,11 +48,7 @@ const OrderFunnelContainer = () => {
       </Step>
 
       <Step name="payment">
-        <Payment
-          onNext={handleNextToPending}
-          onBack={handleBackToCart}
-          orderData={orderData}
-        />
+        <Payment onBack={handleBackToCart} orderData={orderData} />
       </Step>
 
       <Step name="pending">

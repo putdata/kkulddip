@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import OrderSummary from '@/components/pages/payment/OrderSummary/OrderSummary';
 import PickupInfo from '@/components/pages/payment/PickupInfo/PickupInfo';
 import CouponSection from '@/components/pages/payment/CouponSection/CouponSection';
@@ -12,12 +13,8 @@ import {
 import { PAYMENT_MESSAGES } from '@/constants/payment';
 import { formatPrice } from '@/utils/priceFormat';
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
-
-interface PaymentData {
-  appliedCouponId?: string;
-  discountAmount: number;
-  finalAmount: number;
-}
+import { requestTossPayment } from '@/services/tossPayments';
+import { ROUTE_PATH } from '@/router/route-path';
 
 interface OrderData {
   quantity: number;
@@ -31,31 +28,59 @@ interface OrderData {
 }
 
 interface PaymentProps {
-  onNext: (paymentData: PaymentData) => void;
   onBack: () => void;
   orderData: OrderData;
 }
 
-const Payment = ({ onBack, onNext, orderData }: PaymentProps) => {
+const Payment = ({ onBack, orderData }: PaymentProps) => {
+  const [isProcessing, setIsProcessing] = useState(false);
   const baseAmount =
     orderData.total || dummyProductData.price * orderData.quantity;
   const finalAmount = baseAmount - dummyDiscountAmount;
 
-  const handleNext = () => {
-    const paymentData: PaymentData = {
-      appliedCouponId: 'COUPON123',
-      discountAmount: dummyDiscountAmount,
-      finalAmount: finalAmount,
-    };
-    onNext(paymentData);
+  const handleNext = async () => {
+    if (isProcessing) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // 주문 ID 생성 (실제로는 서버에서 생성)
+      const orderId = `ORDER_${Date.now()}`;
+
+      // 토스페이먼츠 결제 요청
+      await requestTossPayment({
+        amount: finalAmount,
+        orderId,
+        orderName: `${dummyProductData.name} x ${orderData.quantity}`,
+        customerName: '고객명', // 실제 고객 정보로 변경 필요
+        customerEmail: 'customer@example.com', // 실제 고객 정보로 변경 필요
+        successUrl: `${window.location.origin}${ROUTE_PATH.PAYMENT_SUCCESS}`,
+        failUrl: `${window.location.origin}${ROUTE_PATH.PAYMENT_FAIL}`,
+      });
+    } catch (error) {
+      console.error('결제 요청 실패:', error);
+      setIsProcessing(false);
+      // 에러를 상위로 전파하여 GlobalErrorBoundary에서 처리
+      throw error;
+    }
   };
 
   const bottomButton = (
     <button
       onClick={handleNext}
-      className="fixed bottom-3 w-11/12 rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors"
+      disabled={isProcessing}
+      className="fixed bottom-3 w-11/12 rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
     >
-      {formatPrice(finalAmount)} {PAYMENT_MESSAGES.PAYMENT_BUTTON}
+      {isProcessing ? (
+        <div className="flex items-center justify-center">
+          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+          결제 처리 중...
+        </div>
+      ) : (
+        `${formatPrice(finalAmount)} ${PAYMENT_MESSAGES.PAYMENT_BUTTON}`
+      )}
     </button>
   );
 
