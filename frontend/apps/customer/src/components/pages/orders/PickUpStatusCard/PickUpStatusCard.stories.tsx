@@ -17,7 +17,7 @@ export const InProgress: Story = {
   args: {
     item: {
       orderId: 12345,
-      status: 'in-progress',
+      status: 'IN_PROGRESS',
       createdAt: '2024-01-15 14:30',
     },
   },

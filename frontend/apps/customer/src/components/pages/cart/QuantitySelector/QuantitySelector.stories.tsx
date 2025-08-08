@@ -13,7 +13,7 @@ const meta = {
     quantity: {
       control: { type: 'number', min: 1, max: 10 },
     },
-    minQuantity: {
+    initialQuantity: {
       control: { type: 'number', min: 1, max: 5 },
     },
   },
@@ -27,7 +27,7 @@ export const Default: Story = {
     quantity: 1,
     onQuantityChange: (change: number) =>
       console.log('quantity changed:', change),
-    minQuantity: 1,
+    initialQuantity: 1,
     label: '수량',
   },
 };
@@ -37,7 +37,7 @@ export const MultipleItems: Story = {
     quantity: 3,
     onQuantityChange: (change: number) =>
       console.log('quantity changed:', change),
-    minQuantity: 1,
+    initialQuantity: 1,
     label: '수량',
   },
 };
@@ -47,7 +47,7 @@ export const MinimumQuantity: Story = {
     quantity: 1,
     onQuantityChange: (change: number) =>
       console.log('quantity changed:', change),
-    minQuantity: 1,
+    initialQuantity: 1,
     label: '수량',
   },
 };
@@ -57,7 +57,7 @@ export const CustomMinimum: Story = {
     quantity: 2,
     onQuantityChange: (change: number) =>
       console.log('quantity changed:', change),
-    minQuantity: 2,
+    initialQuantity: 2,
     label: '최소 주문 수량',
   },
 };

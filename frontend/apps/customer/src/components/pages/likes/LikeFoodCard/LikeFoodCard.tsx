@@ -33,11 +33,11 @@ const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
         <div className="flex items-center gap-1 text-xs">
           {item.price.original && (
             <span className="text-gray-400 line-through">
-              {formatPrice(item.price.original)}{' '}
+              {formatPrice(item.price.original)}
             </span>
           )}
           <span className="font-bold text-green-600">
-            {formatPrice(item.price.discount)}{' '}
+            {formatPrice(item.price.discount)}
           </span>
         </div>
 

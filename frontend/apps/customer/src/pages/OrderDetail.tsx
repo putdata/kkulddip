@@ -33,12 +33,11 @@ const dummyPaymentInfo: PaymentInfo = {
     },
   ],
   totalItems: 3,
-  paymentMethod: '토스페이',
 };
 
 const OrderDetail = () => {
   return (
-    <div className="mx-2 space-y-2 pb-16 pt-12">
+    <div className="pb-17 mx-2 space-y-2 pt-14">
       <div className="mt-3 px-1 text-sm font-semibold">픽업 상태</div>
 
       <PickUpStatusCard item={dummyStatusData} />

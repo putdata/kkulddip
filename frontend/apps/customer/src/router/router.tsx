@@ -10,6 +10,8 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
+import OrderDetail from '@/pages/OrderDetail';
+import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
 
@@ -44,6 +46,10 @@ export const router = createBrowserRouter([
           },
           // 임시 - 리뷰 작성 페이지
           {
+            path: ROUTE_PATH.ORDER_DETAIL,
+            element: <OrderDetail />,
+          },
+          {
             path: ROUTE_PATH.REVIEW_CREATE,
             element: <ReviewCreate />,
           },
@@ -60,6 +66,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Login />,
+          },
+        ],
+      },
+      {
+        path: ROUTE_PATH.PAY,
+        element: <MobileLayout />,
+        children: [
+          {
+            index: true,
+            element: <OrderFunnelContainer />,
           },
         ],
       },

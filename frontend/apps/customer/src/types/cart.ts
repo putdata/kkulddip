@@ -19,7 +19,7 @@ export interface CartPageProps {
 /**
  * 매장 정보 인터페이스
  */
-export interface RestaurantInfo {
+export interface StoreInfo {
   name: string;
   pickupTime: string;
   pickupType: string;

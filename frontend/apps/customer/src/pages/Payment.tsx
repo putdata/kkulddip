@@ -8,52 +8,101 @@ import {
   dummyStoreData,
   dummyDiscountAmount,
 } from '@/dummies/paymentDummy';
+
 import { PAYMENT_MESSAGES } from '@/constants/payment';
 import { formatPrice } from '@/utils/priceFormat';
-import { ROUTE_PATH } from '@/router';
-import { useNavigate } from 'react-router-dom';
+import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
 
-const Payment = () => {
-  const finalAmount =
-    dummyProductData.price * dummyProductData.quantity - dummyDiscountAmount;
-  const navigate = useNavigate();
+interface PaymentData {
+  appliedCouponId?: string;
+  discountAmount: number;
+  finalAmount: number;
+}
+
+interface OrderData {
+  quantity: number;
+  total: number;
+  productId?: number;
+  appliedCouponId?: string;
+  discountAmount?: number;
+  finalAmount?: number;
+  orderNumber?: string;
+  orderDate?: Date;
+}
+
+interface PaymentProps {
+  onNext: (paymentData: PaymentData) => void;
+  onBack: () => void;
+  orderData: OrderData;
+}
+
+const Payment = ({ onBack, onNext, orderData }: PaymentProps) => {
+  const baseAmount =
+    orderData.total || dummyProductData.price * orderData.quantity;
+  const finalAmount = baseAmount - dummyDiscountAmount;
+
+  const handleNext = () => {
+    const paymentData: PaymentData = {
+      appliedCouponId: 'COUPON123',
+      discountAmount: dummyDiscountAmount,
+      finalAmount: finalAmount,
+    };
+    onNext(paymentData);
+  };
+
+  const bottomButton = (
+    <button
+      onClick={handleNext}
+      className="fixed bottom-3 w-11/12 rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors"
+    >
+      {formatPrice(finalAmount)} {PAYMENT_MESSAGES.PAYMENT_BUTTON}
+    </button>
+  );
+
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-white pb-16 pt-16">
-      <div className="space-y-6 px-4 py-4">
+    <OrderFlowLayout
+      title="결제하기"
+      currentStep="payment"
+      onBack={onBack}
+      bottomButton={bottomButton}
+    >
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
         <OrderSummary
           productName={dummyProductData.name}
-          quantity={dummyProductData.quantity}
+          quantity={orderData.quantity}
         />
+      </div>
+
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
         <PickupInfo
           storeName={dummyStoreData.name}
           address={dummyStoreData.address}
           pickupTime={dummyStoreData.pickupTime}
         />
+      </div>
+
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
         <PaymentMethod />
+      </div>
+
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
         <CouponSection discountAmount={dummyDiscountAmount} />
+      </div>
+
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
         <FinalPrice
-          orderAmount={dummyProductData.price * dummyProductData.quantity}
+          orderAmount={orderData.total}
           discount={dummyDiscountAmount}
         />
+      </div>
 
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
         <div className="space-y-1 text-xs text-gray-500">
           <p>• {PAYMENT_MESSAGES.PICKUP_NOTICE}</p>
           <p>• {PAYMENT_MESSAGES.CANCEL_NOTICE}</p>
         </div>
       </div>
-
-      {/* Bottom Button */}
-      <div className="sticky bottom-0 border-t bg-white p-4">
-        <button
-          onClick={() => {
-            navigate(ROUTE_PATH.HOME);
-          }}
-          className="w-full rounded-lg bg-blue-600 py-4 font-medium text-white"
-        >
-          {formatPrice(finalAmount)} {PAYMENT_MESSAGES.PAYMENT_BUTTON}
-        </button>
-      </div>
-    </div>
+    </OrderFlowLayout>
   );
 };
 

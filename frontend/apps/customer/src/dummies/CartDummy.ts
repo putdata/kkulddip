@@ -1,4 +1,4 @@
-import type { Product, RestaurantInfo } from '@/types/cart';
+import type { Product, StoreInfo } from '@/types/cart';
 
 /**
  * 더미 상품 데이터
@@ -15,7 +15,7 @@ export const dummyCartProduct: Product = {
 /**
  * 더미 매장 정보
  */
-export const dummyRestaurantInfo: RestaurantInfo = {
+export const dummyStoreInfo: StoreInfo = {
   name: '최고집 김치삼겹구이&김치찜',
   pickupTime: '15-20분',
   pickupType: '매장 픽업',
