@@ -188,7 +188,7 @@ domain/
 5. public 메서드
 6. private 메서드
 
-### 어노테이션 순서
+### Annotations Order
 | 순서 | 범주 | 예시 어노테이션 |
 | --- | --- | --- |
 | 1 | **로깅 및 코드 생성용** | `@Slf4j`, `@Getter`, `@Setter`, `@Builder`, `@RequiredArgsConstructor`, `@NoArgsConstructor` |
