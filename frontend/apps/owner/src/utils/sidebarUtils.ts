@@ -1,5 +1,5 @@
 import { matchPath } from 'react-router-dom';
-import { sidebarItems } from '@/constants/navigation';
+import { sidebarItems } from '@/constants/sidebarItems';
 import { ROUTE_PATH } from '@/router/route-path';
 
 /**

@@ -16,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { sidebarItems } from '@/constants/navigation';
+import { sidebarItems } from '@/constants/sidebarItems';
 import StoreSwitcher from '@/components/StoreSelector';
 import UserSwitcher from '@/components/UserSwitcher';
 
