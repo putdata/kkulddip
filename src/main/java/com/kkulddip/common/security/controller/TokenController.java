@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 @Tag(name = "인증", description = "OAuth2 인증 및 토큰 관리")
 public class TokenController implements TokenApi {
 
