@@ -2,34 +2,44 @@ import { StoreDetailHeader } from '@/components/pages/storeDetail/StoreDetailHea
 import { StoreDetailContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreDetailContainer';
 import { mockStoreDetail } from '@/dummies/storeDetailDummy';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { StoreReviews } from '@/components/pages/storeDetail/StoreDetailContainer/StoreReviews';
+import { StoreReviewsContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreReviews/StoreReviewsContainer';
+import { reviewMockData } from '@/constants/reviewMockData';
 // import { useParams } from 'react-router-dom';
-// 커밋 실수입니다. 집에서 이어서 작업하겠습니다.
 
 const StoreDetail = () => {
-  //   const params = useParams();
-  //   const storeId = params.storeId;
+  // const params = useParams();
+  // const storeId = params.storeId;
 
   const store = mockStoreDetail;
+  const reviews = reviewMockData;
 
   return (
-    <div className="gap-2 bg-gray-300">
+    <div className="bg-gray-100 font-[segoe_ui]">
       <StoreDetailHeader store={store} />
 
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Tabs className="bg-white" defaultValue="details">
-          <TabsList className="bg-amber-100">
-            <TabsTrigger value="details">details</TabsTrigger>
-            <TabsTrigger value="reviews">reviews</TabsTrigger>
-          </TabsList>
-          <TabsContent value="details">
-            <StoreDetailContainer />
-          </TabsContent>
-          <TabsContent value="reviews">
-            <StoreReviews />
-          </TabsContent>
-        </Tabs>
-      </div>
+      <Tabs className="w-full gap-0" defaultValue="details">
+        <TabsList className="bg-background w-full justify-start rounded-none border-b p-0">
+          <TabsTrigger
+            value="details"
+            className="bg-background data-[state=active]:border-b-primary h-full rounded-none border border-b-[3px] border-transparent data-[state=active]:text-amber-500 data-[state=active]:shadow-none"
+          >
+            가게 정보
+          </TabsTrigger>
+          <TabsTrigger
+            value="reviews"
+            className="bg-background data-[state=active]:border-b-primary h-full rounded-none border border-b-[3px] border-transparent data-[state=active]:text-amber-500 data-[state=active]:shadow-none"
+          >
+            가게 리뷰
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="details">
+          <StoreDetailContainer store={store} />
+        </TabsContent>
+        <TabsContent value="reviews">
+          <StoreReviewsContainer reviews={reviews} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

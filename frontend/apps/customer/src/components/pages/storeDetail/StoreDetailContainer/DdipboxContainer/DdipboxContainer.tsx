@@ -1,11 +1,31 @@
-import { Ddipbox1 } from './Ddipbox1';
-import { Ddipbox2 } from './Ddipbox2';
+import type { StoreDetailDto } from '@/dummies/storeDetailDummy';
+import { DdipboxItem } from './DdipboxItem';
+import { DdipboxRandomItem } from './DdipboxRandomItem';
 
-export const DdipboxContainer = () => {
-  return (
-    <div className="flex flex-col justify-center bg-white">
-      <Ddipbox1 />
-      <Ddipbox2 />
-    </div>
-  );
+interface DdipboxContainerProps {
+  store: StoreDetailDto;
+}
+
+export const DdipboxContainer = ({ store }: DdipboxContainerProps) => {
+  // TODO: 에러 처리 필요
+  if (store) {
+    const ddipboxes = store.ddipBoxes;
+
+    return (
+      <div className="flex w-full flex-col items-start justify-start gap-2 bg-white p-5">
+        <h2 className="text justify-center text-lg font-bold">띱박스 구성</h2>
+        <div className="flex w-full flex-col gap-2 p-2">
+          {ddipboxes.map(ddipBoxItem => (
+            <div>
+              {ddipBoxItem.isRandom ? (
+                <DdipboxRandomItem ddipbox={ddipBoxItem} />
+              ) : (
+                <DdipboxItem ddipbox={ddipBoxItem} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 };
