@@ -9,6 +9,8 @@ export const ROUTE_PATH = {
   NOTIFICATIONS: '/notifications',
   LOGIN: '/login',
   PAY: '/pay',
+  PAYMENT_SUCCESS: '/payment/success',
+  PAYMENT_FAIL: '/payment/fail',
   NOT_FOUND: '*',
   REVIEW: '/store/:storeId/reviews',
   REVIEW_CREATE: '/review/create',

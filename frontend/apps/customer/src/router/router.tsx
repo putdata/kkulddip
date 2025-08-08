@@ -10,10 +10,14 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
+import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 import OrderDetail from '@/pages/OrderDetail';
 import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
+import PaymentSuccess from '@/pages/PaymentSuccess';
+import PaymentFail from '@/pages/PaymentFail';
+import Notifications from '@/pages/Notifications';
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +32,12 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
+        ],
+      },
+      {
+        path: '/',
+        element: <MobileLayoutWithPageNavbar />,
+        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
@@ -43,6 +53,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
+          },
+          {
+            path: ROUTE_PATH.NOTIFICATIONS,
+            element: <Notifications />,
           },
           // 임시 - 리뷰 작성 페이지
           {
@@ -80,11 +94,28 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: '*',
-        element: <NotFound />,
+        path: ROUTE_PATH.PAYMENT_SUCCESS,
+        element: <MobileLayout />,
+        children: [
+          {
+            index: true,
+            element: <PaymentSuccess />,
+          },
+        ],
       },
       {
-        path: ROUTE_PATH.NOTIFICATIONS,
+        path: ROUTE_PATH.PAYMENT_FAIL,
+        element: <MobileLayout />,
+        children: [
+          {
+            index: true,
+            element: <PaymentFail />,
+          },
+        ],
+      },
+      {
+        path: '*',
+        element: <NotFound />,
       },
       // 임시 - 리뷰 작성 페이지
       {
