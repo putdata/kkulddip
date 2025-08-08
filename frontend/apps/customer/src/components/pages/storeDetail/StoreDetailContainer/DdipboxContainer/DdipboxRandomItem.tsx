@@ -27,7 +27,7 @@ export const DdipboxRandomItem = ({ ddipbox }: RandomItemProps) => {
       <CardHeader className="text-lg font-bold">
         {ddipbox.ddipboxName}
         <CardDescription className="text-gray-400">
-          {message.randomDdipbox}
+          {message.RANDOM_DDIPBOX_DESCRIPTION}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -60,7 +60,7 @@ export const DdipboxRandomItem = ({ ddipbox }: RandomItemProps) => {
             {ddipbox.salePrice}원
           </p>
         </div>
-        <Button className="bg-amber-500">{message.reserve}</Button>{' '}
+        <Button className="bg-amber-500">{message.RESERVE_BUTTON_TEXT}</Button>
       </CardFooter>
     </Card>
   );
