@@ -2,7 +2,12 @@ server:
     address: 127.0.0.1
     port: 8080
 
+# Override environment variables for CI/Test
 spring:
+    config:
+        import: ""  # Disable .env import for tests
+    main:
+        allow-bean-definition-overriding: true
     datasource:
         url: jdbc:h2:mem:kkulddip-inmem-db;DATABASE_TO_UPPER=FALSE;mode=mysql
         username: sa
@@ -26,6 +31,12 @@ spring:
                 use_sql_comments: true
                 dialect: org.hibernate.dialect.H2Dialect
         open-in-view: false
+
+    data:
+        redis:
+            host: localhost
+            port: 6379
+            password:
 
     security:
         oauth2:
@@ -69,10 +80,11 @@ app:
 
 toss:
     payments:
-        test-secret-key: ${TOSS_SECRET_KEY}
-        test-client-key: ${TOSS_CLIENT_KEY}
+        test-secret-key: test
+        test-client-key: test
         base-url: https://api.tosspayments.com
         
 management:
     server:
         port: 8080
+

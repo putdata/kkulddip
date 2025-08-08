@@ -15,7 +15,7 @@ public final class SecurityPaths {
      * 인증 없이 접근 가능한 모든 HTTP 메서드 경로
      */
     public static final String[] PUBLIC_PATHS = {
-        "/api/v1/auth/**",
+        "/v1/auth/**",
         "/swagger-ui/**",
         "/api-docs/**",
         "/actuator/**"
@@ -25,7 +25,7 @@ public final class SecurityPaths {
      * GET 메서드로만 인증 없이 접근 가능한 경로
      */
     public static final String[] PUBLIC_GET_PATHS = {
-        "/api/v1/events/**",
-        "/api/v1/stores/**"
+        "/v1/events/**",
+        "/v1/stores/**"
     };
 }
