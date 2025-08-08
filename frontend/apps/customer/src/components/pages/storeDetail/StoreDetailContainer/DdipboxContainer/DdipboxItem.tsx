@@ -35,7 +35,7 @@ export const DdipboxItem = ({ ddipbox }: ItemProps) => {
             {ddipbox.salePrice}원
           </p>
         </div>
-        <Button className="bg-amber-500">{message.reserve}</Button>
+        <Button className="bg-amber-500">{message.RESERVE_BUTTON_TEXT}</Button>
       </CardFooter>
     </Card>
   );
