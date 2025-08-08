@@ -32,6 +32,12 @@ spring:
                 dialect: org.hibernate.dialect.H2Dialect
         open-in-view: false
 
+    data:
+        redis:
+            host: localhost
+            port: 6379
+            password:
+
     security:
         oauth2:
             client:
@@ -74,10 +80,11 @@ app:
 
 toss:
     payments:
-        test-secret-key: ${TOSS_SECRET_KEY}
-        test-client-key: ${TOSS_CLIENT_KEY}
+        test-secret-key: test
+        test-client-key: test
         base-url: https://api.tosspayments.com
         
 management:
     server:
         port: 8080
+
