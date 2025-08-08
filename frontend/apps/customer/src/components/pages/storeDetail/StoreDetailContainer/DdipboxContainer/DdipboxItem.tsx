@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -6,6 +5,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { STORE_DETAIL_MESSAGES } from '@/constants/storeDetail';
 import type { DdipBoxSummaryDto } from '@/dummies/storeDetailDummy';
 
 interface ItemProps {
@@ -13,6 +13,7 @@ interface ItemProps {
 }
 
 export const DdipboxItem = ({ ddipbox }: ItemProps) => {
+  const message = STORE_DETAIL_MESSAGES;
   return (
     <Card className="flex w-full flex-col gap-1">
       <CardHeader className="text-lg font-bold">
@@ -24,9 +25,6 @@ export const DdipboxItem = ({ ddipbox }: ItemProps) => {
             <li>{item.ddipboxItemName}</li>
           ))}
         </div>
-        <div>
-          <Badge></Badge>
-        </div>
       </CardContent>
       <CardFooter className="justify-between">
         <div className="flex items-end gap-1">
@@ -37,7 +35,7 @@ export const DdipboxItem = ({ ddipbox }: ItemProps) => {
             {ddipbox.salePrice}원
           </p>
         </div>
-        <Button className="bg-amber-500">예약하기</Button>
+        <Button className="bg-amber-500">{message.reserve}</Button>
       </CardFooter>
     </Card>
   );

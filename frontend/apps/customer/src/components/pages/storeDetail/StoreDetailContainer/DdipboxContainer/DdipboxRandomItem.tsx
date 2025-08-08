@@ -12,6 +12,7 @@ import {
   DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { STORE_DETAIL_MESSAGES } from '@/constants/storeDetail';
 import type { DdipBoxSummaryDto } from '@/dummies/storeDetailDummy';
 
 interface RandomItemProps {
@@ -19,12 +20,14 @@ interface RandomItemProps {
 }
 
 export const DdipboxRandomItem = ({ ddipbox }: RandomItemProps) => {
+  const message = STORE_DETAIL_MESSAGES;
+
   return (
     <Card className="flex w-full flex-col gap-1">
       <CardHeader className="text-lg font-bold">
         {ddipbox.ddipboxName}
         <CardDescription className="text-gray-400">
-          아래 상품 중 2~5개가 들어있습니다.
+          {message.randomDdipbox}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -57,7 +60,7 @@ export const DdipboxRandomItem = ({ ddipbox }: RandomItemProps) => {
             {ddipbox.salePrice}원
           </p>
         </div>
-        <Button className="bg-amber-500">예약하기</Button>{' '}
+        <Button className="bg-amber-500">{message.reserve}</Button>{' '}
       </CardFooter>
     </Card>
   );
