@@ -8,6 +8,7 @@ export const ROUTE_PATH = {
   ORDER_DETAIL: '/order/:orderId',
   NOTIFICATIONS: '/notifications',
   LOGIN: '/login',
+  AUTH_CALLBACK: '/auth-callback',
   PAY: '/pay',
   NOT_FOUND: '*',
   REVIEW: '/store/:storeId/reviews',

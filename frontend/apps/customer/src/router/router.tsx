@@ -14,6 +14,7 @@ import OrderDetail from '@/pages/OrderDetail';
 import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
+import AuthCallback from '@/pages/AuthCallback';
 
 export const router = createBrowserRouter([
   {
@@ -68,6 +69,10 @@ export const router = createBrowserRouter([
             element: <Login />,
           },
         ],
+      },
+      {
+        path: ROUTE_PATH.AUTH_CALLBACK,
+        element: <AuthCallback />,
       },
       {
         path: ROUTE_PATH.PAY,
