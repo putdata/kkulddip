@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -84,7 +83,7 @@ public class JwtUtil {
             .claim("oauth2_provider", userInfo.oauth2Provider())
             .claim("oauth2_provider_id", userInfo.oauth2ProviderId())
             .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plus(expiration, ChronoUnit.SECONDS)))
+            .expiration(Date.from(now.plusSeconds(expiration)))
             .signWith(secretKey)
             .compact();
     }

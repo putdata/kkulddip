@@ -21,6 +21,10 @@ spring:
             port: ${REDIS_PORT}
             password: ${REDIS_PASSWORD:}
 
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 20MB
     jpa:
         hibernate:
             ddl-auto: update
@@ -62,6 +66,15 @@ spring:
                         token-uri: https://oauth2.googleapis.com/token
                         user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
                         user-name-attribute: id
+    cloud:
+        aws:
+            credentials:
+                access-key: ${AWS_ACCESS_KEY}
+                secret-key: ${AWS_SECRET_KEY}
+            region:
+                static: us-east-2
+            s3:
+                bucket: ${AWS_BUCKET}
 
 
 springdoc:

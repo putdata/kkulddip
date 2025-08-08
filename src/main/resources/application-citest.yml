@@ -13,17 +13,23 @@ spring:
         username: sa
         password:
         driver-class-name: org.h2.Driver
-    
+
     h2:
         console:
             enabled: true
             path: /h2-console
 
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 20MB
+
     jpa:
         show-sql: true
         hibernate:
             ddl-auto: create
-
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         properties:
             hibernate:
                 format_sql: true
@@ -66,6 +72,16 @@ spring:
                         token-uri: https://oauth2.googleapis.com/token
                         user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
                         user-name-attribute: id
+
+    cloud:
+        aws:
+            credentials:
+                access-key: test-access-key-AKIAIOSFODNN7EXAMPLE
+                secret-key: test-secret-key-wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+            region:
+                static: us-east-2
+            s3:
+                bucket: test-bucket-kkulddip
 
 jwt:
     secret-key: ci-test-secret-key-for-jwt-token-signing-minimum-256-bits-required-for-hmac-sha256-algorithm
