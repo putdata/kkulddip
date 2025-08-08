@@ -15,9 +15,17 @@ spring:
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
 
+    data:
+        redis:
+            host: ${REDIS_HOST}
+            port: ${REDIS_PORT}
+            password: ${REDIS_PASSWORD:}
+
     jpa:
         hibernate:
             ddl-auto: update
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         show-sql: false
         properties:
             hibernate:
@@ -76,6 +84,12 @@ app:
         success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL}
     cors:
         max-age-seconds: ${CORS_MAX_AGE_SECONDS}
+
+toss:
+    payments:
+        test-secret-key: ${TOSS_SECRET_KEY}
+        test-client-key: ${TOSS_CLIENT_KEY}
+        base-url: https://api.tosspayments.com
 
 logging:
     level:

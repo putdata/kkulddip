@@ -67,6 +67,12 @@ app:
     cors:
         max-age-seconds: 3600
 
+toss:
+    payments:
+        test-secret-key: ${TOSS_SECRET_KEY}
+        test-client-key: ${TOSS_CLIENT_KEY}
+        base-url: https://api.tosspayments.com
+        
 management:
     server:
         port: 8080
