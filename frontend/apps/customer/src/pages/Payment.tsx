@@ -13,13 +13,14 @@ import {
 import { PAYMENT_MESSAGES } from '@/constants/payment';
 import { formatPrice } from '@/utils/priceFormat';
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
-import { requestTossPayment } from '@/services/tossPayments';
-import { ROUTE_PATH } from '@/router/route-path';
 
+// Props용 주문 데이터 인터페이스 (기존)
 interface OrderData {
   quantity: number;
   total: number;
   productId?: number;
+  customerId?: number;
+  storeId?: number;
   appliedCouponId?: string;
   discountAmount?: number;
   finalAmount?: number;
@@ -28,11 +29,12 @@ interface OrderData {
 }
 
 interface PaymentProps {
+  onNext: () => void;
   onBack: () => void;
   orderData: OrderData;
 }
 
-const Payment = ({ onBack, orderData }: PaymentProps) => {
+const Payment = ({ onNext, onBack, orderData }: PaymentProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const baseAmount =
     orderData.total || dummyProductData.price * orderData.quantity;
@@ -46,23 +48,12 @@ const Payment = ({ onBack, orderData }: PaymentProps) => {
     setIsProcessing(true);
 
     try {
-      // 주문 ID 생성 (실제로는 서버에서 생성)
-      const orderId = `ORDER_${Date.now()}`;
-
-      // 토스페이먼츠 결제 요청
-      await requestTossPayment({
-        amount: finalAmount,
-        orderId,
-        orderName: `${dummyProductData.name} x ${orderData.quantity}`,
-        customerName: '고객명', // 실제 고객 정보로 변경 필요
-        customerEmail: 'customer@example.com', // 실제 고객 정보로 변경 필요
-        successUrl: `${window.location.origin}${ROUTE_PATH.PAYMENT_SUCCESS}`,
-        failUrl: `${window.location.origin}${ROUTE_PATH.PAYMENT_FAIL}`,
-      });
+      // 주문 데이터 준비하고 pending 단계로 이동
+      // 실제 토스 결제는 pending 단계에서 처리
+      onNext();
     } catch (error) {
       console.error('결제 요청 실패:', error);
       setIsProcessing(false);
-      // 에러를 상위로 전파하여 GlobalErrorBoundary에서 처리
       throw error;
     }
   };

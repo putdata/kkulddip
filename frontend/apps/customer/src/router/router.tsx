@@ -17,7 +17,7 @@ import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
 import PaymentSuccess from '@/pages/PaymentSuccess';
 import PaymentFail from '@/pages/PaymentFail';
-import Notifications from '@/pages/Notifications';
+// import Notifications from '@/pages/Notifications';
 
 export const router = createBrowserRouter([
   {
@@ -54,10 +54,10 @@ export const router = createBrowserRouter([
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
           },
-          {
-            path: ROUTE_PATH.NOTIFICATIONS,
-            element: <Notifications />,
-          },
+          // {
+          //   path: ROUTE_PATH.NOTIFICATIONS,
+          //   element: <Notifications />,
+          // },
           // 임시 - 리뷰 작성 페이지
           {
             path: ROUTE_PATH.ORDER_DETAIL,
