@@ -42,7 +42,13 @@ const OrderFunnelContainer = () => {
     } catch {
       navigate(ROUTE_PATH.HOME, { replace: true });
     }
-  }, [initializeFromSession, isCompleted, currentStep, navigate, nextClickHandler]);
+  }, [
+    initializeFromSession,
+    isCompleted,
+    currentStep,
+    navigate,
+    nextClickHandler,
+  ]);
 
   return (
     <Funnel>
@@ -55,7 +61,11 @@ const OrderFunnelContainer = () => {
       </Step>
 
       <Step name="payment">
-        <Payment onNext={handleNextToPending} onBack={handleBackToCart} orderData={orderData} />
+        <Payment
+          onNext={handleNextToPending}
+          onBack={handleBackToCart}
+          orderData={orderData}
+        />
       </Step>
 
       <Step name="pending">
@@ -73,5 +83,3 @@ const OrderFunnelContainer = () => {
 };
 
 export default OrderFunnelContainer;
-
-

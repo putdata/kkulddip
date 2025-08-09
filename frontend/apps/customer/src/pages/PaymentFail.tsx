@@ -21,30 +21,36 @@ const PaymentFail = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
-        <div className="mb-6 h-20 w-20 rounded-full bg-red-100 flex items-center justify-center mx-auto">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
           <span className="text-3xl">❌</span>
         </div>
-        
+
         <h1 className="mb-4 text-2xl font-bold text-red-600">결제 실패</h1>
-        
+
         <div className="mb-6 space-y-2 text-left">
           {orderId && (
             <div className="rounded bg-gray-50 p-3">
-              <span className="text-sm font-medium text-gray-600">주문번호:</span>
+              <span className="text-sm font-medium text-gray-600">
+                주문번호:
+              </span>
               <p className="font-mono text-sm">{orderId}</p>
             </div>
           )}
-          
+
           {code && (
             <div className="rounded bg-gray-50 p-3">
-              <span className="text-sm font-medium text-gray-600">오류 코드:</span>
+              <span className="text-sm font-medium text-gray-600">
+                오류 코드:
+              </span>
               <p className="font-mono text-sm">{code}</p>
             </div>
           )}
-          
+
           {message && (
             <div className="rounded bg-gray-50 p-3">
-              <span className="text-sm font-medium text-gray-600">오류 메시지:</span>
+              <span className="text-sm font-medium text-gray-600">
+                오류 메시지:
+              </span>
               <p className="text-sm">{message}</p>
             </div>
           )}
@@ -53,14 +59,14 @@ const PaymentFail = () => {
         <div className="space-y-3">
           <button
             onClick={handleRetry}
-            className="w-full rounded-lg bg-amber-500 py-3 text-white font-semibold hover:bg-amber-600 transition-colors"
+            className="w-full rounded-lg bg-amber-500 py-3 font-semibold text-white transition-colors hover:bg-amber-600"
           >
             다시 결제하기
           </button>
-          
+
           <button
             onClick={handleGoHome}
-            className="w-full rounded-lg border border-gray-300 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+            className="w-full rounded-lg border border-gray-300 py-3 font-semibold text-gray-700 transition-colors hover:bg-gray-50"
           >
             홈으로 돌아가기
           </button>
