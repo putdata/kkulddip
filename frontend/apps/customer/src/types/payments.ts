@@ -2,6 +2,7 @@
  * 상품 정보 인터페이스
  */
 export interface ProductInfo {
+  id: number;
   name: string;
   price: number;
   quantity: number;
@@ -11,6 +12,7 @@ export interface ProductInfo {
  * 매장 정보 인터페이스
  */
 export interface StoreInfo {
+  id: number;
   name: string;
   address: string;
   pickupTime: string;
