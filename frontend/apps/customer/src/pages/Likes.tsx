@@ -1,6 +1,5 @@
 import LikeFoodCard from '@/components/pages/likes/LikeFoodCard/LikeFoodCard';
 import { useLikes } from '@/hooks/useLikes';
-// import { dummyLikeFoodData } from '@/dummies/dummyFoodData';
 
 const Likes = () => {
   const { stores } = useLikes(5);
