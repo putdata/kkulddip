@@ -3,7 +3,6 @@ import { likeService } from '@/services/likeService';
 import useGeolocation from './useGeolocation';
 import type { Store } from '@/types/likedStore';
 
-
 export const useLikes = (customerId: number) => {
   const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
