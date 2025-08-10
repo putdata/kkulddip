@@ -64,18 +64,25 @@ public class PaymentQueryService {
 
     /**
      * orderId로 TTL을 검증하여 유효한 PaymentOrderId 반환
-     * READY 상태에서만 진행 가능, TTL 만료 시 새로운 PaymentOrderId 생성
+     * READY, ABORTED, EXPIRED 상태에서 진행 가능, TTL 만료 시 새로운 PaymentOrderId 생성
      */
     @Transactional
     public String getValidPaymentOrderIdByOrderId(Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
             .orElseThrow(() -> PaymentException.orderNotFound(orderId));
 
-        // READY 상태가 아닌 경우 에러
-        if (payment.getStatus() != PaymentStatus.READY) {
-            throw PaymentException.invalidPaymentStatus(payment.getStatus().toString());
+        // 재시도 가능한 상태인지 확인
+        if (!canRetryPayment(payment.getStatus())) {
+            throw PaymentException.invalidPaymentStatus(
+                "결제 재시도가 불가능한 상태입니다. 현재 상태: " + payment.getStatus()
+            );
         }
 
+        // ABORTED나 EXPIRED 상태인 경우 무조건 새로운 PaymentOrderId 생성 후 READY 상태로 변경
+        if (payment.getStatus() == PaymentStatus.ABORTED || payment.getStatus() == PaymentStatus.EXPIRED) {
+            payment.regenerateForRetry();  // 새로운 PaymentOrderId 생성 + READY 상태 변경
+        }
+        
         // TTL 검증 후 유효한 PaymentOrderId 반환
         String validPaymentOrderId = payment.getValidPaymentOrderId();
         
@@ -83,5 +90,21 @@ public class PaymentQueryService {
         paymentRepository.save(payment);
         
         return validPaymentOrderId;
+    }
+    
+    /**
+     * 결제 재시도가 가능한 상태인지 확인
+     */
+    private boolean canRetryPayment(PaymentStatus status) {
+        return switch (status) {
+            case READY -> true;        // 기본 상태
+            case ABORTED -> true;      // 결제 실패 후 재시도
+            case EXPIRED -> true;      // 만료 후 재시도
+            case DONE -> false;        // 이미 완료된 결제
+            case CANCELED -> false;    // 이미 결제 완료 후 취소된 상태
+            case PARTIAL_CANCELED -> false; // 이미 결제 완료 후 부분 취소된 상태
+            case IN_PROGRESS -> false; // 진행 중인 결제
+            case WAITING_FOR_DEPOSIT -> false; // 입금 대기 중
+        };
     }
 }

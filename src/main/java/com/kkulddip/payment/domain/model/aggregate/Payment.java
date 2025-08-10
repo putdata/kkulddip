@@ -130,4 +130,18 @@ public class Payment {
         }
         return this.paymentOrderId.value();
     }
+    
+    /**
+     * 결제 재시도를 위한 초기화 (새로운 PaymentOrderId 생성 + READY 상태로 변경)
+     */
+    public void regenerateForRetry() {
+        this.paymentOrderId = PaymentOrderId.generate(this.orderId);
+        this.paymentOrderIdCreatedAt = LocalDateTime.now();
+        this.status = PaymentStatus.READY;
+        this.paymentKey = null; // 이전 결제 키 제거
+        this.method = null;
+        this.requestedAt = null;
+        this.approvedAt = null;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

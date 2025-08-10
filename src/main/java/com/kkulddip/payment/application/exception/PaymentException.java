@@ -37,4 +37,10 @@ public class PaymentException extends BusinessException {
     public static PaymentException processingFailed(String message) {
         return new PaymentException(ErrorCode.PAYMENT_API_ERROR, message);
     }
+    
+    // 결제 중복 처리 방지
+    public static PaymentException alreadyProcessing(String paymentOrderId) {
+        return new PaymentException(ErrorCode.PAYMENT_ALREADY_PROCESSING,
+            "결제가 이미 처리 중입니다. 잠시 후 다시 시도해주세요. PaymentOrderId: " + paymentOrderId);
+    }
 }
