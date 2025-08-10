@@ -274,6 +274,7 @@ public class OAuth2TokenService {
      */
     private OAuth2TokenResponse createTokenResponse(User user) {
         JwtUserInfo jwtUserInfo = new JwtUserInfo(
+            user.getId().toString(),
             user.getEmail(),
             user.getRole().name(),
             user.getOauth2Provider().name(),
