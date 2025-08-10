@@ -1,6 +1,8 @@
 package com.kkulddip.payment.presentation.rest;
 
 import com.kkulddip.common.response.ApiResponse;
+import com.kkulddip.common.lock.DistributedLock;
+import com.kkulddip.payment.application.exception.PaymentException;
 import com.kkulddip.payment.application.facade.PaymentFacade;
 import com.kkulddip.payment.infrastructure.external.toss.dto.TossPaymentConfirmRequest;
 import com.kkulddip.payment.presentation.dto.request.RequestPaymentRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentFacade paymentFacade;
+    private final DistributedLock distributedLock;
 
     /**
      * 2. Client로부터 [paymentKey, orderId] 수신하여 결제 확정 처리
