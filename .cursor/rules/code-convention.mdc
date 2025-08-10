@@ -5,7 +5,7 @@ alwaysApply: true
 
 ### 네이밍 컨벤션
 - API Endpoint: kebab-case
-- Class: PaskalCase
+- Class: PascalCase
 - 메서드/변수명: camelCase
 - static 상수: UPPER_SNAKE_CASE
 - DB 컬럼명: snake_case
