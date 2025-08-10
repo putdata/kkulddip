@@ -1,4 +1,4 @@
-package com.kkulddip.notification.domain.service;
+package com.kkulddip.notification.application.service;
 
 import com.kkulddip.notification.domain.model.entity.Notification;
 import com.kkulddip.notification.domain.model.entity.UserToken;

@@ -1,4 +1,4 @@
-package com.kkulddip.notification.application.mapper;
+package com.kkulddip.notification.infrastructure.persistence.jpa.mapper;
 
 import com.kkulddip.notification.domain.model.entity.UserToken;
 import com.kkulddip.notification.infrastructure.persistence.jpa.entity.UserTokenEntity;

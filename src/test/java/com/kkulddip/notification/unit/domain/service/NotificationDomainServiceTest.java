@@ -1,5 +1,6 @@
 package com.kkulddip.notification.unit.domain.service;
 
+import com.kkulddip.notification.application.service.NotificationDomainService;
 import com.kkulddip.notification.domain.model.entity.Notification;
 import com.kkulddip.notification.domain.model.entity.UserToken;
 import com.kkulddip.notification.domain.model.status.DeviceType;
@@ -7,7 +8,6 @@ import com.kkulddip.notification.domain.model.status.NotificationType;
 import com.kkulddip.notification.domain.model.status.SubscriberType;
 import com.kkulddip.notification.domain.model.status.UserType;
 import com.kkulddip.notification.domain.repository.NotificationLogRepository;
-import com.kkulddip.notification.domain.service.NotificationDomainService;
 import com.kkulddip.notification.infrastructure.external.firebase.FirebaseMessagingService;
 import com.kkulddip.notification.infrastructure.external.firebase.MockFirebaseMessagingService;
 import org.junit.jupiter.api.BeforeEach;

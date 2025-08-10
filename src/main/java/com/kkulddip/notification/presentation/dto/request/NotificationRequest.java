@@ -1,4 +1,4 @@
-package com.kkulddip.notification.interfaces.dto.request;
+package com.kkulddip.notification.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,20 +28,15 @@ public class NotificationRequest {
     @NotBlank(message = "알림 내용은 필수입니다.")
     private String content;
 
-    @JsonProperty("publisher_id")
     private Long publisherId;
 
-    @JsonProperty("publisher_type")
     private PublisherType publisherType;
 
-    @JsonProperty("subscriber_id")
     private Long subscriberId;
 
-    @JsonProperty("subscriber_type")
     @NotNull(message = "수신자 타입은 필수입니다.")
     private SubscriberType subscriberType;
 
-    @JsonProperty("action_url")
     private String actionUrl;
 
     private NotificationType notificationType;
@@ -52,6 +47,9 @@ public class NotificationRequest {
     // Redis Z-Set score 계산용
     @JsonIgnore
     public long getScoreTimestamp() {
+        if (createdAt == null) {
+            return System.currentTimeMillis();
+        }
         return createdAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }

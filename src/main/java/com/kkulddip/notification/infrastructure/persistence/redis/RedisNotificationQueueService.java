@@ -2,7 +2,8 @@ package com.kkulddip.notification.infrastructure.persistence.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kkulddip.notification.interfaces.dto.request.NotificationRequest;
+import com.kkulddip.notification.presentation.dto.request.NotificationRequest;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -72,16 +73,25 @@ public class RedisNotificationQueueService {
      */
     public void addNotificationRequest(NotificationRequest request) {
         try {
+            if (request == null) {
+                log.warn("NotificationRequest가 null입니다.");
+                return;
+            }
+            
             String jsonRequest = objectMapper.writeValueAsString(request);
             double score = request.getScoreTimestamp();
 
-            redisTemplate.opsForZSet().add(NOTIFICATION_QUEUE_KEY, jsonRequest, score);
-            log.debug("Redis ZSet에 알림 요청 추가: score={}", score);
+            Boolean success = redisTemplate.opsForZSet().add(NOTIFICATION_QUEUE_KEY, jsonRequest, score);
+            if (Boolean.TRUE.equals(success)) {
+                log.debug("Redis ZSet에 알림 요청 추가 성공: score={}", score);
+            } else {
+                log.warn("Redis ZSet에 알림 요청 추가 실패: 이미 존재하는 요청일 수 있습니다.");
+            }
 
         } catch (JsonProcessingException e) {
-            log.error("알림 요청 직렬화 실패: {}", e.getMessage());
+            log.error("알림 요청 직렬화 실패: {}", e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Redis ZSet에 알림 요청 추가 실패: {}", e.getMessage());
+            log.error("Redis ZSet에 알림 요청 추가 실패: {}", e.getMessage(), e);
         }
     }
 

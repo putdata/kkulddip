@@ -4,7 +4,7 @@ import com.kkulddip.notification.domain.model.entity.Notification;
 import com.kkulddip.notification.domain.model.status.NotificationType;
 import com.kkulddip.notification.domain.model.status.SubscriberType;
 import com.kkulddip.notification.domain.repository.NotificationRepository;
-import com.kkulddip.notification.application.mapper.NotificationMapper;
+import com.kkulddip.notification.infrastructure.persistence.jpa.mapper.NotificationMapper;
 import com.kkulddip.notification.infrastructure.persistence.jpa.repository.JpaNotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

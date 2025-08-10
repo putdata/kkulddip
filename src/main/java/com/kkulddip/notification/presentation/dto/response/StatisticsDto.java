@@ -1,4 +1,4 @@
-package com.kkulddip.notification.interfaces.dto.response;
+package com.kkulddip.notification.presentation.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

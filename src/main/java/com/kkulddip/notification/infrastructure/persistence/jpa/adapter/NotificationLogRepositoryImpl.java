@@ -3,7 +3,7 @@ package com.kkulddip.notification.infrastructure.persistence.jpa.adapter;
 import com.kkulddip.notification.domain.model.valueobject.NotificationRecord;
 import com.kkulddip.notification.domain.model.status.UserType;
 import com.kkulddip.notification.domain.repository.NotificationLogRepository;
-import com.kkulddip.notification.application.mapper.NotificationLogMapper;
+import com.kkulddip.notification.infrastructure.persistence.jpa.mapper.NotificationLogMapper;
 import com.kkulddip.notification.infrastructure.persistence.jpa.repository.JpaNotificationLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

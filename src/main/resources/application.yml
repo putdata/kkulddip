@@ -44,12 +44,19 @@ spring:
 
     data:
         redis:
-            host: ${REDIS_SERVER_ADDRESS}
-            port: ${REDIS_SERVER_PORT}
+            host: ${REDIS_HOST}
+            port: ${REDIS_PORT}
+            password: ${REDIS_PASSWORD:}
+
+scheduler:
+    process-rate: ${SCHEDULER_PROCESS_RATE:1000}
+    monitor-rate: ${SCHEDULER_MONITOR_RATE:6000}
+    statistics-rate: ${SCHEDULER_STATISTICS_RATE:60000}
+    healthcheck-rate: ${SCHEDULER_HEALTHCHECK_RATE:30000}
 
 # Firebase 설정
 firebase:
-    service-account-file: classpath:firebase-service-account.json
+    service-account-file: ${FIREBASE_CREDENTIALS_PATH}
 
 # 애플리케이션 설정
 app:
@@ -83,6 +90,5 @@ springdoc:
 
 logging:
     level:
-        web: INFO
-        org.springframework.data.redis: WARN
-        org.springframework.scheduling: WARN
+        web: DEBUG
+        com.kkulddip.notification: DEBUG

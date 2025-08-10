@@ -4,7 +4,7 @@ import com.kkulddip.notification.domain.model.status.UserType;
 import com.kkulddip.notification.domain.model.status.DeviceType;
 import com.kkulddip.notification.domain.model.entity.UserToken;
 import com.kkulddip.notification.domain.repository.UserTokenRepository;
-import com.kkulddip.notification.application.mapper.UserTokenMapper;
+import com.kkulddip.notification.infrastructure.persistence.jpa.mapper.UserTokenMapper;
 import com.kkulddip.notification.infrastructure.persistence.jpa.repository.JpaUserTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

@@ -1,9 +1,6 @@
 package com.kkulddip.notification.application.facade;
 
-import com.kkulddip.notification.interfaces.dto.request.NotificationRequest;
-import com.kkulddip.notification.interfaces.dto.response.NotificationResponse;
-import com.kkulddip.notification.interfaces.dto.response.StatisticsDto;
-import com.kkulddip.notification.application.mapper.NotificationMapper;
+import com.kkulddip.notification.application.service.NotificationDomainService;
 import com.kkulddip.notification.domain.model.entity.Notification;
 import com.kkulddip.notification.domain.model.entity.UserToken;
 import com.kkulddip.notification.domain.model.status.NotificationType;
@@ -12,7 +9,10 @@ import com.kkulddip.notification.domain.model.status.UserType;
 import com.kkulddip.notification.domain.repository.NotificationLogRepository;
 import com.kkulddip.notification.domain.repository.NotificationRepository;
 import com.kkulddip.notification.domain.repository.UserTokenRepository;
-import com.kkulddip.notification.domain.service.NotificationDomainService;
+import com.kkulddip.notification.presentation.dto.request.NotificationRequest;
+import com.kkulddip.notification.presentation.dto.response.NotificationResponse;
+import com.kkulddip.notification.presentation.dto.response.StatisticsDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,6 @@ public class NotificationProcessingFacade {
     private final UserTokenRepository userTokenRepository;
     private final NotificationLogRepository notificationLogRepository;
     private final NotificationDomainService notificationDomainService;
-    private final NotificationMapper notificationMapper;
 
     /**
      * 알림 요청 처리 - Redis ZSet에서 가져온 요청 처리

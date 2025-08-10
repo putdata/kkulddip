@@ -58,3 +58,6 @@ app:
     notification:
         mock-mode: true
         timeout: 5000
+
+firebase:
+    service-account-file: test.json

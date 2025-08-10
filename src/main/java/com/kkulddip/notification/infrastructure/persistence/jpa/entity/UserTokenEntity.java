@@ -1,27 +1,30 @@
 package com.kkulddip.notification.infrastructure.persistence.jpa.entity;
 
-import com.kkulddip.notification.domain.model.status.UserType;
 import com.kkulddip.notification.domain.model.status.DeviceType;
-import jakarta.persistence.*;
-import lombok.*;
+import com.kkulddip.notification.domain.model.status.UserType;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_token",
-    indexes = {
-        @Index(name = "idx_user_token_user_id", columnList = "user_id, user_type"),
-        @Index(name = "idx_user_token_active", columnList = "is_active, user_type"),
-        @Index(name = "idx_user_token_fcm", columnList = "fcm_token")
-    })
+@Table(name = "user_token")
 public class UserTokenEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_token_id")
     private Long userTokenId;
 
@@ -40,8 +43,7 @@ public class UserTokenEntity {
     private DeviceType deviceType;
 
     @Column(name = "is_active", nullable = false)
-    @Builder.Default
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
@@ -51,20 +53,4 @@ public class UserTokenEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        if (updatedAt == null) {
-            updatedAt = now;
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }

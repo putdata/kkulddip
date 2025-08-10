@@ -1,9 +1,10 @@
-package com.kkulddip.notification.interfaces.scheduled;
+package com.kkulddip.notification.presentation.scheduled;
 
 import com.kkulddip.notification.application.facade.NotificationProcessingFacade;
 import com.kkulddip.notification.infrastructure.persistence.redis.RedisNotificationQueueService;
-import com.kkulddip.notification.interfaces.dto.request.NotificationRequest;
-import com.kkulddip.notification.interfaces.dto.response.NotificationResponse;
+import com.kkulddip.notification.presentation.dto.request.NotificationRequest;
+import com.kkulddip.notification.presentation.dto.response.NotificationResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,7 +38,6 @@ public class NotificationScheduler {
             long queueSize = redisNotificationQueueService.getQueueSize();
 
             if (queueSize == 0) {
-                log.debug("Redis ZSet이 비어있습니다.");
                 return;
             }
 
@@ -68,7 +68,7 @@ public class NotificationScheduler {
                     NotificationResponse response = notificationProcessingFacade
                         .processNotificationRequest(request);
 
-                    if ("success".equals(response.getStatus())) {
+                    if (response.isSuccess()) {
                         successCount++;
                         log.debug("알림 요청 처리 성공: 제목={}", request.getTitle());
                     } else {
