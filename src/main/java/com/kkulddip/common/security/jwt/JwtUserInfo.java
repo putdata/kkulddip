@@ -9,12 +9,14 @@ import java.util.Optional;
  * 필수 필드에 대한 검증을 수행합니다.
  */
 public record JwtUserInfo(
+    String userId,
     String username,
     String role,
     String oauth2Provider,
     String oauth2ProviderId
 ) {
     public JwtUserInfo {
+        validateRequired(userId, "User ID");
         validateRequired(username, "Username");
         validateRequired(role, "Role");
         validateRequired(oauth2Provider, "OAuth2 provider");

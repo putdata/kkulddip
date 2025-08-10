@@ -78,6 +78,7 @@ public class JwtUtil {
 
         return Jwts.builder()
             .subject(userInfo.username())
+            .claim("user_id", userInfo.userId())
             .claim("role", userInfo.role())
             .claim("token_type", tokenType)
             .claim("oauth2_provider", userInfo.oauth2Provider())
@@ -110,6 +111,7 @@ public class JwtUtil {
      */
     public JwtUserInfo createJwtUserInfo(Claims claims) {
         return new JwtUserInfo(
+            claims.get("user_id", String.class),
             claims.getSubject(),
             claims.get("role", String.class),
             claims.get("oauth2_provider", String.class),

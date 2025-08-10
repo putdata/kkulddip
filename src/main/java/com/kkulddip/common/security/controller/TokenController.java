@@ -1,5 +1,6 @@
 package com.kkulddip.common.security.controller;
 
+import com.kkulddip.common.enums.UserRole;
 import com.kkulddip.common.response.ApiResponse;
 import com.kkulddip.common.security.oauth2.OAuth2TokenService;
 import com.kkulddip.common.security.oauth2.dto.OAuth2TokenRequest;
@@ -41,7 +42,7 @@ public class TokenController implements TokenApi {
     )
     public ApiResponse<OAuth2TokenResponse> exchangeCustomerToken(
         @Valid @RequestBody OAuth2TokenRequest request) {
-        return processTokenExchange(request, "CUSTOMER");
+        return processTokenExchange(request, UserRole.CUSTOMER);
     }
 
     /**
@@ -58,7 +59,7 @@ public class TokenController implements TokenApi {
     )
     public ApiResponse<OAuth2TokenResponse> exchangeOwnerToken(
         @Valid @RequestBody OAuth2TokenRequest request) {
-        return processTokenExchange(request, "OWNER");
+        return processTokenExchange(request, UserRole.OWNER);
     }
 
     /**
@@ -66,17 +67,17 @@ public class TokenController implements TokenApi {
      * 사용자 타입에 관계없이 공통으로 사용되는 토큰 교환 처리를 수행합니다.
      *
      * @param request OAuth2 토큰 요청 객체
-     * @param userType 사용자 타입 ("CUSTOMER" 또는 "OWNER")
+     * @param userRole 사용자 역할
      * @return JWT 토큰 정보가 담긴 응답 객체
      */
     private ApiResponse<OAuth2TokenResponse> processTokenExchange(
-        OAuth2TokenRequest request, String userType) {
+        OAuth2TokenRequest request, UserRole userRole) {
 
-        log.info("{} 토큰 교환 요청 - 코드: {}", userType, request.code());
+        log.info("{} 토큰 교환 요청 - 코드: {}", userRole.getAuthority(), request.code());
 
-        OAuth2TokenResponse tokenResponse = oauth2TokenService.exchangeCodeForToken(request.code(), userType);
+        OAuth2TokenResponse tokenResponse = oauth2TokenService.exchangeCodeForToken(request.code(), userRole);
 
-        log.info("{} 토큰 교환 성공", userType);
+        log.info("{} 토큰 교환 성공", userRole.getAuthority());
 
         return ApiResponse.of(tokenResponse);
     }
