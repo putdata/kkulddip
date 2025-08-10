@@ -147,6 +147,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
 
         Map<String, Object> details = new HashMap<>();
+        details.put("user_id", userInfo.userId());
         details.put("oauth2_provider", userInfo.oauth2Provider());
         details.put("oauth2_provider_id", userInfo.oauth2ProviderId());
         authentication.setDetails(details);

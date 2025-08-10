@@ -1,6 +1,7 @@
 package com.kkulddip.common.security.oauth2;
 
 import com.kkulddip.common.enums.OAuth2Provider;
+import com.kkulddip.common.enums.UserRole;
 import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
@@ -25,7 +26,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * OAuth2 Authorization Code를 처리하여 사용자를 생성하거나 조회하는 서비스
@@ -49,7 +49,10 @@ public class OAuth2TokenService {
     private String googleClientSecret;
 
     @Value("${spring.security.oauth2.client.registration.google-customer.redirect-uri}")
-    private String googleRedirectUri;
+    private String googleCustomerRedirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.google-owner.redirect-uri}")
+    private String googleOwnerRedirectUri;
 
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiration;
@@ -61,12 +64,12 @@ public class OAuth2TokenService {
      * OAuth2 Authorization Code를 JWT 토큰 응답으로 교환
      *
      * @param authorizationCode Google에서 받은 Authorization Code
-     * @param userType 사용자 타입
+     * @param userRole 사용자 역할
      * @return OAuth2TokenResponse 객체
      */
     @Transactional
-    public OAuth2TokenResponse exchangeCodeForToken(String authorizationCode, String userType) {
-        User user = exchangeCodeForUser(authorizationCode, userType);
+    public OAuth2TokenResponse exchangeCodeForToken(String authorizationCode, UserRole userRole) {
+        User user = exchangeCodeForUser(authorizationCode, userRole);
         return createTokenResponse(user);
     }
 
@@ -74,13 +77,13 @@ public class OAuth2TokenService {
      * OAuth2 Authorization Code로 사용자 정보를 가져와 User 객체를 반환
      *
      * @param authorizationCode Google에서 받은 Authorization Code
-     * @param userType 사용자 타입
+     * @param userRole 사용자 역할
      * @return User 객체
      */
     @Transactional
-    public User exchangeCodeForUser(String authorizationCode, String userType) {
+    public User exchangeCodeForUser(String authorizationCode, UserRole userRole) {
         // 1. Authorization Code를 OAuth2 Access Token으로 교환
-        String oauthAccessToken = exchangeCodeForAccessToken(authorizationCode);
+        String oauthAccessToken = exchangeCodeForAccessToken(authorizationCode, userRole);
 
         // 2. OAuth2 Access Token으로 사용자 정보 가져오기
         Map<String, Object> userAttributes = getUserInfo(oauthAccessToken);
@@ -88,8 +91,8 @@ public class OAuth2TokenService {
         // 3. OAuth2 사용자 정보 추출
         OAuth2UserInfo userInfo = oauth2UserInfoFactory.getOAuth2UserInfo("google", userAttributes);
 
-        // 4. 사용자 타입에 따라 처리
-        return processUser(userInfo, userType);
+        // 4. 사용자 역할에 따라 처리
+        return processUser(userInfo, userRole);
     }
 
     /**
@@ -97,16 +100,19 @@ public class OAuth2TokenService {
      * Google의 OAuth2 토큰 엔드포인트에 요청을 보내 Access Token을 획득합니다.
      *
      * @param authorizationCode Google에서 받은 Authorization Code
+     * @param userRole 사용자 역할
      * @return Google OAuth2 Access Token
      * @throws BusinessException OAuth2 토큰 교환 실패 시
      */
-    private String exchangeCodeForAccessToken(String authorizationCode) {
+    private String exchangeCodeForAccessToken(String authorizationCode, UserRole userRole) {
+        String redirectUri = getRedirectUriByUserRole(userRole);
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("client_id", googleClientId);
         params.add("client_secret", googleClientSecret);
         params.add("code", authorizationCode);
         params.add("grant_type", "authorization_code");
-        params.add("redirect_uri", googleRedirectUri);
+        params.add("redirect_uri", redirectUri);
 
         return Optional.ofNullable(
             webClient.post()
@@ -149,21 +155,20 @@ public class OAuth2TokenService {
     }
 
     /**
-     * 사용자 타입에 따라 Customer 또는 Owner 처리
-     * 사용자 타입에 따라 적절한 엔티티로 사용자를 생성하거나 조회합니다.
+     * 사용자 역할에 따라 Customer 또는 Owner 처리
+     * 사용자 역할에 따라 적절한 엔티티로 사용자를 생성하거나 조회합니다.
      *
      * @param userInfo OAuth2 사용자 정보
-     * @param userType 사용자 타입 ("customer" 또는 "owner")
+     * @param userRole 사용자 역할
      * @return 생성되거나 조회된 User 엔티티
-     * @throws BusinessException 지원하지 않는 사용자 타입인 경우
      */
-    private User processUser(OAuth2UserInfo userInfo, String userType) {
+    private User processUser(OAuth2UserInfo userInfo, UserRole userRole) {
         OAuth2Provider provider = OAuth2Provider.GOOGLE;
 
-        return switch (userType.toLowerCase()) {
-            case "customer" -> processCustomer(userInfo, provider);
-            case "owner" -> processOwner(userInfo, provider);
-            default -> throw new BusinessException(ErrorCode.USER_REGISTER_TYPE_ERROR, "지원하지 않는 사용자 타입입니다: " + userType);
+        return switch (userRole) {
+            case CUSTOMER -> processCustomer(userInfo, provider);
+            case OWNER -> processOwner(userInfo, provider);
+            case ADMIN -> throw new BusinessException(ErrorCode.USER_REGISTER_TYPE_ERROR, "ADMIN 사용자는 OAuth2 로그인을 지원하지 않습니다.");
         };
     }
 
@@ -274,6 +279,7 @@ public class OAuth2TokenService {
      */
     private OAuth2TokenResponse createTokenResponse(User user) {
         JwtUserInfo jwtUserInfo = new JwtUserInfo(
+            user.getId().toString(),
             user.getEmail(),
             user.getRole().name(),
             user.getOauth2Provider().name(),
@@ -295,5 +301,19 @@ public class OAuth2TokenService {
                 .profileImageUrl(user.getProfileImageUrl())
                 .build())
             .build();
+    }
+
+    /**
+     * 사용자 역할에 따른 적절한 redirect URI 반환
+     *
+     * @param userRole 사용자 역할
+     * @return 해당하는 redirect URI
+     */
+    private String getRedirectUriByUserRole(UserRole userRole) {
+        return switch (userRole) {
+            case CUSTOMER -> googleCustomerRedirectUri;
+            case OWNER -> googleOwnerRedirectUri;
+            case ADMIN -> throw new BusinessException(ErrorCode.USER_REGISTER_TYPE_ERROR, "ADMIN 사용자는 OAuth2 로그인을 지원하지 않습니다.");
+        };
     }
 }

@@ -89,6 +89,7 @@ class FcmTokenControllerUnitTest {
             .build();
 
         customerUserInfo = new JwtUserInfo(
+            "1",
             "customer@test.com",
             "CUSTOMER",
             "GOOGLE",
@@ -96,6 +97,7 @@ class FcmTokenControllerUnitTest {
         );
 
         ownerUserInfo = new JwtUserInfo(
+            "2",
             "owner@test.com",
             "OWNER",
             "GOOGLE",
