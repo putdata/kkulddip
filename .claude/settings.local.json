@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew:*)",
+      "Bash(rm:*)",
+      "Bash(gradlew test:*)",
+      "Bash(cmd /c \"gradlew test --tests \"\"com.kkulddip.customerProfile.controller.CustomerProfileControllerTest\"\" --no-daemon\")",
+      "Bash(gradlew.bat test:*)"
+    ],
+    "deny": []
+  }
+}

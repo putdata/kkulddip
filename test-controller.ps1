@@ -1,0 +1,1 @@
+./gradlew test --tests "com.kkulddip.customerProfile.controller.CustomerProfileControllerTest" --no-daemon
