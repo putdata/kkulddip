@@ -16,13 +16,13 @@ public record StoreResponseDto(
     String storeAddress,
     String description,
     String operatingHours,
-    String phoneNumber,
+    String phone,
     Double ratingAverage,
-    Long reviewNum,
+    Long reviewCount,
     Double distanceFromUser,
     String representativeDdipboxName,
     Long representativeOriginalPrice,
     Long representativeSalePrice,
     String storeProfileImage,
-    Boolean active
+    Boolean isActive
 ) {}

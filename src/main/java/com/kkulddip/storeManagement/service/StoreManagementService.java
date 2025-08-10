@@ -6,7 +6,6 @@ import com.kkulddip.storeManagement.dto.request.CreateStoreRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreStatusRequest;
 import com.kkulddip.storeManagement.dto.response.StoreManagementResponse;
-import com.kkulddip.storeManagement.dto.response.StoreImageResponseDto;
 import com.kkulddip.store.entity.Store;
 import com.kkulddip.store.repository.StoreRepository;
 
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 가게 관리 서비스
@@ -50,7 +48,7 @@ public class StoreManagementService {
             .operatingHours(request.operatingHours())
             .businessNumber(request.businessNumber())
             .storeAddress(request.storeAddress())
-            .storeProfileImage(request.storeProfileImage())
+            .storeProfileImage(null)
             .latitude(request.latitude())
             .longitude(request.longitude())
             .isActive(true)
@@ -66,32 +64,48 @@ public class StoreManagementService {
     }
 
     /**
-     * 가게 생성 (이미지 포함)
+     * 가게 생성 (이미지 포함) - 단일 이미지만 처리
      */
     @Transactional
-    public StoreManagementResponse createStoreWithImages(CreateStoreRequest request, List<MultipartFile> images, Long ownerId) {
-        log.info("가게 생성 시작 (이미지 포함) - ownerId: {}, storeName: {}, imageCount: {}", 
-            ownerId, request.storeName(), images != null ? images.size() : 0);
+    public StoreManagementResponse createStoreWithImage(CreateStoreRequest request, MultipartFile image, Long ownerId) {
+        log.info("가게 생성 시작 (이미지 포함) - ownerId: {}, storeName: {}, hasImage: {}", 
+            ownerId, request.storeName(), image != null && !image.isEmpty());
         
-        // 기본 가게 생성
-        StoreManagementResponse response = createStore(request, ownerId);
+        String imageUrl = null;
         
-        // 이미지가 있으면 업로드
-        if (images != null && !images.isEmpty()) {
+        // 이미지가 있으면 S3에 업로드
+        if (image != null && !image.isEmpty()) {
             try {
-                List<StoreImageResponseDto> uploadedImages = storeImageService.addImage(
-                    response.storeId(), images, 0);
-                
-                log.info("가게 이미지 업로드 완료 - storeId: {}, uploadCount: {}", 
-                    response.storeId(), uploadedImages.size());
-                    
+                imageUrl = storeImageService.uploadSingleImageToS3(image);
+                log.info("가게 이미지 S3 업로드 완료 - imageUrl: {}", imageUrl);
             } catch (Exception e) {
-                log.error("가게 이미지 업로드 실패 - storeId: {}", response.storeId(), e);
-                // 이미지 업로드 실패해도 가게 생성은 완료된 상태로 유지
+                log.error("가게 이미지 S3 업로드 실패 - ownerId: {}", ownerId, e);
+                // 이미지 업로드 실패해도 가게 생성은 진행
             }
         }
         
-        return response;
+        // Store 엔티티 생성 (S3 이미지 URL 포함)
+        Store store = Store.builder()
+            .ownerId(ownerId)
+            .storeName(request.storeName())
+            .phone(request.phone())
+            .description(request.description())
+            .operatingHours(request.operatingHours())
+            .businessNumber(request.businessNumber())
+            .storeAddress(request.storeAddress())
+            .storeProfileImage(imageUrl)
+            .latitude(request.latitude())
+            .longitude(request.longitude())
+            .isActive(true)
+            .ratingAverage(0.0)
+            .reviewCount(0L)
+            .createdAt(LocalDateTime.now())
+            .build();
+        
+        Store savedStore = storeRepository.save(store);
+        
+        log.info("가게 생성 완료 (이미지 포함) - storeId: {}, ownerId: {}", savedStore.getStoreId(), ownerId);
+        return StoreManagementResponse.from(savedStore);
     }
     
     /**
@@ -128,9 +142,6 @@ public class StoreManagementService {
         if (request.storeAddress() != null) {
             store.setStoreAddress(request.storeAddress());
         }
-        if (request.storeProfileImage() != null) {
-            store.setStoreProfileImage(request.storeProfileImage());
-        }
         if (request.latitude() != null) {
             store.setLatitude(request.latitude());
         }
@@ -143,6 +154,52 @@ public class StoreManagementService {
         Store updatedStore = storeRepository.save(store);
         
         log.info("가게 정보 수정 완료 - storeId: {}", storeId);
+        return StoreManagementResponse.from(updatedStore);
+    }
+    
+    /**
+     * 가게 이미지 업데이트
+     */
+    @Transactional
+    public StoreManagementResponse updateStoreImage(Long storeId, MultipartFile image, Long ownerId) {
+        log.info("가게 이미지 업데이트 시작 - storeId: {}, ownerId: {}, hasImage: {}", 
+            storeId, ownerId, image != null && !image.isEmpty());
+        
+        // 가게 존재 및 소유권 확인
+        Store store = validateStoreOwnership(storeId, ownerId);
+        
+        // 기존 이미지가 있으면 S3에서 삭제
+        String oldImageUrl = store.getStoreProfileImage();
+        if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+            try {
+                storeImageService.deleteImageFromS3(oldImageUrl);
+                log.info("기존 가게 이미지 S3 삭제 완료 - storeId: {}", storeId);
+            } catch (Exception e) {
+                log.error("기존 가게 이미지 S3 삭제 실패 - storeId: {}", storeId, e);
+                // 삭제 실패해도 계속 진행
+            }
+        }
+        
+        String newImageUrl = null;
+        
+        // 새 이미지가 있으면 S3에 업로드
+        if (image != null && !image.isEmpty()) {
+            try {
+                newImageUrl = storeImageService.uploadSingleImageToS3(image);
+                log.info("새 가게 이미지 S3 업로드 완료 - imageUrl: {}", newImageUrl);
+            } catch (Exception e) {
+                log.error("새 가게 이미지 S3 업로드 실패 - storeId: {}", storeId, e);
+                throw new BusinessException(ErrorCode.STORE_IMAGE_UPLOAD_FAILED, "이미지 업로드에 실패했습니다.");
+            }
+        }
+        
+        // Store 엔티티 업데이트
+        store.setStoreProfileImage(newImageUrl);
+        store.setUpdatedAt(LocalDateTime.now());
+        
+        Store updatedStore = storeRepository.save(store);
+        
+        log.info("가게 이미지 업데이트 완료 - storeId: {}", storeId);
         return StoreManagementResponse.from(updatedStore);
     }
     
@@ -185,12 +242,16 @@ public class StoreManagementService {
     public void deleteStore(Long storeId, Long ownerId) {
         log.info("가게 삭제 시작 - storeId: {}, ownerId: {}", storeId, ownerId);
 
-        // 가게 이미지 먼저 삭제
-        try {
-            storeImageService.deleteImagesBeforeDeleteStore(storeId);
-        } catch (Exception e) {
-            log.error("가게 삭제 전 이미지 정리 실패 - storeId: {}", storeId, e);
-            // 이미지 삭제 실패해도 가게 삭제는 진행
+        // 가게 정보 조회 후 S3 이미지 삭제
+        Store store = validateStoreOwnership(storeId, ownerId);
+        if (store.getStoreProfileImage() != null && !store.getStoreProfileImage().isEmpty()) {
+            try {
+                storeImageService.deleteImageFromS3(store.getStoreProfileImage());
+                log.info("가게 이미지 S3 삭제 완료 - storeId: {}", storeId);
+            } catch (Exception e) {
+                log.error("가게 삭제 전 S3 이미지 정리 실패 - storeId: {}", storeId, e);
+                // 이미지 삭제 실패해도 가게 삭제는 진행
+            }
         }
 
         UpdateStoreStatusRequest deleteRequest = UpdateStoreStatusRequest.builder()

@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 /**
  * 가게 관리 컨트롤러
@@ -46,18 +45,18 @@ public class StoreManagementController implements StoreManagementApi {
         return ApiResponse.of(201, response);
     }
 
-    @PostMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/with-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('OWNER')")
-    public ApiResponse<StoreManagementResponse> createStoreWithImages(
+    public ApiResponse<StoreManagementResponse> createStoreWithImage(
             @RequestPart("request") @Valid CreateStoreRequest request,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         
         Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
-        log.info("가게 생성 요청 (이미지 포함) - ownerId: {}, storeName: {}, imageCount: {}", 
-            ownerId, request.storeName(), images != null ? images.size() : 0);
+        log.info("가게 생성 요청 (이미지 포함) - ownerId: {}, storeName: {}, hasImage: {}", 
+            ownerId, request.storeName(), image != null && !image.isEmpty());
         
-        StoreManagementResponse response = storeManagementService.createStoreWithImages(request, images, ownerId);
+        StoreManagementResponse response = storeManagementService.createStoreWithImage(request, image, ownerId);
         
         log.info("가게 생성 완료 (이미지 포함) - storeId: {}, ownerId: {}", response.storeId(), ownerId);
         return ApiResponse.of(201, response);
@@ -96,6 +95,23 @@ public class StoreManagementController implements StoreManagementApi {
         return ApiResponse.of(response);
     }
 
+    @PutMapping(value = "/{storeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('OWNER')")
+    public ApiResponse<StoreManagementResponse> updateStoreImage(
+            @PathVariable Long storeId,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
+        
+        log.info("가게 이미지 업데이트 요청 - storeId: {}, ownerId: {}, hasImage: {}", 
+            storeId, ownerId, image != null && !image.isEmpty());
+        
+        StoreManagementResponse response = storeManagementService.updateStoreImage(storeId, image, ownerId);
+        
+        log.info("가게 이미지 업데이트 완료 - storeId: {}", storeId);
+        return ApiResponse.of(response);
+    }
+    
     @DeleteMapping("/{storeId}")
     @PreAuthorize("hasRole('OWNER')")
     public ApiResponse<Void> deleteStore(@PathVariable Long storeId) {

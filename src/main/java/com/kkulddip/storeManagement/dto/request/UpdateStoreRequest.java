@@ -26,9 +26,6 @@ public record UpdateStoreRequest(
     @Size(max = 100, message = "가게 주소는 100자를 초과할 수 없습니다.")
     String storeAddress,
     
-    @Size(max = 100, message = "프로필 이미지 URL은 100자를 초과할 수 없습니다.")
-    String storeProfileImage,
-    
     @DecimalMin(value = "-90.0", message = "위도는 -90.0 이상이어야 합니다.")
     @DecimalMax(value = "90.0", message = "위도는 90.0 이하여야 합니다.")
     Double latitude,
@@ -53,7 +50,7 @@ public record UpdateStoreRequest(
     
     public boolean hasUpdates() {
         return storeName != null || phone != null || description != null || 
-               operatingHours != null || storeAddress != null || storeProfileImage != null ||
+               operatingHours != null || storeAddress != null ||
                latitude != null || longitude != null;
     }
 }
