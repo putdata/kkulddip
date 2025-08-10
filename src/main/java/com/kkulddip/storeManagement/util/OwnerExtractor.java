@@ -1,16 +1,26 @@
 package com.kkulddip.storeManagement.util;
 
+import com.kkulddip.common.enums.OAuth2Provider;
+import com.kkulddip.common.enums.UserRole;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
+import com.kkulddip.domain.owner.entity.Owner;
+import com.kkulddip.domain.owner.repository.OwnerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 /**
  * 현재 인증된 사장님의 정보를 추출하는 유틸리티 클래스
  */
-public final class OwnerExtractor {
+@Component
+public class OwnerExtractor {
 
-    private OwnerExtractor() {
-        // Utility class - prevent instantiation
+    private static OwnerRepository ownerRepository;
+
+    @Autowired
+    public OwnerExtractor(OwnerRepository ownerRepository) {
+        OwnerExtractor.ownerRepository = ownerRepository;
     }
 
     /**
@@ -28,65 +38,24 @@ public final class OwnerExtractor {
         
         Object principal = authentication.getPrincipal();
         
-        if (!(principal instanceof JwtUserInfo)) {
+        if (!(principal instanceof JwtUserInfo userInfo)) {
             throw new IllegalStateException("JWT 인증 정보가 없습니다.");
         }
         
-        JwtUserInfo userInfo = (JwtUserInfo) principal;
-        
-        if (!"OWNER".equals(userInfo.role())) {
+        if (!UserRole.OWNER.name().equals(userInfo.role())) {
             throw new IllegalStateException("사장님만 접근할 수 있습니다.");
         }
         
-        // JwtUserInfo에서 사장님 ID 추출
-        // 실제 구현에서는 JwtUserInfo에 ownerId 필드가 있어야 함
-        // 현재는 OAuth2ProviderId를 사용한다고 가정
+        // OAuth2 Provider와 Provider ID로 Owner를 찾음
         try {
-            return Long.parseLong(userInfo.oauth2ProviderId());
-        } catch (NumberFormatException e) {
-            throw new IllegalStateException("유효하지 않은 사장님 ID입니다.");
+            OAuth2Provider provider = OAuth2Provider.valueOf(userInfo.oauth2Provider().toUpperCase());
+            Owner owner = ownerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, userInfo.oauth2ProviderId())
+                .orElseThrow(() -> new IllegalStateException("등록되지 않은 사장님입니다."));
+            
+            return owner.getOwnerId();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("지원하지 않는 OAuth2 제공자입니다: " + userInfo.oauth2Provider());
         }
     }
 
-    /**
-     * 현재 인증된 사용자가 사장님인지 확인
-     */
-    public static boolean isCurrentUserOwner() {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return false;
-            }
-            
-            Object principal = authentication.getPrincipal();
-            
-            if (!(principal instanceof JwtUserInfo)) {
-                return false;
-            }
-            
-            JwtUserInfo userInfo = (JwtUserInfo) principal;
-            return "OWNER".equals(userInfo.role());
-            
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * 현재 사용자가 특정 가게의 소유자인지 확인
-     * (서비스 레이어에서 추가 검증과 함께 사용)
-     */
-    public static boolean isOwnerOf(Long storeId, Long ownerId) {
-        if (storeId == null || ownerId == null) {
-            return false;
-        }
-        
-        try {
-            Long currentOwnerId = getCurrentOwnerId();
-            return currentOwnerId.equals(ownerId);
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

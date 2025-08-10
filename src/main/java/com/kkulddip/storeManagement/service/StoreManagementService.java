@@ -1,9 +1,12 @@
 package com.kkulddip.storeManagement.service;
 
+import com.kkulddip.common.exception.BusinessException;
+import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.storeManagement.dto.request.CreateStoreRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreStatusRequest;
 import com.kkulddip.storeManagement.dto.response.StoreManagementResponse;
+import com.kkulddip.storeManagement.dto.response.StoreImageResponseDto;
 import com.kkulddip.store.entity.Store;
 import com.kkulddip.store.repository.StoreRepository;
 
@@ -11,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 가게 관리 서비스
@@ -23,7 +28,7 @@ import java.time.LocalDateTime;
 public class StoreManagementService {
     
     private final StoreRepository storeRepository;
-    // private final StoreImageService storeImageService;
+    private final StoreImageService storeImageService;
     
     /**
      * 가게 생성
@@ -33,7 +38,8 @@ public class StoreManagementService {
         log.info("가게 생성 시작 - ownerId: {}, storeName: {}", ownerId, request.storeName());
         
         // 중복 가게명 검증 (같은 사장님)
-        validateDuplicateStoreName(request.storeName(), ownerId);
+        // 현재 owner 관련 도메인 구현 안됨
+        // validateDuplicateStoreName(request.storeName(), ownerId);
         
         // Store 엔티티 생성
         Store store = Store.builder()
@@ -58,6 +64,35 @@ public class StoreManagementService {
         log.info("가게 생성 완료 - storeId: {}, ownerId: {}", savedStore.getStoreId(), ownerId);
         return StoreManagementResponse.from(savedStore);
     }
+
+    /**
+     * 가게 생성 (이미지 포함)
+     */
+    @Transactional
+    public StoreManagementResponse createStoreWithImages(CreateStoreRequest request, List<MultipartFile> images, Long ownerId) {
+        log.info("가게 생성 시작 (이미지 포함) - ownerId: {}, storeName: {}, imageCount: {}", 
+            ownerId, request.storeName(), images != null ? images.size() : 0);
+        
+        // 기본 가게 생성
+        StoreManagementResponse response = createStore(request, ownerId);
+        
+        // 이미지가 있으면 업로드
+        if (images != null && !images.isEmpty()) {
+            try {
+                List<StoreImageResponseDto> uploadedImages = storeImageService.addImage(
+                    response.storeId(), images, 0);
+                
+                log.info("가게 이미지 업로드 완료 - storeId: {}, uploadCount: {}", 
+                    response.storeId(), uploadedImages.size());
+                    
+            } catch (Exception e) {
+                log.error("가게 이미지 업로드 실패 - storeId: {}", response.storeId(), e);
+                // 이미지 업로드 실패해도 가게 생성은 완료된 상태로 유지
+            }
+        }
+        
+        return response;
+    }
     
     /**
      * 가게 정보 수정
@@ -77,7 +112,6 @@ public class StoreManagementService {
         
         // 가게명 중복 확인 (변경하는 경우만)
         if (request.storeName() != null && !request.storeName().equals(store.getStoreName())) {
-            validateDuplicateStoreName(request.storeName(), ownerId);
             store.setStoreName(request.storeName());
         }
         
@@ -130,12 +164,9 @@ public class StoreManagementService {
         }
         
         // 비활성화하는 경우 활성 주문 확인
-//        if (!request.isActive()) {
-//            // 가게가 이미 비활성화된 경우 예외 처리
-//            if (!store.getIsActive()) {
-//                throw StoreManagementException.storeAlreadyInactive(storeId);
-//            }
-//        }
+        if (!request.isActive()) {
+            validateStoreCanBeDeactivated(storeId);
+        }
         
         store.setIsActive(request.isActive());
         store.setUpdatedAt(LocalDateTime.now());
@@ -154,13 +185,13 @@ public class StoreManagementService {
     public void deleteStore(Long storeId, Long ownerId) {
         log.info("가게 삭제 시작 - storeId: {}, ownerId: {}", storeId, ownerId);
 
-//        // 가게 이미지 먼저 삭제
-//        try {
-//            storeImageService.deleteImagesBeforeDeleteStore(storeId);
-//        } catch (Exception e) {
-//            log.error("가게 삭제 전 이미지 정리 실패 - storeId: {}", storeId, e);
-//            // 이미지 삭제 실패해도 가게 삭제는 진행
-//        }
+        // 가게 이미지 먼저 삭제
+        try {
+            storeImageService.deleteImagesBeforeDeleteStore(storeId);
+        } catch (Exception e) {
+            log.error("가게 삭제 전 이미지 정리 실패 - storeId: {}", storeId, e);
+            // 이미지 삭제 실패해도 가게 삭제는 진행
+        }
 
         UpdateStoreStatusRequest deleteRequest = UpdateStoreStatusRequest.builder()
             .isActive(false)
@@ -176,25 +207,27 @@ public class StoreManagementService {
      * 가게 소유권 검증
      */
     private Store validateStoreOwnership(Long storeId, Long ownerId) {
-        Store store = storeRepository.findById(storeId).get();
-//            .orElseThrow(() -> StoreManagementException.storeNotFound(storeId));
-//
-//        if (!store.getOwnerId().equals(ownerId)) {
-//            throw StoreManagementException.storeNotOwned(storeId, ownerId);
-//        }
+        Store store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "가게를 찾을 수 없습니다."));
+
+        if (!store.getOwnerId().equals(ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_OWNED, "해당 가게의 소유자가 아닙니다.");
+        }
 
         return store;
     }
     
     /**
-     * 중복 가게명 검증
+     * 가게 비활성화 가능 여부 검증 (활성 주문이 있는지 확인)
      */
-    private void validateDuplicateStoreName(String storeName, Long ownerId) {
-        // 현재 프로젝트에는 중복 검증 로직이 없어 보이므로 
-        // 필요시 추후 구현 (storeRepository에 메서드 추가 필요)
-        // boolean exists = storeRepository.existsByStoreNameAndOwnerId(storeName, ownerId);
-        // if (exists) {
-        //     throw StoreManagementException.storeAlreadyExists(storeName, ownerId);
+    private void validateStoreCanBeDeactivated(Long storeId) {
+        // 현재 프로젝트에서는 Order 도메인과의 직접적인 연관관계가 없으므로
+        // 일단 로그만 남기고 필요시 Order 서비스에서 검증 로직 추가 필요
+        log.info("가게 비활성화 검증 - storeId: {} (활성 주문 확인 필요)", storeId);
+        // TODO: Order 도메인에서 해당 가게의 활성 주문이 있는지 확인하는 로직 추가 필요
+        // if (orderService.hasActiveOrdersByStoreId(storeId)) {
+        //     throw new BusinessException(ErrorCode.STORE_MANAGEMENT_HAS_ACTIVE_ORDERS, 
+        //         "진행 중인 주문이 있어 가게를 비활성화할 수 없습니다.");
         // }
     }
     

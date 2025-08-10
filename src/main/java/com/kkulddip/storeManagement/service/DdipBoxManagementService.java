@@ -1,5 +1,7 @@
 package com.kkulddip.storeManagement.service;
 
+import com.kkulddip.common.exception.BusinessException;
+import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.storeManagement.dto.request.CreateDdipBoxRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateDdipBoxRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateDdipBoxQuantityRequest;
@@ -79,13 +81,13 @@ public class DdipBoxManagementService {
         validateStoreOwnership(storeId, ownerId);
 
         // 띱박스 존재 확인
-        DdipBox ddipBox = ddipBoxRepository.findById(ddipboxId).get();
-//            .orElseThrow(() -> StoreManagementException.ddipBoxNotFound(ddipboxId));
+        DdipBox ddipBox = ddipBoxRepository.findById(ddipboxId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "띱박스를 찾을 수 없습니다."));
 
         // 띱박스가 해당 가게의 것인지 확인
-//        if (!ddipBox.getStore().getStoreId().equals(storeId)) {
-//            throw StoreManagementException.ddipBoxNotFound(ddipboxId);
-//        }
+        if (!ddipBox.getStore().getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "해당 가게의 띱박스가 아닙니다.");
+        }
 
         // 업데이트할 내용이 있는지 확인
         if (!request.hasUpdates()) {
@@ -155,33 +157,33 @@ public class DdipBoxManagementService {
         validateStoreOwnership(storeId, ownerId);
 
         // 띱박스 존재 확인
-        DdipBox ddipBox = ddipBoxRepository.findById(ddipboxId).get();
-//            .orElseThrow(() -> StoreManagementException.ddipBoxNotFound(ddipboxId));
+        DdipBox ddipBox = ddipBoxRepository.findById(ddipboxId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "띱박스를 찾을 수 없습니다."));
 
         // 띱박스가 해당 가게의 것인지 확인
-//        if (!ddipBox.getStore().getStoreId().equals(storeId)) {
-//            throw StoreManagementException.ddipBoxNotFound(ddipboxId);
-//        }
+        if (!ddipBox.getStore().getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "해당 가게의 띱박스가 아닙니다.");
+        }
 
         // 유효한 업데이트 작업인지 확인
-//        if (!request.hasValidOperation()) {
-//            throw StoreManagementException.invalidQuantityUpdate(ddipboxId, "유효하지 않은 수량 업데이트 요청");
-//        }
+        if (!request.hasValidOperation()) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_INVALID_QUANTITY, 
+                "유효하지 않은 수량 업데이트 요청입니다.");
+        }
 
-//        if (request.isDirectQuantityUpdate()) {
-//            // 직접 잔여 수량 설정
-//            if (request.remainingQuantity() > ddipBox.getDailyQuantity()) {
-//                throw StoreManagementException.invalidQuantityUpdate(
-//                    ddipboxId, "잔여 수량은 일일 수량을 초과할 수 없습니다"
-//                );
-//            }
-//            ddipBox.setRemainingQuantity(request.remainingQuantity());
-//
-//        } else if (request.isDailyQuantityReset()) {
-//            // 일일 수량 재설정 및 잔여 수량 초기화
-//            ddipBox.setDailyQuantity(request.dailyQuantity());
-//            ddipBox.setRemainingQuantity(request.dailyQuantity());
-//        }
+        if (request.isDirectQuantityUpdate()) {
+            // 직접 잔여 수량 설정
+            if (request.remainingQuantity() > ddipBox.getDailyQuantity()) {
+                throw new BusinessException(ErrorCode.STORE_MANAGEMENT_INVALID_QUANTITY,
+                    "잔여 수량은 일일 수량을 초과할 수 없습니다");
+            }
+            ddipBox.setRemainingQuantity(request.remainingQuantity());
+
+        } else if (request.isDailyQuantityReset()) {
+            // 일일 수량 재설정 및 잔여 수량 초기화
+            ddipBox.setDailyQuantity(request.dailyQuantity());
+            ddipBox.setRemainingQuantity(request.dailyQuantity());
+        }
 
         DdipBox updatedDdipBox = ddipBoxRepository.save(ddipBox);
 
@@ -203,13 +205,13 @@ public class DdipBoxManagementService {
         validateStoreOwnership(storeId, ownerId);
 
         // 띱박스 존재 확인
-        DdipBox ddipBox = ddipBoxRepository.findById(ddipboxId).get();
-//            .orElseThrow(() -> StoreManagementException.ddipBoxNotFound(ddipboxId));
+        DdipBox ddipBox = ddipBoxRepository.findById(ddipboxId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "띱박스를 찾을 수 없습니다."));
 
         // 띱박스가 해당 가게의 것인지 확인
-//        if (!ddipBox.getStore().getStoreId().equals(storeId)) {
-//            throw StoreManagementException.ddipBoxNotFound(ddipboxId);
-//        }
+        if (!ddipBox.getStore().getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "해당 가게의 띱박스가 아닙니다.");
+        }
 
         // 현재 상태와 동일한 경우 스킵
         if (ddipBox.getIsActive().equals(request.isActive())) {
@@ -258,8 +260,7 @@ public class DdipBoxManagementService {
         validateStoreOwnership(storeId, ownerId);
 
         // 모든 띱박스 조회 (비활성화된 것도 포함)
-        List<DdipBox> ddipBoxes = null;
-//        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
+        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
 
         return ddipBoxes.stream()
             .map(DdipBoxManagementResponse::from)
@@ -270,12 +271,12 @@ public class DdipBoxManagementService {
      * 가게 소유권 검증
      */
     private Store validateStoreOwnership(Long storeId, Long ownerId) {
-        Store store = storeRepository.findById(storeId).get();
-//            .orElseThrow(() -> StoreManagementException.storeNotFound(storeId));
+        Store store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_FOUND, "가게를 찾을 수 없습니다."));
 
-//        if (!store.getOwnerId().equals(ownerId)) {
-//            throw StoreManagementException.storeNotOwned(storeId, ownerId);
-//        }
+        if (!store.getOwnerId().equals(ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_NOT_OWNED, "해당 가게의 소유자가 아닙니다.");
+        }
 
         return store;
     }
@@ -284,22 +285,20 @@ public class DdipBoxManagementService {
      * 가격 구성 유효성 검증
      */
     private void validatePriceConfiguration(Long originalPrice, Long salePrice) {
-//        if (salePrice > originalPrice) {
-//            throw StoreManagementException.invalidPriceConfiguration(
-//                "판매가는 정가보다 높을 수 없습니다. 정가: " + originalPrice + ", 판매가: " + salePrice
-//            );
-//        }
+        if (salePrice > originalPrice) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_INVALID_PRICE, 
+                "판매가는 정가보다 높을 수 없습니다. 정가: " + originalPrice + ", 판매가: " + salePrice);
+        }
     }
 
     /**
      * 수량 구성 유효성 검증
      */
     private void validateQuantityConfiguration(Long dailyQuantity, Long maxPerCustomer) {
-//        if (maxPerCustomer > dailyQuantity) {
-//            throw StoreManagementException.invalidQuantityUpdate(
-//                null, "고객당 최대 구매 수량은 일일 수량보다 많을 수 없습니다. 일일수량: " + dailyQuantity + ", 고객당최대: " + maxPerCustomer
-//            );
-//        }
+        if (maxPerCustomer > dailyQuantity) {
+            throw new BusinessException(ErrorCode.STORE_MANAGEMENT_INVALID_QUANTITY, 
+                "고객당 최대 구매 수량은 일일 수량보다 많을 수 없습니다. 일일수량: " + dailyQuantity + ", 고객당최대: " + maxPerCustomer);
+        }
     }
 
     /**

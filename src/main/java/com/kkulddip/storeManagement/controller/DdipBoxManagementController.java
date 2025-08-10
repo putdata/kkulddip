@@ -7,6 +7,7 @@ import com.kkulddip.storeManagement.dto.request.UpdateDdipBoxQuantityRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreStatusRequest;
 import com.kkulddip.storeManagement.dto.response.DdipBoxManagementResponse;
 import com.kkulddip.storeManagement.service.DdipBoxManagementService;
+import com.kkulddip.storeManagement.util.OwnerExtractor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
             @PathVariable Long storeId,
             @Valid @RequestBody CreateDdipBoxRequest request) {
         
-        Long ownerId = getCurrentOwnerId();
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
         log.info("띱박스 생성 요청 - storeId: {}, ddipboxName: {}, ownerId: {}", 
             storeId, request.ddipboxName(), ownerId);
@@ -51,7 +52,7 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
             @PathVariable Long ddipboxId,
             @Valid @RequestBody UpdateDdipBoxRequest request) {
         
-        Long ownerId = getCurrentOwnerId();
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
         log.info("띱박스 수정 요청 - storeId: {}, ddipboxId: {}, ownerId: {}", 
             storeId, ddipboxId, ownerId);
@@ -70,7 +71,7 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
             @PathVariable Long ddipboxId,
             @Valid @RequestBody UpdateDdipBoxQuantityRequest request) {
         
-        Long ownerId = getCurrentOwnerId();
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
         log.info("띱박스 재고 업데이트 요청 - storeId: {}, ddipboxId: {}, ownerId: {}", 
             storeId, ddipboxId, ownerId);
@@ -90,7 +91,7 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
             @PathVariable Long ddipboxId,
             @Valid @RequestBody UpdateStoreStatusRequest request) {
         
-        Long ownerId = getCurrentOwnerId();
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
         log.info("띱박스 상태 변경 요청 - storeId: {}, ddipboxId: {}, isActive: {}, ownerId: {}", 
             storeId, ddipboxId, request.isActive(), ownerId);
@@ -109,7 +110,7 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
             @PathVariable Long storeId,
             @PathVariable Long ddipboxId) {
         
-        Long ownerId = getCurrentOwnerId();
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
         log.info("띱박스 삭제 요청 - storeId: {}, ddipboxId: {}, ownerId: {}", 
             storeId, ddipboxId, ownerId);
@@ -125,7 +126,7 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
     public ApiResponse<List<DdipBoxManagementResponse>> getDdipBoxesByStore(
             @PathVariable Long storeId) {
         
-        Long ownerId = getCurrentOwnerId();
+        Long ownerId = OwnerExtractor.getCurrentOwnerId();
         
         log.info("가게 띱박스 목록 조회 요청 - storeId: {}, ownerId: {}", storeId, ownerId);
         
@@ -135,17 +136,4 @@ public class DdipBoxManagementController implements DdipBoxManagementApi {
         return ApiResponse.of(responses);
     }
 
-    /**
-     * 현재 인증된 사장님의 ID를 가져옵니다.
-     * 실제 구현에서는 @AuthenticationPrincipal JwtUserInfo userInfo를 사용하여
-     * userInfo에서 사장님 ID를 추출해야 합니다.
-     */
-    private Long getCurrentOwnerId() {
-        // TODO: 실제 구현에서는 JWT에서 사장님 ID 추출
-        // 예시: @AuthenticationPrincipal JwtUserInfo userInfo 매개변수 사용
-        // return userInfo.getOwnerId();
-        
-        // 임시 하드코딩 (실제로는 JWT에서 추출)
-        return 1L;
-    }
 }
