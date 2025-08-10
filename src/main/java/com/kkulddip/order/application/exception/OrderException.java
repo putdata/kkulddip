@@ -79,6 +79,12 @@ public class OrderException extends BusinessException {
     public static OrderException orderUpdateFailed(String orderId, Throwable cause) {
         return new OrderException(ErrorCode.ORDER_UPDATE_FAILED, cause);
     }
+    
+    // 주문 중복 생성 방지
+    public static OrderException orderAlreadyProcessing(Long customerId) {
+        return new OrderException(ErrorCode.ORDER_ALREADY_EXISTS,
+            "이미 주문을 처리 중입니다. 잠시 후 다시 시도해주세요. CustomerId: " + customerId);
+    }
 
     public static OrderException orderPersistenceError(String orderId, Throwable cause) {
         return new OrderException(ErrorCode.ORDER_PERSISTENCE_ERROR, cause);

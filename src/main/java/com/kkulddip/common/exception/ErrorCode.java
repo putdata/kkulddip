@@ -94,6 +94,7 @@ public enum ErrorCode {
     PAYMENT_CONFIRM_FAILED(BAD_REQUEST, "PAYMENT_CONFIRM_FAILED", "결제 승인에 실패했습니다."),
     PAYMENT_CANCEL_FAILED(BAD_REQUEST, "PAYMENT_CANCEL_FAILED", "결제 취소에 실패했습니다."),
     PAYMENT_INVALID_KEY(BAD_REQUEST, "PAYMENT_INVALID_KEY", "유효하지 않은 결제 키입니다."),
+    PAYMENT_ALREADY_PROCESSING(CONFLICT, "PAYMENT_ALREADY_PROCESSING", "결제가 이미 처리 중입니다."),
     
     // 가게 도메인 에러
     STORE_NOT_FOUND(NOT_FOUND, "STORE_NOT_FOUND", "가게를 찾을 수 없습니다."),

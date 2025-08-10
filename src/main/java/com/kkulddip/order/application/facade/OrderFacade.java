@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kkulddip.common.lock.DistributedLock;
 import com.kkulddip.order.application.mapper.OrderMapper;
 import com.kkulddip.order.application.service.NotificationService;
 import com.kkulddip.order.application.service.OrderService;
@@ -39,6 +40,7 @@ public class OrderFacade {
     private final NotificationService notificationService;
     private final OrderMapper orderMapper;
     private final PriceValidationService priceValidationService;
+    private final DistributedLock distributedLock;
     
     /**
      * 1. 사용자로부터 주문 요청 처리
@@ -51,6 +53,13 @@ public class OrderFacade {
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
         log.info("주문 생성 요청 시작 - customerId: {}, storeId: {}", request.customerId(), request.storeId());
+        
+        String lockKey = "order:create:" + request.customerId();
+        
+        if (!distributedLock.tryLock(lockKey)) {
+            log.warn("⚠️ 주문 생성 중복 요청 감지: customerId={}", request.customerId());
+            throw OrderException.orderAlreadyProcessing(request.customerId());
+        }
         
         try {
             // 1. 요청 데이터를 도메인 객체로 변환
@@ -91,6 +100,8 @@ public class OrderFacade {
             log.error("주문 생성 중 오류 발생 - customerId: {}, storeId: {}", 
                 request.customerId(), request.storeId(), e);
             throw OrderException.orderCreationFailed(e);
+        } finally {
+            distributedLock.unlock(lockKey);
         }
     }
     
