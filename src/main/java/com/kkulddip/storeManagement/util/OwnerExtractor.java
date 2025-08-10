@@ -49,26 +49,6 @@ public final class OwnerExtractor {
     }
 
     /**
-     * 현재 인증된 사용자의 이메일을 반환
-     */
-    public static String getCurrentOwnerEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
-        }
-        
-        Object principal = authentication.getPrincipal();
-        
-        if (!(principal instanceof JwtUserInfo)) {
-            throw new IllegalStateException("JWT 인증 정보가 없습니다.");
-        }
-        
-        JwtUserInfo userInfo = (JwtUserInfo) principal;
-        return userInfo.email();
-    }
-
-    /**
      * 현재 인증된 사용자가 사장님인지 확인
      */
     public static boolean isCurrentUserOwner() {

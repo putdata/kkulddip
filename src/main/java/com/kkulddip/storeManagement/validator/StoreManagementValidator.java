@@ -1,7 +1,5 @@
 package com.kkulddip.storeManagement.validator;
 
-import com.kkulddip.storeManagement.exception.StoreManagementException;
-
 /**
  * 가게 관리 도메인 유효성 검증 유틸리티 클래스
  */
@@ -23,24 +21,6 @@ public final class StoreManagementValidator {
 
     private StoreManagementValidator() {
         // Utility class - prevent instantiation
-    }
-
-    /**
-     * 가게 ID 유효성 검증
-     */
-    public static void validateStoreId(Long storeId) {
-        if (storeId == null || storeId <= 0) {
-            throw StoreManagementException.storeNotFound(storeId);
-        }
-    }
-
-    /**
-     * 띱박스 ID 유효성 검증
-     */
-    public static void validateDdipBoxId(Long ddipboxId) {
-        if (ddipboxId == null || ddipboxId <= 0) {
-            throw StoreManagementException.ddipBoxNotFound(ddipboxId);
-        }
     }
 
     /**
@@ -113,27 +93,6 @@ public final class StoreManagementValidator {
         }
     }
 
-    /**
-     * 가격 구성 유효성 검증 (정가 vs 판매가)
-     */
-    public static void validatePriceConfiguration(Long originalPrice, Long salePrice) {
-        validatePrice(originalPrice, "정가");
-        validatePrice(salePrice, "판매가");
-        
-        if (salePrice > originalPrice) {
-            throw StoreManagementException.invalidPriceConfiguration(
-                "판매가(" + salePrice + "원)는 정가(" + originalPrice + "원)보다 높을 수 없습니다."
-            );
-        }
-        
-        // 할인율이 90% 이상인 경우 경고 (비즈니스 로직)
-        double discountRate = (double)(originalPrice - salePrice) / originalPrice * 100;
-        if (discountRate > 90.0) {
-            throw StoreManagementException.invalidPriceConfiguration(
-                "할인율이 90%를 초과할 수 없습니다. 현재 할인율: " + String.format("%.1f", discountRate) + "%"
-            );
-        }
-    }
 
     /**
      * 수량 유효성 검증
@@ -152,38 +111,6 @@ public final class StoreManagementValidator {
         }
     }
 
-    /**
-     * 수량 구성 유효성 검증 (일일 수량 vs 고객당 최대 수량)
-     */
-    public static void validateQuantityConfiguration(Long dailyQuantity, Long maxPerCustomer) {
-        validateQuantity(dailyQuantity, "일일 수량");
-        validateQuantity(maxPerCustomer, "고객당 최대 구매 수량");
-        
-        if (maxPerCustomer > dailyQuantity) {
-            throw StoreManagementException.invalidQuantityUpdate(
-                null, "고객당 최대 구매 수량(" + maxPerCustomer + "개)은 일일 수량(" + dailyQuantity + "개)보다 많을 수 없습니다."
-            );
-        }
-    }
-
-    /**
-     * 잔여 수량 유효성 검증
-     */
-    public static void validateRemainingQuantity(Long remainingQuantity, Long dailyQuantity) {
-        if (remainingQuantity == null) {
-            throw new IllegalArgumentException("잔여 수량은 필수입니다.");
-        }
-        
-        if (remainingQuantity < 0) {
-            throw new IllegalArgumentException("잔여 수량은 0개 이상이어야 합니다.");
-        }
-        
-        if (dailyQuantity != null && remainingQuantity > dailyQuantity) {
-            throw StoreManagementException.invalidQuantityUpdate(
-                null, "잔여 수량(" + remainingQuantity + "개)은 일일 수량(" + dailyQuantity + "개)을 초과할 수 없습니다."
-            );
-        }
-    }
 
     /**
      * 카테고리 유효성 검증

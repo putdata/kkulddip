@@ -4,8 +4,6 @@ import com.kkulddip.storeManagement.dto.request.CreateStoreRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateStoreStatusRequest;
 import com.kkulddip.storeManagement.dto.response.StoreManagementResponse;
-import com.kkulddip.storeManagement.exception.StoreManagementException;
-import com.kkulddip.storeManagement.service.StoreImageService;
 import com.kkulddip.store.entity.Store;
 import com.kkulddip.store.repository.StoreRepository;
 
@@ -25,7 +23,7 @@ import java.time.LocalDateTime;
 public class StoreManagementService {
     
     private final StoreRepository storeRepository;
-    private final StoreImageService storeImageService;
+    // private final StoreImageService storeImageService;
     
     /**
      * 가게 생성
@@ -132,12 +130,12 @@ public class StoreManagementService {
         }
         
         // 비활성화하는 경우 활성 주문 확인
-        if (!request.isActive()) {
-            // 가게가 이미 비활성화된 경우 예외 처리
-            if (!store.getIsActive()) {
-                throw StoreManagementException.storeAlreadyInactive(storeId);
-            }
-        }
+//        if (!request.isActive()) {
+//            // 가게가 이미 비활성화된 경우 예외 처리
+//            if (!store.getIsActive()) {
+//                throw StoreManagementException.storeAlreadyInactive(storeId);
+//            }
+//        }
         
         store.setIsActive(request.isActive());
         store.setUpdatedAt(LocalDateTime.now());
@@ -155,36 +153,36 @@ public class StoreManagementService {
     @Transactional
     public void deleteStore(Long storeId, Long ownerId) {
         log.info("가게 삭제 시작 - storeId: {}, ownerId: {}", storeId, ownerId);
-        
-        // 가게 이미지 먼저 삭제
-        try {
-            storeImageService.deleteImagesBeforeDeleteStore(storeId);
-        } catch (Exception e) {
-            log.error("가게 삭제 전 이미지 정리 실패 - storeId: {}", storeId, e);
-            // 이미지 삭제 실패해도 가게 삭제는 진행
-        }
-        
+
+//        // 가게 이미지 먼저 삭제
+//        try {
+//            storeImageService.deleteImagesBeforeDeleteStore(storeId);
+//        } catch (Exception e) {
+//            log.error("가게 삭제 전 이미지 정리 실패 - storeId: {}", storeId, e);
+//            // 이미지 삭제 실패해도 가게 삭제는 진행
+//        }
+
         UpdateStoreStatusRequest deleteRequest = UpdateStoreStatusRequest.builder()
             .isActive(false)
             .reason("가게 삭제")
             .build();
-        
+
         updateStoreStatus(storeId, deleteRequest, ownerId);
-        
+
         log.info("가게 삭제 완료 - storeId: {}", storeId);
     }
-    
+
     /**
      * 가게 소유권 검증
      */
     private Store validateStoreOwnership(Long storeId, Long ownerId) {
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> StoreManagementException.storeNotFound(storeId));
-        
-        if (!store.getOwnerId().equals(ownerId)) {
-            throw StoreManagementException.storeNotOwned(storeId, ownerId);
-        }
-        
+        Store store = storeRepository.findById(storeId).get();
+//            .orElseThrow(() -> StoreManagementException.storeNotFound(storeId));
+//
+//        if (!store.getOwnerId().equals(ownerId)) {
+//            throw StoreManagementException.storeNotOwned(storeId, ownerId);
+//        }
+
         return store;
     }
     
