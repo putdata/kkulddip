@@ -3,9 +3,10 @@ import { useLikes } from '@/hooks/useLikes';
 import { Loader2 } from 'lucide-react';
 
 const Likes = () => {
-  const { stores, isLoading } = useLikes(5);
+  const { data: stores, isLoading, isFetching, isSuccess } = useLikes(5);
 
-  const transformedStores = stores.map(store => ({
+  const transformedStores = stores?.map(store => ({
+    id: store.storeId,
     img: {
       src: store.storeProfileImage,
       alt: store.storeName,
@@ -21,7 +22,8 @@ const Likes = () => {
     discountRate: 0,
   }));
 
-  if (isLoading) {
+  // 로딩 중이거나 데이터를 가져오는 중일 때
+  if (isLoading || isFetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
@@ -32,8 +34,8 @@ const Likes = () => {
     );
   }
 
-  // 데이터가 없을 때
-  if (!stores || stores.length === 0) {
+  // 데이터가 성공적으로 로드되었지만 비어있을 때만
+  if (isSuccess && (!stores || stores.length === 0)) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center space-y-4 px-4">
         <div className="text-4xl">💔</div>
@@ -52,10 +54,10 @@ const Likes = () => {
   return (
     <div>
       <div className="space-y-2 px-2 pb-16 pt-16">
-        {transformedStores.map((item, idx) => {
+        {transformedStores?.map(item => {
           return (
             <LikeFoodCard
-              key={stores[idx]?.storeId}
+              key={item.id}
               item={item}
               onClick={() => console.log('매장 클릭')}
             />
