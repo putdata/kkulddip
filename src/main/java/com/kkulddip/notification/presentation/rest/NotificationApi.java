@@ -1,6 +1,7 @@
 package com.kkulddip.notification.presentation.rest;
 
 import com.kkulddip.common.response.ApiResponse;
+import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.notification.application.dto.request.NotificationRequest;
 import com.kkulddip.notification.application.dto.response.NotificationResponse;
 import com.kkulddip.notification.domain.model.enums.SubscriberType;
@@ -13,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -232,6 +233,6 @@ public interface NotificationApi {
             example = "CUSTOMER"
         ) @RequestParam SubscriberType subscriberType,
         
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     );
 }
