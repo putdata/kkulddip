@@ -26,17 +26,65 @@ public interface StoreApi {
 
     @Operation(
         summary = "가게 목록 조회",
-        description = "Cursor 기반 페이지네이션을 사용하여 가게 목록을 조회합니다."
+        description = "Cursor 기반 페이지네이션을 사용하여 가게 목록을 조회합니다. 거리 계산을 위해 사용자 위치 정보를 선택적으로 제공할 수 있습니다."
     )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "가게 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "content": [
+                              {
+                                "storeId": 1,
+                                "storeName": "친환경 마트",
+                                "storeImageUrl": "https://example.com/store1.jpg",
+                                "location": "서울시 강남구",
+                                "rating": 4.5,
+                                "reviewCount": 128,
+                                "distance": 0.8,
+                                "activeDdipBoxCount": 3
+                              }
+                            ],
+                            "hasNext": true,
+                            "nextCursor": "eyJzdG9yZUlkIjoxfQ==",
+                            "size": 10
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "400",
-            description = "잘못된 요청 파라미터"
+            description = "잘못된 요청 파라미터",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "size",
+                              "message": "페이지 크기는 1 이상이어야 합니다.",
+                              "rejectedValue": "0"
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<Page<StoreResponseDto>> getStores(
@@ -137,17 +185,58 @@ public interface StoreApi {
 
     @Operation(
         summary = "가게 상세 조회",
-        description = "특정 가게의 상세 정보를 조회합니다."
+        description = "특정 가게의 상세 정보를 조회합니다. 가게 정보, 운영 시간, 주소, 평점 등을 포함합니다."
     )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "가게 상세 조회 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "storeId": 1,
+                            "storeName": "친환경 마트",
+                            "storeImageUrl": "https://example.com/store1.jpg",
+                            "description": "신선한 유기농 식품을 판매하는 친환경 마트입니다.",
+                            "address": "서울특별시 강남구 테헤란로 123",
+                            "latitude": 37.5665,
+                            "longitude": 126.9780,
+                            "phoneNumber": "02-1234-5678",
+                            "openTime": "09:00",
+                            "closeTime": "22:00",
+                            "rating": 4.5,
+                            "reviewCount": 128,
+                            "activeDdipBoxCount": 3,
+                            "totalDdipBoxCount": 5
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "존재하지 않는 가게"
+            description = "존재하지 않는 가게",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "STORE_NOT_FOUND",
+                          "message": "가게를 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<StoreDetailDto> getStoreDetail(
