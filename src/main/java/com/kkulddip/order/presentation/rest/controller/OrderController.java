@@ -25,6 +25,7 @@ import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 import com.kkulddip.order.presentation.rest.api.OrderApi;
 
@@ -92,5 +93,23 @@ public class OrderController implements OrderApi {
         
         List<CustomerOrderHistoryResponse> orderHistory = orderFacade.getCustomerOrderHistory(customerId);
         return ApiResponse.of(200, orderHistory);
+    }
+
+    @Override
+    @GetMapping("/store-history")
+    public ApiResponse<List<OwnerOrderHistoryResponse>> getStoreOrderHistory(
+        @RequestParam Long storeId,
+        @AuthenticationPrincipal JwtUserInfo userInfo) {
+        
+        // JWT에서 ownerId 추출 및 권한 확인
+        if (!"OWNER".equals(userInfo.role())) {
+            throw OrderException.accessDenied("사장님만 가게 주문 내역을 조회할 수 있습니다.");
+        }
+        
+        Long ownerId = Long.valueOf(userInfo.userId());
+        StoreId storeIdVO = StoreId.of(storeId);
+        
+        List<OwnerOrderHistoryResponse> storeOrderHistory = orderFacade.getStoreOrderHistory(ownerId, storeIdVO);
+        return ApiResponse.of(200, storeOrderHistory);
     }
 }

@@ -16,11 +16,13 @@ import com.kkulddip.order.domain.model.vo.ProductId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.domain.service.OrderItemIdGenerator;
 import com.kkulddip.order.presentation.rest.dto.request.OrderItemRequest;
+import com.kkulddip.domain.customer.repository.CustomerRepository;
 import com.kkulddip.store.repository.DdipBoxRepository;
 import com.kkulddip.store.repository.StoreRepository;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
 @Slf4j
@@ -31,6 +33,7 @@ public class OrderMapper {
     private final OrderItemIdGenerator orderItemIdGenerator;
     private final StoreRepository storeRepository;
     private final DdipBoxRepository ddipBoxRepository;
+    private final CustomerRepository customerRepository;
     
     /**
      * CreateOrderRequest를 도메인 객체들로 변환
@@ -172,6 +175,59 @@ public class OrderMapper {
             .orElse("알 수 없는 상품");
             
         return CustomerOrderHistoryResponse.OrderItemResponse.builder()
+            .productId(orderItem.getProductId().value())
+            .productName(productName)
+            .quantity(orderItem.getQuantity())
+            .unitPrice(orderItem.getUnitPrice().amount().intValue())
+            .totalPrice(orderItem.calcDiscountPrice().amount().intValue())
+            .build();
+    }
+    
+    /**
+     * Order를 OwnerOrderHistoryResponse로 변환
+     */
+    public OwnerOrderHistoryResponse toOwnerOrderHistoryResponse(Order order) {
+        // Customer 이름 조회
+        String customerName = customerRepository.findCustomerNameByCustomerId(order.getCustomerId().value())
+            .orElse("알 수 없는 고객");
+            
+        return OwnerOrderHistoryResponse.builder()
+            .orderId(String.valueOf(order.getOrderId().value()))
+            .customerId(order.getCustomerId().value())
+            .customerName(customerName)
+            .orderItems(toOwnerOrderItemResponses(order.getOrderItems()))
+            .originalPrice(order.getOriginalPrice().amount().intValue())
+            .finalPrice(order.getFinalPrice().amount().intValue())
+            .orderStatus(order.getOrderStatus().name())
+            .orderDate(order.getOrderDate())
+            .pickupTime(order.getPickupTime())
+            .build();
+    }
+    
+    /**
+     * List<Order>를 List<OwnerOrderHistoryResponse>로 변환
+     */
+    public List<OwnerOrderHistoryResponse> toOwnerOrderHistoryResponses(List<Order> orders) {
+        return orders.stream()
+            .map(this::toOwnerOrderHistoryResponse)
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * OrderItem을 OwnerOrderHistoryResponse.OrderItemResponse로 변환
+     */
+    private List<OwnerOrderHistoryResponse.OrderItemResponse> toOwnerOrderItemResponses(List<OrderItem> orderItems) {
+        return orderItems.stream()
+            .map(this::toOwnerOrderItemResponse)
+            .collect(Collectors.toList());
+    }
+    
+    private OwnerOrderHistoryResponse.OrderItemResponse toOwnerOrderItemResponse(OrderItem orderItem) {
+        // DdipBox 이름 조회 (비활성화된 상품도 포함)
+        String productName = ddipBoxRepository.findDdipBoxNameById(orderItem.getProductId().value())
+            .orElse("알 수 없는 상품");
+            
+        return OwnerOrderHistoryResponse.OrderItemResponse.builder()
             .productId(orderItem.getProductId().value())
             .productName(productName)
             .quantity(orderItem.getQuantity())

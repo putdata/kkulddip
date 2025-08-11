@@ -6,10 +6,10 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record CustomerOrderHistoryResponse(
+public record OwnerOrderHistoryResponse(
     String orderId,
-    Long storeId,
-    String storeName,
+    Long customerId,
+    String customerName,
     List<OrderItemResponse> orderItems,
     Integer originalPrice,
     Integer finalPrice,

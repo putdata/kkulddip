@@ -34,6 +34,7 @@ import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
 @Slf4j
@@ -341,6 +342,34 @@ public class OrderFacade {
             
         } catch (Exception e) {
             log.error("고객 주문 내역 조회 중 오류 발생 - customerId: {}", customerId, e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
+    
+    /**
+     * 7. 사장님용 가게 주문 내역 조회
+     * - 권한 검증: 사장님이 소유한 가게의 주문만 조회 가능
+     * - 가게 ID로 주문 목록 조회
+     */
+    public List<OwnerOrderHistoryResponse> getStoreOrderHistory(Long ownerId, StoreId storeId) {
+        log.info("가게 주문 내역 조회 시작 - ownerId: {}, storeId: {}", ownerId, storeId.value());
+        
+        try {
+            // 권한 검증: 사장님이 해당 가게를 소유하고 있는지 확인
+            storeAuthService.validateOwnerPermission(ownerId, storeId);
+            
+            List<Order> orders = orderService.findByStoreId(storeId);
+            
+            log.info("가게 주문 내역 조회 완료 - ownerId: {}, storeId: {}, count: {}", 
+                ownerId, storeId.value(), orders.size());
+            
+            return orderMapper.toOwnerOrderHistoryResponses(orders);
+            
+        } catch (Exception e) {
+            if (e instanceof OrderException) {
+                throw e;
+            }
+            log.error("가게 주문 내역 조회 중 오류 발생 - ownerId: {}, storeId: {}", ownerId, storeId.value(), e);
             throw OrderException.orderDatabaseError(e);
         }
     }
