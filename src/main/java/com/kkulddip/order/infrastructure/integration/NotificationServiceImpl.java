@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.kkulddip.order.application.service.NotificationService;
 import com.kkulddip.order.application.exception.OrderException;
-import com.kkulddip.order.infrastructure.integration.dto.enums.NotificationType;
+import com.kkulddip.notification.domain.model.enums.NotificationType;
 import com.kkulddip.order.infrastructure.persistence.redis.RedisNotificationPublisher;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
                 customerId,
                 "주문 알림", // 기본 제목
                 message,
-                NotificationType.ORDER_AWAITING_CONFIRMATION
+                NotificationType.ORDER
             );
             
             log.info("고객에게 알림 전송 완료 - customerId: {}", customerId);
@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
                 storeId,
                 "주문 알림", // 기본 제목
                 message,
-                NotificationType.ORDER_AWAITING_CONFIRMATION
+                NotificationType.ORDER
             );
             
             log.info("가게 사장에게 알림 전송 완료 - storeId: {}", storeId);
