@@ -1,4 +1,7 @@
 import { Star } from 'lucide-react';
+import { useStarRating } from '@/hooks/useStarRating'; // 1. import 추가
+
+// 2. 기존 useState 삭제하고 커스텀 훅 사용
 
 interface Store {
   storeId: number;
@@ -9,15 +12,11 @@ interface Store {
 
 interface ReviewCreateHeaderProps {
   store: Store;
-  rating: number;
-  setRating: (rating: number) => void;
 }
 
-const ReviewCreateHeader = ({
-  store,
-  rating,
-  setRating,
-}: ReviewCreateHeaderProps) => {
+const ReviewCreateHeader = ({ store }: ReviewCreateHeaderProps) => {
+  const { handleStarClick, isStarFilled } = useStarRating(0);
+
   return (
     <div className="flex w-full items-center justify-between">
       {/* 상단 왼쪽 */}
@@ -31,23 +30,21 @@ const ReviewCreateHeader = ({
           </div>
         </div>
         <div className="flex items-center">
-          {[1, 2, 3, 4, 5].map(star => {
+          {[1, 2, 3, 4, 5].map(star => (
             // 현재 별이 채워져야 하는지 판단
-            const isFilled = star <= rating;
-
-            return (
-              <Star
-                key={star}
-                className={`h-6 w-6 cursor-pointer transition-colors ${
-                  isFilled ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                }`}
-                onClick={() => {
-                  setRating(star);
-                  console.log('선택된 별점:', star);
-                }}
-              />
-            );
-          })}
+            <Star
+              key={star}
+              className={`h-6 w-6 cursor-pointer transition-colors ${
+                isStarFilled(star)
+                  ? 'fill-yellow-400 text-yellow-400'
+                  : 'text-gray-300'
+              }`}
+              onClick={() => {
+                handleStarClick(star);
+                console.log('선택된 별점:', star);
+              }}
+            />
+          ))}
         </div>
       </div>
 
