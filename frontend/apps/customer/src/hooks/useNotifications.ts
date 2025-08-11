@@ -3,7 +3,8 @@ import type { Notification } from '@/types/notification';
 import { dummyNotifications } from '@/dummies/notifications';
 
 export const useNotifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(dummyNotifications);
+  const [notifications, setNotifications] =
+    useState<Notification[]>(dummyNotifications);
 
   const unreadCount = notifications.filter(
     notification => !notification.isRead,
