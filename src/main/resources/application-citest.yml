@@ -99,6 +99,10 @@ toss:
         test-secret-key: test
         test-client-key: test
         base-url: https://api.tosspayments.com
+
+openvidu:
+    url: https://stream.kkulddip.store
+    secret: MY_SECRET
         
 management:
     server:
