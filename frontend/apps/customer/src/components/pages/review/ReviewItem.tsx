@@ -3,42 +3,30 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import type { ReviewResponse } from '@/types/review';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
 
-interface Review {
-  id: number;
-  user: {
-    name: string;
-    usageCount: number;
-  };
-  rating: number;
-  content: string;
-  //   TODO: 이미지 경로로 수정 필요
-  images: { emoji: string }[];
-  createDate: string;
-}
-
 interface ReviewProps {
-  review: Review;
+  review: ReviewResponse;
 }
 
 const ReviewItem = ({ review }: ReviewProps) => {
   return (
-    <Card key={review.id} className="w-full rounded-none bg-white">
+    <Card key={review.reviewId} className="w-full rounded-none bg-white">
       <CardContent className="flex flex-col items-start gap-3 px-5">
         <div className="flex w-full items-start justify-between">
           <div className="inline-flex items-center gap-3">
             {/* TODO: 유저 프로필 사진 어떻게 할 것 인지 논의 필요... */}
             <Avatar className="h-10 w-10 bg-amber-500">
               <AvatarFallback className="bg-amber-500 text-sm font-bold text-white">
-                {review.user.name.charAt(0)}
+                {review.userName.charAt(0)}
               </AvatarFallback>
             </Avatar>
 
             <div className="inline-flex flex-col items-start gap-1">
               <div className="flex items-center gap-2">
                 <div className="font-normal text-gray-700">
-                  {review.user.name}님
+                  {review.userName}님
                 </div>
 
                 {review.images.length >= 1 && (
@@ -53,7 +41,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
           </div>
           {/* 리뷰 작성 날짜 */}
           <div className="text-sm font-normal text-gray-400">
-            {review.createDate}
+            {review.createdAt.slice(0, 10)}{' '}
           </div>
         </div>
         {/* 리뷰 내용 */}
@@ -70,7 +58,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
                 key={index}
                 className="flex h-20 w-20 items-center justify-center overflow-hidden rounded bg-gray-100"
               >
-                <div className="text-2xl">{image.emoji}</div>
+                <img src={review.profileImage} alt="" />
               </div>
             ))}
           </div>

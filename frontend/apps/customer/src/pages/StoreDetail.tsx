@@ -3,7 +3,7 @@ import { StoreDetailContainer } from '@/components/pages/storeDetail/StoreDetail
 import { mockStoreDetail } from '@/dummies/storeDetailDummy';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StoreReviewsContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreReviews/StoreReviewsContainer';
-import { reviewMockData } from '@/constants/reviewMockData';
+import { mockReviews } from '@/dummies/reviewDummy';
 // import { useParams } from 'react-router-dom';
 
 const StoreDetail = () => {
@@ -11,7 +11,8 @@ const StoreDetail = () => {
   // const storeId = params.storeId;
 
   const store = mockStoreDetail;
-  const reviews = reviewMockData;
+  const reviews = mockReviews[1];
+  const reviewTotalCount = store.reviewCount;
 
   return (
     <div className="bg-gray-100 font-[segoe_ui]">
@@ -37,7 +38,10 @@ const StoreDetail = () => {
           <StoreDetailContainer store={store} />
         </TabsContent>
         <TabsContent value="reviews">
-          <StoreReviewsContainer reviews={reviews} />
+          <StoreReviewsContainer
+            reviews={reviews}
+            reviewTotalCount={reviewTotalCount}
+          />
         </TabsContent>
       </Tabs>
     </div>

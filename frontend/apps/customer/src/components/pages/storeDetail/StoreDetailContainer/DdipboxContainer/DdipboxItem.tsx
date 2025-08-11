@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { STORE_DETAIL_MESSAGES } from '@/constants/storeDetail';
-import type { DdipBoxSummaryDto } from '@/dummies/storeDetailDummy';
+import type { DdipBoxSummaryDto } from '@/types/store';
 
 interface RandomItemProps {
   ddipbox: DdipBoxSummaryDto;

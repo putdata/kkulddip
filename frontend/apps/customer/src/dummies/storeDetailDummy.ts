@@ -1,43 +1,6 @@
 // 가게 상세 페이지 Mock Data
 
-export interface DdipBoxItem {
-  itemId: number;
-  ddipboxItemName: string;
-  originalPrice: number;
-  itemQuantity: number;
-}
-
-export interface DdipBoxSummaryDto {
-  ddipboxId: number;
-  ddipboxName: string;
-  category: string;
-  originalPrice: number;
-  salePrice: number;
-  remainingQuantity: number;
-  active: boolean;
-  isRandom: boolean;
-  ddipBoxItem: DdipBoxItem[]; // isRandom이 True면 약 8~10개, False 면 약 2~3개
-}
-
-export interface StoreDetailDto {
-  storeId: number;
-  ownerId: number;
-  storeName: string;
-  storeAddress: string;
-  description: string;
-  operatingHours: string;
-  phoneNumber: string;
-  ratingAverage: number;
-  reviewCount: number;
-  businessNumber: string;
-  storeProfileImage: string;
-  latitude: number;
-  longitude: number;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-  ddipBoxes: DdipBoxSummaryDto[];
-}
+import type { StoreDetailDto } from '@/types/store';
 
 // Mock Data
 export const mockStoreDetail: StoreDetailDto = {
@@ -90,13 +53,13 @@ export const mockStoreDetail: StoreDetailDto = {
         },
         {
           itemId: 121,
-          ddipboxItemName: '크로와상',
+          ddipboxItemName: '타르트',
           originalPrice: 3500,
           itemQuantity: 1,
         },
         {
           itemId: 121,
-          ddipboxItemName: '크로와상',
+          ddipboxItemName: '타르트',
           originalPrice: 3500,
           itemQuantity: 1,
         },
