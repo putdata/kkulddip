@@ -3,8 +3,10 @@ package com.kkulddip.owner.controller;
 import com.kkulddip.common.response.ApiResponse;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.owner.dto.request.SettlementQueryRequest;
+import com.kkulddip.owner.dto.request.MonthlySettlementRangeRequest;
 import com.kkulddip.owner.dto.response.SettlementResponse;
 import com.kkulddip.owner.dto.response.SettlementSummaryResponse;
+import com.kkulddip.owner.dto.response.MonthlySettlementResponse;
 import com.kkulddip.owner.service.OwnerSettlementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +53,23 @@ public class OwnerSettlementController implements OwnerSettlementApi {
         
         Long ownerId = Long.parseLong(userInfo.userId());
         SettlementSummaryResponse response = ownerSettlementService.getOwnerSettlementSummary(ownerId, request);
+        
+        return ApiResponse.of(HttpStatus.OK.value(), response);
+    }
+
+    @GetMapping("/stores/{storeId}/settlement/monthly")
+    @Override
+    public ApiResponse<MonthlySettlementResponse> getStoreMonthlySettlement(
+        @AuthenticationPrincipal JwtUserInfo userInfo,
+        @PathVariable Long storeId,
+        @Valid MonthlySettlementRangeRequest request) {
+        
+        log.info("가게 월별 정산 조회 요청 - userId: {}, storeId: {}, 시작: {}/{}, 종료: {}/{}", 
+            userInfo.userId(), storeId, request.startYear(), request.startMonth(), 
+            request.endYear(), request.endMonth());
+        
+        Long ownerId = Long.parseLong(userInfo.userId());
+        MonthlySettlementResponse response = ownerSettlementService.getStoreMonthlySettlement(ownerId, storeId, request);
         
         return ApiResponse.of(HttpStatus.OK.value(), response);
     }

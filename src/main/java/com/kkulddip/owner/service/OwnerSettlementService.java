@@ -3,9 +3,12 @@ package com.kkulddip.owner.service;
 import com.kkulddip.order.infrastructure.persistence.jpa.repository.OrderJpaRepository;
 import com.kkulddip.order.infrastructure.persistence.jpa.repository.OrderJpaRepository.SettlementProjection;
 import com.kkulddip.order.infrastructure.persistence.jpa.repository.OrderJpaRepository.StoreSettlementProjection;
+import com.kkulddip.order.infrastructure.persistence.jpa.repository.OrderJpaRepository.MonthlySettlementProjection;
 import com.kkulddip.owner.dto.request.SettlementQueryRequest;
+import com.kkulddip.owner.dto.request.MonthlySettlementRangeRequest;
 import com.kkulddip.owner.dto.response.SettlementResponse;
 import com.kkulddip.owner.dto.response.SettlementSummaryResponse;
+import com.kkulddip.owner.dto.response.MonthlySettlementResponse;
 import com.kkulddip.owner.exception.UnauthorizedStoreAccessException;
 import com.kkulddip.owner.mapper.OwnerMapper;
 import com.kkulddip.store.entity.Store;
@@ -140,6 +143,60 @@ public class OwnerSettlementService {
             ownerId, response.totalRevenue(), response.totalOrderCount(), response.storeCount());
 
         return response;
+    }
+
+    public MonthlySettlementResponse getStoreMonthlySettlement(Long ownerId, Long storeId, MonthlySettlementRangeRequest request) {
+        log.info("가게 월별 정산 조회 요청 - ownerId: {}, storeId: {}, 시작: {}/{}, 종료: {}/{}", 
+            ownerId, storeId, request.startYear(), request.startMonth(), request.endYear(), request.endMonth());
+
+        validateStoreOwnership(ownerId, storeId);
+        validateDateRange(request);
+
+        Store store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new StoreNotFoundException("Store not found with ID: " + storeId));
+
+        YearMonth startPeriod = YearMonth.of(request.startYear(), request.startMonth());
+        YearMonth endPeriod = YearMonth.of(request.endYear(), request.endMonth());
+
+        List<MonthlySettlementProjection> monthlyData = orderJpaRepository.findMonthlySettlementByStoreIdAndPeriod(
+            storeId, 
+            request.startYear(), 
+            request.startMonth(),
+            request.endYear(),
+            request.endMonth()
+        );
+
+        MonthlySettlementResponse response = ownerMapper.toMonthlySettlementResponse(
+            storeId,
+            store.getStoreName(),
+            startPeriod,
+            endPeriod,
+            monthlyData
+        );
+
+        log.info("가게 월별 정산 조회 완료 - storeId: {}, 조회 월 수: {}, 총 매출: {}", 
+            storeId, response.totalMonths(), response.totalRevenue());
+
+        return response;
+    }
+
+    private void validateDateRange(MonthlySettlementRangeRequest request) {
+        YearMonth startPeriod = YearMonth.of(request.startYear(), request.startMonth());
+        YearMonth endPeriod = YearMonth.of(request.endYear(), request.endMonth());
+
+        if (startPeriod.isAfter(endPeriod)) {
+            throw new IllegalArgumentException("시작 날짜가 종료 날짜보다 늦을 수 없습니다.");
+        }
+
+        long monthsBetween = java.time.temporal.ChronoUnit.MONTHS.between(startPeriod, endPeriod) + 1;
+        if (monthsBetween > 12) {
+            throw new IllegalArgumentException("조회 가능한 최대 기간은 12개월입니다.");
+        }
+
+        YearMonth currentMonth = YearMonth.now();
+        if (endPeriod.isAfter(currentMonth)) {
+            throw new IllegalArgumentException("미래 날짜의 정산 데이터는 조회할 수 없습니다.");
+        }
     }
 
     private SettlementSummaryResponse createEmptySettlementSummary(YearMonth period) {

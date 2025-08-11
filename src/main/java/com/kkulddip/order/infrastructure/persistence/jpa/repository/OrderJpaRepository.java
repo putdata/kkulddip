@@ -123,10 +123,45 @@ public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
     }
 
     /**
+     * 특정 가게의 기간별 정산 데이터 조회 (CONFIRMED 상태만)
+     */
+    @Query("""
+        SELECT 
+            YEAR(o.orderDate) as year,
+            MONTH(o.orderDate) as month,
+            COALESCE(SUM(o.finalPrice), 0) as totalRevenue,
+            COUNT(o) as orderCount
+        FROM OrderEntity o 
+        WHERE o.storeId = :storeId 
+        AND o.orderStatus = 'CONFIRMED'
+        AND ((YEAR(o.orderDate) = :startYear AND MONTH(o.orderDate) >= :startMonth) OR YEAR(o.orderDate) > :startYear)
+        AND ((YEAR(o.orderDate) = :endYear AND MONTH(o.orderDate) <= :endMonth) OR YEAR(o.orderDate) < :endYear)
+        GROUP BY YEAR(o.orderDate), MONTH(o.orderDate)
+        ORDER BY YEAR(o.orderDate), MONTH(o.orderDate)
+        """)
+    List<MonthlySettlementProjection> findMonthlySettlementByStoreIdAndPeriod(
+        @Param("storeId") Long storeId,
+        @Param("startYear") Integer startYear,
+        @Param("startMonth") Integer startMonth,
+        @Param("endYear") Integer endYear,
+        @Param("endMonth") Integer endMonth
+    );
+
+    /**
      * 가게별 정산 데이터 조회용 Projection 인터페이스
      */
     interface StoreSettlementProjection {
         Long getStoreId();
+        Long getTotalRevenue();
+        Long getOrderCount();
+    }
+
+    /**
+     * 월별 정산 데이터 조회용 Projection 인터페이스
+     */
+    interface MonthlySettlementProjection {
+        Integer getYear();
+        Integer getMonth();
         Long getTotalRevenue();
         Long getOrderCount();
     }

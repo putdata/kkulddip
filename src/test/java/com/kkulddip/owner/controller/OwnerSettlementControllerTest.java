@@ -2,8 +2,10 @@ package com.kkulddip.owner.controller;
 
 import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.owner.dto.request.SettlementQueryRequest;
+import com.kkulddip.owner.dto.request.MonthlySettlementRangeRequest;
 import com.kkulddip.owner.dto.response.SettlementResponse;
 import com.kkulddip.owner.dto.response.SettlementSummaryResponse;
+import com.kkulddip.owner.dto.response.MonthlySettlementResponse;
 import com.kkulddip.common.exception.GlobalExceptionHandler;
 import com.kkulddip.owner.exception.UnauthorizedStoreAccessException;
 import com.kkulddip.owner.service.OwnerSettlementService;
@@ -281,6 +283,121 @@ class OwnerSettlementControllerTest {
         mockMvc.perform(get("/v1/owners/settlement/summary")
                 .param("year", "invalid")
                 .param("month", "3")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        then(ownerSettlementService).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("가게 월별 정산 리스트 조회 성공")
+    void getStoreMonthlySettlement_Success() throws Exception {
+        // given
+        MonthlySettlementResponse.MonthlySettlementData data1 = 
+            new MonthlySettlementResponse.MonthlySettlementData(
+                YearMonth.of(2024, 4),
+                1200000L, 80L, 15000.0,
+                1000000L, 70L, 20, 14
+            );
+        
+        MonthlySettlementResponse.MonthlySettlementData data2 = 
+            new MonthlySettlementResponse.MonthlySettlementData(
+                YearMonth.of(2024, 5),
+                1350000L, 90L, 15000.0,
+                1200000L, 80L, 12, 12
+            );
+
+        MonthlySettlementResponse response = new MonthlySettlementResponse(
+            storeId, "테스트 가게",
+            List.of(data1, data2),
+            YearMonth.of(2024, 4),
+            YearMonth.of(2024, 5),
+            2,
+            2550000L, 170L,
+            1275000.0, 12.5
+        );
+
+        given(ownerSettlementService.getStoreMonthlySettlement(
+            eq(ownerId), eq(storeId), any(MonthlySettlementRangeRequest.class)))
+            .willReturn(response);
+
+        // when & then
+        mockMvc.perform(get("/v1/owners/stores/{storeId}/settlement/monthly", storeId)
+                .param("startYear", "2024")
+                .param("startMonth", "4")
+                .param("endYear", "2024")
+                .param("endMonth", "5")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.status").value(200))
+            .andExpect(jsonPath("$.body.storeId").value(1))
+            .andExpect(jsonPath("$.body.storeName").value("테스트 가게"))
+            .andExpect(jsonPath("$.body.totalMonths").value(2))
+            .andExpect(jsonPath("$.body.totalRevenue").value(2550000))
+            .andExpect(jsonPath("$.body.totalOrderCount").value(170))
+            .andExpect(jsonPath("$.body.averageMonthlyRevenue").value(1275000.0))
+            .andExpect(jsonPath("$.body.overallGrowthRate").value(12.5))
+            .andExpect(jsonPath("$.body.monthlyData").value(hasSize(2)))
+            .andExpect(jsonPath("$.body.monthlyData[0].period[0]").value(2024))
+            .andExpect(jsonPath("$.body.monthlyData[0].period[1]").value(4))
+            .andExpect(jsonPath("$.body.monthlyData[0].totalRevenue").value(1200000))
+            .andExpect(jsonPath("$.body.monthlyData[0].orderCount").value(80))
+            .andExpect(jsonPath("$.body.monthlyData[0].revenueGrowthRate").value(20))
+            .andExpect(jsonPath("$.body.monthlyData[1].period[0]").value(2024))
+            .andExpect(jsonPath("$.body.monthlyData[1].period[1]").value(5))
+            .andExpect(jsonPath("$.body.monthlyData[1].totalRevenue").value(1350000))
+            .andExpect(jsonPath("$.body.monthlyData[1].revenueGrowthRate").value(12));
+
+        then(ownerSettlementService).should().getStoreMonthlySettlement(
+            eq(ownerId), eq(storeId), any(MonthlySettlementRangeRequest.class));
+    }
+
+    @Test
+    @DisplayName("가게 월별 정산 조회 실패 - 잘못된 날짜 범위")
+    void getStoreMonthlySettlement_InvalidDateRange() throws Exception {
+        // given
+        given(ownerSettlementService.getStoreMonthlySettlement(
+            eq(ownerId), eq(storeId), any(MonthlySettlementRangeRequest.class)))
+            .willThrow(new IllegalArgumentException("시작 날짜가 종료 날짜보다 늦을 수 없습니다."));
+
+        // when & then - 시작 날짜가 종료 날짜보다 늦음
+        mockMvc.perform(get("/v1/owners/stores/{storeId}/settlement/monthly", storeId)
+                .param("startYear", "2024")
+                .param("startMonth", "6")
+                .param("endYear", "2024") 
+                .param("endMonth", "4") // 시작보다 이전
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        then(ownerSettlementService).should().getStoreMonthlySettlement(
+            eq(ownerId), eq(storeId), any(MonthlySettlementRangeRequest.class));
+    }
+
+    @Test
+    @DisplayName("가게 월별 정산 조회 실패 - 잘못된 년도")
+    void getStoreMonthlySettlement_InvalidYear() throws Exception {
+        // when & then
+        mockMvc.perform(get("/v1/owners/stores/{storeId}/settlement/monthly", storeId)
+                .param("startYear", "2019") // 2020 미만
+                .param("startMonth", "1")
+                .param("endYear", "2024")
+                .param("endMonth", "6")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        then(ownerSettlementService).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("가게 월별 정산 조회 실패 - 필수 파라미터 누락")
+    void getStoreMonthlySettlement_MissingParams() throws Exception {
+        // when & then - startYear 누락
+        mockMvc.perform(get("/v1/owners/stores/{storeId}/settlement/monthly", storeId)
+                .param("startMonth", "1")
+                .param("endYear", "2024")
+                .param("endMonth", "6")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
 
