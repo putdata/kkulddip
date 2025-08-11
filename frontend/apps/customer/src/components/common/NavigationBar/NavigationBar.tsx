@@ -2,7 +2,7 @@ import { MapPin, Bell, Menu } from 'lucide-react';
 
 const NavigationBar = () => {
   return (
-    <nav className="flex items-center justify-between bg-white px-4 py-3 shadow-md">
+    <nav className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between bg-white px-4 py-3 shadow-md">
       <div className="flex items-center space-x-2">
         <img src="/logo.png" alt="logo" className="h-6 w-6" />
         <span className="text-lg font-semibold text-amber-600">꿀띱</span>

@@ -1,24 +1,20 @@
 /**
- * 카드 아이템 인터페이스
+ * 카드 아이템 인터페이스 (실제 사용 필드만)
  */
 export interface CardItem {
-  storeInfo: {
-    storeName: string;
-    description: string;
-    ratingAverage: number;
-  };
   img: {
     src: string;
     alt: string;
   };
+  storeInfo: {
+    storeName: string;
+    ratingAverage: number;
+  };
+  distance: number;
   price: {
-    original?: number;
     discount: number;
   };
-  timeLeftHour?: number;
   discountRate?: number;
-  distance: number;
-  remainingQuantity?: number;
 }
 
 /**
