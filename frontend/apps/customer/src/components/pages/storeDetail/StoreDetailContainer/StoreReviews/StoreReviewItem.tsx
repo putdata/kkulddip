@@ -1,5 +1,5 @@
+import { StarRating } from '@/components/common/StarRating';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star } from 'lucide-react';
 
 interface Review {
   id: number;
@@ -33,18 +33,7 @@ const StoreReviewItem = ({ review }: ReviewProps) => {
                 </div>
               </div>
               {/* 별점 표시 */}
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <Star
-                    key={star}
-                    className={`h-3 w-3 ${
-                      star <= review.rating
-                        ? 'fill-amber-500 text-amber-500'
-                        : 'fill-gray-200 text-gray-200'
-                    }`}
-                  />
-                ))}
-              </div>
+              <StarRating rating={review.rating} />
             </div>
           </div>
           {/* 리뷰 작성 날짜 */}
