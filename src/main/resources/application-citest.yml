@@ -100,7 +100,10 @@ toss:
         test-client-key: test
         base-url: https://api.tosspayments.com
         
+firebase:
+    service-account-key: ""
+    project-id: ""
+
 management:
     server:
         port: 8080
-
