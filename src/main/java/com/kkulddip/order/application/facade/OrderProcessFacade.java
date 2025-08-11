@@ -1,11 +1,9 @@
 package com.kkulddip.order.application.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,22 +23,24 @@ import com.kkulddip.order.domain.model.vo.CustomerId;
 import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.common.event.OrderCreatedEvent;
-import com.kkulddip.order.application.dto.request.HandleOrderConfirmedRequest;
 import com.kkulddip.order.application.dto.request.HandlePaymentResultRequest;
 import com.kkulddip.order.application.exception.OrderException;
 import com.kkulddip.order.presentation.rest.dto.request.ConfirmationAction;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
 import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
-import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
-import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
-import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
+/**
+ * 주문 처리 흐름 담당 Facade
+ * - 주문 생성
+ * - 결제 결과 처리  
+ * - 주문 확정/거절 처리
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class OrderFacade {
+public class OrderProcessFacade {
     
     private final OrderService orderService;
     private final EventPublisher eventPublisher;
@@ -188,69 +188,7 @@ public class OrderFacade {
     }
     
     /**
-     * 3. 주문 확정 이벤트 수신 처리
-     * - 이벤트의 주문 번호로 Order Entity 찾기
-     * - 주문 상태 변경 (주문 완료)
-     * - 푸시 알림 요청 (system → user)
-     */
-    @Transactional
-    public void handleOrderConfirmed(HandleOrderConfirmedRequest request) {
-        log.info("주문 확정 이벤트 처리 시작 - orderId: {}, storeId: {}", 
-            request.orderId(), request.storeId());
-        
-        try {
-            // 1. 주문 조회
-            OrderId orderId = OrderId.of(request.orderId());
-            Order order = orderService.findByOrderId(orderId);
-            
-            // 2. 주문 상태 변경 (주문 완료)
-            orderService.changeOrderStatus(order, OrderStatus.CONFIRMED);
-            log.info("주문 상태 변경 완료 - orderId: {}, status: CONFIRMED", 
-                order.getOrderId().value());
-            
-            // 3. 푸시 알림 요청 (system → user)
-            notificationService.sendNotificationToCustomer(
-                order.getCustomerId().value(),
-                "주문이 확정되었습니다. 음식을 준비 중입니다."
-            );
-            
-            log.info("주문 확정 이벤트 처리 완료 - orderId: {}", request.orderId());
-            
-        } catch (Exception e) {
-            log.error("주문 확정 처리 중 오류 발생 - orderId: {}, storeId: {}", 
-                request.orderId(), request.storeId(), e);
-            throw OrderException.orderUpdateFailed(String.valueOf(request.orderId()), e);
-        }
-    }
-    
-    /**
-     * 4. 가게의 대기 중인 주문 목록 조회 (사장님용)
-     * - 권한 검증 후 특정 가게의 AWAITING_CONFIRMATION 상태 주문들을 조회
-     */
-    public List<PendingOrderResponse> getPendingOrdersByStore(Long ownerId, StoreId storeId) {
-        log.info("가게 대기 주문 조회 시작 - ownerId: {}, storeId: {}", ownerId, storeId.value());
-        
-        try {
-            // 권한 검증: 사장님이 해당 가게를 소유하고 있는지 확인
-            storeAuthService.validateOwnerPermission(ownerId, storeId);
-            
-            List<Order> pendingOrders = orderService.findPendingOrdersByStore(storeId);
-            log.info("가게 대기 주문 조회 완료 - ownerId: {}, storeId: {}, count: {}", 
-                ownerId, storeId.value(), pendingOrders.size());
-            
-            return orderMapper.toPendingOrderResponses(pendingOrders);
-            
-        } catch (Exception e) {
-            if (e instanceof OrderException) {
-                throw e;
-            }
-            log.error("가게 대기 주문 조회 중 오류 발생 - ownerId: {}, storeId: {}", ownerId, storeId.value(), e);
-            throw OrderException.orderDatabaseError(e);
-        }
-    }
-    
-    /**
-     * 5. 주문 확정/거절 처리 (사장님용)
+     * 3. 주문 확정/거절 처리 (사장님용)
      * - 권한 검증: 해당 주문의 가게를 사장님이 소유하고 있는지 확인
      * - 주문 확정 시 픽업 시간 설정
      * - 주문 거절 시 취소 처리
@@ -321,56 +259,6 @@ public class OrderFacade {
             log.error("주문 확정/거절 처리 중 오류 발생 - ownerId: {}, orderId: {}", 
                 ownerId, orderId.value(), e);
             throw OrderException.orderUpdateFailed(String.valueOf(orderId.value()), e);
-        }
-    }
-    
-    /**
-     * 6. 고객 주문 내역 조회
-     * - 권한 검증: 본인의 주문만 조회 가능
-     * - 고객 ID로 주문 목록 조회
-     */
-    public List<CustomerOrderHistoryResponse> getCustomerOrderHistory(Long customerId) {
-        log.info("고객 주문 내역 조회 시작 - customerId: {}", customerId);
-        
-        try {
-            CustomerId customerIdVO = CustomerId.of(customerId);
-            List<Order> orders = orderService.findByCustomerId(customerIdVO);
-            
-            log.info("고객 주문 내역 조회 완료 - customerId: {}, count: {}", customerId, orders.size());
-            
-            return orderMapper.toCustomerOrderHistoryResponses(orders);
-            
-        } catch (Exception e) {
-            log.error("고객 주문 내역 조회 중 오류 발생 - customerId: {}", customerId, e);
-            throw OrderException.orderDatabaseError(e);
-        }
-    }
-    
-    /**
-     * 7. 사장님용 가게 주문 내역 조회
-     * - 권한 검증: 사장님이 소유한 가게의 주문만 조회 가능
-     * - 가게 ID로 주문 목록 조회
-     */
-    public List<OwnerOrderHistoryResponse> getStoreOrderHistory(Long ownerId, StoreId storeId) {
-        log.info("가게 주문 내역 조회 시작 - ownerId: {}, storeId: {}", ownerId, storeId.value());
-        
-        try {
-            // 권한 검증: 사장님이 해당 가게를 소유하고 있는지 확인
-            storeAuthService.validateOwnerPermission(ownerId, storeId);
-            
-            List<Order> orders = orderService.findByStoreId(storeId);
-            
-            log.info("가게 주문 내역 조회 완료 - ownerId: {}, storeId: {}, count: {}", 
-                ownerId, storeId.value(), orders.size());
-            
-            return orderMapper.toOwnerOrderHistoryResponses(orders);
-            
-        } catch (Exception e) {
-            if (e instanceof OrderException) {
-                throw e;
-            }
-            log.error("가게 주문 내역 조회 중 오류 발생 - ownerId: {}, storeId: {}", ownerId, storeId.value(), e);
-            throw OrderException.orderDatabaseError(e);
         }
     }
 }

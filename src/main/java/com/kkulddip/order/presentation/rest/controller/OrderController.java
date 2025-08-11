@@ -17,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import com.kkulddip.common.response.ApiResponse;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.order.application.exception.OrderException;
-import com.kkulddip.order.application.facade.OrderFacade;
+import com.kkulddip.order.application.facade.CustomerOrderFacade;
+import com.kkulddip.order.application.facade.OrderProcessFacade;
+import com.kkulddip.order.application.facade.OwnerOrderFacade;
 import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
@@ -34,12 +36,14 @@ import com.kkulddip.order.presentation.rest.api.OrderApi;
 @RequestMapping("/v1/orders")
 public class OrderController implements OrderApi {
 
-    private final OrderFacade orderFacade;
+    private final OrderProcessFacade orderProcessFacade;
+    private final CustomerOrderFacade customerOrderFacade;
+    private final OwnerOrderFacade ownerOrderFacade;
 
     @Override
     @PostMapping
     public ApiResponse<CreateOrderResponse> createOrder(@RequestBody @Valid CreateOrderRequest request) {
-        CreateOrderResponse response = orderFacade.createOrder(request);
+        CreateOrderResponse response = orderProcessFacade.createOrder(request);
         return ApiResponse.of(201, response);
     }
 
@@ -57,7 +61,7 @@ public class OrderController implements OrderApi {
         Long ownerId = Long.valueOf(userInfo.userId());
         StoreId storeIdVO = StoreId.of(storeId);
         
-        List<PendingOrderResponse> pendingOrders = orderFacade.getPendingOrdersByStore(ownerId, storeIdVO);
+        List<PendingOrderResponse> pendingOrders = ownerOrderFacade.getPendingOrdersByStore(ownerId, storeIdVO);
         return ApiResponse.of(200, pendingOrders);
     }
 
@@ -76,7 +80,7 @@ public class OrderController implements OrderApi {
         Long ownerId = Long.valueOf(userInfo.userId());
         OrderId orderIdVO = OrderId.of(Long.parseLong(orderId));
         
-        OrderConfirmationResponse response = orderFacade.processOrderConfirmation(ownerId, orderIdVO, request);
+        OrderConfirmationResponse response = orderProcessFacade.processOrderConfirmation(ownerId, orderIdVO, request);
         return ApiResponse.of(200, response);
     }
 
@@ -91,7 +95,7 @@ public class OrderController implements OrderApi {
         
         Long customerId = Long.valueOf(userInfo.userId());
         
-        List<CustomerOrderHistoryResponse> orderHistory = orderFacade.getCustomerOrderHistory(customerId);
+        List<CustomerOrderHistoryResponse> orderHistory = customerOrderFacade.getMyOrderHistory(customerId);
         return ApiResponse.of(200, orderHistory);
     }
 
@@ -109,7 +113,7 @@ public class OrderController implements OrderApi {
         Long ownerId = Long.valueOf(userInfo.userId());
         StoreId storeIdVO = StoreId.of(storeId);
         
-        List<OwnerOrderHistoryResponse> storeOrderHistory = orderFacade.getStoreOrderHistory(ownerId, storeIdVO);
+        List<OwnerOrderHistoryResponse> storeOrderHistory = ownerOrderFacade.getStoreOrderHistory(ownerId, storeIdVO);
         return ApiResponse.of(200, storeOrderHistory);
     }
 }
