@@ -41,19 +41,20 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// MySQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	
+
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'io.lettuce:lettuce-core'
-	
+
 	// Jackson
 	implementation 'com.fasterxml.jackson.core:jackson-core'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
-	
+
 	// API Documentation
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
 	
@@ -61,15 +62,18 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-	
+
 	// OpenFeign
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	
+
+	// OpenVidu
+	implementation 'io.openvidu:openvidu-java-client:2.30.0'
+
 	// AWS S3
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.1.1'
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.767'
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
-	
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -108,6 +108,11 @@ logging:
     level:
         web: INFO
 
+openvidu:
+    url: ${OPENVIDU_URL}
+    secret: ${OPENVIDU_SECRET}
+
+
 management:
     server:
         port: ${API_SERVER_PORT}
