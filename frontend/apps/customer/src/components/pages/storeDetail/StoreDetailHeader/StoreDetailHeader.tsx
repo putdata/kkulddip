@@ -47,8 +47,7 @@ export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
         </div>
         <div className="flex w-full flex-col items-start justify-start gap-2 p-2">
           {stockAvailablity ? <OutOfStockBadge /> : null}
-          {/* TODO: 운영시간 props 추가 필요 */}
-          <OperatingHoursBadge />
+          <OperatingHoursBadge operatingHours={store.operatingHours} />
         </div>
       </div>
     </div>
