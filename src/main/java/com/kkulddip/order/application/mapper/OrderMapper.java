@@ -16,6 +16,8 @@ import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.domain.service.OrderItemIdGenerator;
 import com.kkulddip.order.presentation.rest.dto.request.OrderItemRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -79,6 +81,43 @@ public class OrderMapper {
             .finalPrice(order.getFinalPrice().amount())
             .orderStatus(order.getOrderStatus().name())
             .orderDate(order.getOrderDate())
+            .build();
+    }
+    
+    /**
+     * Order를 PendingOrderResponse로 변환
+     */
+    public PendingOrderResponse toPendingOrderResponse(Order order) {
+        return PendingOrderResponse.builder()
+            .orderId(String.valueOf(order.getOrderId().value()))
+            .customerId(order.getCustomerId().value())
+            .storeId(order.getStoreId().value())
+            .orderItems(List.of())  // TODO: OrderItem -> OrderItemResponse 변환 로직 추가
+            .originalPrice(order.getOriginalPrice().amount())
+            .finalPrice(order.getFinalPrice().amount())
+            .orderStatus(order.getOrderStatus().name())
+            .orderDate(order.getOrderDate())
+            .build();
+    }
+    
+    /**
+     * List<Order>를 List<PendingOrderResponse>로 변환
+     */
+    public List<PendingOrderResponse> toPendingOrderResponses(List<Order> orders) {
+        return orders.stream()
+            .map(this::toPendingOrderResponse)
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Order를 OrderConfirmationResponse로 변환
+     */
+    public OrderConfirmationResponse toOrderConfirmationResponse(Order order) {
+        return OrderConfirmationResponse.builder()
+            .orderId(String.valueOf(order.getOrderId().value()))
+            .orderStatus(order.getOrderStatus().name())
+            .pickupTime(order.getPickupTime())
+            .confirmedAt(java.time.LocalDateTime.now())
             .build();
     }
 }

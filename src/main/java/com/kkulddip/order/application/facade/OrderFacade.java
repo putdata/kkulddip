@@ -1,5 +1,6 @@
 package com.kkulddip.order.application.facade;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import com.kkulddip.order.application.service.NotificationService;
 import com.kkulddip.order.application.service.OrderService;
 import com.kkulddip.order.application.service.EventPublisher;
 import com.kkulddip.order.application.service.PriceValidationService;
+import com.kkulddip.order.application.service.StoreAuthService;
 import com.kkulddip.order.application.service.StoreService;
 import com.kkulddip.order.domain.model.aggregate.Order;
 import com.kkulddip.order.domain.model.command.AddOrderItemCommand;
@@ -26,8 +28,12 @@ import com.kkulddip.common.event.OrderCreatedEvent;
 import com.kkulddip.order.application.dto.request.HandleOrderConfirmedRequest;
 import com.kkulddip.order.application.dto.request.HandlePaymentResultRequest;
 import com.kkulddip.order.application.exception.OrderException;
+import com.kkulddip.order.presentation.rest.dto.request.ConfirmationAction;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
+import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +43,7 @@ public class OrderFacade {
     private final OrderService orderService;
     private final EventPublisher eventPublisher;
     private final StoreService storeService;
+    private final StoreAuthService storeAuthService;
     private final NotificationService notificationService;
     private final OrderMapper orderMapper;
     private final PriceValidationService priceValidationService;
@@ -211,6 +218,107 @@ public class OrderFacade {
             log.error("주문 확정 처리 중 오류 발생 - orderId: {}, storeId: {}", 
                 request.orderId(), request.storeId(), e);
             throw OrderException.orderUpdateFailed(String.valueOf(request.orderId()), e);
+        }
+    }
+    
+    /**
+     * 4. 가게의 대기 중인 주문 목록 조회 (사장님용)
+     * - 권한 검증 후 특정 가게의 AWAITING_CONFIRMATION 상태 주문들을 조회
+     */
+    public List<PendingOrderResponse> getPendingOrdersByStore(Long ownerId, StoreId storeId) {
+        log.info("가게 대기 주문 조회 시작 - ownerId: {}, storeId: {}", ownerId, storeId.value());
+        
+        try {
+            // 권한 검증: 사장님이 해당 가게를 소유하고 있는지 확인
+            storeAuthService.validateOwnerPermission(ownerId, storeId);
+            
+            List<Order> pendingOrders = orderService.findPendingOrdersByStore(storeId);
+            log.info("가게 대기 주문 조회 완료 - ownerId: {}, storeId: {}, count: {}", 
+                ownerId, storeId.value(), pendingOrders.size());
+            
+            return orderMapper.toPendingOrderResponses(pendingOrders);
+            
+        } catch (Exception e) {
+            if (e instanceof OrderException) {
+                throw e;
+            }
+            log.error("가게 대기 주문 조회 중 오류 발생 - ownerId: {}, storeId: {}", ownerId, storeId.value(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
+    
+    /**
+     * 5. 주문 확정/거절 처리 (사장님용)
+     * - 권한 검증: 해당 주문의 가게를 사장님이 소유하고 있는지 확인
+     * - 주문 확정 시 픽업 시간 설정
+     * - 주문 거절 시 취소 처리
+     * - 고객에게 알림 발송
+     */
+    @Transactional
+    public OrderConfirmationResponse processOrderConfirmation(Long ownerId, OrderId orderId, OrderConfirmationRequest request) {
+        log.info("주문 확정/거절 처리 시작 - ownerId: {}, orderId: {}, action: {}", 
+            ownerId, orderId.value(), request.action());
+        
+        try {
+            // 1. 주문 조회
+            Order order = orderService.findByOrderId(orderId);
+            
+            // 2. 권한 검증: 사장님이 해당 가게를 소유하고 있는지 확인
+            storeAuthService.validateOwnerPermission(ownerId, order.getStoreId());
+            
+            // 3. 주문 상태 확인
+            if (!order.isAwaitingConfirmation()) {
+                log.warn("주문 확정 불가 상태 - orderId: {}, status: {}", 
+                    orderId.value(), order.getOrderStatus());
+                throw OrderException.orderInvalidStatus(String.valueOf(orderId.value()), order.getOrderStatus().name());
+            }
+            
+            // 4. 확정/거절 처리
+            if (request.action() == ConfirmationAction.CONFIRM) {
+                orderService.confirmOrder(order, request.pickupTime());
+                log.info("주문 확정 완료 - orderId: {}, pickupTime: {}", 
+                    orderId.value(), request.pickupTime());
+                
+                // 고객에게 확정 알림
+                String notificationMessage = "주문이 확정되었습니다.";
+                if (request.pickupTime() != null) {
+                    java.time.ZonedDateTime seoulTime = request.pickupTime().atZone(java.time.ZoneId.of("Asia/Seoul"));
+                    int hour = seoulTime.getHour();
+                    int minute = seoulTime.getMinute();
+                    notificationMessage += " " + hour + "시 " + minute + "분까지 픽업이 준비될 예정이에요.";
+                }
+
+                notificationService.sendNotificationToCustomer(
+                    order.getCustomerId().value(),
+                    notificationMessage
+                );
+                
+            } else {
+                orderService.rejectOrder(order);
+                log.info("주문 거절 완료 - orderId: {}, reason: {}", 
+                    orderId.value(), request.rejectionReason());
+                
+                // 고객에게 거절 알림
+                String message = "주문이 거절되었습니다.";
+                if (request.rejectionReason() != null && !request.rejectionReason().trim().isEmpty()) {
+                    message += " (" + request.rejectionReason() + ")";
+                }
+                notificationService.sendNotificationToCustomer(
+                    order.getCustomerId().value(),
+                    message
+                );
+            }
+            
+            // 5. 응답 반환
+            return orderMapper.toOrderConfirmationResponse(order);
+            
+        } catch (Exception e) {
+            if (e instanceof OrderException) {
+                throw e;
+            }
+            log.error("주문 확정/거절 처리 중 오류 발생 - ownerId: {}, orderId: {}", 
+                ownerId, orderId.value(), e);
+            throw OrderException.orderUpdateFailed(String.valueOf(orderId.value()), e);
         }
     }
 }

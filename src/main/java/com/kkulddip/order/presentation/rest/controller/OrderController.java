@@ -1,17 +1,30 @@
 package com.kkulddip.order.presentation.rest.controller;
 
+import java.util.List;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import com.kkulddip.common.response.ApiResponse;
+import com.kkulddip.common.security.jwt.JwtUserInfo;
+import com.kkulddip.order.application.exception.OrderException;
 import com.kkulddip.order.application.facade.OrderFacade;
+import com.kkulddip.order.domain.model.vo.OrderId;
+import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
+import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 import com.kkulddip.order.presentation.rest.api.OrderApi;
 
 @RequiredArgsConstructor
@@ -21,9 +34,47 @@ public class OrderController implements OrderApi {
 
     private final OrderFacade orderFacade;
 
+    @Override
     @PostMapping
     public ApiResponse<CreateOrderResponse> createOrder(@RequestBody @Valid CreateOrderRequest request) {
         CreateOrderResponse response = orderFacade.createOrder(request);
         return ApiResponse.of(201, response);
+    }
+
+    @Override
+    @GetMapping("/pending")
+    public ApiResponse<List<PendingOrderResponse>> getPendingOrders(
+        @RequestParam Long storeId,
+        @AuthenticationPrincipal JwtUserInfo userInfo) {
+        
+        // JWT에서 ownerId 추출 및 권한 확인
+        if (!"OWNER".equals(userInfo.role())) {
+            throw OrderException.accessDenied("사장님만 대기 주문을 조회할 수 있습니다.");
+        }
+        
+        Long ownerId = Long.valueOf(userInfo.userId());
+        StoreId storeIdVO = StoreId.of(storeId);
+        
+        List<PendingOrderResponse> pendingOrders = orderFacade.getPendingOrdersByStore(ownerId, storeIdVO);
+        return ApiResponse.of(200, pendingOrders);
+    }
+
+    @Override
+    @PostMapping("/{orderId}/confirm")
+    public ApiResponse<OrderConfirmationResponse> confirmOrder(
+        @PathVariable String orderId,
+        @RequestBody @Valid OrderConfirmationRequest request,
+        @AuthenticationPrincipal JwtUserInfo userInfo) {
+        
+        // JWT에서 ownerId 추출 및 권한 확인
+        if (!"OWNER".equals(userInfo.role())) {
+            throw OrderException.accessDenied("사장님만 주문을 확정할 수 있습니다.");
+        }
+        
+        Long ownerId = Long.valueOf(userInfo.userId());
+        OrderId orderIdVO = OrderId.of(Long.parseLong(orderId));
+        
+        OrderConfirmationResponse response = orderFacade.processOrderConfirmation(ownerId, orderIdVO, request);
+        return ApiResponse.of(200, response);
     }
 }
