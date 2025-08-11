@@ -24,16 +24,39 @@ export type StreamFlowStatus =
   | 'ERROR';
 
 /**
- * OpenVidu 기반 스트림 정보
+ * OpenVidu 연결 상태
+ */
+export type OpenViduConnectionStatus = 
+  | 'disconnected'
+  | 'connecting' 
+  | 'connected'
+  | 'error';
+
+/**
+ * OpenVidu 퍼블리셔 상태
+ */
+export type OpenViduPublisherStatus =
+  | 'ready'
+  | 'publishing'
+  | 'stopped'
+  | 'error';
+
+/**
+ * OpenVidu 세션 이벤트
+ */
+export interface OpenViduSessionEvent {
+  type: 'connectionCreated' | 'connectionDestroyed' | 'streamCreated' | 'streamDestroyed';
+  connection?: unknown;
+  stream?: unknown;
+}
+
+/**
+ * 프론트엔드 스트림 플로우 관리용 상태
  */
 export interface StreamFlow {
   id?: number;
-  sessionId: string | null;
-  token: string | null;
   title: string;
   description?: string;
   status: StreamFlowStatus;
   error?: string;
-  startedAt?: Date;
-  endedAt?: Date;
 }

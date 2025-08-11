@@ -7,6 +7,7 @@ export const API_PATH = {
 
   STREAMS: {
     CREATE: '/v1/streams',
+    CONNECT: (streamId: number) => `/v1/streams/${streamId}/connect`,
     START: (streamId: number) => `/v1/streams/${streamId}/start`,
     END: (streamId: number) => `/v1/streams/${streamId}`,
     MY: '/v1/streams/my',

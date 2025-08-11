@@ -1,23 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Stream } from 'common';
+import type { StreamTokenResponse } from 'common';
 import { streamService } from '@/services/streamService';
 import { streamQueryKeys } from './streamQueryKeys';
 import { toast } from 'sonner';
 
 /**
- * 스트림 시작 뮤테이션 (방송 상태를 LIVE로 변경)
+ * 스트림 연결 뮤테이션 (OpenVidu 토큰 발급)
  */
-export const useStartStream = () => {
+export const useConnectStream = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Stream, Error, number>({
-    mutationFn: streamService.startStream,
+  return useMutation<StreamTokenResponse, Error, number>({
+    mutationFn: streamService.connectStream,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: streamQueryKeys.myStreams() });
-      toast.success('라이브 방송이 시작되었습니다!');
     },
     onError: error => {
-      toast.error(`방송 시작에 실패했습니다: ${error.message}`);
+      toast.error(`스트림 연결에 실패했습니다: ${error.message}`);
     },
   });
 };

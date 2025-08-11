@@ -15,10 +15,20 @@ export const streamService = {
   },
 
   /**
-   * 스트림 시작 및 퍼블리셔 토큰 발급
+   * 스트림 연결을 위한 OpenVidu 토큰 발급
    */
-  startStream: (streamId: number): Promise<StreamTokenResponse> => {
+  connectStream: (streamId: number): Promise<StreamTokenResponse> => {
     return apiClient.post<StreamTokenResponse>(
+      API_PATH.STREAMS.CONNECT(streamId),
+      {},
+    );
+  },
+
+  /**
+   * 스트림 방송 시작 (상태를 LIVE로 변경)
+   */
+  startStream: (streamId: number): Promise<Stream> => {
+    return apiClient.post<Stream>(
       API_PATH.STREAMS.START(streamId),
       {},
     );
