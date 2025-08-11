@@ -1,10 +1,7 @@
-import {
-  type DdipBoxSummaryDto,
-  type StoreDetailDto,
-} from '@/dummies/storeDetailDummy';
 import { OperatingHoursBadge } from './OperatingHoursBadge';
 import { OutOfStockBadge } from './OutOfStockBadge';
 import { ChevronRight } from 'lucide-react';
+import type { DdipBoxSummaryDto, StoreDetailDto } from '@/types/store';
 
 interface StoreDetailHeaderProps {
   store: StoreDetailDto;

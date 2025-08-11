@@ -1,4 +1,4 @@
-import type { ReviewCreateRequest, ReviewCreateResponse } from '@/types/review';
+import type { ReviewCreateRequest, ReviewResponse } from '@/types/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from 'common';
 
@@ -12,9 +12,7 @@ export class ReviewService {
    * @param data - 등록할 리뷰 정보
    * @returns 등록된 리뷰 정보
    */
-  static async create(
-    data: ReviewCreateRequest,
-  ): Promise<ReviewCreateResponse> {
+  static async create(data: ReviewCreateRequest): Promise<ReviewResponse> {
     const formData = new FormData();
     formData.append('rating', data.rating.toString());
     formData.append('reviewText', data.reviewText);

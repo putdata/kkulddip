@@ -1,4 +1,4 @@
-import type { StoreDetailDto } from '@/dummies/storeDetailDummy';
+import type { StoreDetailDto } from '@/types/store';
 
 interface StoreDetailMapProps {
   store: StoreDetailDto;
