@@ -32,6 +32,7 @@ import com.kkulddip.order.presentation.rest.dto.request.ConfirmationAction;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
 import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
+import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
@@ -285,7 +286,7 @@ public class OrderFacade {
                     java.time.ZonedDateTime seoulTime = request.pickupTime().atZone(java.time.ZoneId.of("Asia/Seoul"));
                     int hour = seoulTime.getHour();
                     int minute = seoulTime.getMinute();
-                    notificationMessage += " " + hour + "시 " + minute + "분까지 픽업이 준비될 예정이에요.";
+                    notificationMessage += " " + hour + "시 " + minute + "분까지 픽업 준비될 예정이에요.";
                 }
 
                 notificationService.sendNotificationToCustomer(
@@ -319,6 +320,28 @@ public class OrderFacade {
             log.error("주문 확정/거절 처리 중 오류 발생 - ownerId: {}, orderId: {}", 
                 ownerId, orderId.value(), e);
             throw OrderException.orderUpdateFailed(String.valueOf(orderId.value()), e);
+        }
+    }
+    
+    /**
+     * 6. 고객 주문 내역 조회
+     * - 권한 검증: 본인의 주문만 조회 가능
+     * - 고객 ID로 주문 목록 조회
+     */
+    public List<CustomerOrderHistoryResponse> getCustomerOrderHistory(Long customerId) {
+        log.info("고객 주문 내역 조회 시작 - customerId: {}", customerId);
+        
+        try {
+            CustomerId customerIdVO = CustomerId.of(customerId);
+            List<Order> orders = orderService.findByCustomerId(customerIdVO);
+            
+            log.info("고객 주문 내역 조회 완료 - customerId: {}, count: {}", customerId, orders.size());
+            
+            return orderMapper.toCustomerOrderHistoryResponses(orders);
+            
+        } catch (Exception e) {
+            log.error("고객 주문 내역 조회 중 오류 발생 - customerId: {}", customerId, e);
+            throw OrderException.orderDatabaseError(e);
         }
     }
 }

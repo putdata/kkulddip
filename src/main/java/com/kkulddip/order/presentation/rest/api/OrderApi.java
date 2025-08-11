@@ -13,6 +13,7 @@ import com.kkulddip.common.response.ApiResponse;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
 import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
+import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
@@ -38,6 +39,12 @@ public interface OrderApi {
     public ApiResponse<OrderConfirmationResponse> confirmOrder(
         @PathVariable String orderId,
         @RequestBody @Valid OrderConfirmationRequest request,
+        @AuthenticationPrincipal JwtUserInfo userInfo
+    );
+
+    @Operation(summary = "내 주문 내역 조회", description = "고객이 본인의 주문 내역을 조회합니다")
+    @GetMapping("/my-history")
+    public ApiResponse<List<CustomerOrderHistoryResponse>> getMyOrderHistory(
         @AuthenticationPrincipal JwtUserInfo userInfo
     );
 }
