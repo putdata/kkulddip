@@ -2,7 +2,8 @@ import {
   type DdipBoxSummaryDto,
   type StoreDetailDto,
 } from '@/dummies/storeDetailDummy';
-import { OperatingHours, OutOfStockBadge } from './StockStatusBadge';
+import { OperatingHoursBadge } from './OperatingHoursBadge';
+import { OutOfStockBadge } from './OutOfStockBadge';
 import { ChevronRight } from 'lucide-react';
 
 interface StoreDetailHeaderProps {
@@ -46,7 +47,8 @@ export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
         </div>
         <div className="flex w-full flex-col items-start justify-start gap-2 p-2">
           {stockAvailablity ? <OutOfStockBadge /> : null}
-          <OperatingHours />
+          {/* TODO: 운영시간 props 추가 필요 */}
+          <OperatingHoursBadge />
         </div>
       </div>
     </div>
