@@ -25,6 +25,7 @@ public class Order {
     private Money finalPrice;
     private OrderStatus orderStatus;
     private LocalDateTime orderDate;
+    private LocalDateTime pickupTime;
 
     /**
      * 생성자
@@ -70,11 +71,13 @@ public class Order {
      * @param finalPrice 최종 가격
      * @param orderStatus 주문 상태
      * @param orderDate 주문 날짜
+     * @param pickupTime 픽업 시간
      * @return 복원된 Order
      */
     public static Order restore(OrderId orderId, CustomerId customerId, StoreId storeId,
-                               List<OrderItem> orderItems, Money originalPrice, Money finalPrice,
-                               OrderStatus orderStatus, LocalDateTime orderDate) {
+        List<OrderItem> orderItems, Money originalPrice, Money finalPrice,
+        OrderStatus orderStatus, LocalDateTime orderDate, LocalDateTime pickupTime) {
+
         Order order = new Order();
         order.orderId = orderId;
         order.customerId = customerId;
@@ -84,6 +87,7 @@ public class Order {
         order.finalPrice = finalPrice;
         order.orderStatus = orderStatus;
         order.orderDate = orderDate;
+        order.pickupTime = pickupTime;
         return order;
     }
 
@@ -137,6 +141,18 @@ public class Order {
 
     public boolean isCancelled() {
         return this.orderStatus == OrderStatus.CANCELLED;
+    }
+
+    /**
+     * 예상 픽업 시간 설정
+     * 
+     * @param pickupTime 픽업 시간
+     */
+    public void setPickupTime(LocalDateTime pickupTime) {
+        if (this.orderStatus != OrderStatus.AWAITING_CONFIRMATION) {
+            throw new IllegalStateException("AWAITING_CONFIRMATION 상태에서만 픽업 시간을 설정할 수 있습니다.");
+        }
+        this.pickupTime = pickupTime;
     }
 
     private boolean canTransitionTo(OrderStatus newStatus) {
