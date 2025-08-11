@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "order_items")
@@ -27,7 +28,6 @@ public class OrderItemEntity {
     @Column(name = "order_item_id", nullable = false, unique = true)
     private Long orderItemId;
     
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", referencedColumnName = "order_id")
     private OrderEntity order;
