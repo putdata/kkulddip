@@ -6,7 +6,7 @@ import type { Store, StoreListResponse } from '@/types/store';
 // Mock 데이터
 const mockStores: Store[] = [
   {
-    id: 'store-1',
+    id: '1',
     name: '강남점',
     address: '서울시 강남구 역삼동 123-45',
     description: '강남역 2번 출구 앞',
@@ -15,7 +15,7 @@ const mockStores: Store[] = [
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
   {
-    id: 'store-2',
+    id: '2',
     name: '홍대점',
     address: '서울시 마포구 홍익로 67-89',
     description: '홍대입구역 9번 출구',
@@ -24,11 +24,11 @@ const mockStores: Store[] = [
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
   {
-    id: 'store-3',
+    id: '3',
     name: '신촌점',
     address: '서울시 서대문구 신촌로 101-23',
     description: '신촌역 3번 출구',
-    isActive: false,
+    isActive: true,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   },
