@@ -10,10 +10,8 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
-import Cart from '@/pages/Cart';
-import Payment from '@/pages/Payment';
-import OrderDetail from '@/pages/OrderDetail';
-import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
+import ReviewsPage from '@/pages/review/Reviews';
+import ReviewCreate from '@/pages/review/ReviewCreate';
 
 export const router = createBrowserRouter([
   {
@@ -28,12 +26,6 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
-        ],
-      },
-      {
-        path: '/',
-        element: <MobileLayoutWithPageNavbar />,
-        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
@@ -50,17 +42,14 @@ export const router = createBrowserRouter([
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
           },
+          // 임시 - 리뷰 작성 페이지
           {
-            path: ROUTE_PATH.PAYMENT,
-            element: <Payment />,
+            path: ROUTE_PATH.REVIEW_CREATE,
+            element: <ReviewCreate />,
           },
           {
-            path: ROUTE_PATH.CART,
-            element: <Cart />,
-          },
-          {
-            path: ROUTE_PATH.ORDER_DETAIL,
-            element: <OrderDetail />,
+            path: ROUTE_PATH.REVIEW,
+            element: <ReviewsPage />,
           },
         ],
       },
@@ -77,6 +66,14 @@ export const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFound />,
+      },
+      {
+        path: ROUTE_PATH.NOTIFICATIONS,
+      },
+      // 임시 - 리뷰 작성 페이지
+      {
+        path: ROUTE_PATH.REVIEW_CREATE,
+        element: <ReviewCreate />,
       },
     ],
   },

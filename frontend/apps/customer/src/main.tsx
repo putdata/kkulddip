@@ -6,12 +6,14 @@ import { queryClient } from 'common';
 import GlobalErrorBoundary from '@/components/boundary/GlobalErrorBoundary';
 import './index.css';
 import App from './App';
+import { Toaster } from './components/ui/sonner';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <GlobalErrorBoundary>
         <App />
+        <Toaster position="top-center" />
         <ReactQueryDevtools initialIsOpen={false} />
       </GlobalErrorBoundary>
     </QueryClientProvider>
