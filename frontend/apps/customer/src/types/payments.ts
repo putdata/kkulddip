@@ -57,3 +57,93 @@ export interface FinalPriceProps {
   orderAmount: number;
   discount: number;
 }
+
+/**
+ * 주문 생성 요청 데이터
+ */
+export interface OrderData {
+  customerId: number;
+  storeId: number;
+  orderItems: Array<{
+    productId: number;
+    quantity: number;
+    unitPrice: number;
+    discountInfos: {
+      discountCode: number;
+      discountAmount: number;
+    }[];
+  }>;
+}
+
+/**
+ * 주문 생성 응답 데이터
+ */
+export interface OrderResponse {
+  success: boolean;
+  body: {
+    orderId: number;
+    customerId: number;
+    finalPrice: number;
+  };
+  message: string;
+}
+
+/**
+ * 결제 주문 ID 요청 데이터
+ */
+export interface PaymentOrderIdRequest {
+  orderId: number;
+}
+
+/**
+ * 결제 주문 ID 응답 데이터
+ */
+export interface PaymentOrderIdResponse {
+  success: boolean;
+  body: {
+    paymentOrderId: string;
+  };
+  code: string;
+  message: string;
+}
+
+/**
+ * 결제 승인 요청 데이터
+ */
+export interface PaymentConfirmRequest {
+  paymentKey: string;
+  orderId: string;
+  amount: string;
+}
+
+/**
+ * 결제 승인 응답 데이터
+ */
+export interface PaymentConfirmResponse {
+  success: boolean;
+  body: Record<string, unknown>;
+  message: string;
+}
+
+/**
+ * 토스페이먼츠 결제 요청 데이터
+ */
+export interface TossPaymentRequest {
+  amount: number;
+  paymentOrderId: string;
+  orderName: string;
+  customerName: string;
+  successUrl: string;
+  failUrl: string;
+}
+
+/**
+ * useTossPayment 훅 매개변수
+ */
+export interface TossPaymentParams {
+  productId?: number;
+  quantity: number;
+  customerId?: number;
+  storeId?: number;
+  baseUrl?: string;
+}
