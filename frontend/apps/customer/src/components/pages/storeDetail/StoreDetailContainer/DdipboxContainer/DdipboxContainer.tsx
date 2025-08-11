@@ -1,6 +1,5 @@
 import type { StoreDetailDto } from '@/dummies/storeDetailDummy';
-import { DdipboxItem } from './DdipboxItem';
-import { DdipboxRandomItem } from './DdipboxRandomItem';
+import { DdipboxRandomItem } from './DdipboxItem';
 
 interface DdipboxContainerProps {
   store: StoreDetailDto;
@@ -17,11 +16,8 @@ export const DdipboxContainer = ({ store }: DdipboxContainerProps) => {
         <div className="flex w-full flex-col gap-2 p-2">
           {ddipboxes.map(ddipBoxItem => (
             <div>
-              {ddipBoxItem.isRandom ? (
-                <DdipboxRandomItem ddipbox={ddipBoxItem} />
-              ) : (
-                <DdipboxItem ddipbox={ddipBoxItem} />
-              )}
+              {' '}
+              <DdipboxRandomItem ddipbox={ddipBoxItem} />
             </div>
           ))}
         </div>
