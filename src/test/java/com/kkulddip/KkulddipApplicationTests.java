@@ -9,8 +9,8 @@ import org.springframework.test.context.ActiveProfiles;
 // @Import(TestConfig.class)
 class KkulddipApplicationTests {
 
-//	@Test
-//	void contextLoads() {
-//	}
+	@Test
+	void contextLoads() {
+	}
 
 }

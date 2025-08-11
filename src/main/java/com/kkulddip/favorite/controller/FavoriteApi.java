@@ -30,24 +30,96 @@ public interface FavoriteApi {
 
     @Operation(
         summary = "즐겨찾기 추가",
-        description = "특정 고객이 특정 가게를 즐겨찾기에 추가합니다."
+        description = "특정 고객이 특정 가게를 즐겨찾기에 추가합니다. 이미 즐겨찾기에 추가된 가게인 경우 409 에러가 발생합니다."
     )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "201",
             description = "즐겨찾기 추가 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 201,
+                          "body": {
+                            "favoriteId": 1,
+                            "customerId": 1,
+                            "storeId": 5,
+                            "storeName": "친환경 마트",
+                            "addedAt": "2025-08-11T15:30:00"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "400",
-            description = "잘못된 요청 데이터"
+            description = "잘못된 요청 데이터",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "storeId",
+                              "message": "가게 ID는 필수입니다",
+                              "rejectedValue": null
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "가게를 찾을 수 없음"
+            description = "가게를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "STORE_NOT_FOUND",
+                          "message": "가게를 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "409",
+            description = "이미 즐겨찾기에 추가된 가게",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 409,
+                          "code": "FAVORITE_ALREADY_EXISTS",
+                          "message": "이미 즐겨찾기에 추가된 가게입니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
             description = "이미 즐겨찾기에 추가된 가게"
         )
     })
@@ -63,11 +135,80 @@ public interface FavoriteApi {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "즐겨찾기 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "content": [
+                              {
+                                "favoriteId": 1,
+                                "storeId": 5,
+                                "storeName": "친환경 마트",
+                                "storeImageUrl": "https://example.com/store5.jpg",
+                                "address": "서울시 강남구 테헤란로 123",
+                                "rating": 4.5,
+                                "reviewCount": 128,
+                                "distance": 0.8,
+                                "activeDdipBoxCount": 3,
+                                "addedAt": "2025-08-11T15:30:00"
+                              }
+                            ],
+                            "hasNext": true,
+                            "nextCursor": "eyJmYXZvcml0ZUlkIjoxfQ==",
+                            "size": 20
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "400",
-            description = "잘못된 요청 파라미터"
+            description = "잘못된 요청 파라미터",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "size",
+                              "message": "페이지 크기는 1 이상이어야 합니다.",
+                              "rejectedValue": "0"
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<Page<GetFavoritesResponse>> getFavorites(
@@ -101,11 +242,61 @@ public interface FavoriteApi {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "즐겨찾기 삭제 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "favoriteId": 1,
+                            "customerId": 1,
+                            "storeId": 5,
+                            "deletedAt": "2025-08-11T15:30:00"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "즐겨찾기를 찾을 수 없음"
+            description = "즐겨찾기를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "FAVORITE_NOT_FOUND",
+                          "message": "즐겨찾기를 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<DeleteFavoriteResponse> deleteFavorite(
@@ -121,11 +312,86 @@ public interface FavoriteApi {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "즐겨찾기 삭제 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "favoriteId": 1,
+                            "customerId": 1,
+                            "storeId": 5,
+                            "deletedAt": "2025-08-11T15:30:00"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "즐겨찾기를 찾을 수 없음"
+            description = "즐겨찾기를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "FAVORITE_NOT_FOUND",
+                          "message": "해당 고객의 가게 즐겨찾기를 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 파라미터",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "customerId",
+                              "message": "고객 ID는 필수입니다",
+                              "rejectedValue": null
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<DeleteFavoriteResponse> deleteFavoriteByCustomerAndStore(
@@ -144,7 +410,62 @@ public interface FavoriteApi {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "즐겨찾기 여부 확인 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": true
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 파라미터",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "customerId",
+                              "message": "고객 ID는 필수입니다",
+                              "rejectedValue": null
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<Boolean> isFavorite(
