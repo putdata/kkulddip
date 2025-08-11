@@ -15,7 +15,7 @@ import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
 import AuthCallback from '@/pages/AuthCallback';
-
+import Notification from '@/pages/Notification';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -44,6 +44,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
+          },
+          {
+            path: ROUTE_PATH.NOTIFICATION,
+            element: <Notification />,
           },
           // 임시 - 리뷰 작성 페이지
           {
@@ -88,9 +92,7 @@ export const router = createBrowserRouter([
         path: '*',
         element: <NotFound />,
       },
-      {
-        path: ROUTE_PATH.NOTIFICATIONS,
-      },
+
       // 임시 - 리뷰 작성 페이지
       {
         path: ROUTE_PATH.REVIEW_CREATE,
