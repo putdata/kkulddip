@@ -19,7 +19,7 @@ interface RandomItemProps {
   ddipbox: DdipBoxSummaryDto;
 }
 
-export const DdipboxRandomItem = ({ ddipbox }: RandomItemProps) => {
+export const DdipboxItem = ({ ddipbox }: RandomItemProps) => {
   const message = STORE_DETAIL_MESSAGES;
 
   return (
