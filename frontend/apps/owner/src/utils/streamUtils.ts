@@ -1,18 +1,18 @@
 import { STREAM_STATUS_COLORS, STREAM_STATUS_TEXT } from '@/constants/stream';
-import type { StreamStatus } from 'common';
+import type { StreamFlowStatus } from '@/types/stream';
 
 /**
  * 스트림 상태에 따른 색상 클래스를 반환
  */
-export const getStatusColor = (status: StreamStatus): string => {
-  return STREAM_STATUS_COLORS[status] || STREAM_STATUS_COLORS.ENDED;
+export const getStatusColor = (status: StreamFlowStatus): string => {
+  return STREAM_STATUS_COLORS[status] || STREAM_STATUS_COLORS.ERROR;
 };
 
 /**
  * 스트림 상태에 따른 텍스트를 반환
  */
-export const getStatusText = (status: StreamStatus): string => {
-  return STREAM_STATUS_TEXT[status] || STREAM_STATUS_TEXT.ENDED;
+export const getStatusText = (status: StreamFlowStatus): string => {
+  return STREAM_STATUS_TEXT[status] || STREAM_STATUS_TEXT.ERROR;
 };
 
 /**

@@ -11,7 +11,7 @@ export const ROUTE_PATH = {
     ANALYTICS: '/:storeId/analytics',
     SETTINGS: '/:storeId/settings',
     STREAMING: '/:storeId/streaming',
-    STREAMING_LIVE: '/:storeId/streaming/live',
+    STREAMING_LIVE: '/:storeId/streaming/live/:streamId',
   },
   NOT_FOUND: '*',
 } as const;
