@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kkulddip.notification.application.dto.request.NotificationRequest;
+import com.kkulddip.notification.domain.model.enums.NotificationType;
+import com.kkulddip.notification.domain.model.enums.PublisherType;
+import com.kkulddip.notification.domain.model.enums.SubscriberType;
 import com.kkulddip.order.application.exception.OrderException;
-import com.kkulddip.order.infrastructure.integration.dto.enums.NotificationType;
-import com.kkulddip.order.infrastructure.integration.dto.enums.PublisherType;
-import com.kkulddip.order.infrastructure.integration.dto.enums.SubscriberType;
-import com.kkulddip.order.infrastructure.integration.dto.request.NotificationRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,7 +79,7 @@ public class RedisNotificationPublisher {
             .title(title)
             .content(content)
             .publisherId(null) // ORDER_SERVICE의 ID (필요시 설정)
-            .publisherType(PublisherType.ORDER_SERVICE)
+            .publisherType(PublisherType.SYSTEM)
             .subscriberId(customerId)
             .subscriberType(SubscriberType.CUSTOMER)
             .notificationType(notificationType)
@@ -102,9 +102,9 @@ public class RedisNotificationPublisher {
             .title(title)
             .content(content)
             .publisherId(null) // ORDER_SERVICE의 ID (필요시 설정)
-            .publisherType(PublisherType.ORDER_SERVICE)
+            .publisherType(PublisherType.SYSTEM)
             .subscriberId(storeId)
-            .subscriberType(SubscriberType.STORE_OWNER)
+            .subscriberType(SubscriberType.OWNER)
             .notificationType(notificationType)
             .createdAt(LocalDateTime.now())
             .build();
@@ -126,7 +126,7 @@ public class RedisNotificationPublisher {
             .title(title)
             .content(content)
             .publisherId(null)
-            .publisherType(PublisherType.ORDER_SERVICE)
+            .publisherType(PublisherType.SYSTEM)
             .subscriberId(customerId)
             .subscriberType(SubscriberType.CUSTOMER)
             .notificationType(notificationType)
@@ -151,9 +151,9 @@ public class RedisNotificationPublisher {
             .title(title)
             .content(content)
             .publisherId(null)
-            .publisherType(PublisherType.ORDER_SERVICE)
+            .publisherType(PublisherType.SYSTEM)
             .subscriberId(storeId)
-            .subscriberType(SubscriberType.STORE_OWNER)
+            .subscriberType(SubscriberType.OWNER)
             .notificationType(notificationType)
             .actionUrl(actionUrl)
             .createdAt(LocalDateTime.now())

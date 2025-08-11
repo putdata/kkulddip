@@ -116,3 +116,6 @@ management:
             base-path: /actuator
             exposure:
                 include: health, info
+
+firebase:
+    service-account-key: ${FIREBASE_CREDENTIALS_PATH}
