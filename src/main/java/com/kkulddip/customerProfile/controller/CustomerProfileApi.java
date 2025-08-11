@@ -25,21 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@Tag(name = "고객 프로필", description = """
-    고객 프로필 관리 API
-    
-    ## 주요 기능
-    - 프로필 조회/수정
-    - 위치 정보 관리 (주소 및 실시간 위치)
-    - 고객 통계 및 레벨 시스템
-    - Redis 기반 실시간 위치 추적
-    
-    ## 고객 레벨 시스템
-    - SPROUT_BEE (새싹벌): 시작 레벨 (0-9 주문)
-    - WORKER_BEE (일벌): 10-29 주문
-    - HONEY_BEE (꿀벌): 30-49 주문  
-    - QUEEN_BEE (여왕벌): 50+ 주문
-    """)
+@Tag(name = "고객 프로필", description = "고객 프로필 관리 API")
 @SecurityRequirement(name = "bearerAuth")
 public interface CustomerProfileApi {
     
@@ -51,15 +37,70 @@ public interface CustomerProfileApi {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "프로필 조회 성공",
-            content = @Content(schema = @Schema(implementation = CustomerProfileResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "code": null,
+                          "message": null,
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": {
+                            "customerId": 1,
+                            "email": "customer@example.com",
+                            "name": "김철수",
+                            "profileImageUrl": "https://example.com/profile.jpg",
+                            "address": "서울특별시 강남구 테헤란로 123",
+                            "latitude": 37.5665,
+                            "longitude": 126.9780,
+                            "level": "SPROUT_BEE",
+                            "createdAt": "2024-01-01T00:00:00",
+                            "lastActiveAt": "2024-01-01T12:00:00"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "401",
-            description = "인증 실패"
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "고객 정보를 찾을 수 없음"
+            description = "고객 정보를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "CUSTOMER_NOT_FOUND",
+                          "message": "고객을 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     @GetMapping("/profile")
@@ -73,19 +114,86 @@ public interface CustomerProfileApi {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "프로필 수정 성공",
-            content = @Content(schema = @Schema(implementation = UpdateProfileResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "customerId": 1,
+                            "name": "새로운 이름",
+                            "profileImageUrl": "https://example.com/new-profile.jpg",
+                            "updatedAt": "2025-08-11T15:30:00"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "400",
-            description = "잘못된 요청"
+            description = "잘못된 요청",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "name",
+                              "message": "이름은 필수입니다",
+                              "rejectedValue": ""
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "401",
-            description = "인증 실패"
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "고객 정보를 찾을 수 없음"
+            description = "고객 정보를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "CUSTOMER_NOT_FOUND",
+                          "message": "고객을 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     @PutMapping("/profile")
@@ -96,25 +204,93 @@ public interface CustomerProfileApi {
     
     @Operation(
         summary = "위치 정보 업데이트",
-        description = "현재 로그인한 고객의 위치 정보를 업데이트합니다."
+        description = "현재 로그인한 고객의 주소 및 좌표 정보를 업데이트합니다."
     )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "위치 정보 업데이트 성공",
-            content = @Content(schema = @Schema(implementation = UpdateLocationResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "customerId": 1,
+                            "address": "서울특별시 송파구 올림픽로 300",
+                            "latitude": 37.5145,
+                            "longitude": 127.1058,
+                            "updatedAt": "2025-08-11T15:30:00"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "400",
-            description = "잘못된 위치 정보"
+            description = "잘못된 위치 정보",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "CUSTOMER_LOCATION_INVALID",
+                          "message": "유효하지 않은 위치 정보입니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "latitude",
+                              "message": "위도는 -90 이상 90 이하여야 합니다",
+                              "rejectedValue": "200.0"
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "401",
-            description = "인증 실패"
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "고객 정보를 찾을 수 없음"
+            description = "고객 정보를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "CUSTOMER_NOT_FOUND",
+                          "message": "고객을 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     @PutMapping("/location")
@@ -125,21 +301,70 @@ public interface CustomerProfileApi {
     
     @Operation(
         summary = "고객 통계 조회",
-        description = "현재 로그인한 고객의 통계 정보를 조회합니다."
+        description = "현재 로그인한 고객의 통계 정보를 조회합니다. 총 주문수, 절약 금액, CO2 절약량, 레벨 정보를 포함합니다."
     )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "통계 조회 성공",
-            content = @Content(schema = @Schema(implementation = CustomerStatsResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": {
+                            "customerId": 1,
+                            "level": "WORKER_BEE",
+                            "totalOrder": 15,
+                            "totalMoneySaved": 25000,
+                            "totalCo2Saved": 12.5,
+                            "ordersUntilNextLevel": 15,
+                            "nextLevel": "HONEY_BEE"
+                          }
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "401",
-            description = "인증 실패"
+            description = "인증 실패",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
-            description = "고객 정보를 찾을 수 없음"
+            description = "고객 정보를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 404,
+                          "code": "CUSTOMER_NOT_FOUND",
+                          "message": "고객을 찾을 수 없습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     @GetMapping("/stats")

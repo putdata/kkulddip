@@ -18,7 +18,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 고객 프로필 관리 컨트롤러
@@ -47,7 +54,7 @@ public class CustomerProfileController implements CustomerProfileApi {
         Long customerId = getCurrentCustomerId();
         log.info("프로필 조회 요청 - customerId: {}", customerId);
         
-        CustomerProfileResponse response = customerProfileService.getProfile(customerId);
+        CustomerProfileResponse response = customerProfileService.getProfileWithUpdatedStats(customerId);
         return ApiResponse.of(response);
     }
     
@@ -80,7 +87,7 @@ public class CustomerProfileController implements CustomerProfileApi {
         Long customerId = getCurrentCustomerId();
         log.info("통계 조회 요청 - customerId: {}", customerId);
         
-        CustomerStatsResponse response = customerProfileService.getStats(customerId);
+        CustomerStatsResponse response = customerProfileService.getUpdatedStats(customerId);
         return ApiResponse.of(response);
     }
     

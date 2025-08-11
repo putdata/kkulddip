@@ -44,4 +44,12 @@ public abstract class User {
             default -> throw new IllegalStateException("Unknown user type: " + this.getClass().getName());
         };
     }
+    
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
 }
