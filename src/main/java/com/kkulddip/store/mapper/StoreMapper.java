@@ -55,15 +55,15 @@ public class StoreMapper {
             .storeAddress(store.getStoreAddress())
             .description(store.getDescription())
             .operatingHours(store.getOperatingHours())
-            .phoneNumber(store.getPhone())
+            .phone(store.getPhone())
             .ratingAverage(store.getRatingAverage())
-            .reviewNum(store.getReviewCount())
+            .reviewCount(store.getReviewCount())
             .distanceFromUser(distance)
             .representativeDdipboxName(representativeDdipboxName)
             .representativeOriginalPrice(representativeOriginalPrice)
             .representativeSalePrice(representativeSalePrice)
             .storeProfileImage(store.getStoreProfileImage())
-            .active(store.getIsActive())
+            .isActive(store.getIsActive())
             .build();
     }
 
@@ -84,7 +84,7 @@ public class StoreMapper {
                 .originalPrice(ddipBox.getOriginalPrice())
                 .salePrice(ddipBox.getSalePrice())
                 .remainingQuantity(ddipBox.getRemainingQuantity())
-                .active(ddipBox.getIsActive())
+                .isActive(ddipBox.getIsActive())
                 .build())
             .collect(Collectors.toList());
 
@@ -95,14 +95,14 @@ public class StoreMapper {
             .storeAddress(store.getStoreAddress())
             .description(store.getDescription())
             .operatingHours(store.getOperatingHours())
-            .phoneNumber(store.getPhone())
+            .phone(store.getPhone())
             .ratingAverage(store.getRatingAverage())
             .reviewCount(store.getReviewCount())
             .businessNumber(store.getBusinessNumber())
             .storeProfileImage(store.getStoreProfileImage())
             .latitude(store.getLatitude())
             .longitude(store.getLongitude())
-            .active(store.getIsActive())
+            .isActive(store.getIsActive())
             .createdAt(store.getCreatedAt())
             .updatedAt(store.getUpdatedAt())
             .ddipBoxes(ddipBoxSummaries)
@@ -134,7 +134,7 @@ public class StoreMapper {
             .dailyQuantity(ddipBox.getDailyQuantity())
             .remainingQuantity(ddipBox.getRemainingQuantity())
             .maxPerCustomer(ddipBox.getMaxPerCustomer())
-            .active(ddipBox.getIsActive())
+            .isActive(ddipBox.getIsActive())
             .soldOut(null) // will be calculated
             .items(items)
             .build();
@@ -152,7 +152,7 @@ public class StoreMapper {
             .dailyQuantity(dto.dailyQuantity())
             .remainingQuantity(dto.remainingQuantity())
             .maxPerCustomer(dto.maxPerCustomer())
-            .active(dto.active())
+            .isActive(dto.isActive())
             .soldOut(dto.calculateIsSoldOut())
             .items(dto.items())
             .build();

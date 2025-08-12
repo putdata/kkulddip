@@ -23,7 +23,7 @@ public record DdipBoxCardViewDto(
     Long dailyQuantity,
     Long remainingQuantity,
     Long maxPerCustomer,
-    Boolean active,
+    Boolean isActive,
     Boolean soldOut,
     List<DdipBoxItemDto> items
 ) {

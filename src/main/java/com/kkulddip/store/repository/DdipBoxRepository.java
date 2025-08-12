@@ -39,6 +39,17 @@ public interface DdipBoxRepository extends JpaRepository<DdipBox, Long> {
     List<DdipBox> findActiveByStoreId(@Param("storeId") Long storeId);
 
     /**
+     * 특정 가게의 띱박스 목록 조회
+     * storeId를 이용해 DdipBox를 조회
+     */
+    @Query("""
+        SELECT d FROM DdipBox d 
+        WHERE d.store.storeId = :storeId 
+        ORDER BY d.ddipboxId ASC
+        """)
+    List<DdipBox> findByStore_StoreId(@Param("storeId") Long storeId);
+
+    /**
      * 카테고리별 띱박스가 있는 가게 ID 목록 조회
      */
     @Query("""
