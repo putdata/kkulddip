@@ -12,5 +12,6 @@ public record DdipBoxItemDto(
     Long itemId,
     String ddipboxItemName,
     Integer originalPrice,
-    Integer itemQuantity
+    Integer itemQuantity,
+    Integer weight
 ) {}
