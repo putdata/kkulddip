@@ -13,7 +13,7 @@ class KkulddipApplicationTests {
 
 	@MockitoBean
 	private FirebaseMessaging firebaseMessaging;
-	
+
 	@Test
 	void contextLoads() {
 	}
