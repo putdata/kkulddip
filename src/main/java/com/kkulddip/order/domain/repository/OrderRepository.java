@@ -1,5 +1,6 @@
 package com.kkulddip.order.domain.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,8 @@ import com.kkulddip.order.domain.model.enums.OrderStatus;
 import com.kkulddip.order.domain.model.vo.CustomerId;
 import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.StoreId;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * 주문 도메인 저장소 인터페이스
@@ -86,4 +89,5 @@ public interface OrderRepository {
      * @return 존재 여부
      */
     boolean existsByOrderId(OrderId orderId);
+
 }
