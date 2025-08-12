@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.kkulddip.order.application.dto.request.HandlePaymentResultRequest;
-import com.kkulddip.order.application.facade.OrderFacade;
+import com.kkulddip.order.application.facade.OrderProcessFacade;
 import com.kkulddip.common.event.PaymentResultEvent;
 
 @Slf4j
@@ -15,7 +15,7 @@ import com.kkulddip.common.event.PaymentResultEvent;
 @Component
 public class PaymentCompletedEventListener {
 
-    private final OrderFacade orderFacade;
+    private final OrderProcessFacade orderProcessFacade;
 
     /**
      * 결제 완료 이벤트 수신
@@ -34,7 +34,7 @@ public class PaymentCompletedEventListener {
                 .build();
             
             // Application 계층으로 위임
-            orderFacade.handlePaymentResult(request);
+            orderProcessFacade.handlePaymentResult(request);
             
         } catch (Exception e) {
             log.error("결제 완료 이벤트 처리 실패 - orderId: {}, error: {}", 

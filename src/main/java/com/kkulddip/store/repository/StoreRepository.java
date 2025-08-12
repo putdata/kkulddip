@@ -46,4 +46,33 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         WHERE s.storeId = :storeId
         """)
     Optional<Double> calculateStoreRating(@Param("storeId") Long storeId);
+
+    /**
+     * storeId로 ownerId를 조회합니다.
+     */
+    @Query("""
+        SELECT s.ownerId FROM Store s 
+        WHERE s.storeId = :storeId 
+        AND s.isActive = true
+        """)
+    Optional<Long> findOwnerIdByStoreId(@Param("storeId") Long storeId);
+
+    /**
+     * ownerId로 관리하는 모든 활성 가게의 ID 목록을 조회합니다.
+     */
+    @Query("""
+        SELECT s.storeId FROM Store s 
+        WHERE s.ownerId = :ownerId 
+        AND s.isActive = true
+        """)
+    List<Long> findStoreIdsByOwnerId(@Param("ownerId") Long ownerId);
+
+    /**
+     * storeId로 상점명을 조회합니다. (비활성화된 상점 포함)
+     */
+    @Query("""
+        SELECT s.storeName FROM Store s 
+        WHERE s.storeId = :storeId
+        """)
+    Optional<String> findStoreNameByStoreId(@Param("storeId") Long storeId);
 }

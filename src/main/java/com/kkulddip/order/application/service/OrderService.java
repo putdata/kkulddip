@@ -138,4 +138,46 @@ public class OrderService {
     public boolean existsByOrderId(OrderId orderId) {
         return orderRepository.existsByOrderId(orderId);
     }
+    
+    /**
+     * 가게의 대기 중인 주문 목록 조회
+     * 
+     * @param storeId 가게 ID
+     * @return AWAITING_CONFIRMATION 상태의 주문 목록
+     */
+    public List<Order> findPendingOrdersByStore(StoreId storeId) {
+        return orderRepository.findByStoreIdAndOrderStatus(storeId, OrderStatus.AWAITING_CONFIRMATION);
+    }
+    
+    /**
+     * 주문 확정 처리 (픽업 시간 설정 포함)
+     * 
+     * @param order 주문
+     * @param pickupTime 픽업 시간
+     */
+    public void confirmOrder(Order order, LocalDateTime pickupTime) {
+        try {
+            if (pickupTime != null) {
+                order.setPickupTime(pickupTime);
+            }
+            order.changeStatus(OrderStatus.CONFIRMED);
+            orderRepository.save(order);
+        } catch (Exception e) {
+            throw OrderException.orderUpdateFailed(String.valueOf(order.getOrderId().value()), e);
+        }
+    }
+    
+    /**
+     * 주문 거절 처리
+     * 
+     * @param order 주문
+     */
+    public void rejectOrder(Order order) {
+        try {
+            order.changeStatus(OrderStatus.CANCELLED);
+            orderRepository.save(order);
+        } catch (Exception e) {
+            throw OrderException.orderUpdateFailed(String.valueOf(order.getOrderId().value()), e);
+        }
+    }
 }

@@ -35,8 +35,7 @@ import java.time.LocalDateTime;
  */
 
 @Entity
-@Table(name = "user_token",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"fcm_token"}))
+@Table(name = "user_token")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Builder
@@ -60,7 +59,7 @@ public class UserToken {
     private UserRole userType;
 
     /** Firebase Cloud Messaging 토큰 */
-    @Column(name = "fcm_token", nullable = false, length = 1000)
+    @Column(name = "fcm_token", nullable = false, length = 500)
     private String fcmToken;
 
     /** 디바이스 타입 (WEB, ANDROID, IOS) */

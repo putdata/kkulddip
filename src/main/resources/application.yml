@@ -15,16 +15,6 @@ spring:
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
 
-    data:
-        redis:
-            host: ${REDIS_HOST}
-            port: ${REDIS_PORT}
-            password: ${REDIS_PASSWORD:}
-
-    servlet:
-        multipart:
-            max-file-size: 10MB
-            max-request-size: 20MB
     jpa:
         hibernate:
             ddl-auto: update
@@ -76,6 +66,21 @@ spring:
             s3:
                 bucket: ${AWS_BUCKET}
 
+    data:
+        redis:
+            host: ${REDIS_HOST}
+            port: ${REDIS_PORT}
+            password: ${REDIS_PASSWORD:}
+
+# Firebase 설정
+firebase:
+    service-account-key: ${FIREBASE_CREDENTIALS_PATH:}
+
+app:
+    oauth2:
+        success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL}
+    cors:
+        max-age-seconds: ${CORS_MAX_AGE_SECONDS}
 
 springdoc:
     swagger-ui:
@@ -92,12 +97,6 @@ jwt:
     access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600}
     refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400}
 
-app:
-    oauth2:
-        success-redirect-url: ${OAUTH2_SUCCESS_REDIRECT_URL}
-    cors:
-        max-age-seconds: ${CORS_MAX_AGE_SECONDS}
-
 toss:
     payments:
         test-secret-key: ${TOSS_SECRET_KEY}
@@ -107,6 +106,12 @@ toss:
 logging:
     level:
         web: INFO
+        com.kkulddip: INFO
+
+openvidu:
+    url: ${OPENVIDU_URL}
+    secret: ${OPENVIDU_SECRET}
+
 
 management:
     server:

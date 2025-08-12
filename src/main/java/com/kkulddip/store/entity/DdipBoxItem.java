@@ -30,6 +30,9 @@ public class DdipBoxItem {
     @Column(name = "item_quantity", nullable = false)
     private Integer itemQuantity;
 
+    @Column(name = "weight")
+    private Integer weight;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ddipbox_id", nullable = false)
     private DdipBox ddipBox;

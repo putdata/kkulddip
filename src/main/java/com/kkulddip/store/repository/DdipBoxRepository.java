@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * DdipBox Repository
@@ -84,4 +85,13 @@ public interface DdipBoxRepository extends JpaRepository<DdipBox, Long> {
         @Param("storeId") Long storeId,
         @Param("ddipBoxIds") List<Long> ddipBoxIds
     );
+
+    /**
+     * ddipboxId로 띱박스명을 조회합니다. (비활성화된 띱박스 포함)
+     */
+    @Query("""
+        SELECT d.ddipboxName FROM DdipBox d 
+        WHERE d.ddipboxId = :ddipboxId
+        """)
+    Optional<String> findDdipBoxNameById(@Param("ddipboxId") Long ddipboxId);
 }

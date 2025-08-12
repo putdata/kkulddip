@@ -101,4 +101,8 @@ public class OrderException extends BusinessException {
     public static OrderException orderEventPublishFailed(Throwable cause) {
         return new OrderException(ErrorCode.ORDER_EVENT_PUBLISH_FAILED, cause);
     }
+
+    public static OrderException accessDenied(String message) {
+        return new OrderException(ErrorCode.ORDER_ACCESS_DENIED, message);
+    }
 }
