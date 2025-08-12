@@ -104,7 +104,10 @@ openvidu:
     url: https://stream.kkulddip.store
     secret: MY_SECRET
         
+firebase:
+    service-account-key: ""
+    project-id: ""
+
 management:
     server:
         port: 8080
-
