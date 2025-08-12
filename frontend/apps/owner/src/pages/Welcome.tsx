@@ -202,7 +202,7 @@ const Welcome = () => {
                 <Package className="h-4 w-4" />
                 핵심 기능
               </div>
-              <h2 className="mb-6 text-4xl font-bold text-gray-900 lg:text-5xl">
+              <h2 className="mb-6 text-4xl font-bold leading-normal text-gray-900 lg:text-5xl lg:leading-normal">
                 남는 재료를
                 <br />
                 <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
@@ -416,7 +416,7 @@ const Welcome = () => {
                 <Leaf className="h-4 w-4" />
                 사회적 가치
               </div>
-              <h2 className="mb-6 text-4xl font-bold text-gray-900 lg:text-5xl">
+              <h2 className="mb-6 text-4xl font-bold leading-normal text-gray-900 lg:text-5xl lg:leading-normal">
                 지구를 위한
                 <br />
                 <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
@@ -483,7 +483,7 @@ const Welcome = () => {
                 <BarChart3 className="h-4 w-4" />
                 비즈니스 인사이트
               </div>
-              <h2 className="mb-6 text-4xl font-bold text-gray-900 lg:text-5xl">
+              <h2 className="mb-6 text-4xl font-bold leading-normal text-gray-900 lg:text-5xl lg:leading-normal">
                 데이터로 보는
                 <br />
                 <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -649,7 +649,7 @@ const Welcome = () => {
       >
         <div className="mx-auto w-full max-w-7xl px-4">
           <div
-            className={`mb-16 text-center transition-all duration-1500 ${
+            className={`duration-1500 mb-16 text-center transition-all ${
               howItWorksSection.isVisible
                 ? 'translate-y-0 opacity-100'
                 : 'translate-y-10 opacity-0'
@@ -767,7 +767,7 @@ const Welcome = () => {
       >
         <div className="mx-auto max-w-6xl px-4">
           <div
-            className={`mb-12 text-center transition-all duration-1500 ${
+            className={`duration-1500 mb-12 text-center transition-all ${
               additionalFeaturesSection.isVisible
                 ? 'translate-y-0 opacity-100'
                 : 'translate-y-10 opacity-0'
