@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Stream } from 'common';
 import { streamService } from '@/services/streamService';
 import { streamQueryKeys } from './streamQueryKeys';
-import { toast } from 'sonner';
 
 /**
  * 스트림 시작 뮤테이션 (방송 상태를 LIVE로 변경)
@@ -14,10 +13,9 @@ export const useStartStream = () => {
     mutationFn: streamService.startStream,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: streamQueryKeys.myStreams() });
-      toast.success('라이브 방송이 시작되었습니다!');
     },
     onError: error => {
-      toast.error(`방송 시작에 실패했습니다: ${error.message}`);
+      console.error('방송 시작 실패:', error);
     },
   });
 };
