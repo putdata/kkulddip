@@ -4,6 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
@@ -11,6 +12,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useStoreSelection } from '@/hooks/useStoreSelection';
+import AddStoreDialog from '@/components/AddStoreDialog';
 
 const StoreSwitcher = () => {
   const { stores, selectedStore, selectStore } = useStoreSelection();
@@ -32,7 +34,7 @@ const StoreSwitcher = () => {
                   {selectedStore?.storeName || '가게 선택'}
                 </span>
                 <span className="text-sidebar-foreground/60 text-xs">
-                  {selectedStore?.storeAddress || '가게를 선택해주세요'}
+                  {selectedStore?.storeAddress || '운영할 가게를 선택해주세요'}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -63,6 +65,13 @@ const StoreSwitcher = () => {
                 </div>
               </DropdownMenuItem>
             ))}
+            {stores.length > 0 && <DropdownMenuSeparator />}
+            <DropdownMenuItem
+              onSelect={e => e.preventDefault()}
+              className="p-1"
+            >
+              <AddStoreDialog />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
