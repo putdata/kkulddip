@@ -1,9 +1,5 @@
 import { useMemo } from 'react';
-import {
-  useNavigate,
-  useLocation,
-  generatePath,
-} from 'react-router-dom';
+import { useNavigate, useLocation, generatePath } from 'react-router-dom';
 import { useNumberParam } from 'common';
 import { useMyStores } from '@/queries/useMyStores';
 import { getCurrentPageRoute } from '@/utils/sidebarUtils';
@@ -39,7 +35,9 @@ export const useStoreSelection = () => {
    */
   const selectStore = (store: Store) => {
     const currentRoutePath = getCurrentPageRoute(location.pathname);
-    const newPath = generatePath(currentRoutePath, { storeId: store.storeId.toString() });
+    const newPath = generatePath(currentRoutePath, {
+      storeId: store.storeId.toString(),
+    });
     navigate(newPath);
   };
 

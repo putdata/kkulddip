@@ -199,6 +199,8 @@ export const useStreamFlowManager = ({
       return;
     }
 
+    setStatus('PUBLISHING');
+
     try {
       await openVidu.startPublishing('video-container');
       await startStreamMutation.mutateAsync(streamFlow.id!);

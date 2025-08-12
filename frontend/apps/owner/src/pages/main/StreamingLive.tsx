@@ -290,9 +290,6 @@ const StreamingLive = () => {
                 <StreamFlowControls
                   status={streamFlowManager.streamFlow.status}
                   isLoading={streamFlowManager.isLoading}
-                  canConnect={streamFlowManager.canConnect}
-                  canStartStreaming={streamFlowManager.canStartStreaming}
-                  canEndStreaming={streamFlowManager.canEndStreaming}
                   onConnect={streamFlowManager.connectToStream}
                   onStartStreaming={streamFlowManager.startStream}
                   onEndStreaming={handleShowEndDialog}
