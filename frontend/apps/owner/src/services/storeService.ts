@@ -5,6 +5,10 @@ import type {
   StoreListResponse,
   CreateStoreRequest,
   CreateStoreResponse,
+  UpdateStoreRequest,
+  UpdateStoreResponse,
+  ToggleStoreStatusRequest,
+  ToggleStoreStatusResponse,
 } from '@/types/store';
 
 /**
@@ -32,6 +36,45 @@ export const storeService = {
    * 새로운 가게를 등록합니다. 사장님만 사용할 수 있습니다.
    */
   createStore: (data: CreateStoreRequest): Promise<CreateStoreResponse> => {
-    return apiClient.post<CreateStoreResponse>(API_PATH.CREATE_STORE, data);
+    return apiClient.post<CreateStoreResponse>(
+      API_PATH.STORE_MANAGEMENT.CREATE,
+      data,
+    );
+  },
+
+  /**
+   * 가게 정보 수정
+   * 기존 가게의 정보를 수정합니다. 사장님만 사용할 수 있습니다.
+   */
+  updateStore: (
+    storeId: number,
+    data: UpdateStoreRequest,
+  ): Promise<UpdateStoreResponse> => {
+    return apiClient.put<UpdateStoreResponse>(
+      API_PATH.STORE_MANAGEMENT.UPDATE(storeId),
+      data,
+    );
+  },
+
+  /**
+   * 가게 삭제
+   * 가게를 삭제합니다. 사장님만 사용할 수 있습니다.
+   */
+  deleteStore: (storeId: number): Promise<void> => {
+    return apiClient.delete<void>(API_PATH.STORE_MANAGEMENT.DELETE(storeId));
+  },
+
+  /**
+   * 가게 활성화/비활성화 토글
+   * 가게의 운영 상태를 변경합니다. 사장님만 사용할 수 있습니다.
+   */
+  toggleStoreStatus: (
+    storeId: number,
+    data: ToggleStoreStatusRequest,
+  ): Promise<ToggleStoreStatusResponse> => {
+    return apiClient.put<ToggleStoreStatusResponse>(
+      API_PATH.STORE_MANAGEMENT.TOGGLE_STATUS(storeId),
+      data,
+    );
   },
 };

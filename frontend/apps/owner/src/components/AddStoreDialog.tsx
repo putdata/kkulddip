@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useCreateStore } from '@/queries/useCreateStore';
+import { useCreateStore } from '@/queries/store';
 import type { CreateStoreRequest } from '@/types/store';
 
 const AddStoreDialog = () => {

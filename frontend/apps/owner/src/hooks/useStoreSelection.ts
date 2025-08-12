@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate, useLocation, generatePath } from 'react-router-dom';
 import { useNumberParam } from 'common';
-import { useMyStores } from '@/queries/useMyStores';
+import { useMyStores } from '@/queries/store';
 import { getCurrentPageRoute } from '@/utils/sidebarUtils';
 import type { Store } from '@/types/store';
 
