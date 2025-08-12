@@ -1,9 +1,9 @@
 export const API_PATH = {
   AUTH_EXCHANGE_TOKEN: 'v1/auth/owner/token',
 
-  // TODO: 실제 api 주소 필요
-  STORE_LIST: '/stores',
-  STORE_DETAIL: '/stores/:storeId',
+  OWNER_STORES: '/v1/owners/stores',
+  OWNER_STORE_DETAIL: (storeId: number) => `/v1/owners/stores/${storeId}`,
+  CREATE_STORE: '/v1/store-management/stores',
 
   STREAMS: {
     CREATE: '/v1/streams',

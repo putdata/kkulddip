@@ -1,22 +1,61 @@
 export interface Store {
   storeId: number;
-  ownerId: number;
+  storeName: string;
+  phone: string;
+  description: string;
+  operatingHours: string;
+  isActive: boolean;
+  ratingAverage: number;
+  reviewCount: number;
+  businessNumber: string;
+  storeAddress: string;
+  storeProfileImage: string | null;
+  latitude: number;
+  longitude: number;
+  createdAt: string;
+  updatedAt: string;
+  totalOrderCount: number;
+  totalRevenue: number;
+}
+
+export interface PaginatedResponse {
+  totalCount: number;
+  activeCount: number;
+  inactiveCount: number;
+  hasNext: boolean;
+  nextCursor: string | null;
+}
+
+export interface StoreListResponse extends PaginatedResponse {
+  stores: Store[];
+}
+
+export interface CreateStoreRequest {
   storeName: string;
   storeAddress: string;
   description: string;
   operatingHours: string;
-  phoneNumber: string;
-  ratingAverage: number;
-  reviewNum: number;
-  distanceFromUser: number;
-  representativeDdipboxName: string;
-  representativeOriginalPrice: number;
-  representativeSalePrice: number;
-  storeProfileImage: string;
-  active: boolean;
+  phone: string;
+  businessNumber: string;
+  latitude: number;
+  longitude: number;
 }
 
-export interface StoreListResponse {
-  stores: Store[];
-  totalCount: number;
+export interface CreateStoreResponse {
+  storeId: number;
+  ownerId: number;
+  storeName: string;
+  phone: string;
+  description: string;
+  operatingHours: string;
+  isActive: boolean;
+  ratingAverage: number;
+  reviewCount: number;
+  businessNumber: string;
+  storeAddress: string;
+  storeProfileImage: string | null;
+  latitude: number;
+  longitude: number;
+  createdAt: string;
+  updatedAt: string;
 }
