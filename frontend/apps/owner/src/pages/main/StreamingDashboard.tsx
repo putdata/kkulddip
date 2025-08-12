@@ -1,4 +1,5 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useNumberParam } from 'common';
 import { useMyStreams } from '@/queries/stream';
 import { useStreamFlowManager } from '@/hooks/useStreamFlowManager';
 import { CreateStreamDialog } from '@/components/stream/CreateStreamDialog';
@@ -19,7 +20,7 @@ import type { Stream } from 'common';
 
 const StreamingDashboard = () => {
   const navigate = useNavigate();
-  const { storeId } = useParams<{ storeId: string }>();
+  const storeId = useNumberParam('storeId');
 
   const { data: streams, isLoading, error } = useMyStreams();
   const streamFlowManager = useStreamFlowManager();

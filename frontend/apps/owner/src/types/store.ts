@@ -1,12 +1,19 @@
-// TODO: 실제 api 타입으로 변경
 export interface Store {
-  id: string;
-  name: string;
+  storeId: number;
+  ownerId: number;
+  storeName: string;
+  storeAddress: string;
   description: string;
-  address: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  operatingHours: string;
+  phoneNumber: string;
+  ratingAverage: number;
+  reviewNum: number;
+  distanceFromUser: number;
+  representativeDdipboxName: string;
+  representativeOriginalPrice: number;
+  representativeSalePrice: number;
+  storeProfileImage: string;
+  active: boolean;
 }
 
 export interface StoreListResponse {

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useNumberParam } from 'common';
 import { ArrowLeft, Video, AlertCircle } from 'lucide-react';
 
 import { useStreamDetails } from '@/queries/stream';
@@ -34,15 +35,13 @@ import {
 
 const StreamingLive = () => {
   const navigate = useNavigate();
-  const { storeId, streamId } = useParams<{
-    storeId: string;
-    streamId: string;
-  }>();
+  const storeId = useNumberParam('storeId');
+  const streamId = useNumberParam('streamId');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [hasTriedConnect, setHasTriedConnect] = useState(false);
 
-  const { data: stream, isLoading, error } = useStreamDetails(Number(streamId));
+  const { data: stream, isLoading, error } = useStreamDetails(streamId);
 
   const streamFlowManager = useStreamFlowManager({
     initialStream: stream,

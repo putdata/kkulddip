@@ -44,9 +44,17 @@ export const CreateStreamDialog = ({
     handleDescriptionChange,
     resetForm,
   } = useStreamForm({
-    storeId: selectedStore?.id || 0,
+    storeId: selectedStore?.storeId || 0,
     onSubmit: handleSubmitSuccess,
   });
+
+  if (!selectedStore) {
+    return (
+      <div className="text-muted-foreground text-center">
+        스토어를 먼저 선택해주세요.
+      </div>
+    );
+  }
 
   const defaultTrigger = (
     <Button className="gap-2">
