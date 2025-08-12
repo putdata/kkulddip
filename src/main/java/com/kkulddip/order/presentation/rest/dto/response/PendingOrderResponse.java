@@ -19,10 +19,9 @@ public record PendingOrderResponse(
     
     @Builder
     public record OrderItemResponse(
-        String menuName,
+        Long productId,
+        String productName,
         Integer quantity,
-        Integer basePrice,
-        Integer discountPrice,
-        List<String> options
+        Integer unitPrice
     ) {}
 }

@@ -101,7 +101,7 @@ public class OrderMapper {
             .orderId(String.valueOf(order.getOrderId().value()))
             .customerId(order.getCustomerId().value())
             .storeId(order.getStoreId().value())
-            .orderItems(List.of())  // TODO: OrderItem -> OrderItemResponse 변환 로직 추가
+            .orderItems(toPendingOrderItemResponses(order.getOrderItems()))
             .originalPrice(order.getOriginalPrice().amount())
             .finalPrice(order.getFinalPrice().amount())
             .orderStatus(order.getOrderStatus().name())
@@ -116,6 +116,28 @@ public class OrderMapper {
         return orders.stream()
             .map(this::toPendingOrderResponse)
             .collect(Collectors.toList());
+    }
+    
+    /**
+     * OrderItem을 PendingOrderResponse.OrderItemResponse로 변환
+     */
+    private List<PendingOrderResponse.OrderItemResponse> toPendingOrderItemResponses(List<OrderItem> orderItems) {
+        return orderItems.stream()
+            .map(this::toPendingOrderItemResponse)
+            .collect(Collectors.toList());
+    }
+    
+    private PendingOrderResponse.OrderItemResponse toPendingOrderItemResponse(OrderItem orderItem) {
+        // DdipBox 이름 조회 (비활성화된 상품도 포함)
+        String productName = ddipBoxRepository.findDdipBoxNameById(orderItem.getProductId().value())
+            .orElse("알 수 없는 상품");
+            
+        return PendingOrderResponse.OrderItemResponse.builder()
+            .productId(orderItem.getProductId().value())
+            .productName(productName)
+            .quantity(orderItem.getQuantity())
+            .unitPrice(orderItem.getUnitPrice().amount().intValue())
+            .build();
     }
     
     /**
