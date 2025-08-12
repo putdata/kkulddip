@@ -1,5 +1,6 @@
 import { apiClient } from 'common';
 import type { Notification } from '@/types/notification';
+import { API_PATH } from '@/constants/api-path';
 
 export interface NotificationResponse {
   notificationId: number;
@@ -42,7 +43,7 @@ export const getNotifications = async (
   userId: number,
 ): Promise<Notification[]> => {
   const response = await apiClient.get<NotificationResponse[]>(
-    '/v1/notifications',
+    API_PATH.NOTIFICATIONS,
     {
       subscriberId: userId,
       subscriberType: 'CUSTOMER',
