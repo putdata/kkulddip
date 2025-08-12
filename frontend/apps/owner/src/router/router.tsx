@@ -6,6 +6,7 @@ import AuthCallback from '@/pages/AuthCallback';
 import Welcome from '@/pages/Welcome';
 import Dashboard from '@/pages/main/Dashboard';
 import StreamingDashboard from '@/pages/main/StreamingDashboard';
+import StreamingLive from '@/pages/main/StreamingLive';
 import MenuManagement from '@/pages/main/MenuManagement';
 import OrdersManagement from '@/pages/main/OrdersManagement';
 import Analytics from '@/pages/main/Analytics';
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.STORE.STREAMING,
             element: <StreamingDashboard />,
+          },
+          {
+            path: ROUTE_PATH.STORE.STREAMING_LIVE,
+            element: <StreamingLive />,
           },
         ],
       },

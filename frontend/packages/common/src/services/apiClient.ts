@@ -57,6 +57,11 @@ class ApiClient {
         return response;
       },
       error => {
+        // TODO: 401 처리 필요
+        if (error.response?.status === 401) {
+          useAuthStore.getState().clearAuth();
+        }
+
         if (error.isAxiosError) {
           throw new ApiError(error);
         }

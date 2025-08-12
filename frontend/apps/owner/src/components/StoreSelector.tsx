@@ -29,10 +29,10 @@ const StoreSwitcher = () => {
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-medium">
-                  {selectedStore?.name || '가게 선택'}
+                  {selectedStore?.storeName || '가게 선택'}
                 </span>
                 <span className="text-sidebar-foreground/60 text-xs">
-                  {selectedStore?.description || '가게를 선택해주세요'}
+                  {selectedStore?.storeAddress || '가게를 선택해주세요'}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -44,7 +44,7 @@ const StoreSwitcher = () => {
           >
             {stores.map(store => (
               <DropdownMenuItem
-                key={store.id}
+                key={store.storeId}
                 onSelect={() => selectStore(store)}
               >
                 <div className="flex w-full items-center gap-2">
@@ -52,12 +52,12 @@ const StoreSwitcher = () => {
                     <Store className="size-4 shrink-0" />
                   </div>
                   <div className="flex flex-1 flex-col gap-0.5">
-                    <span className="font-medium">{store.name}</span>
+                    <span className="font-medium">{store.storeName}</span>
                     <span className="text-muted-foreground text-xs">
-                      {store.description}
+                      {store.storeAddress}
                     </span>
                   </div>
-                  {selectedStore?.id === store.id && (
+                  {selectedStore?.storeId === store.storeId && (
                     <Check className="ml-auto size-4" />
                   )}
                 </div>
