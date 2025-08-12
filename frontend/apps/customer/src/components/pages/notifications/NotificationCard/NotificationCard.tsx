@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/utils/dateFormat';
 
 export interface NotificationCardProps {
-  id: string;
+  id: number;
   title: string;
   message: string;
-  type: 'order' | 'promotion' | 'system' | 'review' | 'pickup';
-  isRead: boolean;
+  type: 'order' | 'event' | 'marketing' | 'system' | 'review' | 'pickup';
   createdAt: string;
   onClick?: () => void;
 }
@@ -14,7 +14,6 @@ const NotificationCard = ({
   title,
   message,
   type,
-  isRead,
   createdAt,
   onClick,
 }: NotificationCardProps) => {
@@ -22,8 +21,10 @@ const NotificationCard = ({
     switch (type) {
       case 'order':
         return 'bg-blue-100 text-blue-800';
-      case 'promotion':
+      case 'event':
         return 'bg-green-100 text-green-800';
+      case 'marketing':
+        return 'bg-pink-100 text-pink-800';
       case 'system':
         return 'bg-gray-100 text-gray-800';
       case 'review':
@@ -37,8 +38,10 @@ const NotificationCard = ({
     switch (type) {
       case 'order':
         return '주문';
-      case 'promotion':
-        return '프로모션';
+      case 'event':
+        return '이벤트';
+      case 'marketing':
+        return '마케팅';
       case 'system':
         return '시스템';
       case 'review':
@@ -52,7 +55,6 @@ const NotificationCard = ({
     <div
       className={cn(
         'cursor-pointer border-b border-gray-100 px-4 py-3 transition-colors hover:bg-gray-50',
-        !isRead && 'bg-blue-50/50',
       )}
       onClick={onClick}
     >
@@ -67,20 +69,12 @@ const NotificationCard = ({
             >
               {getTypeText(type)}
             </span>
-            {!isRead && (
-              <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
-            )}
           </div>
-          <h4
-            className={cn(
-              'mb-0.5 text-sm font-medium text-gray-900',
-              !isRead && 'font-semibold',
-            )}
-          >
-            {title}
-          </h4>
+          <h4 className="mb-0.5 text-sm font-medium text-gray-900">{title}</h4>
           <p className="text-xs leading-normal text-gray-600">{message}</p>
-          <p className="mt-1 text-xs text-gray-400">{createdAt}</p>
+          <p className="mt-1 text-xs text-gray-400">
+            {formatDateTime(createdAt)}
+          </p>
         </div>
       </div>
     </div>
