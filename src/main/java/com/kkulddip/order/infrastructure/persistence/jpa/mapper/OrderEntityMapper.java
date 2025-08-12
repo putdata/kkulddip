@@ -30,6 +30,7 @@ public class OrderEntityMapper {
             .finalPrice(order.getFinalPrice().amount())
             .orderStatus(order.getOrderStatus())
             .orderDate(order.getOrderDate())
+            .pickupTime(order.getPickupTime())
             .build();
         
         return orderEntity;
@@ -47,7 +48,8 @@ public class OrderEntityMapper {
             Money.of(orderEntity.getOriginalPrice()),
             Money.of(orderEntity.getFinalPrice()),
             orderEntity.getOrderStatus(),
-            orderEntity.getOrderDate()
+            orderEntity.getOrderDate(),
+            orderEntity.getPickupTime()
         );
     }
     

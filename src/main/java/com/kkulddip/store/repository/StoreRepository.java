@@ -66,4 +66,13 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         AND s.isActive = true
         """)
     List<Long> findStoreIdsByOwnerId(@Param("ownerId") Long ownerId);
+
+    /**
+     * storeId로 상점명을 조회합니다. (비활성화된 상점 포함)
+     */
+    @Query("""
+        SELECT s.storeName FROM Store s 
+        WHERE s.storeId = :storeId
+        """)
+    Optional<String> findStoreNameByStoreId(@Param("storeId") Long storeId);
 }
