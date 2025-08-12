@@ -32,7 +32,7 @@ if (typeof window !== 'undefined') {
 
 // VAPID Key
 const VAPID_KEY =
-  'BOMYKHkQFGEj9pTa5oXTBX39K2HrOYJbx0QSPB3qiWp42Q-q8rAU7o8fK7lHF7EfwfTEBAOEXH1PK5qGBUc2rME';
+  'BN1CqbuYubImwKXr0QyK_WzJokRwHtbdv_wvdbL6dZeJuO7PvPtBjQYa5EQpifGKJ0zOZkoCFPFnHoe_OR1tgsg';
 
 // Get messaging instance
 const getMessagingInstance = (): Messaging | null => {
