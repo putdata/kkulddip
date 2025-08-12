@@ -318,6 +318,7 @@ public class OAuth2TokenService {
             .refreshToken(jwtRefreshToken)
             .expiresIn(accessTokenExpiration)
             .user(OAuth2TokenResponse.UserInfo.builder()
+                .userid(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole().name())

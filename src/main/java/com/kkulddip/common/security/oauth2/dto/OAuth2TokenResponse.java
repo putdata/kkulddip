@@ -1,7 +1,6 @@
 package com.kkulddip.common.security.oauth2.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kkulddip.domain.user.entity.User;
 import lombok.Builder;
 
 /**
@@ -24,6 +23,7 @@ public record OAuth2TokenResponse(
 ) {
     @Builder
     public record UserInfo(
+        Long userid,
         String email,
         String name,
         String role,
