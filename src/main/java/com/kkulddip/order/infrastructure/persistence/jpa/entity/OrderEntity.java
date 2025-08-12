@@ -13,10 +13,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import com.kkulddip.order.domain.model.enums.OrderStatus;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "orders")
@@ -44,10 +46,13 @@ public class OrderEntity {
     
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;
+
+    @Column(name = "pickup_time", nullable = false)
+    private LocalDateTime pickupTime;
     
     @Builder
     protected OrderEntity(Long orderId, Long customerId, Long storeId, Integer originalPrice, 
-        Integer finalPrice, OrderStatus orderStatus, LocalDateTime orderDate) {
+        Integer finalPrice, OrderStatus orderStatus, LocalDateTime orderDate, LocalDateTime pickupTime) {
 
         this.orderId = orderId;
         this.customerId = customerId;
@@ -56,6 +61,7 @@ public class OrderEntity {
         this.finalPrice = finalPrice;
         this.orderStatus = orderStatus;
         this.orderDate = orderDate;
+        this.pickupTime = pickupTime;
     }
     
     public void updateStatus(OrderStatus newStatus) {

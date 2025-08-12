@@ -29,6 +29,16 @@ import static com.kkulddip.domain.customer.enums.CustomerLevel.SPROUT_BEE;
 
 /**
  * 고객 엔티티
+ * 
+ * 꿀딥(kkulddip) 서비스를 이용하는 고객의 정보를 관리합니다.
+ * User 엔티티를 상속받아 기본 사용자 정보를 포함하며, 추가로 고객 특화 정보를 관리합니다.
+ * 
+ * 주요 기능:
+ * - 고객 기본 정보 (주소, 좌표 정보)
+ * - 고객 레벨 시스템 (SPROUT_BEE → WORKER_BEE → HONEY_BEE → QUEEN_BEE)
+ * - 주문 및 환경 기여도 통계 (총 주문 수, 절약 금액, CO2 절약량)
+ * - 자동 레벨업 시스템 (주문 수에 따른 레벨 승급)
+ * - 마지막 활동 시간 추적
  */
 @SuperBuilder
 @Getter
@@ -89,5 +99,37 @@ public class Customer extends User {
     @Override
     public Long getId() {
         return customerId;
+    }
+    
+    public void updateProfile(String name, String profileImageUrl) {
+        this.name = name;
+        this.profileImageUrl = profileImageUrl;
+    }
+    
+    public void updateLocation(String address, Double latitude, Double longitude) {
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+    
+    public void updateLastActiveAt() {
+        this.lastActiveAt = LocalDateTime.now();
+    }
+    
+    public void updateStats(Integer orderIncrement, Long moneySavedIncrement, Double co2SavedIncrement) {
+        this.totalOrder += orderIncrement;
+        this.totalMoneySaved += moneySavedIncrement;
+        this.totalCo2Saved += co2SavedIncrement;
+        updateCustomerLevel();
+    }
+    
+    private void updateCustomerLevel() {
+        if (this.totalOrder >= 50 && this.level != CustomerLevel.QUEEN_BEE) {
+            this.level = CustomerLevel.QUEEN_BEE;
+        } else if (this.totalOrder >= 30 && this.level != CustomerLevel.HONEY_BEE && this.level != CustomerLevel.QUEEN_BEE) {
+            this.level = CustomerLevel.HONEY_BEE;
+        } else if (this.totalOrder >= 10 && this.level == CustomerLevel.SPROUT_BEE) {
+            this.level = CustomerLevel.WORKER_BEE;
+        }
     }
 }

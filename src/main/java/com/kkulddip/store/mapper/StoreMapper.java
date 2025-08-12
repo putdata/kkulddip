@@ -170,6 +170,7 @@ public class StoreMapper {
             .ddipboxItemName(item.getDdipboxItemName())
             .originalPrice(item.getOriginalPrice())
             .itemQuantity(item.getItemQuantity())
+            .weight(item.getWeight())
             .build();
     }
 

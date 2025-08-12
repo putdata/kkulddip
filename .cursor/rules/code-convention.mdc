@@ -12,7 +12,7 @@ alwaysApply: true
 
 | 항목 | 명사/동사 | 형식 | 예시 | 설명 |
 | --- | --- | --- | --- | --- |
-| 📦 클래스명 | **명사** | `PascalCase` | `User`, `OrderService`, `UserController` | 실체, 역할을 나타내는 이름 |
+| 📦 클래스명 | **명사** | `PaskalCase` | `User`, `OrderService`, `UserController` | 실체, 역할을 나타내는 이름 |
 | 🔧 메서드명 | **동사** (또는 동사+명사) | `camelCase` | `getUser()`, `updateOrder()` | 동작이나 기능 수행 |
 | 📄 변수명 | **명사** | `camelCase` | `user`, `productList` | 데이터를 담는 객체 이름 |
 | ✅ Boolean 변수 | **동사**+의미 | `is`, `has`, `can` | `isActive`, `hasPermission`, `canEdit` | 상태, 가능 여부 표현 |
