@@ -12,7 +12,6 @@ public record PendingOrderResponse(
     Long storeId,
     List<OrderItemResponse> orderItems,
     Integer originalPrice,
-    Integer finalPrice,
     String orderStatus,
     LocalDateTime orderDate
 ) {

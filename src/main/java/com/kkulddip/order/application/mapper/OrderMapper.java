@@ -103,7 +103,6 @@ public class OrderMapper {
             .storeId(order.getStoreId().value())
             .orderItems(toPendingOrderItemResponses(order.getOrderItems()))
             .originalPrice(order.getOriginalPrice().amount())
-            .finalPrice(order.getFinalPrice().amount())
             .orderStatus(order.getOrderStatus().name())
             .orderDate(order.getOrderDate())
             .build();
@@ -219,7 +218,6 @@ public class OrderMapper {
             .customerName(customerName)
             .orderItems(toOwnerOrderItemResponses(order.getOrderItems()))
             .originalPrice(order.getOriginalPrice().amount().intValue())
-            .finalPrice(order.getFinalPrice().amount().intValue())
             .orderStatus(order.getOrderStatus().name())
             .orderDate(order.getOrderDate())
             .pickupTime(order.getPickupTime())
@@ -254,7 +252,6 @@ public class OrderMapper {
             .productName(productName)
             .quantity(orderItem.getQuantity())
             .unitPrice(orderItem.getUnitPrice().amount().intValue())
-            .totalPrice(orderItem.calcDiscountPrice().amount().intValue())
             .build();
     }
 }
