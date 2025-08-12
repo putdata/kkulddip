@@ -739,13 +739,6 @@ const Welcome = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Connecting line for mobile */}
-                    {index < 2 && (
-                      <div className="mb-8 mt-12 flex justify-center lg:hidden">
-                        <div className="h-12 w-0.5 bg-gradient-to-b from-gray-300 to-gray-200"></div>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
