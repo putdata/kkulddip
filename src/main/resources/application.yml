@@ -108,6 +108,11 @@ logging:
         web: INFO
         com.kkulddip: INFO
 
+openvidu:
+    url: ${OPENVIDU_URL}
+    secret: ${OPENVIDU_SECRET}
+
+
 management:
     server:
         port: ${API_SERVER_PORT}
