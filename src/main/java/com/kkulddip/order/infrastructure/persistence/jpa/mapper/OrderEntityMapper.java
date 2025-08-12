@@ -1,5 +1,8 @@
 package com.kkulddip.order.infrastructure.persistence.jpa.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,14 +12,19 @@ import com.kkulddip.order.domain.model.entity.OrderItem;
 import com.kkulddip.order.domain.model.vo.CustomerId;
 import com.kkulddip.order.domain.model.vo.Money;
 import com.kkulddip.order.domain.model.vo.OrderId;
+import com.kkulddip.order.domain.model.vo.OrderItemId;
+import com.kkulddip.order.domain.model.vo.ProductId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.infrastructure.persistence.jpa.entity.DiscountInfoEntity;
 import com.kkulddip.order.infrastructure.persistence.jpa.entity.OrderEntity;
 import com.kkulddip.order.infrastructure.persistence.jpa.entity.OrderItemEntity;
+import com.kkulddip.order.infrastructure.persistence.jpa.repository.OrderItemJpaRepository;
 
 @RequiredArgsConstructor
 @Component
 public class OrderEntityMapper {
+    
+    private final OrderItemJpaRepository orderItemJpaRepository;
     
     /**
      * 도메인 Order를 OrderEntity로 변환
@@ -40,11 +48,17 @@ public class OrderEntityMapper {
      * OrderEntity를 도메인 Order로 변환
      */
     public Order toDomain(OrderEntity orderEntity) {
+        // OrderItem들 조회 및 변환
+        List<OrderItemEntity> orderItemEntities = orderItemJpaRepository.findByOrderOrderId(orderEntity.getOrderId());
+        List<OrderItem> orderItems = orderItemEntities.stream()
+            .map(this::toOrderItemDomain)
+            .collect(Collectors.toList());
+            
         return Order.restore(
             OrderId.of(orderEntity.getOrderId()),
             CustomerId.of(orderEntity.getCustomerId()),
             StoreId.of(orderEntity.getStoreId()),
-            new java.util.ArrayList<>(), // OrderItem들은 필요시 별도 로딩
+            orderItems,
             Money.of(orderEntity.getOriginalPrice()),
             Money.of(orderEntity.getFinalPrice()),
             orderEntity.getOrderStatus(),
@@ -66,6 +80,24 @@ public class OrderEntityMapper {
             .build();
         
         return orderItemEntity;
+    }
+    
+    /**
+     * OrderItemEntity를 도메인 OrderItem으로 변환
+     */
+    private OrderItem toOrderItemDomain(OrderItemEntity orderItemEntity) {
+        OrderItem orderItem = OrderItem.builder()
+            .orderItemId(OrderItemId.of(orderItemEntity.getOrderItemId()))
+            .order(null) // Order 참조는 나중에 설정
+            .productId(ProductId.of(orderItemEntity.getProductId()))
+            .quantity(orderItemEntity.getQuantity())
+            .unitPrice(Money.of(orderItemEntity.getUnitPrice()))
+            .build();
+            
+        // 현재는 DiscountInfo를 빈 리스트로 처리 (추후 필요시 구현)
+        // orderItem의 discountInfos 필드를 직접 설정할 수 없으므로 일단 그대로 둠
+        
+        return orderItem;
     }
     
     /**

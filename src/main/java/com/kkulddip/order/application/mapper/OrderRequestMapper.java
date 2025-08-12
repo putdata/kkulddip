@@ -1,0 +1,65 @@
+package com.kkulddip.order.application.mapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import com.kkulddip.order.domain.model.command.AddOrderItemCommand;
+import com.kkulddip.order.domain.model.vo.CustomerId;
+import com.kkulddip.order.domain.model.vo.Money;
+import com.kkulddip.order.domain.model.vo.ProductId;
+import com.kkulddip.order.domain.model.vo.StoreId;
+import com.kkulddip.order.domain.service.OrderItemIdGenerator;
+import com.kkulddip.order.presentation.rest.dto.request.OrderItemRequest;
+
+/**
+ * Order 관련 Request 객체들을 도메인 객체로 변환하는 매퍼
+ */
+@Slf4j
+@RequiredArgsConstructor
+@Component
+public class OrderRequestMapper {
+    
+    private final OrderItemIdGenerator orderItemIdGenerator;
+    
+    /**
+     * CreateOrderRequest를 도메인 객체들로 변환
+     */
+    public CustomerId toCustomerId(Long customerId) {
+        return CustomerId.of(customerId);
+    }
+    
+    public StoreId toStoreId(Long storeId) {
+        return StoreId.of(storeId);
+    }
+    
+    public List<AddOrderItemCommand> toAddOrderItemCommands(List<OrderItemRequest> orderItemRequests) {
+        return orderItemRequests.stream()
+            .map(this::toAddOrderItemCommand)
+            .collect(Collectors.toList());
+    }
+    
+    private AddOrderItemCommand toAddOrderItemCommand(OrderItemRequest request) {
+        log.debug("Converting OrderItemRequest - productId: {}, quantity: {}, unitPrice: {}", 
+            request.productId(), request.quantity(), request.unitPrice());
+        
+        Money unitPrice = Money.of(request.unitPrice());
+        log.debug("Created Money object - amount: {}", unitPrice.amount());
+        
+        AddOrderItemCommand command = new AddOrderItemCommand(
+            orderItemIdGenerator.generate(),
+            ProductId.of(request.productId()),
+            request.quantity(),
+            unitPrice,
+            List.of()
+        );
+        
+        log.debug("Created AddOrderItemCommand - quantity: {}, unitPrice: {}", 
+            command.quantity(), command.unitPrice().amount());
+        
+        return command;
+    }
+}
