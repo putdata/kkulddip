@@ -2,13 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { StreamFlowStatus } from '@/types/stream';
 import { getStatusColor, getStatusText, formatDate } from '@/utils/streamUtils';
-import { 
-  Radio, 
-  CheckCircle, 
-  AlertCircle, 
-  Clock, 
+import {
+  Radio,
+  CheckCircle,
+  AlertCircle,
+  Clock,
   StopCircle,
-  Loader2 
+  Loader2,
 } from 'lucide-react';
 
 interface StreamStatusCardProps {
@@ -23,8 +23,8 @@ interface StreamStatusCardProps {
 }
 
 const getStatusIcon = (status: StreamFlowStatus) => {
-  const iconProps = { className: "h-4 w-4" };
-  
+  const iconProps = { className: 'h-4 w-4' };
+
   switch (status) {
     case 'IDLE':
       return <Clock {...iconProps} />;
@@ -93,7 +93,9 @@ export const StreamStatusCard = ({
     <Card className={className}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{title || '스트림 제목 없음'}</CardTitle>
+          <CardTitle className="text-lg">
+            {title || '스트림 제목 없음'}
+          </CardTitle>
           <Badge className={`gap-1 ${statusColor}`}>
             {statusIcon}
             {statusText}
@@ -102,21 +104,21 @@ export const StreamStatusCard = ({
       </CardHeader>
       <CardContent className="space-y-3">
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground text-sm">{description}</p>
         )}
 
         <div className="space-y-2">
           <p className="text-sm">{statusDescription}</p>
-          
+
           {error && (
             <div className="rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
                 <div>
                   <h4 className="text-sm font-medium text-red-700 dark:text-red-400">
                     오류 발생
                   </h4>
-                  <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-300">
                     {error}
                   </p>
                 </div>
@@ -126,24 +128,26 @@ export const StreamStatusCard = ({
         </div>
 
         {(status === 'LIVE' || status === 'ENDED') && (
-          <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+          <div className="grid grid-cols-2 gap-4 border-t pt-2">
             {typeof viewerCount === 'number' && (
               <div>
-                <p className="text-xs text-muted-foreground">시청자 수</p>
-                <p className="text-sm font-medium">{viewerCount.toLocaleString()}명</p>
+                <p className="text-muted-foreground text-xs">시청자 수</p>
+                <p className="text-sm font-medium">
+                  {viewerCount.toLocaleString()}명
+                </p>
               </div>
             )}
-            
+
             {startedAt && (
               <div>
-                <p className="text-xs text-muted-foreground">시작 시간</p>
+                <p className="text-muted-foreground text-xs">시작 시간</p>
                 <p className="text-sm font-medium">{formatDate(startedAt)}</p>
               </div>
             )}
-            
+
             {endedAt && (
               <div className="col-span-2">
-                <p className="text-xs text-muted-foreground">종료 시간</p>
+                <p className="text-muted-foreground text-xs">종료 시간</p>
                 <p className="text-sm font-medium">{formatDate(endedAt)}</p>
               </div>
             )}

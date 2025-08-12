@@ -26,9 +26,9 @@ export type StreamFlowStatus =
 /**
  * OpenVidu 연결 상태
  */
-export type OpenViduConnectionStatus = 
+export type OpenViduConnectionStatus =
   | 'disconnected'
-  | 'connecting' 
+  | 'connecting'
   | 'connected'
   | 'error';
 
@@ -42,15 +42,6 @@ export type OpenViduPublisherStatus =
   | 'error';
 
 /**
- * OpenVidu 세션 이벤트
- */
-export interface OpenViduSessionEvent {
-  type: 'connectionCreated' | 'connectionDestroyed' | 'streamCreated' | 'streamDestroyed';
-  connection?: unknown;
-  stream?: unknown;
-}
-
-/**
  * 프론트엔드 스트림 플로우 관리용 상태
  */
 export interface StreamFlow {
@@ -59,4 +50,37 @@ export interface StreamFlow {
   description?: string;
   status: StreamFlowStatus;
   error?: string;
+}
+
+/**
+ * OpenVidu 퍼블리셔 설정 인터페이스
+ */
+export interface OpenViduPublisherOptions {
+  audioSource?: undefined | string;
+  videoSource?: undefined | string;
+  publishAudio: boolean;
+  publishVideo: boolean;
+  resolution: string;
+  frameRate: number;
+  insertMode: 'APPEND' | 'AFTER' | 'BEFORE' | 'REPLACE';
+}
+
+/**
+ * 에러 타입 구분을 위한 인터페이스
+ */
+export interface StreamError {
+  type: 'api' | 'openvidu' | 'media' | 'network';
+  code?: string;
+  message: string;
+  originalError?: unknown;
+}
+
+/**
+ * 스트림 상태 검증 결과
+ */
+export interface StreamStatusValidation {
+  canConnect: boolean;
+  canStartStreaming: boolean;
+  canEndStreaming: boolean;
+  reason?: string;
 }

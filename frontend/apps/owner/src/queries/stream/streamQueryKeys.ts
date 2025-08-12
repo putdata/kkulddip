@@ -6,7 +6,8 @@ export const streamQueryKeys = {
   all: ['streams'] as const,
   lists: () => [...streamQueryKeys.all, 'list'] as const,
   myStreams: () => [...streamQueryKeys.lists(), 'my'] as const,
-  store: (storeId: number) => [...streamQueryKeys.lists(), 'store', storeId] as const,
+  store: (storeId: number) =>
+    [...streamQueryKeys.lists(), 'store', storeId] as const,
   details: () => [...streamQueryKeys.all, 'detail'] as const,
   detail: (id: number) => [...streamQueryKeys.details(), id] as const,
 } as const;

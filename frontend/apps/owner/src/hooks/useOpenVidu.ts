@@ -1,10 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { OpenVidu, Session, Publisher } from 'openvidu-browser';
+import { toast } from 'sonner';
+
 import type {
   OpenViduConnectionStatus,
   OpenViduPublisherStatus,
 } from '@/types/stream';
-import { toast } from 'sonner';
+import { createPublisherConfig } from '@/utils/streamUtils';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/constants/stream';
 
 interface UseOpenViduProps {
   onSessionConnected?: () => void;
@@ -71,7 +74,7 @@ export const useOpenVidu = ({
       setPublisherStatus('ready');
       setError(null);
       openViduRef.current = null;
-      
+
       console.log('OpenVidu 리소스 정리 완료');
     } catch (err) {
       console.error('Cleanup error:', err);
@@ -85,12 +88,21 @@ export const useOpenVidu = ({
     setError(null);
   }, []);
 
+  /** 에러 상태 자동 리셋 */
+  const scheduleErrorReset = useCallback(() => {
+    console.log('에러 상태 즉시 리셋');
+    resetConnection();
+  }, [resetConnection]);
+
   /** OpenVidu 세션에 연결하고 미리보기 Publisher 생성 */
   const connectToSession = useCallback(
     async (token: string, videoElementId?: string) => {
       try {
         // 이미 연결 중이거나 연결된 상태면 중복 연결 방지
-        if (connectionStatus === 'connecting' || connectionStatus === 'connected') {
+        if (
+          connectionStatus === 'connecting' ||
+          connectionStatus === 'connected'
+        ) {
           console.warn('이미 연결된 상태입니다.');
           return;
         }
@@ -115,50 +127,83 @@ export const useOpenVidu = ({
         // 세션 연결 후 미디어 권한 확인 및 미리보기용 Publisher 생성
         if (videoElementId) {
           try {
-            const publisher = await openVidu.initPublisherAsync(videoElementId, {
-              audioSource: undefined,
-              videoSource: undefined,
-              publishAudio: false, // 미리보기에서는 음소거
-              publishVideo: true,
-              resolution: '640x480',
-              frameRate: 30,
-              insertMode: 'REPLACE',
-            });
+            const config = createPublisherConfig('PREVIEW');
+            const publisher = await openVidu.initPublisherAsync(
+              videoElementId,
+              config,
+            );
             publisherRef.current = publisher;
             console.log('미리보기 Publisher 생성 완료');
           } catch (publisherError) {
             console.error('Publisher 생성 실패:', publisherError);
-            throw new Error('카메라나 마이크에 접근할 수 없습니다. 권한을 확인해주세요.');
+            throw new Error(ERROR_MESSAGES.MEDIA_ACCESS_DENIED);
           }
         }
 
         setConnectionStatus('connected');
-        toast.success('스트림 세션에 연결되었습니다.');
+        toast.success(SUCCESS_MESSAGES.SESSION_CONNECTED);
         onSessionConnected?.();
       } catch (err) {
         const error =
-          err instanceof Error ? err : new Error('세션 연결에 실패했습니다.');
-        
+          err instanceof Error
+            ? err
+            : new Error(ERROR_MESSAGES.SESSION_CONNECTION_FAILED);
+
         console.error('OpenVidu 연결 실패:', error);
-        
-        // 연결 실패 시 완전히 정리하고 초기화
         await cleanup();
-        
+
         setError(error);
         setConnectionStatus('error');
         onError?.(error);
         toast.error(`연결 실패: ${error.message}`);
-        
-        // 3초 후 자동으로 에러 상태 리셋
-        setTimeout(() => {
-          if (connectionStatus === 'error') {
-            console.log('에러 상태 자동 리셋');
-            resetConnection();
-          }
-        }, 3000);
+
+        scheduleErrorReset();
       }
     },
-    [initializeOpenVidu, onSessionConnected, onSessionDisconnected, onError, cleanup, connectionStatus, resetConnection],
+    [
+      connectionStatus,
+      initializeOpenVidu,
+      onSessionConnected,
+      onSessionDisconnected,
+      onError,
+      cleanup,
+      scheduleErrorReset,
+    ],
+  );
+
+  /** 라이브용 Publisher 생성 또는 기존 Publisher 업데이트 */
+  const getOrCreateLivePublisher = useCallback(
+    async (videoElementId?: string): Promise<Publisher> => {
+      let publisher = publisherRef.current;
+
+      if (!publisher) {
+        const openVidu = initializeOpenVidu();
+        try {
+          const config = createPublisherConfig('LIVE');
+          publisher = await openVidu.initPublisherAsync(videoElementId, config);
+          publisherRef.current = publisher;
+          console.log('새 Publisher 생성 완료');
+        } catch (publisherError) {
+          console.error('새 Publisher 생성 실패:', publisherError);
+          throw new Error(ERROR_MESSAGES.MEDIA_DEVICE_ACCESS_FAILED);
+        }
+      } else {
+        try {
+          if (publisher.stream && publisher.stream.getMediaStream()) {
+            publisher.publishAudio(true);
+            console.log('기존 Publisher 오디오 활성화');
+          } else {
+            throw new Error(ERROR_MESSAGES.PUBLISHER_STREAM_INVALID);
+          }
+        } catch (audioError) {
+          console.error('오디오 활성화 실패:', audioError);
+          throw new Error(ERROR_MESSAGES.MEDIA_STREAM_PROBLEM);
+        }
+      }
+
+      return publisher;
+    },
+    [initializeOpenVidu],
   );
 
   /** 실제 방송을 시작 (퍼블리싱) */
@@ -166,47 +211,13 @@ export const useOpenVidu = ({
     async (videoElementId?: string) => {
       try {
         if (!sessionRef.current) {
-          throw new Error('세션이 연결되지 않았습니다.');
+          throw new Error(ERROR_MESSAGES.SESSION_NOT_CONNECTED);
         }
 
         setPublisherStatus('publishing');
         setError(null);
 
-        let publisher = publisherRef.current;
-
-        // Publisher가 없으면 새로 생성
-        if (!publisher) {
-          const openVidu = initializeOpenVidu();
-          try {
-            publisher = await openVidu.initPublisherAsync(videoElementId, {
-              audioSource: undefined,
-              videoSource: undefined,
-              publishAudio: true,
-              publishVideo: true,
-              resolution: '640x480',
-              frameRate: 30,
-              insertMode: 'REPLACE',
-            });
-            publisherRef.current = publisher;
-            console.log('새 Publisher 생성 완료');
-          } catch (publisherError) {
-            console.error('새 Publisher 생성 실패:', publisherError);
-            throw new Error('미디어 장치에 접근할 수 없습니다. 카메라와 마이크 권한을 확인해주세요.');
-          }
-        } else {
-          try {
-            // 기존 Publisher의 오디오를 활성화 (미리보기에서는 음소거였음)
-            if (publisher.stream && publisher.stream.getMediaStream()) {
-              publisher.publishAudio(true);
-              console.log('기존 Publisher 오디오 활성화');
-            } else {
-              throw new Error('Publisher 스트림이 유효하지 않습니다.');
-            }
-          } catch (audioError) {
-            console.error('오디오 활성화 실패:', audioError);
-            throw new Error('미디어 스트림에 문제가 있습니다. 페이지를 새로고침해주세요.');
-          }
-        }
+        const publisher = await getOrCreateLivePublisher(videoElementId);
 
         publisher.on('streamDestroyed', () => {
           setPublisherStatus('stopped');
@@ -215,37 +226,45 @@ export const useOpenVidu = ({
 
         await sessionRef.current.publish(publisher);
 
-        // 퍼블리싱 성공 후 콜백 호출
         onPublishingStarted?.();
-        toast.success('방송을 시작했습니다.');
+        toast.success(SUCCESS_MESSAGES.BROADCAST_STARTED);
       } catch (err) {
         const error =
-          err instanceof Error ? err : new Error('방송 시작에 실패했습니다.');
+          err instanceof Error
+            ? err
+            : new Error(ERROR_MESSAGES.BROADCAST_START_FAILED);
         setError(error);
         setPublisherStatus('error');
         onError?.(error);
         toast.error(error.message);
       }
     },
-    [initializeOpenVidu, onPublishingStarted, onPublishingStopped, onError],
+    [
+      onPublishingStarted,
+      onPublishingStopped,
+      onError,
+      getOrCreateLivePublisher,
+    ],
   );
 
   /** 방송을 중지 (퍼블리싱 중단) */
   const stopPublishing = useCallback(async () => {
     try {
       if (!sessionRef.current || !publisherRef.current) {
-        throw new Error('퍼블리셔가 활성화되지 않았습니다.');
+        throw new Error(ERROR_MESSAGES.PUBLISHER_NOT_ACTIVE);
       }
 
       await sessionRef.current.unpublish(publisherRef.current);
       publisherRef.current = null;
       setPublisherStatus('stopped');
 
-      toast.success('방송을 종료했습니다.');
+      toast.success(SUCCESS_MESSAGES.BROADCAST_ENDED);
       onPublishingStopped?.();
     } catch (err) {
       const error =
-        err instanceof Error ? err : new Error('방송 종료에 실패했습니다.');
+        err instanceof Error
+          ? err
+          : new Error(ERROR_MESSAGES.BROADCAST_END_FAILED);
       setError(error);
       onError?.(error);
       toast.error(error.message);
@@ -261,7 +280,7 @@ export const useOpenVidu = ({
       }
 
       if (sessionRef.current) {
-        await sessionRef.current.disconnect();
+        sessionRef.current.disconnect();
         sessionRef.current = null;
       }
 
@@ -272,7 +291,9 @@ export const useOpenVidu = ({
       onSessionDisconnected?.();
     } catch (err) {
       const error =
-        err instanceof Error ? err : new Error('세션 종료에 실패했습니다.');
+        err instanceof Error
+          ? err
+          : new Error(ERROR_MESSAGES.SESSION_DISCONNECT_FAILED);
       setError(error);
       onError?.(error);
       toast.error(error.message);

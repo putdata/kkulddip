@@ -28,10 +28,7 @@ export const streamService = {
    * 스트림 방송 시작 (상태를 LIVE로 변경)
    */
   startStream: (streamId: number): Promise<Stream> => {
-    return apiClient.post<Stream>(
-      API_PATH.STREAMS.START(streamId),
-      {},
-    );
+    return apiClient.post<Stream>(API_PATH.STREAMS.START(streamId), {});
   },
 
   /**

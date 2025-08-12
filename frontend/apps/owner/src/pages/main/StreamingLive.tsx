@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Video, AlertCircle } from 'lucide-react';
+
 import { useStreamDetails } from '@/queries/stream';
 import { useStreamFlowManager } from '@/hooks/useStreamFlowManager';
 import { StreamStatusCard } from '@/components/stream/StreamStatusCard';
@@ -24,8 +26,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { mapApiStatusToFlowStatus } from '@/utils/streamUtils';
-import { ArrowLeft, Video, AlertCircle } from 'lucide-react';
+import { EndStreamAlertDialog } from '@/components/stream/EndStreamAlertDialog';
+import {
+  mapApiStatusToFlowStatus,
+  validateStreamStatus,
+} from '@/utils/streamUtils';
 
 const StreamingLive = () => {
   const navigate = useNavigate();
@@ -34,13 +39,14 @@ const StreamingLive = () => {
     streamId: string;
   }>();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const [showEndDialog, setShowEndDialog] = useState(false);
   const [hasTriedConnect, setHasTriedConnect] = useState(false);
 
   const { data: stream, isLoading, error } = useStreamDetails(Number(streamId));
 
   const streamFlowManager = useStreamFlowManager({
     initialStream: stream,
+    onStreamEnded: () => navigate(`/${storeId}/streaming`),
   });
 
   useEffect(() => {
@@ -52,25 +58,26 @@ const StreamingLive = () => {
         status: mapApiStatusToFlowStatus(stream.status),
       });
     }
-  }, [stream?.id, stream?.status, streamFlowManager.streamFlow.status]);
+  }, [stream, streamFlowManager]);
 
-  // LIVE 상태 스트림에 들어왔을 때 한 번만 자동 연결 시도
-  useEffect(() => {
-    if (!stream || hasTriedConnect) {
-      return;
-    }
+  /** LIVE 상태 스트림에 들어왔을 때 한 번만 자동 연결 시도 */
+  const handleAutoConnection = useCallback(
+    async (streamData: typeof stream) => {
+      if (!streamData) {
+        return;
+      }
 
-    const handleStream = async () => {
-      if (stream.status === 'ENDED') {
-        // 종료된 스트림 - 백엔드에 정리 요청
+      if (streamData.status === 'ENDED') {
         try {
           console.log('종료된 스트림 서버 정리 요청');
           await streamFlowManager.endStream();
         } catch (error) {
           console.error('종료된 스트림 정리 실패:', error);
         }
-      } else if (stream.status === 'LIVE' && !streamFlowManager.openVidu.isConnected) {
-        // LIVE 스트림 - 연결 시도
+      } else if (
+        streamData.status === 'LIVE' &&
+        !streamFlowManager.openVidu.isConnected
+      ) {
         try {
           console.log('LIVE 스트림 자동 연결 시도');
           await streamFlowManager.connectToStream();
@@ -81,79 +88,73 @@ const StreamingLive = () => {
           console.error('LIVE 스트림 자동 연결 실패:', error);
         }
       }
-      
-      setHasTriedConnect(true);
-    };
+    },
+    [streamFlowManager],
+  );
 
-    handleStream();
-  }, [stream, hasTriedConnect]);
-
-  // 페이지 새로고침/닫기 시 세션 정리
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      // 즉시 OpenVidu 세션 정리
-      streamFlowManager.openVidu.cleanup();
-      
-      // LIVE 상태면 백엔드에도 종료 요청
-      if (streamFlowManager.streamFlow.status === 'LIVE') {
-        streamFlowManager.endStream();
-      }
-    };
+    if (!stream || hasTriedConnect) {
+      return;
+    }
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('unload', handleBeforeUnload);
+    handleAutoConnection(stream).finally(() => setHasTriedConnect(true));
+  }, [stream, hasTriedConnect, handleAutoConnection]);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('unload', handleBeforeUnload);
-    };
-  }, []);
-
-  // 컴포넌트 언마운트 시 OpenVidu 세션 정리
-  useEffect(() => {
-    return () => {
-      // 상태에 관계없이 OpenVidu 세션을 정리
-      streamFlowManager.openVidu.cleanup();
-      
-      // LIVE 상태면 백엔드에도 종료 요청
-      if (streamFlowManager.streamFlow.status === 'LIVE') {
-        streamFlowManager.endStream();
-      }
-    };
-  }, []);
-
-
-  const handleGoBack = () => {
+  /** 페이지 나갈 때 세션 정리 */
+  const handlePageUnload = useCallback(() => {
+    streamFlowManager.openVidu.cleanup();
     if (streamFlowManager.streamFlow.status === 'LIVE') {
+      streamFlowManager.endStream();
+    }
+  }, [streamFlowManager]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', handlePageUnload);
+    window.addEventListener('unload', handlePageUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handlePageUnload);
+      window.removeEventListener('unload', handlePageUnload);
+      // 컴포넌트 언마운트 시에만 정리 (페이지 새로고침/닫기가 아닌 경우)
+      // handlePageUnload(); // 이 줄을 제거
+    };
+  }, [handlePageUnload]);
+
+  /** 뒤로가기 핸들러 - LIVE 상태면 확인 다이얼로그 표시 */
+  const handleGoBack = () => {
+    const statusValidation = validateStreamStatus(
+      streamFlowManager.streamFlow.status,
+      streamFlowManager.openVidu.isConnected,
+      streamFlowManager.openVidu.isPublishing,
+    );
+
+    if (statusValidation.canEndStreaming) {
       setShowExitConfirm(true);
       return;
     }
     navigate(`/${storeId}/streaming`);
   };
 
+  /** 나가기 확인 핸들러 */
   const handleConfirmExit = async () => {
     setShowExitConfirm(false);
     await streamFlowManager.endStream();
-    navigate(`/${storeId}/streaming`);
   };
 
+  /** 방송 종료 다이얼로그 열기 */
+  const handleShowEndDialog = () => {
+    setShowEndDialog(true);
+  };
+
+  /** 에러 상태 재시도 핸들러 */
+  const handleRetryConnection = () => {
+    streamFlowManager.openVidu.resetConnection();
+    setHasTriedConnect(false);
+  };
+
+  /** 나가기 취소 핸들러 */
   const handleCancelExit = () => {
     setShowExitConfirm(false);
-  };
-
-  const handleEndStream = () => {
-    if (streamFlowManager.streamFlow.status === 'LIVE') {
-      setShowEndConfirm(true);
-    }
-  };
-
-  const handleConfirmEnd = async () => {
-    setShowEndConfirm(false);
-    await streamFlowManager.endStream();
-  };
-
-  const handleCancelEnd = () => {
-    setShowEndConfirm(false);
   };
 
   if (isLoading) {
@@ -232,7 +233,7 @@ const StreamingLive = () => {
         {streamFlowManager.canEndStreaming && (
           <Button
             variant="destructive"
-            onClick={handleEndStream}
+            onClick={handleShowEndDialog}
             disabled={streamFlowManager.isLoading}
           >
             방송 종료
@@ -295,7 +296,7 @@ const StreamingLive = () => {
                   canEndStreaming={streamFlowManager.canEndStreaming}
                   onConnect={streamFlowManager.connectToStream}
                   onStartStreaming={streamFlowManager.startStream}
-                  onEndStreaming={handleEndStream}
+                  onEndStreaming={handleShowEndDialog}
                 />
               </div>
             </CardContent>
@@ -321,19 +322,18 @@ const StreamingLive = () => {
               </AlertDescription>
             </Alert>
           )}
-          
+
           {streamFlowManager.streamFlow.status === 'ERROR' && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
-                <span>{streamFlowManager.streamFlow.error || '연결에 실패했습니다.'}</span>
-                <Button 
-                  variant="outline" 
+                <span>
+                  {streamFlowManager.streamFlow.error || '연결에 실패했습니다.'}
+                </span>
+                <Button
+                  variant="outline"
                   size="sm"
-                  onClick={() => {
-                    streamFlowManager.openVidu.resetConnection();
-                    setHasTriedConnect(false);
-                  }}
+                  onClick={handleRetryConnection}
                 >
                   다시 시도
                 </Button>
@@ -363,25 +363,13 @@ const StreamingLive = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={showEndConfirm} onOpenChange={setShowEndConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>방송 종료</AlertDialogTitle>
-            <AlertDialogDescription>
-              정말로 방송을 종료하시겠습니까? 종료된 스트림은 다시 시작할 수
-              없습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelEnd}>
-              취소
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmEnd}>
-              방송 종료
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <EndStreamAlertDialog
+        open={showEndDialog}
+        onOpenChange={setShowEndDialog}
+        onConfirm={streamFlowManager.endStream}
+        isLoading={streamFlowManager.isLoading}
+        streamTitle={stream?.title}
+      />
     </div>
   );
 };

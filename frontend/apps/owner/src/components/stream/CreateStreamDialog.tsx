@@ -21,10 +21,10 @@ interface CreateStreamDialogProps {
   trigger?: React.ReactNode;
 }
 
-export const CreateStreamDialog = ({ 
-  onSubmit, 
+export const CreateStreamDialog = ({
+  onSubmit,
   isLoading = false,
-  trigger 
+  trigger,
 }: CreateStreamDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { selectedStore } = useStoreSelection();
@@ -50,21 +50,18 @@ export const CreateStreamDialog = ({
 
   const defaultTrigger = (
     <Button className="gap-2">
-      <Plus className="h-4 w-4" />
-      새 스트림 생성
+      <Plus className="h-4 w-4" />새 스트림 생성
     </Button>
   );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger || defaultTrigger}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>새 라이브 스트림 생성</DialogTitle>
         </DialogHeader>
-        
+
         <Card>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,7 +77,7 @@ export const CreateStreamDialog = ({
                   maxLength={200}
                   disabled={isLoading}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {title.length}/200자
                 </p>
               </div>
@@ -98,7 +95,7 @@ export const CreateStreamDialog = ({
                   rows={3}
                   disabled={isLoading}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {description.length}/1000자
                 </p>
               </div>
@@ -112,10 +109,7 @@ export const CreateStreamDialog = ({
                 >
                   취소
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={!isValid || isLoading}
-                >
+                <Button type="submit" disabled={!isValid || isLoading}>
                   {isLoading ? '생성 중...' : '스트림 생성'}
                 </Button>
               </div>
