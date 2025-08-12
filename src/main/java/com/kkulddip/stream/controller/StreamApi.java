@@ -33,13 +33,24 @@ public interface StreamApi {
             @Valid @RequestBody StreamCreateRequest request
     );
 
-    @Operation(summary = "스트림 시작", description = "생성된 스트림을 시작하고 Owner용 토큰을 발급합니다.")
+    @Operation(summary = "OpenVidu 토큰 발급", description = "스트림에 대한 OpenVidu 토큰을 발급합니다. 스트림 상태는 READY로 유지됩니다.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "토큰 발급 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "접근 권한 없음"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "스트림을 찾을 수 없음")
     })
-    ApiResponse<StreamTokenResponse> startStream(
+    ApiResponse<StreamTokenResponse> connectStream(
+            @Parameter(hidden = true) @AuthenticationPrincipal JwtUserInfo userInfo,
+            @PathVariable Long streamId
+    );
+
+    @Operation(summary = "방송 시작", description = "스트림 상태를 LIVE로 변경합니다. 토큰 발급은 하지 않습니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "방송 시작 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "접근 권한 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "스트림을 찾을 수 없음")
+    })
+    ApiResponse<StreamResponse> startStream(
             @Parameter(hidden = true) @AuthenticationPrincipal JwtUserInfo userInfo,
             @PathVariable Long streamId
     );

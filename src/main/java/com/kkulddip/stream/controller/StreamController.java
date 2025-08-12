@@ -50,18 +50,36 @@ public class StreamController implements StreamApi {
     }
 
     /**
-     * 생성된 스트림을 시작하고 Owner용 OpenVidu 토큰을 발급합니다.
+     * OpenVidu 토큰을 발급합니다.
+     * 스트림 상태는 READY 상태로 유지하고 토큰만 발급합니다.
      * 
      * @param userInfo JWT 토큰에서 추출된 사용자 정보
-     * @param streamId 시작할 스트림의 ID
+     * @param streamId 토큰을 발급할 스트림의 ID
      * @return OpenVidu 세션 연결을 위한 토큰 정보
      */
-    @PostMapping("/{streamId}/start")
-    public ApiResponse<StreamTokenResponse> startStream(
+    @PostMapping("/{streamId}/connect")
+    public ApiResponse<StreamTokenResponse> connectStream(
             @AuthenticationPrincipal JwtUserInfo userInfo,
             @PathVariable Long streamId
     ) {
-        StreamTokenResponse response = streamManagementService.startStream(Long.parseLong(userInfo.userId()), streamId);
+        StreamTokenResponse response = streamManagementService.connectStream(Long.parseLong(userInfo.userId()), streamId);
+        return ApiResponse.of(response);
+    }
+
+    /**
+     * 방송을 시작합니다.
+     * 스트림 상태를 LIVE로 변경합니다. 토큰 발급은 하지 않습니다.
+     * 
+     * @param userInfo JWT 토큰에서 추출된 사용자 정보
+     * @param streamId 시작할 스트림의 ID
+     * @return 업데이트된 스트림 정보
+     */
+    @PostMapping("/{streamId}/start")
+    public ApiResponse<StreamResponse> startStream(
+            @AuthenticationPrincipal JwtUserInfo userInfo,
+            @PathVariable Long streamId
+    ) {
+        StreamResponse response = streamManagementService.startStream(Long.parseLong(userInfo.userId()), streamId);
         return ApiResponse.of(response);
     }
 

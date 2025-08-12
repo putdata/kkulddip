@@ -78,24 +78,22 @@ public class StreamManagementService {
     }
 
     /**
-     * 스트림을 시작하고 Owner용 OpenVidu 토큰을 생성합니다.
+     * OpenVidu 토큰을 발급합니다.
      * 
-     * READY 상태의 스트림을 LIVE 상태로 변경하고, Owner가 방송을 송출할 수 있는
-     * PUBLISHER 권한의 토큰을 생성합니다. 새로운 OpenVidu 세션을 생성하고
+     * 스트림 상태는 READY 상태로 유지하고, Owner가 방송을 준비할 수 있는
+     * PUBLISHER 권한의 토큰만 생성합니다. 새로운 OpenVidu 세션을 생성하고
      * 해당 세션 ID를 스트림에 저장합니다.
      * 
-     * @param ownerId 스트림을 시작하는 Owner의 ID  
-     * @param streamId 시작할 스트림의 ID
+     * @param ownerId 토큰을 발급받을 Owner의 ID  
+     * @param streamId 토큰을 발급할 스트림의 ID
      * @return OpenVidu 연결을 위한 토큰과 세션 ID를 포함한 응답
      * 
      * @throws StreamNotFoundException 스트림을 찾을 수 없는 경우
      * @throws StreamOwnerMismatchException 스트림 소유자가 아닌 경우
-     * 
-     * @since 1.0
      */
     @Transactional
-    public StreamTokenResponse startStream(Long ownerId, Long streamId) {
-        log.info("스트림 시작 및 Owner 토큰 생성 요청 - OwnerId: {}, StreamId: {}", ownerId, streamId);
+    public StreamTokenResponse connectStream(Long ownerId, Long streamId) {
+        log.info("Owner 토큰 발급 요청 - OwnerId: {}, StreamId: {}", ownerId, streamId);
 
         Stream stream = streamRepository.findById(streamId)
                 .orElseThrow(() -> new StreamNotFoundException(streamId));
@@ -109,16 +107,48 @@ public class StreamManagementService {
         Session session = createOpenViduSession(sessionId);
         Connection connection = createOwnerConnection(session);
         
-        // 스트림 시작 (상태를 LIVE로 변경하고 세션 ID 저장)
-        stream.start(sessionId);
+        // 세션 ID만 저장하고 상태는 READY 유지
+        stream.updateSessionId(sessionId);
         streamRepository.save(stream);
         
-        log.info("스트림 시작 및 Owner 토큰 생성 완료 - StreamId: {}, SessionId: {}", streamId, sessionId);
+        log.info("Owner 토큰 발급 완료 - StreamId: {}, SessionId: {}", streamId, sessionId);
         
         return StreamTokenResponse.builder()
                 .token(connection.getToken())
-                .sessionId(stream.getSessionId())
+                .sessionId(sessionId)
                 .build();
+    }
+
+    /**
+     * 방송을 시작합니다.
+     * 
+     * 스트림 상태를 LIVE로 변경합니다. 토큰 발급은 하지 않습니다.
+     * 
+     * @param ownerId 방송을 시작하는 Owner의 ID  
+     * @param streamId 시작할 스트림의 ID
+     * @return 업데이트된 스트림 정보
+     * 
+     * @throws StreamNotFoundException 스트림을 찾을 수 없는 경우
+     * @throws StreamOwnerMismatchException 스트림 소유자가 아닌 경우
+     */
+    @Transactional
+    public StreamResponse startStream(Long ownerId, Long streamId) {
+        log.info("방송 시작 요청 - OwnerId: {}, StreamId: {}", ownerId, streamId);
+
+        Stream stream = streamRepository.findById(streamId)
+                .orElseThrow(() -> new StreamNotFoundException(streamId));
+
+        if (!stream.isOwner(ownerId)) {
+            throw new StreamOwnerMismatchException(ownerId, streamId);
+        }
+
+        // 스트림 상태만 LIVE로 변경
+        stream.start(stream.getSessionId());
+        Stream savedStream = streamRepository.save(stream);
+        
+        log.info("방송 시작 완료 - StreamId: {}, SessionId: {}", streamId, stream.getSessionId());
+        
+        return StreamResponse.from(savedStream);
     }
 
     /**

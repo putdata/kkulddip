@@ -141,6 +141,14 @@ public class Stream {
     }
     
     /**
+     * 세션 ID 업데이트
+     * 상태 변경 없이 세션 ID만 설정합니다.
+     */
+    public void updateSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+    
+    /**
      * 스트림이 라이브 상태인지 확인
      */
     public boolean isLive() {
