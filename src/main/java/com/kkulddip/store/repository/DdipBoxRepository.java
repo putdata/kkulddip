@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * DdipBox Repository
@@ -36,6 +37,17 @@ public interface DdipBoxRepository extends JpaRepository<DdipBox, Long> {
         ORDER BY d.ddipboxId ASC
         """)
     List<DdipBox> findActiveByStoreId(@Param("storeId") Long storeId);
+
+    /**
+     * 특정 가게의 띱박스 목록 조회
+     * storeId를 이용해 DdipBox를 조회
+     */
+    @Query("""
+        SELECT d FROM DdipBox d 
+        WHERE d.store.storeId = :storeId 
+        ORDER BY d.ddipboxId ASC
+        """)
+    List<DdipBox> findByStore_StoreId(@Param("storeId") Long storeId);
 
     /**
      * 카테고리별 띱박스가 있는 가게 ID 목록 조회
@@ -73,4 +85,13 @@ public interface DdipBoxRepository extends JpaRepository<DdipBox, Long> {
         @Param("storeId") Long storeId,
         @Param("ddipBoxIds") List<Long> ddipBoxIds
     );
+
+    /**
+     * ddipboxId로 띱박스명을 조회합니다. (비활성화된 띱박스 포함)
+     */
+    @Query("""
+        SELECT d.ddipboxName FROM DdipBox d 
+        WHERE d.ddipboxId = :ddipboxId
+        """)
+    Optional<String> findDdipBoxNameById(@Param("ddipboxId") Long ddipboxId);
 }

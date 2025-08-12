@@ -26,23 +26,68 @@ public interface FcmTokenApi {
 
     @Operation(
         summary = "FCM 토큰 등록",
-        description = "사용자의 FCM 토큰을 등록하거나 업데이트합니다. 기존 토큰이 있는 경우 새로운 토큰으로 업데이트됩니다."
+        description = "사용자의 FCM 토큰을 등록하거나 업데이트합니다. 기존 토큰이 있는 경우 새로운 토큰으로 업데이트되며, 푸시 알림 발송 대상에 포함됩니다."
     )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
             description = "토큰 등록 성공",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": true,
+                          "status": 200,
+                          "body": null
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "400",
             description = "잘못된 요청 데이터",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 400,
+                          "code": "COMMON_INVALID_INPUT",
+                          "message": "입력값이 올바르지 않습니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": [
+                            {
+                              "field": "fcmToken",
+                              "message": "FCM 토큰은 필수입니다",
+                              "rejectedValue": ""
+                            }
+                          ]
+                        }
+                        """
+                )
+            )
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "401",
             description = "인증되지 않은 사용자",
-            content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    example = """
+                        {
+                          "success": false,
+                          "status": 401,
+                          "code": "AUTH_TOKEN_MISSING",
+                          "message": "인증 토큰이 필요합니다.",
+                          "timestamp": "2025-08-11T15:30:00",
+                          "body": null
+                        }
+                        """
+                )
+            )
         )
     })
     ApiResponse<Void> registerToken(

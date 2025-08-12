@@ -185,7 +185,8 @@ public class OAuth2TokenService {
             userInfo, 
             providerId -> customerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, providerId),
             info -> customerRepository.save(createCustomer(info, provider)),
-            "Customer"
+            "Customer",
+            customerRepository
         );
     }
 
@@ -202,7 +203,8 @@ public class OAuth2TokenService {
             userInfo, 
             providerId -> ownerRepository.findByOauth2ProviderAndOauth2ProviderId(provider, providerId),
             info -> ownerRepository.save(createOwner(info, provider)),
-            "Owner"
+            "Owner",
+            ownerRepository
         );
     }
 
@@ -214,17 +216,38 @@ public class OAuth2TokenService {
      * @param finder OAuth2Provider와 providerId로 사용자를 찾는 Function
      * @param creator 새로운 엔티티를 생성하고 저장하는 Function
      * @param userType 사용자 타입 문자열 (로깅용)
+     * @param repository 사용자 저장을 위한 Repository
      * @return 조회되거나 생성된 사용자 엔티티
      */
     private <T extends User> T processUserByType(
             OAuth2UserInfo userInfo,
             Function<String, Optional<T>> finder,
             Function<OAuth2UserInfo, T> creator,
-            String userType) {
+            String userType,
+            org.springframework.data.jpa.repository.JpaRepository<T, Long> repository) {
 
         return finder.apply(userInfo.getId())
             .map(existingUser -> {
                 log.info("기존 {} 로그인 - Email: {}", userType, userInfo.getEmail());
+                
+                boolean needsUpdate = false;
+                
+                if (userInfo.getImageUrl() != null && !userInfo.getImageUrl().equals(existingUser.getProfileImageUrl())) {
+                    existingUser.setProfileImageUrl(userInfo.getImageUrl());
+                    needsUpdate = true;
+                    log.info("{} 프로필 이미지 업데이트 - Email: {}", userType, userInfo.getEmail());
+                }
+                
+                if (userInfo.getName() != null && !userInfo.getName().equals(existingUser.getName())) {
+                    existingUser.setName(userInfo.getName());
+                    needsUpdate = true;
+                    log.info("{} 이름 업데이트 - Email: {}", userType, userInfo.getEmail());
+                }
+                
+                if (needsUpdate) {
+                    return repository.save(existingUser);
+                }
+                
                 return existingUser;
             })
             .orElseGet(() -> {

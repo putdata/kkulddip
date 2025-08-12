@@ -22,4 +22,24 @@ public interface DdipBoxItemRepository extends JpaRepository<DdipBoxItem, Long> 
         ORDER BY i.itemId ASC
         """)
     List<DdipBoxItem> findByDdipBoxId(@Param("ddipboxId") Long ddipboxId);
+    
+    /**
+     * 특정 띱박스의 모든 아이템 무게 총합 계산
+     */
+    @Query("""
+        SELECT SUM(i.weight * i.itemQuantity) 
+        FROM DdipBoxItem i 
+        WHERE i.ddipBox.ddipboxId = :ddipboxId
+        """)
+    Integer sumWeightByDdipboxId(@Param("ddipboxId") Long ddipboxId);
+    
+    /**
+     * 여러 띱박스의 모든 아이템 무게 총합 계산
+     */
+    @Query("""
+        SELECT SUM(i.weight * i.itemQuantity) 
+        FROM DdipBoxItem i 
+        WHERE i.ddipBox.ddipboxId IN :ddipboxIds
+        """)
+    Integer sumWeightByDdipboxIds(@Param("ddipboxIds") List<Long> ddipboxIds);
 }

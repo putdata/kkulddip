@@ -142,6 +142,21 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * 잘못된 인수 예외 처리
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ErrorResponse<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.warn("IllegalArgumentException: {}", e.getMessage());
+        
+        ErrorResponse<Void> response = ErrorResponse.of(
+            ErrorCode.COMMON_INVALID_INPUT,
+            e.getMessage()
+        );
+        
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
      * 그 외 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)

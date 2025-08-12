@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
     type = FilterType.ASSIGNABLE_TYPE, 
     classes = {UserTokenRepository.class}
 ))
+@EnableJpaAuditing
 @ActiveProfiles("citest")
+@org.springframework.test.context.TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 @DisplayName("UserTokenRepository 테스트")
 class UserTokenRepositoryTest {
 
