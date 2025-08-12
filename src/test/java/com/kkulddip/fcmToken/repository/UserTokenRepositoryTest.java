@@ -12,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import com.kkulddip.common.config.JpaAuditingConfig;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     type = FilterType.ASSIGNABLE_TYPE, 
     classes = {UserTokenRepository.class}
 ))
+@Import(JpaAuditingConfig.class)
 @ActiveProfiles("citest")
 @DisplayName("UserTokenRepository 테스트")
 class UserTokenRepositoryTest {
@@ -41,34 +44,37 @@ class UserTokenRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        // 테스트 간 충돌을 방지하기 위해 유니크한 토큰 생성
+        String uniqueSuffix = "-" + System.currentTimeMillis() + "-" + Thread.currentThread().getId();
+        
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oldDate = now.minusDays(10);
 
         customerToken1 = UserToken.builder()
             .userId(1L)
             .userType(UserRole.CUSTOMER)
-            .fcmToken("customer-android-token")
+            .fcmToken("customer-android-token" + uniqueSuffix)
             .deviceType(DeviceType.ANDROID)
             .build();
 
         customerToken2 = UserToken.builder()
             .userId(1L)
             .userType(UserRole.CUSTOMER)
-            .fcmToken("customer-web-token")
+            .fcmToken("customer-web-token" + uniqueSuffix)
             .deviceType(DeviceType.WEB)
             .build();
 
         ownerToken1 = UserToken.builder()
             .userId(2L)
             .userType(UserRole.OWNER)
-            .fcmToken("owner-ios-token")
+            .fcmToken("owner-ios-token" + uniqueSuffix)
             .deviceType(DeviceType.IOS)
             .build();
 
         inactiveToken = UserToken.builder()
             .userId(3L)
             .userType(UserRole.CUSTOMER)
-            .fcmToken("inactive-token")
+            .fcmToken("inactive-token" + uniqueSuffix)
             .deviceType(DeviceType.ANDROID)
             .build();
 
@@ -92,7 +98,7 @@ class UserTokenRepositoryTest {
         // then
         assertThat(activeTokens).hasSize(2);
         assertThat(activeTokens).extracting(UserToken::getFcmToken)
-            .containsExactlyInAnyOrder("customer-android-token", "customer-web-token");
+            .containsExactlyInAnyOrder(customerToken1.getFcmToken(), customerToken2.getFcmToken());
         assertThat(activeTokens).allMatch(UserToken::getIsActive);
     }
 
@@ -105,7 +111,7 @@ class UserTokenRepositoryTest {
 
         // then
         assertThat(token).isPresent();
-        assertThat(token.get().getFcmToken()).isEqualTo("customer-android-token");
+        assertThat(token.get().getFcmToken()).isEqualTo(customerToken1.getFcmToken());
         assertThat(token.get().getDeviceType()).isEqualTo(DeviceType.ANDROID);
     }
 
@@ -139,7 +145,7 @@ class UserTokenRepositoryTest {
     void findByFcmToken_Success() {
         // when
         Optional<UserToken> token = userTokenRepository
-            .findByFcmToken("customer-android-token");
+            .findByFcmToken(customerToken1.getFcmToken());
 
         // then
         assertThat(token).isPresent();
@@ -170,7 +176,7 @@ class UserTokenRepositoryTest {
 
         // then
         assertThat(inactiveTokens).hasSize(1);
-        assertThat(inactiveTokens.get(0).getFcmToken()).isEqualTo("inactive-token");
+        assertThat(inactiveTokens.get(0).getFcmToken()).isEqualTo(inactiveToken.getFcmToken());
         assertThat(inactiveTokens.get(0).getIsActive()).isFalse();
     }
 
@@ -181,7 +187,7 @@ class UserTokenRepositoryTest {
         UserToken newToken = UserToken.builder()
             .userId(4L)
             .userType(UserRole.OWNER)
-            .fcmToken("unique-new-token")
+            .fcmToken("unique-new-token-" + System.currentTimeMillis())
             .deviceType(DeviceType.WEB)
             .build();
 
@@ -190,7 +196,7 @@ class UserTokenRepositoryTest {
 
         // then
         assertThat(savedToken.getTokenId()).isNotNull();
-        assertThat(savedToken.getFcmToken()).isEqualTo("unique-new-token");
+        assertThat(savedToken.getFcmToken()).startsWith("unique-new-token-");
     }
 
     @Test
@@ -222,7 +228,7 @@ class UserTokenRepositoryTest {
         List<UserToken> remainingTokens = userTokenRepository.findAll();
         assertThat(remainingTokens).hasSize(2);
         assertThat(remainingTokens).extracting(UserToken::getFcmToken)
-            .containsExactlyInAnyOrder("owner-ios-token", "inactive-token");
+            .containsExactlyInAnyOrder(ownerToken1.getFcmToken(), inactiveToken.getFcmToken());
     }
 
     @Test
@@ -254,7 +260,7 @@ class UserTokenRepositoryTest {
         UserToken adminToken = UserToken.builder()
             .userId(100L)
             .userType(UserRole.ADMIN)
-            .fcmToken("admin-token")
+            .fcmToken("admin-token-" + System.currentTimeMillis())
             .deviceType(DeviceType.WEB)
             .build();
         entityManager.persistAndFlush(adminToken);
