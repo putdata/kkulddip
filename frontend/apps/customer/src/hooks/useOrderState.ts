@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFunnel } from '@/hooks/useFunnel';
 import { useOrderFlowStore } from '@/store/useOrderFlowStore';
 import { ROUTE_PATH } from '@/router';
-import type { CartData, PaymentData } from '@/types/orderflow';
+import type { CartData } from '@/types/orderflow';
 
 const steps = ['cart', 'payment', 'pending', 'complete'] as const;
 
@@ -20,7 +20,6 @@ export const useOrderState = () => {
     completedOrderData,
     isCompleted,
     updateOrderData,
-    completeOrder,
     createNewOrder,
     initializeFromSession,
   } = useOrderFlowStore();
@@ -44,20 +43,10 @@ export const useOrderState = () => {
     [updateOrderData, nextClickHandler],
   );
 
-  // 결제에서 대기화면으로 (결제 로직 + pending 이동)
-  const handleNextToPending = useCallback(
-    (paymentData: PaymentData) => {
-      completeOrder(paymentData);
-      nextClickHandler('pending');
-
-      // Mock 결제 처리
-      // TODO: 실제 토스 API로 교체
-      setTimeout(() => {
-        handlePendingToComplete();
-      }, 3000);
-    },
-    [completeOrder, nextClickHandler, handlePendingToComplete],
-  );
+  // 결제에서 대기화면으로 (pending에서 실제 결제 처리)
+  const handleNextToPending = useCallback(() => {
+    nextClickHandler('pending');
+  }, [nextClickHandler]);
 
   // 뒤로가기 핸들러들
   const handleBackToCart = useCallback(() => {
@@ -83,6 +72,7 @@ export const useOrderState = () => {
     Funnel,
     Step,
     currentStep,
+    nextClickHandler,
 
     // 상태들
     orderData,

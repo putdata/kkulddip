@@ -2,19 +2,10 @@ import { Button } from '@/components/ui/button';
 
 import { useState } from 'react';
 import ReviewItem from './ReviewItem';
+import type { ReviewResponse } from '@/types/review';
 
 interface ReviewsComponentProps {
-  reviews: {
-    id: number;
-    user: {
-      name: string;
-      usageCount: number;
-    };
-    rating: number;
-    content: string;
-    images: { emoji: string }[];
-    createDate: string;
-  }[];
+  reviews: ReviewResponse[];
 }
 
 const ReviewsContainer = ({ reviews }: ReviewsComponentProps) => {

@@ -1,10 +1,6 @@
 import { useMemo } from 'react';
-import {
-  useNavigate,
-  useParams,
-  useLocation,
-  generatePath,
-} from 'react-router-dom';
+import { useNavigate, useLocation, generatePath } from 'react-router-dom';
+import { useNumberParam } from 'common';
 import { useMyStores } from '@/queries/useMyStores';
 import { getCurrentPageRoute } from '@/utils/sidebarUtils';
 import type { Store } from '@/types/store';
@@ -16,7 +12,7 @@ import type { Store } from '@/types/store';
 export const useStoreSelection = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { storeId } = useParams();
+  const storeId = useNumberParam('storeId');
   const { data: storeListData } = useMyStores();
 
   /**
@@ -30,7 +26,7 @@ export const useStoreSelection = () => {
    * 현재 선택된 스토어
    */
   const selectedStore = useMemo(() => {
-    return storeId ? stores.find(s => s.id === storeId) || null : null;
+    return storeId ? stores.find(s => s.storeId === storeId) || null : null;
   }, [storeId, stores]);
 
   /**
@@ -39,7 +35,9 @@ export const useStoreSelection = () => {
    */
   const selectStore = (store: Store) => {
     const currentRoutePath = getCurrentPageRoute(location.pathname);
-    const newPath = generatePath(currentRoutePath, { storeId: store.id });
+    const newPath = generatePath(currentRoutePath, {
+      storeId: store.storeId.toString(),
+    });
     navigate(newPath);
   };
 

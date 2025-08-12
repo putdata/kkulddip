@@ -22,12 +22,18 @@ const OrderFunnelContainer = () => {
     handleBackToHome,
     handleNewOrder,
     initializeFromSession,
+    nextClickHandler,
   } = useOrderState();
 
   // 세션에서 완료된 주문 복원
   useEffect(() => {
     try {
       initializeFromSession();
+
+      if (isCompleted && currentStep != 'complete') {
+        nextClickHandler('complete');
+        return;
+      }
 
       // 완료된 주문 + Cart 스텝이면 재진입으로 판단
       if (isCompleted && currentStep === 'cart') {
@@ -36,7 +42,13 @@ const OrderFunnelContainer = () => {
     } catch {
       navigate(ROUTE_PATH.HOME, { replace: true });
     }
-  }, [initializeFromSession, isCompleted, currentStep, navigate]);
+  }, [
+    initializeFromSession,
+    isCompleted,
+    currentStep,
+    navigate,
+    nextClickHandler,
+  ]);
 
   return (
     <Funnel>
