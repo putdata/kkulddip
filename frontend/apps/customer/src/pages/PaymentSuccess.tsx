@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useOrderFlowStore } from '@/store/useOrderFlowStore';
-import { confirmPayment } from '@/services/paymentService';
+import { PaymentService } from '@/services/paymentService';
 import { ROUTE_PATH } from '@/router';
 
 const PaymentSuccess = () => {
@@ -30,7 +30,11 @@ const PaymentSuccess = () => {
 
       try {
         // 토스페이먼츠 결제 승인 API 호출
-        await confirmPayment(paymentKey, orderId, parseInt(amount));
+        await PaymentService.confirmPayment(
+          paymentKey,
+          orderId,
+          parseInt(amount),
+        );
 
         // 주문 완료 처리
         completeOrder({
