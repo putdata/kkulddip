@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/utils/priceFormat';
 import { formatDate } from '@/utils/dateFormat';
 import { type OrderCardProps } from '@/types/orderFood';
+import { ROUTE_PATH } from '@/router/route-path';
 
 const OrderCard = ({ item }: OrderCardProps) => {
   const { orderDate, storeName, orderItems, originalPrice, finalPrice } = item;
@@ -20,7 +21,7 @@ const OrderCard = ({ item }: OrderCardProps) => {
         </span>
         <button
           className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          onClick={() => navigate(`/order/${item.orderId}`)}
+          onClick={() => navigate(ROUTE_PATH.ORDER_DETAIL(item.orderId))}
         >
           주문상세
         </button>
