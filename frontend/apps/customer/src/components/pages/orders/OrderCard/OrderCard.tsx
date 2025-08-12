@@ -1,4 +1,4 @@
-import { Heart, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/utils/priceFormat';
 import { formatDate } from '@/utils/dateFormat';
@@ -40,13 +40,6 @@ const OrderCard = ({ item }: OrderCardProps) => {
           </div>
           <div className="flex items-center gap-1">
             <ChevronRight className="h-3 w-3 text-gray-400" />
-            <button className="p-0.5">
-              <Heart
-                className="h-4 w-4 transition-colors"
-                color="#d1d5db"
-                fill="none"
-              />
-            </button>
           </div>
         </div>
 
