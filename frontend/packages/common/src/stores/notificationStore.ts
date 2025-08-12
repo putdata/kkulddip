@@ -16,7 +16,8 @@ export const useNotificationStore = create<NotificationState>()(
       isTokenRegistered: false,
       setFcmToken: token => set({ fcmToken: token }),
       setTokenRegistered: registered => set({ isTokenRegistered: registered }),
-      clearNotification: () => set({ fcmToken: null, isTokenRegistered: false }),
+      clearNotification: () =>
+        set({ fcmToken: null, isTokenRegistered: false }),
     }),
     {
       name: 'notification-storage',

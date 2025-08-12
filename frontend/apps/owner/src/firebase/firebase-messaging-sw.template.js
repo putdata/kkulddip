@@ -6,13 +6,13 @@ importScripts(
 );
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCYm9D-lJ9NqYLwjhXI5gf8EzQIBAIjjgQ",
-  authDomain: "kkulddip.firebaseapp.com",
-  projectId: "kkulddip",
-  storageBucket: "kkulddip.firebasestorage.app",
-  messagingSenderId: "1042547093901",
-  appId: "1:1042547093901:web:04df7f2a4ce9fe6a03d568",
-  measurementId: "G-RZT83D9CPS",
+  apiKey: 'AIzaSyCYm9D-lJ9NqYLwjhXI5gf8EzQIBAIjjgQ',
+  authDomain: 'kkulddip.firebaseapp.com',
+  projectId: 'kkulddip',
+  storageBucket: 'kkulddip.firebasestorage.app',
+  messagingSenderId: '1042547093901',
+  appId: '1:1042547093901:web:04df7f2a4ce9fe6a03d568',
+  measurementId: 'G-RZT83D9CPS',
 };
 
 // Initialize Firebase

@@ -7,11 +7,12 @@ function App() {
   useEffect(() => {
     // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then((registration) => {
+      navigator.serviceWorker
+        .register('/firebase-messaging-sw.js')
+        .then(registration => {
           console.log('SW registered: ', registration);
         })
-        .catch((registrationError) => {
+        .catch(registrationError => {
           console.log('SW registration failed: ', registrationError);
         });
     }
@@ -19,9 +20,9 @@ function App() {
     // Handle foreground messages
     const messaging = getMessagingInstance();
     if (messaging) {
-      const unsubscribe = onMessage(messaging, (payload) => {
+      const unsubscribe = onMessage(messaging, payload => {
         console.log('Message received in foreground: ', payload);
-        
+
         // Show notification manually for foreground messages
         if (Notification.permission === 'granted') {
           new Notification(payload.notification?.title || '꿀띱 알림', {

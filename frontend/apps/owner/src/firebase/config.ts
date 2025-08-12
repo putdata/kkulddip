@@ -8,13 +8,13 @@ import {
 import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCYm9D-lJ9NqYLwjhXI5gf8EzQIBAIjjgQ",
-  authDomain: "kkulddip.firebaseapp.com",
-  projectId: "kkulddip",
-  storageBucket: "kkulddip.firebasestorage.app",
-  messagingSenderId: "1042547093901",
-  appId: "1:1042547093901:web:04df7f2a4ce9fe6a03d568",
-  measurementId: "G-RZT83D9CPS",
+  apiKey: 'AIzaSyCYm9D-lJ9NqYLwjhXI5gf8EzQIBAIjjgQ',
+  authDomain: 'kkulddip.firebaseapp.com',
+  projectId: 'kkulddip',
+  storageBucket: 'kkulddip.firebasestorage.app',
+  messagingSenderId: '1042547093901',
+  appId: '1:1042547093901:web:04df7f2a4ce9fe6a03d568',
+  measurementId: 'G-RZT83D9CPS',
 };
 
 // Initialize Firebase
@@ -31,7 +31,8 @@ if (typeof window !== 'undefined') {
 }
 
 // VAPID Key
-const VAPID_KEY = "BOMYKHkQFGEj9pTa5oXTBX39K2HrOYJbx0QSPB3qiWp42Q-q8rAU7o8fK7lHF7EfwfTEBAOEXH1PK5qGBUc2rME";
+const VAPID_KEY =
+  'BOMYKHkQFGEj9pTa5oXTBX39K2HrOYJbx0QSPB3qiWp42Q-q8rAU7o8fK7lHF7EfwfTEBAOEXH1PK5qGBUc2rME';
 
 // Get messaging instance
 const getMessagingInstance = (): Messaging | null => {
