@@ -48,7 +48,7 @@ public class OwnerExtractorTest {
         Long ownerId = 1L;
         String oauth2ProviderId = "google-user-123";
         
-        JwtUserInfo jwtUserInfo = new JwtUserInfo("owner@example.com", "OWNER", "GOOGLE", oauth2ProviderId);
+        JwtUserInfo jwtUserInfo = new JwtUserInfo("owner-123", "owner@example.com", "OWNER", "GOOGLE", oauth2ProviderId);
         
         Owner mockOwner = Owner.builder()
             .ownerId(ownerId)
