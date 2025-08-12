@@ -2,7 +2,29 @@ import NotificationCard from '@/components/pages/notifications/NotificationCard'
 import { useNotifications } from '@/hooks/useNotifications';
 
 const Notification = () => {
-  const { notifications, markAsRead } = useNotifications();
+  const { notifications, isLoading, error } = useNotifications();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white pb-14 pt-14">
+        <div className="flex items-center justify-center py-16">
+          <div className="text-gray-500">로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white pb-14 pt-14">
+        <div className="flex items-center justify-center py-16">
+          <div className="text-red-500">
+            알림을 불러오는 중 오류가 발생했습니다.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-14 pt-14">
@@ -10,36 +32,20 @@ const Notification = () => {
         {notifications.length > 0 ? (
           <>
             {notifications.map(notification => (
-              <NotificationCard
-                key={notification.id}
-                {...notification}
-                onClick={() => markAsRead(notification.id)}
-              />
+              <NotificationCard key={notification.id} {...notification} />
             ))}
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center px-4 py-16">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-              <svg
-                className="h-8 w-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M15 17h5l-5 5v-5zM9 17h5l-5 5v-5zM21 3.6v16.8a1.8 1.8 0 01-1.8 1.8H4.8A1.8 1.8 0 013 20.4V3.6A1.8 1.8 0 014.8 1.8h14.4A1.8 1.8 0 0121 3.6z"
-                />
-              </svg>
+          <div className="py-50 flex flex-col items-center justify-center px-4">
+            <div className="text-4xl">🔔</div>
+            <div className="text-center">
+              <h3 className="mb-1 mt-2 text-lg font-semibold text-gray-800">
+                알림이 없습니다
+              </h3>
+              <p className="text-sm text-gray-500">
+                새로운 알림이 오면 여기에 표시됩니다
+              </p>
             </div>
-            <h3 className="mb-1 text-lg font-medium text-gray-900">
-              알림이 없습니다
-            </h3>
-            <p className="text-center text-sm text-gray-500">
-              새로운 알림이 오면 여기에 표시됩니다
-            </p>
           </div>
         )}
       </div>
