@@ -228,16 +228,6 @@ const StreamingLive = () => {
           </Button>
           <h1 className="text-2xl font-bold">라이브 스트림</h1>
         </div>
-
-        {streamFlowManager.canEndStreaming && (
-          <Button
-            variant="destructive"
-            onClick={handleShowEndDialog}
-            disabled={streamFlowManager.isLoading}
-          >
-            방송 종료
-          </Button>
-        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
