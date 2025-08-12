@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { useNumberParam } from 'common';
 import { ArrowLeft, Video, AlertCircle } from 'lucide-react';
 
@@ -32,6 +32,7 @@ import {
   mapApiStatusToFlowStatus,
   validateStreamStatus,
 } from '@/utils/streamUtils';
+import { ROUTE_PATH } from '@/router/route-path';
 
 const StreamingLive = () => {
   const navigate = useNavigate();
@@ -43,9 +44,17 @@ const StreamingLive = () => {
 
   const { data: stream, isLoading, error } = useStreamDetails(streamId);
 
+  const handleNavigateToStream = () => {
+    navigate(
+      generatePath(ROUTE_PATH.STORE.STREAMING, {
+        storeId: String(storeId),
+      }),
+    );
+  };
+
   const streamFlowManager = useStreamFlowManager({
     initialStream: stream,
-    onStreamEnded: () => navigate(`/${storeId}/streaming`),
+    onStreamEnded: () => handleNavigateToStream,
   });
 
   useEffect(() => {
@@ -114,8 +123,6 @@ const StreamingLive = () => {
     return () => {
       window.removeEventListener('beforeunload', handlePageUnload);
       window.removeEventListener('unload', handlePageUnload);
-      // 컴포넌트 언마운트 시에만 정리 (페이지 새로고침/닫기가 아닌 경우)
-      // handlePageUnload(); // 이 줄을 제거
     };
   }, [handlePageUnload]);
 
@@ -131,7 +138,8 @@ const StreamingLive = () => {
       setShowExitConfirm(true);
       return;
     }
-    navigate(`/${storeId}/streaming`);
+
+    handleNavigateToStream();
   };
 
   /** 나가기 확인 핸들러 */

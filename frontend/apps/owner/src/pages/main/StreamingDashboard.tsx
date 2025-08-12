@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { useNumberParam } from 'common';
 import { useMyStreams } from '@/queries/stream';
 import { useStreamFlowManager } from '@/hooks/useStreamFlowManager';
@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { mapApiStatusToFlowStatus } from '@/utils/streamUtils';
 import { Play, Plus, AlertCircle } from 'lucide-react';
 import type { Stream } from 'common';
+import { ROUTE_PATH } from '@/router/route-path';
 
 const StreamingDashboard = () => {
   const navigate = useNavigate();
@@ -33,7 +34,12 @@ const StreamingDashboard = () => {
     streams?.filter(stream => stream.status === 'ENDED').slice(0, 3) || [];
 
   const handleStreamStart = (stream: Stream) => {
-    navigate(`/${storeId}/streaming/live/${stream.id}`);
+    navigate(
+      generatePath(ROUTE_PATH.STORE.STREAMING_LIVE, {
+        storeId: String(storeId),
+        streamId: String(stream.id),
+      }),
+    );
   };
 
   const handleCreateStream = streamFlowManager.createStream;

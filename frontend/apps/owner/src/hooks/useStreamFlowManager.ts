@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import type { Stream, CreateStreamRequest } from 'common';
+import { type Stream, type CreateStreamRequest, useNumberParam } from 'common';
 import type { StreamFlowStatus, StreamFlow } from '@/types/stream';
 import {
   useCreateStream,
@@ -19,6 +19,7 @@ import {
   validateStreamStatus,
 } from '@/utils/streamUtils';
 import { ERROR_MESSAGES } from '@/constants/stream';
+import { ROUTE_PATH } from '@/router/route-path';
 
 interface UseStreamFlowManagerProps {
   initialStream?: Stream;
@@ -34,7 +35,7 @@ export const useStreamFlowManager = ({
   onStreamEnded,
 }: UseStreamFlowManagerProps = {}) => {
   const navigate = useNavigate();
-  const { storeId } = useParams<{ storeId: string }>();
+  const storeId = useNumberParam('storeId');
 
   const [streamFlow, setStreamFlow] = useState<StreamFlow>({
     id: initialStream?.id,
@@ -109,11 +110,20 @@ export const useStreamFlowManager = ({
         updateStreamFlow({
           id: newStream.id,
           title: newStream.title,
-          description: newStream.description,
+          description: newStream.description || '',
           status: mapApiStatusToFlowStatus(newStream.status),
         });
 
-        navigate(`/${storeId}/streaming/live/${newStream.id}`);
+        if (!storeId || !newStream?.id) {
+          throw new Error();
+        }
+
+        navigate(
+          generatePath(ROUTE_PATH.STORE.STREAMING_LIVE, {
+            storeId: String(storeId),
+            streamId: String(newStream.id),
+          }),
+        );
       } catch (error) {
         const parsedError = parseStreamError(error);
         setStatus('ERROR', parsedError.message);
