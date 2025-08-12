@@ -1,9 +1,8 @@
 interface Notification {
-  id: string;
+  id: number;
   title: string;
   message: string;
-  type: 'order' | 'promotion' | 'system' | 'review' | 'pickup';
-  isRead: boolean;
+  type: 'order' | 'event' | 'marketing' | 'system' | 'review' | 'pickup';
   createdAt: string;
 }
 
