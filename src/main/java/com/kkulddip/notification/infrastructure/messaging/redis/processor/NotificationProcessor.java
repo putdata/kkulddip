@@ -5,7 +5,6 @@ import com.kkulddip.notification.application.dto.response.NotificationResponse;
 import com.kkulddip.notification.application.service.NotificationService;
 import com.kkulddip.notification.domain.model.enums.RecipientType;
 import com.kkulddip.notification.domain.model.enums.SubscriberType;
-import com.kkulddip.notification.domain.service.NotificationDomainService;
 import com.kkulddip.notification.infrastructure.messaging.redis.processor.sender.NotificationSenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 public class NotificationProcessor {
 
     private final NotificationService notificationService;
-    private final NotificationDomainService notificationDomainService;
     private final NotificationSenderService notificationSenderService;
 
     /**
@@ -36,8 +34,9 @@ public class NotificationProcessor {
      */
     public boolean processNotification(NotificationRequest request) {
         try {
-            log.debug("알림 처리 시작 - id: {}, title: {}, subscriberType: {}", 
-                request.getId(), request.getTitle(), request.getSubscriberType());
+            log.debug("알림 처리 시작 - id: {}, title: {}, subscriberType: {}, publisherType: {}, publisherId: {}, subscriberId: {}", 
+                request.getId(), request.getTitle(), request.getSubscriberType(), 
+                request.getPublisherType(), request.getPublisherId(), request.getSubscriberId());
 
             // 1. 알림을 데이터베이스에 저장 (Redis에서 처리할 때)
             NotificationResponse notification = notificationService.createNotificationFromRedis(request);
@@ -52,7 +51,12 @@ public class NotificationProcessor {
             if (sent) {
                 // 3. 발송 성공 시 알림을 발송 완료로 표시
                 notificationService.markNotificationAsSent(notification.getNotificationId());
-                log.info("알림 처리 완료 - notificationId: {}", notification.getNotificationId());
+                log.info("알림 처리 완료 - notificationId: {}, publisherType: {}, subscriberType: {}", 
+                    notification.getNotificationId(), notification.getPublisherType(), notification.getSubscriberType());
+            } else {
+                log.error("알림 발송 실패 - notificationId: {}, publisherType: {}, subscriberType: {}, publisherId: {}, subscriberId: {}", 
+                    notification.getNotificationId(), notification.getPublisherType(), notification.getSubscriberType(),
+                    notification.getPublisherId(), notification.getSubscriberId());
             }
 
             return sent;
@@ -86,7 +90,7 @@ public class NotificationProcessor {
 
     /**
      * CUSTOMER 타입 알림을 처리합니다.
-     * subscriberId가 있으면 특정 고객에게, 없으면 모든 고객에게 발송합니다.
+     * subscriberId가 있으면 특정 고객에게, 없으면 브로드캐스트 패턴을 확인하여 처리합니다.
      *
      * @param notification 저장된 알림
      * @param request 원본 요청
@@ -102,9 +106,39 @@ public class NotificationProcessor {
                 RecipientType.CUSTOMER
             );
         } else {
-            // subscriberId가 없는 경우 - 모든 고객에게 발송
-            log.debug("전체 고객 알림 발송");
-            return notificationSenderService.sendToAllCustomers(notification);
+            // subscriberId가 없는 경우 - 브로드캐스트 패턴 확인
+            if (notificationSenderService.isStoreFavoriteBroadcast(notification)) {
+                // 가게의 즐겨찾기 고객들에게 브로드캐스트
+                Long storeId = notification.getPublisherId();
+                if (storeId == null) {
+                    log.error("브로드캐스트 알림이지만 publisherId(storeId)가 null입니다. - notificationId: {}", 
+                        notification.getNotificationId());
+                    return false;
+                }
+                
+                log.info("가게 즐겨찾기 고객 브로드캐스트 알림 발송 시작 - notificationId: {}, storeId: {}", 
+                    notification.getNotificationId(), storeId);
+                
+                try {
+                    boolean result = notificationSenderService.sendBroadcastToFavoriteCustomers(notification, storeId);
+                    if (result) {
+                        log.info("가게 즐겨찾기 고객 브로드캐스트 알림 발송 성공 - notificationId: {}, storeId: {}", 
+                            notification.getNotificationId(), storeId);
+                    } else {
+                        log.warn("가게 즐겨찾기 고객 브로드캐스트 알림 발송 실패 - notificationId: {}, storeId: {}", 
+                            notification.getNotificationId(), storeId);
+                    }
+                    return result;
+                } catch (Exception e) {
+                    log.error("가게 즐겨찾기 고객 브로드캐스트 알림 발송 중 오류 발생 - notificationId: {}, storeId: {}, error: {}", 
+                        notification.getNotificationId(), storeId, e.getMessage(), e);
+                    return false;
+                }
+            } else {
+                // 일반적인 전체 고객 알림 발송
+                log.debug("전체 고객 알림 발송");
+                return notificationSenderService.sendToAllCustomers(notification);
+            }
         }
     }
 
