@@ -5,7 +5,7 @@ export const ROUTE_PATH = {
   SEARCH: '/search',
   MY: '/my',
   ORDER: '/order',
-  ORDER_DETAIL: (orderId: string) => `/order/${orderId}`,
+  ORDER_DETAIL: '/order/:orderId',
   NOTIFICATIONS: '/notifications',
   LOGIN: '/login',
   AUTH_CALLBACK: '/auth-callback',
