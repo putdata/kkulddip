@@ -1,72 +1,45 @@
+import { ChevronRight } from 'lucide-react';
 import { type CardItemProps } from '@/types/likeFoodCard';
-import { formatPrice } from '@/utils/priceFormat';
 
 const LikeFoodCard = ({ item, onClick }: CardItemProps) => {
   return (
     <div
       onClick={onClick}
-      className="flex max-w-full cursor-pointer items-start gap-3 rounded-md border border-gray-200 bg-white p-3 shadow-sm hover:shadow-md"
+      className="flex max-w-full cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
     >
-      {/* 이미지 */}
-      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded bg-gray-100">
-        <img
-          src={item.img.src}
-          alt={item.img.alt}
-          className="h-full w-full object-cover"
-        />
+      {/* 이미지 조건부 렌더링 */}
+      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+        {item.img.src ? (
+          <img
+            src={item.img.src}
+            alt={item.img.alt}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-500">
+            <span className="text-xs">🍽️</span>
+          </div>
+        )}
         {item.price.discount > 0 && (
-          <div className="absolute bottom-1 left-1 rounded bg-blue-600 px-1 py-1 text-[0.6rem] font-medium text-white">
-            {formatPrice(item.price.discount)} 할인
+          <div className="absolute bottom-0.5 left-0.5 rounded bg-red-500 px-1 py-0.5 text-[0.6rem] font-bold text-white">
+            {item.discountRate}% 할인
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2">
-        <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-gray-900">
+      {/* 텍스트 영역 */}
+      <div className="flex flex-1 flex-col gap-1">
+        <h3 className="line-clamp-1 text-sm font-semibold text-gray-900">
           {item.storeInfo.storeName}
         </h3>
-
-        <p className="line-clamp-1 text-xs leading-tight text-gray-500">
-          {item.storeInfo.description}
-        </p>
-
-        <div className="flex items-center gap-1 text-xs">
-          {item.price.original && (
-            <span className="text-gray-400 line-through">
-              {formatPrice(item.price.original)}
-            </span>
-          )}
-          <span className="font-bold text-green-600">
-            {formatPrice(item.price.discount)}
-          </span>
-        </div>
-
-        <div className="flex flex-wrap gap-1 text-xs">
-          {item.timeLeftHour && (
-            <span className="rounded-full bg-red-500 px-1.5 py-1 font-semibold text-white">
-              {item.timeLeftHour}시간
-            </span>
-          )}
-          {item.discountRate && (
-            <span className="rounded bg-yellow-100 px-1.5 py-1 font-semibold text-yellow-800">
-              {item.discountRate}% 할인
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between text-xs text-gray-600">
-          <div className="flex items-center gap-1">
-            <span>⭐ {item.storeInfo.ratingAverage.toFixed(1)}</span>
-            <span>📍 {item.distance}km</span>
-          </div>
-
-          {item.remainingQuantity !== undefined && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-1.5 py-1 text-xs text-red-500">
-              남은 수량 {item.remainingQuantity}개
-            </div>
-          )}
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span>⭐ {item.storeInfo.ratingAverage.toFixed(1)}</span>
+          <span>📍 {item.distance.toFixed(2)} km</span>
         </div>
       </div>
+
+      {/* Chevron 아이콘 */}
+      <ChevronRight className="h-4 w-4 text-gray-400" />
     </div>
   );
 };

@@ -18,6 +18,7 @@ import ReviewCreate from '@/pages/review/ReviewCreate';
 import PaymentSuccess from '@/pages/PaymentSuccess';
 import PaymentFail from '@/pages/PaymentFail';
 // import Notifications from '@/pages/Notifications';
+import AuthCallback from '@/pages/AuthCallback';
 
 export const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ export const router = createBrowserRouter([
             element: <Login />,
           },
         ],
+      },
+      {
+        path: ROUTE_PATH.AUTH_CALLBACK,
+        element: <AuthCallback />,
       },
       {
         path: ROUTE_PATH.PAY,
