@@ -110,11 +110,11 @@ class StoreMapperTest {
         assertThat(result.storeAddress()).isEqualTo("서울시 강남구 테헤란로 123");
         assertThat(result.description()).isEqualTo("신선한 식품을 판매하는 마트입니다");
         assertThat(result.operatingHours()).isEqualTo("09:00-22:00");
-        assertThat(result.phoneNumber()).isEqualTo("02-1234-5678");
+        assertThat(result.phone()).isEqualTo("02-1234-5678");
         assertThat(result.ratingAverage()).isEqualTo(4.5);
-        assertThat(result.reviewNum()).isEqualTo(128L);
+        assertThat(result.reviewCount()).isEqualTo(128L);
         assertThat(result.storeProfileImage()).isEqualTo("profile.jpg");
-        assertThat(result.active()).isTrue();
+        assertThat(result.isActive()).isTrue();
         assertThat(result.distanceFromUser()).isNull();
         assertThat(result.representativeDdipboxName()).isEqualTo("유기농 세트");
         assertThat(result.representativeOriginalPrice()).isEqualTo(20000L);
@@ -219,14 +219,14 @@ class StoreMapperTest {
         assertThat(result.storeAddress()).isEqualTo("서울시 강남구 테헤란로 123");
         assertThat(result.description()).isEqualTo("신선한 식품을 판매하는 마트입니다");
         assertThat(result.operatingHours()).isEqualTo("09:00-22:00");
-        assertThat(result.phoneNumber()).isEqualTo("02-1234-5678");
+        assertThat(result.phone()).isEqualTo("02-1234-5678");
         assertThat(result.ratingAverage()).isEqualTo(4.5);
         assertThat(result.reviewCount()).isEqualTo(128L);
         assertThat(result.businessNumber()).isEqualTo("123-45-67890");
         assertThat(result.storeProfileImage()).isEqualTo("profile.jpg");
         assertThat(result.latitude()).isEqualTo(37.5665);
         assertThat(result.longitude()).isEqualTo(126.9780);
-        assertThat(result.active()).isTrue();
+        assertThat(result.isActive()).isTrue();
         assertThat(result.createdAt()).isEqualTo(LocalDateTime.of(2024, 1, 1, 12, 0));
         assertThat(result.updatedAt()).isEqualTo(LocalDateTime.of(2024, 6, 1, 12, 0));
         
@@ -239,7 +239,7 @@ class StoreMapperTest {
         assertThat(ddipBoxSummary.originalPrice()).isEqualTo(20000L);
         assertThat(ddipBoxSummary.salePrice()).isEqualTo(15000L);
         assertThat(ddipBoxSummary.remainingQuantity()).isEqualTo(30L);
-        assertThat(ddipBoxSummary.active()).isTrue();
+        assertThat(ddipBoxSummary.isActive()).isTrue();
     }
 
     @Test
@@ -278,7 +278,7 @@ class StoreMapperTest {
         assertThat(result.dailyQuantity()).isEqualTo(50L);
         assertThat(result.remainingQuantity()).isEqualTo(30L);
         assertThat(result.maxPerCustomer()).isEqualTo(2L);
-        assertThat(result.active()).isTrue();
+        assertThat(result.isActive()).isTrue();
         
         // 구성상품 확인
         assertThat(result.items()).hasSize(1);

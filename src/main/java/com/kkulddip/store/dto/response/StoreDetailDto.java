@@ -19,14 +19,14 @@ public record StoreDetailDto(
     String storeAddress,
     String description,
     String operatingHours,
-    String phoneNumber,
+    String phone,
     Double ratingAverage,
     Long reviewCount,
     String businessNumber,
     String storeProfileImage,
     Double latitude,
     Double longitude,
-    Boolean active,
+    Boolean isActive,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<DdipBoxSummaryDto> ddipBoxes
@@ -44,6 +44,6 @@ public record StoreDetailDto(
         Long originalPrice,
         Long salePrice,
         Long remainingQuantity,
-        Boolean active
+        Boolean isActive
     ) {}
 }

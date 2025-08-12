@@ -7,8 +7,6 @@ import lombok.Setter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -56,7 +54,7 @@ public class Store {
     @Column(name = "store_address", length = 100)
     private String storeAddress;
 
-    @Column(name = "store_profile_image", length = 100)
+    @Column(name = "store_profile_image", length = 500)
     private String storeProfileImage;
 
     @Column(name = "latitude")
