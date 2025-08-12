@@ -22,7 +22,7 @@ export const indexLoader = async () => {
 
   const firstStore = storeList.stores[0]!;
   const dashboardPath = generatePath(ROUTE_PATH.STORE.DASHBOARD, {
-    storeId: firstStore.id,
+    storeId: firstStore.storeId.toString(),
   });
 
   throw redirect(dashboardPath);

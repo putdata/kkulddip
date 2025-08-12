@@ -36,7 +36,7 @@ export const useAuthCallback = () => {
 
     const data = await AuthService.exchangeCodeForToken(code);
 
-    setAccessToken(data.access_token);
+    setAccessToken(data.accessToken);
     setUser(data.user);
     toast.success('로그인 성공!');
 
