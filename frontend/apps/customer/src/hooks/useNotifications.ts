@@ -1,35 +1,22 @@
-import { useState } from 'react';
-import type { Notification } from '@/types/notification';
-import { dummyNotifications } from '@/dummies/notifications';
+import { useQuery } from '@tanstack/react-query';
+import { getNotifications } from '@/services/notificationService';
+import { useUserStore } from 'common';
 
 export const useNotifications = () => {
-  const [notifications, setNotifications] =
-    useState<Notification[]>(dummyNotifications);
+  const { user } = useUserStore();
 
-  const unreadCount = notifications.filter(
-    notification => !notification.isRead,
-  ).length;
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['notifications', user?.userid],
+    queryFn: () => getNotifications(user!.userid),
+    enabled: Boolean(user?.userid),
+  });
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id
-          ? { ...notification, isRead: true }
-          : notification,
-      ),
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, isRead: true })),
-    );
-  };
+  const notifications = data || [];
 
   return {
     notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
+    isLoading,
+    error,
+    refetch,
   };
 };
