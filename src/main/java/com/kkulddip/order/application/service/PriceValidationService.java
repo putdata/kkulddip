@@ -20,13 +20,4 @@ public interface PriceValidationService {
      * @throws PriceValidationException 가격이 일치하지 않는 경우
      */
     void validatePrices(Long storeId, List<OrderItemRequest> orderItems);
-    
-    /**
-     * 특정 상품의 실제 가격을 조회합니다.
-     * 
-     * @param storeId 매장 ID
-     * @param productId 상품 ID
-     * @return 실제 상품 가격
-     */
-    Money getActualProductPrice(Long storeId, Long productId);
 }

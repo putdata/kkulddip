@@ -11,12 +11,15 @@ import com.kkulddip.store.entity.Store;
 import com.kkulddip.store.repository.CursorStoreRepository;
 import com.kkulddip.store.repository.DdipBoxRepository;
 import com.kkulddip.store.service.StoreService;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -45,6 +48,9 @@ class CursorPaginationIntegrationTest {
 
     @Autowired
     private FavoriteRepository favoriteRepository;
+
+    @MockitoBean
+    private FirebaseMessaging firebaseMessaging;
 
     private List<Store> testStores;
     private LocalDateTime baseTime;
