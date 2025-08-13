@@ -6,28 +6,14 @@ import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from 'lucide-react';
 
 const MyPage = () => {
-  const { data: profile, isLoading, error } = useProfile();
+  const { data: profile, isLoading } = useProfile();
 
-  if (isLoading) {
+  if (isLoading || !profile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
           <div className="text-gray-500">프로필을 불러오고 있어요...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !profile) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 px-4">
-        <div className="text-4xl">😵</div>
-        <div className="text-center">
-          <h3 className="mb-2 text-lg font-semibold text-gray-800">
-            프로필을 불러올 수 없어요
-          </h3>
-          <p className="text-sm text-gray-500">잠시 후 다시 시도해주세요</p>
         </div>
       </div>
     );
