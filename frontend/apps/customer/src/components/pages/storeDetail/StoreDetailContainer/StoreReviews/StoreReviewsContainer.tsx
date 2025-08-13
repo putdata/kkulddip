@@ -18,7 +18,7 @@ export const StoreReviewsContainer = ({
 
   // TODO: 리뷰 없을 경우 문구 수정 필요
   return (
-    <div className="flex flex-col items-start justify-start gap-2 bg-white p-5">
+    <div className="flex flex-col items-start justify-start gap-2 p-5 pb-0">
       <div className="flex w-full items-baseline justify-between">
         <h2 className="text text-lg font-bold">리뷰</h2>
         <div className="mb-2 text-sm text-gray-500">
