@@ -1,3 +1,4 @@
+import { API_PATH } from '@/constants/api-path';
 import type { ReviewCreateRequest, ReviewResponse } from '@/types/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from 'common';
@@ -6,6 +7,20 @@ import { apiClient } from 'common';
  * 리뷰 관련 API 서비스 클래스
  */
 export class ReviewService {
+  /**
+   * 리뷰 목록 조회
+   */
+  static async getReviews(
+    storeId: string,
+    params?: {
+      page?: number;
+      size?: number;
+      sort?: string;
+    },
+  ): Promise<ReviewResponse[]> {
+    return apiClient.get(API_PATH.STORE_REVIEWS(storeId), params);
+  }
+
   /**
    * 리뷰 등록 API 호출
    *

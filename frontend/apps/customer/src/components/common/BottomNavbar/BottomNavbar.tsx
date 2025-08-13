@@ -53,7 +53,7 @@ function BottomNavbar() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white">
+    <div className="fixed bottom-0 left-0 right-0 z-50 h-14 border-t bg-white">
       <div className="flex items-center justify-evenly text-xs text-gray-500">
         {gnbProps.map(item => {
           const isActive = location.pathname === item.path;

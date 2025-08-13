@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { ReviewResponse } from '@/types/review';
+import { formatDate } from '@/utils/dateFormat';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
 
 interface ReviewProps {
@@ -41,7 +42,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
           </div>
           {/* 리뷰 작성 날짜 */}
           <div className="text-sm font-normal text-gray-400">
-            {review.createdAt.slice(0, 10)}{' '}
+            {formatDate(review.createdAt)}
           </div>
         </div>
         {/* 리뷰 내용 */}
