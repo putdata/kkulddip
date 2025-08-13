@@ -25,7 +25,8 @@ export const useDeleteFavorite = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (params: DeleteLikeParams) => likeService.deleteFavorite(params),
+    mutationFn: (params: DeleteLikeParams) =>
+      likeService.deleteFavorite(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['likes'] });
     },
