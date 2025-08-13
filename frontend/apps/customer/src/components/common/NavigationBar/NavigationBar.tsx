@@ -1,6 +1,9 @@
+import { ROUTE_PATH } from '@/router';
 import { MapPin, Bell, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const NavigationBar = () => {
+  const navigate = useNavigate();
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between bg-white px-4 py-3 shadow-md">
       <div className="flex items-center space-x-2">
@@ -13,7 +16,10 @@ const NavigationBar = () => {
           <MapPin className="mr-1 h-4 w-4" />
           강남구
         </button>
-        <button className="flex items-center text-gray-700">
+        <button
+          className="flex items-center text-gray-700"
+          onClick={() => navigate(ROUTE_PATH.NOTIFICATION)}
+        >
           <Bell className="mr-1 h-4 w-4" />
         </button>
         <button className="text-sm text-gray-700">
