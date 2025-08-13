@@ -1,16 +1,26 @@
 import { OperatingHoursBadge } from './OperatingHoursBadge';
 import { OutOfStockBadge } from './OutOfStockBadge';
 import { ChevronRight } from 'lucide-react';
-import type { DdipBoxSummaryDto, StoreDetailDto } from '@/types/store';
+import type { DdipBox, StoreDetail } from '@/types/store';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '@/router';
 
 interface StoreDetailHeaderProps {
-  store: StoreDetailDto;
+  store: StoreDetail;
+  ddipboxes: DdipBox[];
 }
 
-export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
-  const ddipboxes = store.ddipBoxes;
+export const StoreDetailHeader = ({
+  store,
+  ddipboxes,
+}: StoreDetailHeaderProps) => {
+  const navigate = useNavigate();
 
-  const outOfStockCheck = (ddipboxes: DdipBoxSummaryDto[]) => {
+  const handleLoadAllReviews = () => {
+    navigate(generatePath(ROUTE_PATH.REVIEW, { storeId: `${store.storeId}` }));
+  };
+
+  const outOfStockCheck = (ddipboxes: DdipBox[]) => {
     let quantity = 0;
     ddipboxes.forEach(item => {
       quantity += item.remainingQuantity;
@@ -23,7 +33,7 @@ export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
   return (
     <div className="flex flex-col">
       <img className="h-60 w-full object-cover" src={store.storeProfileImage} />
-      <div className="flex w-full flex-col items-start justify-start bg-white">
+      <div className="flex w-full flex-col items-start justify-start bg-white px-5 py-2">
         {/* 가게 이름, 주소, 별점 */}
         <div className="flex w-full justify-between">
           {/* 가게 이름, 주소 */}
@@ -36,7 +46,10 @@ export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
             <div className="justify-center font-bold">
               ⭐ {store.ratingAverage}
             </div>
-            <div className="justify-end text-gray-900">
+            <div
+              className="justify-end text-gray-900"
+              onClick={handleLoadAllReviews}
+            >
               ({store.reviewCount})
             </div>
             <ChevronRight className="w-5" />

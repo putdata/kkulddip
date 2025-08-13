@@ -1,6 +1,7 @@
 import { StarRating } from '@/components/common/StarRating';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ReviewResponse } from '@/types/review';
+import { formatDate } from '@/utils/dateFormat';
 
 interface ReviewProps {
   review: ReviewResponse;
@@ -26,7 +27,7 @@ const StoreReviewItem = ({ review }: ReviewProps) => {
           </div>
           {/* 리뷰 작성 날짜 */}
           <div className="text-sm font-normal text-gray-400">
-            {review.createdAt}
+            {formatDate(review.createdAt)}
           </div>
         </div>
         {/* 리뷰 내용 */}
