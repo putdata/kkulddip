@@ -1,18 +1,12 @@
 import { Star } from 'lucide-react';
 import { useStarRating } from '@/hooks/useStarRating'; // 1. import 추가
 import { useEffect } from 'react';
+import type { StoreDetail } from '@/types/store';
 
 // 2. 기존 useState 삭제하고 커스텀 훅 사용
 
-interface Store {
-  storeId: string;
-  storeName: string;
-  img: string;
-  imgAlt: string;
-}
-
 interface ReviewCreateHeaderProps {
-  store: Store;
+  store: StoreDetail;
   rating: number; // 추가
   setRating: (rating: number) => void;
 }
@@ -69,7 +63,10 @@ const ReviewCreateHeader = ({
       </div>
 
       <div className="flex h-20 w-20 items-center justify-center overflow-hidden bg-amber-100">
-        <img alt={store.imgAlt} src={store.img} />
+        <img
+          alt={`${store.storeName}의 가게 이미지`}
+          src={store.storeProfileImage}
+        />
       </div>
     </div>
   );

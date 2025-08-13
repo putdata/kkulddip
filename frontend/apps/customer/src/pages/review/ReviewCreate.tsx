@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-import { reviewCreateMockData } from '@/constants/mockData';
-
 import ReviewCreateHeader from '@/components/pages/reviewCreate/ReviewCreateHeader';
 import ReviewCreatePhotoInput from '@/components/pages/reviewCreate/ReviewCreatePhotoInput';
 import ReviewCreateTextInput from '@/components/pages/reviewCreate/ReviewCreateTextInput';
 import { useCreateReviewMutation } from '@/services/reviewService';
 import type { ReviewCreateRequest } from '@/types/review';
+import { useParams } from 'react-router-dom';
+import { useStoreDetail } from '@/hooks/useStoreDetail';
 
 interface ReviewFormState {
   rating: number;
@@ -18,8 +18,14 @@ interface ReviewFormState {
 }
 
 const ReviewCreate = () => {
-  // TODO: 일단은 예시 데이터
-  const store = reviewCreateMockData;
+  const params = useParams();
+  const storeId = params.storeId!;
+
+  const {
+    data: store,
+    isLoading: storeLoading,
+    error: storeError,
+  } = useStoreDetail(storeId);
 
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({
     rating: 0,
@@ -72,7 +78,7 @@ const ReviewCreate = () => {
     }
 
     const reviewData: ReviewCreateRequest = {
-      storeId: store.storeId,
+      storeId: storeId,
       // TODO: 실제 로그인한 사용자 ID로 변경 필요
       customerId: 1,
       content: trimmedContent,
@@ -143,6 +149,20 @@ const ReviewCreate = () => {
       }
     }
   };
+
+  // 둘 중 하나라도 로딩 중이면 로딩 표시
+  if (storeLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  // 에러 처리
+  if (storeError) {
+    return <div>에러가 발생했습니다.</div>;
+  }
+
+  if (!store) {
+    return <div>가게 정보를 찾을 수 없습니다.</div>;
+  }
 
   // 폼 유효성 검사
   const isFormValid =
