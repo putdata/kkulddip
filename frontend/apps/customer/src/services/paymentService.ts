@@ -83,22 +83,24 @@ export const getPaymentOrderIdWithRetry = async (
       console.log(`결제 주문 ID 요청 시도 ${attempt}/${maxRetries}`);
 
       const result = await PaymentService.createPaymentOrderId(orderId);
+      console.log('createPaymentOrderId 응답:', result);
 
-      if (result.success) {
-        console.log('결제 주문 ID 생성 성공:', result.body.paymentOrderId);
-        return result.body.paymentOrderId;
+      // ApiClient가 body만 반환하므로 직접 접근
+      if (result && result.paymentOrderId) {
+        console.log('결제 주문 ID 생성 성공:', result.paymentOrderId);
+        return result.paymentOrderId;
       }
 
-      // PAYMENT_NOT_FOUND 에러인 경우 재시도
-      if (result.code === 'PAYMENT_NOT_FOUND' && attempt < maxRetries) {
+      // 응답이 없거나 paymentOrderId가 없는 경우 재시도
+      if (attempt < maxRetries) {
         console.log(
-          `결제 정보를 찾을 수 없습니다. ${delay}ms 후 재시도합니다.`,
+          `결제 주문 ID를 찾을 수 없습니다. ${delay}ms 후 재시도합니다.`,
         );
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
 
-      throw new Error(result.message || '알 수 없는 오류');
+      throw new Error('결제 주문 ID 생성 실패');
     } catch (error) {
       if (attempt === maxRetries) {
         console.error('결제 주문 ID 생성 최종 실패:', error);

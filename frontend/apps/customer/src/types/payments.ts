@@ -97,15 +97,10 @@ export interface PaymentOrderIdRequest {
 }
 
 /**
- * 결제 주문 ID 응답 데이터
+ * 결제 주문 ID 응답 데이터 (ApiClient에서 body만 추출 후 반환)
  */
 export interface PaymentOrderIdResponse {
-  success: boolean;
-  body: {
-    paymentOrderId: string;
-  };
-  code: string;
-  message: string;
+  paymentOrderId: string;
 }
 
 /**

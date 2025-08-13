@@ -45,7 +45,7 @@ export const useTossPayment = (): UseTossPaymentReturn => {
       } = params;
 
       // userStore에서 userId 가져오기, 없으면 에러 발생
-      const actualCustomerId = customerId || user?.userId;
+      const actualCustomerId = customerId || user?.userId || 4;
       console.log('파라미터 customerId:', customerId);
       console.log('최종 actualCustomerId:', actualCustomerId);
       
@@ -78,7 +78,9 @@ export const useTossPayment = (): UseTossPaymentReturn => {
       console.log('토스페이먼츠 결제 요청:', paymentData);
 
       try {
-        await (
+        console.log('=== 토스페이먼츠 위젯 호출 시작 ===');
+        
+        const result = await (
           await tossPayments
         ).requestPayment('카드', {
           amount: paymentData.amount,
@@ -88,8 +90,20 @@ export const useTossPayment = (): UseTossPaymentReturn => {
           successUrl: paymentData.successUrl,
           failUrl: paymentData.failUrl,
         });
+        
+        console.log('=== 토스페이먼츠 결제 완료 응답 ===');
+        console.log('result 전체:', result);
+        console.log('result 타입:', typeof result);
+        console.log('result JSON:', JSON.stringify(result, null, 2));
+        
+        return result;
       } catch (error) {
-        console.error('토스페이먼츠 결제 요청 실패:', error);
+        console.error('=== 토스페이먼츠 결제 요청 실패 ===');
+        console.error('error 전체:', error);
+        console.error('error 타입:', typeof error);
+        console.error('error.message:', error?.message);
+        console.error('error.code:', error?.code);
+        console.error('error JSON:', JSON.stringify(error, null, 2));
         throw error;
       }
     },

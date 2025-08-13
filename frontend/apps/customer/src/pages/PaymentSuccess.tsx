@@ -11,30 +11,53 @@ const PaymentSuccess = () => {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
+    let isCancelled = false;
+    
     const processPayment = async () => {
+      console.log('=== PaymentSuccess 페이지 진입 ===');
+      console.log('전체 searchParams:', Array.from(searchParams.entries()));
+      console.log('현재 URL:', window.location.href);
+      
       const paymentKey = searchParams.get('paymentKey');
       const orderId = searchParams.get('orderId');
       const amount = searchParams.get('amount');
 
-      // 디버깅용 로그 추가
-      console.log('URL 파라미터들:', {
-        paymentKey,
-        orderId,
-        amount: amount,
-        amountParsed: parseInt(amount || '0'),
+      // 토스페이먼츠에서 반환하는 모든 파라미터 로그
+      console.log('=== 토스페이먼츠 반환 파라미터 ===');
+      console.log('paymentKey:', paymentKey);
+      console.log('orderId:', orderId);
+      console.log('amount:', amount);
+      console.log('추가 파라미터들:');
+      searchParams.forEach((value, key) => {
+        if (!['paymentKey', 'orderId', 'amount'].includes(key)) {
+          console.log(`${key}:`, value);
+        }
       });
 
       if (!paymentKey || !orderId || !amount) {
         throw new Error('결제 정보가 올바르지 않습니다.');
       }
 
+      // 이미 취소된 경우 실행하지 않음
+      if (isCancelled) {
+        console.log('결제 처리가 취소되었습니다 (React StrictMode 중복 실행 방지)');
+        return;
+      }
+
       try {
         // 토스페이먼츠 결제 승인 API 호출
+        console.log('결제 승인 API 호출 시작...');
         await PaymentService.confirmPayment(
           paymentKey,
           orderId,
           parseInt(amount),
         );
+
+        // 이미 취소된 경우 후속 처리하지 않음
+        if (isCancelled) {
+          console.log('결제 승인 후 처리가 취소되었습니다');
+          return;
+        }
 
         // 주문 완료 처리
         completeOrder({
@@ -46,18 +69,36 @@ const PaymentSuccess = () => {
         setIsProcessing(false);
 
         // 3초 후 주문 완료 페이지로 이동
-        setTimeout(() => {
-          navigate(`${ROUTE_PATH.PAY}`);
+        const timeoutId = setTimeout(() => {
+          if (!isCancelled) {
+            navigate(`${ROUTE_PATH.PAY}`);
+          }
         }, 3000);
+        
+        // cleanup 함수에서 timeout 취소
+        return () => clearTimeout(timeoutId);
       } catch (error) {
         console.error('결제 승인 실패:', error);
-        setIsProcessing(false);
+        if (!isCancelled) {
+          setIsProcessing(false);
+        }
         // 에러를 상위로 전파하여 GlobalErrorBoundary에서 처리
         throw error;
       }
     };
 
-    processPayment();
+    // 약간의 지연을 주어 StrictMode 초기 렌더링 안정화
+    const timeoutId = setTimeout(() => {
+      if (!isCancelled) {
+        processPayment();
+      }
+    }, 0);
+
+    // cleanup 함수 - 컴포넌트가 언마운트되거나 재실행될 때 호출
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [searchParams, completeOrder, navigate]);
 
   if (isProcessing) {
