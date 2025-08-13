@@ -10,7 +10,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: transparent;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -163,5 +163,35 @@
 
   .animation-delay-4000 {
     animation-delay: 4s;
+  }
+}
+
+@layer base {
+  /* Chrome, Edge, Safari */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px; /* 가로 스크롤 있을 때 */
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.7 0 0 / 0.5);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.6 0 0 / 0.8);
+  }
+}
+
+/* 다크 모드용 */
+.dark {
+  /* Chrome, Edge, Safari */
+  &::-webkit-scrollbar-thumb {
+    background: oklch(0.5 0 0 / 0.6);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.6 0 0 / 0.8);
   }
 }
