@@ -5,8 +5,8 @@ import type { ProductInfo, StoreInfo } from '@/types/payments';
  */
 export const dummyProductData: ProductInfo = {
   id: 1,
-  name: '[으뜸] 김치삼겹구이',
-  price: 29900,
+  name: '참치마요 김밥 세트',
+  price: 4000,
   quantity: 1,
 };
 

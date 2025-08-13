@@ -64,6 +64,7 @@ export interface FinalPriceProps {
 export interface OrderData {
   customerId: number;
   storeId: number;
+  pickupTime?: string;  // 픽업 시간 추가
   orderItems: Array<{
     productId: number;
     quantity: number;
@@ -76,23 +77,23 @@ export interface OrderData {
 }
 
 /**
- * 주문 생성 응답 데이터
+ * 주문 생성 응답 데이터 (ApiClient에서 body만 추출 후 반환)
  */
 export interface OrderResponse {
-  success: boolean;
-  body: {
-    orderId: number;
-    customerId: number;
-    finalPrice: number;
-  };
-  message: string;
+  orderId: string;
+  customerId: number;
+  storeId: number;
+  originalPrice: number;
+  finalPrice: number;
+  orderStatus: string;
+  orderDate: string;
 }
 
 /**
  * 결제 주문 ID 요청 데이터
  */
 export interface PaymentOrderIdRequest {
-  orderId: number;
+  orderId: string | number;
 }
 
 /**

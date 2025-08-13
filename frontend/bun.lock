@@ -7,6 +7,7 @@
         "@sentry/react": "^9.40.0",
         "@tanstack/react-query": "^5.83.0",
         "@tosspayments/payment-sdk": "^1.9.1",
+        "@tosspayments/payment-widget-sdk": "^0.12.0",
         "axios": "^1.11.0",
         "firebase": "^12.1.0",
         "lucide-react": "^0.525.0",
@@ -756,7 +757,15 @@
 
     "@testing-library/user-event": ["@testing-library/user-event@14.6.1", "", { "peerDependencies": { "@testing-library/dom": ">=7.21.4" } }, "sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw=="],
 
+    "@tosspayments/brandpay-types": ["@tosspayments/brandpay-types@0.2.6", "", { "peerDependencies": { "typescript": "^4.1.0" }, "optionalPeers": ["typescript"] }, "sha512-FY8aOm/2rqtXjYux9ZdNTL6GC5+VNIw8eOQ7TP01dS2uGWSzAtR6uuw9HVsgkmJtSyJgmo97tjmbio5oyeyFlg=="],
+
     "@tosspayments/payment-sdk": ["@tosspayments/payment-sdk@1.9.1", "", { "dependencies": { "@tosspayments/payment__types": "1.69.0" } }, "sha512-OzDG2kOGOrb5JRvprR8R/mQzXFNnLW/6X09uLY1KF4+O7ASu6LrMoFCERd+WeAJMtRAARkclGDcJ/GSu+OHzzg=="],
+
+    "@tosspayments/payment-widget-sdk": ["@tosspayments/payment-widget-sdk@0.12.0", "", { "dependencies": { "@tosspayments/payment-widget__types": "1.1.0" } }, "sha512-Ll3K2Zh9FdTOtINnO79FdVpeEWvJOfgMHdhUfzUs/QohdbOpT78mRXW9UwexMqBdEAJD/q4NJjOqGA7cFDjsjQ=="],
+
+    "@tosspayments/payment-widget-types": ["@tosspayments/payment-widget-types@0.0.5", "", { "peerDependencies": { "typescript": "^4.7.4" }, "optionalPeers": ["typescript"] }, "sha512-Daaui9u7aRPzJhw4omJIUAbYBSmNAFNjWWkuUnX9uHxzE3gtjcJHIpGrjlzmCFm+j3ZH4rgyrgv4pkazVYH3OQ=="],
+
+    "@tosspayments/payment-widget__types": ["@tosspayments/payment-widget__types@1.1.0", "", { "dependencies": { "@tosspayments/brandpay-types": "^0.2.6", "@tosspayments/payment-widget-types": "^0.0.5", "@tosspayments/payment__types": "^1.68.0" } }, "sha512-1yVQIDNwgjzpm/n8ppsAk3Q0IKha+vOTuRIP6INzL9AkzCsrVjhHr5/eT0fe+tjyekSRL902Uq0TuRyG2sjsWw=="],
 
     "@tosspayments/payment__types": ["@tosspayments/payment__types@1.69.0", "", { "dependencies": { "@tosspayments/sdk-constants": "^0.2.2" } }, "sha512-EbU36vLEWfhRpX/g4V0DyRiUmTkNeeVDYjJamD9aJiLmRbLl9PVdXi5QOQTMYma2RGRgA8drHY4yDMsjvKFwCg=="],
 

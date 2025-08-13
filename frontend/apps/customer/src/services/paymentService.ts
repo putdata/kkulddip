@@ -26,11 +26,11 @@ export class PaymentService {
   /**
    * 결제 주문 ID 생성 API 호출
    *
-   * @param orderId - 주문 ID
+   * @param orderId - 주문 ID (문자열 또는 숫자)
    * @returns 결제 주문 ID
    */
   static async createPaymentOrderId(
-    orderId: number,
+    orderId: string | number,
   ): Promise<PaymentOrderIdResponse> {
     const requestData: PaymentOrderIdRequest = { orderId };
     return apiClient.post<PaymentOrderIdResponse>(
@@ -74,7 +74,7 @@ export class PaymentService {
  * @returns 결제 주문 ID
  */
 export const getPaymentOrderIdWithRetry = async (
-  orderId: number,
+  orderId: string | number,
   maxRetries: number = 10,
   delay: number = 1000,
 ): Promise<string> => {

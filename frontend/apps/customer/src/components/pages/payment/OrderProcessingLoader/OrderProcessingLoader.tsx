@@ -9,23 +9,43 @@ const OrderProcessingLoader = () => {
   const { processPayment } = useTossPayment();
 
   useEffect(() => {
+    let isCancelled = false;
+    
     const handlePayment = async () => {
+      if (isCancelled) {
+        console.log('=== 중복 실행 방지: 이미 취소됨 ===');
+        return;
+      }
+      
       try {
-        // 토스 결제 처리
+        console.log('=== 결제 처리 시작 ===');
+        console.log('isCancelled 상태:', isCancelled);
+        
         await processPayment({
           productId: orderData.productId,
           quantity: orderData.quantity,
         });
       } catch (error) {
-        console.error('결제 처리 실패:', error);
-        // 실패시 결제 페이지로 복귀
-        handlePendingToPayment();
+        if (!isCancelled) {
+          console.error('결제 처리 실패:', error);
+          handlePendingToPayment();
+        }
       }
     };
 
-    // 컴포넌트 마운트 후 바로 결제 처리
-    handlePayment();
-  }, [orderData, processPayment, handlePendingToPayment]);
+    // 비동기 처리로 중복 방지 강화
+    const timeoutId = setTimeout(() => {
+      if (!isCancelled) {
+        handlePayment();
+      }
+    }, 0);
+    
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+      console.log('=== 클린업 실행: isCancelled = true ===');
+    };
+  }, [])
 
   return (
     <div className="flex min-h-screen items-center justify-center">
