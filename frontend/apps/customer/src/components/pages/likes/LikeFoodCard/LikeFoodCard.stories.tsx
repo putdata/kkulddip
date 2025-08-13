@@ -14,6 +14,7 @@ type Story = StoryObj<typeof LikeFoodCard>;
 
 // 기본 아이템 (컴포넌트에서 실제로 쓰는 속성만 유지)
 const baseItem: CardItemProps['item'] = {
+  id: 1,
   storeInfo: {
     storeName: '도미노피자 역삼점',
     ratingAverage: 4.3,
