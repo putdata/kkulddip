@@ -51,11 +51,16 @@ public class OrderRepositoryImpl implements OrderRepository {
                 OrderItemEntity savedOrderItemEntity = orderItemJpaRepository.save(orderItemEntity);
                 log.debug("주문 아이템 저장 완료 - orderItemId: {}", savedOrderItemEntity.getOrderItemId());
                 
-                // 3. 각 OrderItem의 DiscountInfo들 저장
-                for (DiscountInfo discountInfo : orderItem.getDiscountInfos()) {
-                    DiscountInfoEntity discountInfoEntity = orderEntityMapper.toDiscountInfoEntity(discountInfo, savedOrderItemEntity);
-                    DiscountInfoEntity savedDiscountInfoEntity = discountInfoJpaRepository.save(discountInfoEntity);
-                    log.debug("할인 정보 저장 완료 - discountInfoId: {}", savedDiscountInfoEntity.getDiscountInfoId());
+                // 3. 각 OrderItem의 DiscountInfo들 저장 (null 체크 추가)
+                List<DiscountInfo> discountInfos = orderItem.getDiscountInfos();
+                if (discountInfos != null && !discountInfos.isEmpty()) {
+                    for (DiscountInfo discountInfo : discountInfos) {
+                        DiscountInfoEntity discountInfoEntity = orderEntityMapper.toDiscountInfoEntity(discountInfo, savedOrderItemEntity);
+                        DiscountInfoEntity savedDiscountInfoEntity = discountInfoJpaRepository.save(discountInfoEntity);
+                        log.debug("할인 정보 저장 완료 - discountInfoId: {}", savedDiscountInfoEntity.getDiscountInfoId());
+                    }
+                } else {
+                    log.debug("할인 정보 없음 - orderItemId: {}", savedOrderItemEntity.getOrderItemId());
                 }
             }
             
