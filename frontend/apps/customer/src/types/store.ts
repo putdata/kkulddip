@@ -3,21 +3,27 @@ export interface DdipBoxItem {
   ddipboxItemName: string;
   originalPrice: number;
   itemQuantity: number;
+  weight: number;
 }
 
-export interface DdipBoxSummaryDto {
+export interface DdipBox {
   ddipboxId: number;
+  storeId: number;
   ddipboxName: string;
+  description: string;
   category: string;
   originalPrice: number;
   salePrice: number;
+  discountRate: number;
+  dailyQuantity: number;
   remainingQuantity: number;
-  active: boolean;
-  isRandom: boolean;
-  ddipBoxItem: DdipBoxItem[]; // isRandom이 True면 약 8~10개, False 면 약 2~3개
+  maxPerCustomer: number;
+  isActive: boolean;
+  soldOut: boolean;
+  items: DdipBoxItem[];
 }
 
-export interface StoreDetailDto {
+export interface StoreDetail {
   storeId: number;
   ownerId: number;
   storeName: string;
@@ -34,5 +40,5 @@ export interface StoreDetailDto {
   active: boolean;
   createdAt: string;
   updatedAt: string;
-  ddipBoxes: DdipBoxSummaryDto[];
+  ddipBoxes: DdipBox[];
 }

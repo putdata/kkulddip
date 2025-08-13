@@ -13,7 +13,7 @@ export const ROUTE_PATH = {
   PAYMENT_SUCCESS: '/payment/success',
   PAYMENT_FAIL: '/payment/fail',
   NOT_FOUND: '*',
-  REVIEW: '/store/:storeId/reviews',
+  REVIEW: '/stores/:storeId/reviews',
   REVIEW_CREATE: '/review/create',
   STORE: '/stores/:storeId',
 } as const;

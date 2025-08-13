@@ -1,9 +1,9 @@
 // 가게 상세 페이지 Mock Data
 
-import type { StoreDetailDto } from '@/types/store';
+import type { StoreDetail } from '@/types/store';
 
 // Mock Data
-export const mockStoreDetail: StoreDetailDto = {
+export const mockStoreDetail: StoreDetail = {
   storeId: 1,
   ownerId: 101,
   storeName: '맛있는 베이커리',
@@ -153,7 +153,7 @@ export const mockStoreDetail: StoreDetailDto = {
 };
 
 // 추가 Mock Data (다양한 케이스)
-export const mockStoreDetailList: StoreDetailDto[] = [
+export const mockStoreDetailList: StoreDetail[] = [
   mockStoreDetail,
   {
     storeId: 2,
@@ -321,7 +321,7 @@ export const mockStoreDetailList: StoreDetailDto[] = [
 // API 시뮬레이션 함수
 export const fetchStoreDetail = async (
   storeId: number,
-): Promise<StoreDetailDto> => {
+): Promise<StoreDetail> => {
   // 실제 API 호출 대신 mock data 반환
   return new Promise(resolve => {
     setTimeout(() => {
