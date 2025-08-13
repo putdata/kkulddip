@@ -14,6 +14,7 @@ import OrderDetail from '@/pages/OrderDetail';
 import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
+import { StoreDetail } from '@/pages/StoreDetail';
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.REVIEW,
             element: <ReviewsPage />,
+          },
+          {
+            path: ROUTE_PATH.STORE,
+            element: <StoreDetail />,
           },
         ],
       },
