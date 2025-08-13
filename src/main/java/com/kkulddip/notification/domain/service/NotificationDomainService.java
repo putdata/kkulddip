@@ -131,7 +131,7 @@ public class NotificationDomainService {
         return switch (subscriberType) {
             case CUSTOMER -> RecipientType.CUSTOMER;
             case OWNER -> RecipientType.OWNER;
-            case ALL, SPECIFIC -> throw new IllegalArgumentException(
+            case ALL, STORE -> throw new IllegalArgumentException(
                     "구독자 타입 " + subscriberType + "은 개별 수신자 타입으로 변환할 수 없습니다."
             );
         };
@@ -154,9 +154,9 @@ public class NotificationDomainService {
      * @return 특정 사용자 대상 여부
      */
     public boolean isTargetedNotification(SubscriberType subscriberType) {
-        return subscriberType == SubscriberType.SPECIFIC || 
-               subscriberType == SubscriberType.CUSTOMER || 
-               subscriberType == SubscriberType.OWNER;
+        return subscriberType == SubscriberType.CUSTOMER || 
+               subscriberType == SubscriberType.OWNER ||
+               subscriberType == SubscriberType.STORE;
     }
 
     /**

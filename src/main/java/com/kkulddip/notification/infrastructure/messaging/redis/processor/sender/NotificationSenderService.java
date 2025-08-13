@@ -34,8 +34,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NotificationSenderService {
 
-    private static final int MAX_RETRY_COUNT = 3;
-
     private final FcmService fcmService;
     private final UserTokenRepository userTokenRepository;
     private final NotificationService notificationService;

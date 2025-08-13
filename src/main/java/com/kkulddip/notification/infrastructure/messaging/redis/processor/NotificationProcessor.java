@@ -83,8 +83,8 @@ public class NotificationProcessor {
         return switch (subscriberType) {
             case ALL -> notificationSenderService.sendToAll(notification);
             case CUSTOMER -> sendToCustomerOrAll(notification, request);
-            case OWNER -> sendToOwnerOrStore(notification, request);
-            case SPECIFIC -> sendToSpecificUser(notification, request);
+            case OWNER -> sendToOwner(notification, request);
+            case STORE -> sendToStore(notification, request);
         };
     }
 
@@ -144,17 +144,21 @@ public class NotificationProcessor {
 
     /**
      * OWNER 타입 알림을 처리합니다.
-     * subscriberId가 있으면 특정 storeId의 사장에게, 없으면 모든 사장에게 발송합니다.
+     * subscriberId가 있으면 특정 사장에게, 없으면 모든 사장에게 발송합니다.
      *
      * @param notification 저장된 알림
      * @param request 원본 요청
      * @return 발송 성공 여부
      */
-    private boolean sendToOwnerOrStore(NotificationResponse notification, NotificationRequest request) {
+    private boolean sendToOwner(NotificationResponse notification, NotificationRequest request) {
         if (request.getSubscriberId() != null) {
-            // subscriberId가 storeId인 경우 - 특정 가게의 사장에게 발송
-            log.debug("특정 가게 사장 알림 발송 - storeId: {}", request.getSubscriberId());
-            return notificationSenderService.sendToStoreOwner(notification, request.getSubscriberId());
+            // subscriberId가 ownerId인 경우 - 특정 사장에게 발송
+            log.debug("특정 사장 알림 발송 - ownerId: {}", request.getSubscriberId());
+            return notificationSenderService.sendToSpecificUser(
+                notification, 
+                request.getSubscriberId(), 
+                RecipientType.OWNER
+            );
         } else {
             // subscriberId가 없는 경우 - 모든 사장에게 발송
             log.debug("전체 사장 알림 발송");
@@ -163,41 +167,23 @@ public class NotificationProcessor {
     }
 
     /**
-     * 특정 사용자에게 알림을 발송합니다.
+     * STORE 타입 알림을 처리합니다.
+     * subscriberId가 있으면 특정 가게의 사장들에게, 없으면 모든 사장에게 발송합니다.
      *
      * @param notification 저장된 알림
      * @param request 원본 요청
      * @return 발송 성공 여부
      */
-    private boolean sendToSpecificUser(NotificationResponse notification, NotificationRequest request) {
-        if (request.getSubscriberId() == null) {
-            log.error("SPECIFIC 타입이지만 subscriberId가 null입니다. - notificationId: {}", 
-                notification.getNotificationId());
-            return false;
+    private boolean sendToStore(NotificationResponse notification, NotificationRequest request) {
+        if (request.getSubscriberId() != null) {
+            // subscriberId가 storeId인 경우 - 특정 가게의 사장들에게 발송
+            log.debug("특정 가게 알림 발송 - storeId: {}", request.getSubscriberId());
+            return notificationSenderService.sendToStoreOwner(notification, request.getSubscriberId());
+        } else {
+            // subscriberId가 없는 경우 - 모든 사장에게 발송
+            log.debug("전체 사장 알림 발송");
+            return notificationSenderService.sendToAllOwners(notification);
         }
-
-        // subscriberType이 SPECIFIC인 경우, 실제 사용자 타입을 추론해야 함
-        // 여기서는 간단하게 CUSTOMER로 가정하지만, 실제로는 사용자 정보를 조회해야 할 수 있음
-        RecipientType recipientType = inferRecipientType(request.getSubscriberId());
-        
-        return notificationSenderService.sendToSpecificUser(
-            notification, 
-            request.getSubscriberId(), 
-            recipientType
-        );
     }
 
-    /**
-     * 사용자 ID로부터 수신자 타입을 추론합니다.
-     * 
-     * TODO: 실제 구현에서는 사용자 정보를 조회하여 정확한 타입을 결정해야 합니다.
-     *
-     * @param userId 사용자 ID
-     * @return 추론된 수신자 타입
-     */
-    private RecipientType inferRecipientType(Long userId) {
-        // 현재는 기본값으로 CUSTOMER를 반환
-        // 실제로는 UserService나 UserRepository를 통해 사용자 정보를 조회해야 함
-        return RecipientType.CUSTOMER;
-    }
 }
