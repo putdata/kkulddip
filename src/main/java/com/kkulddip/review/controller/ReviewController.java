@@ -1,6 +1,7 @@
 package com.kkulddip.review.controller;
 
 import com.kkulddip.common.response.ApiResponse;
+import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.review.dto.request.ReviewCreateRequestDto;
 import com.kkulddip.review.dto.request.ReviewReplyRequestDto;
 import com.kkulddip.review.dto.request.ReviewUpdateRequestDto;
@@ -16,6 +17,7 @@ import com.kkulddip.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,10 +50,10 @@ public class ReviewController {
         @PathVariable Long storeId,
         @RequestPart("request") @Valid ReviewCreateRequestDto request,
         @RequestPart(value = "images", required = false) List<MultipartFile> images,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewResponseDto response = reviewService
-            .createReview(storeId, request, images, authentication);
+            .createReview(storeId, request, images, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -65,10 +67,10 @@ public class ReviewController {
         @RequestParam(defaultValue = "false") boolean withImage,
         @RequestParam(defaultValue = "LATEST") ReviewSortType sortType,
         @RequestParam(required = false) String cursor,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewListResponseDto response = reviewService
-            .getReviewListByStoreId(storeId, withImage, sortType, cursor, authentication);
+            .getReviewListByStoreId(storeId, withImage, sortType, cursor, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -80,10 +82,10 @@ public class ReviewController {
     @GetMapping("/myReview")
     public ApiResponse<ReviewListResponseDto> getMyReviewList(
         @RequestParam(required = false) String cursor,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewListResponseDto response = reviewService
-            .getMyReviewList(cursor, ReviewSortType.LATEST, authentication);
+            .getMyReviewList(cursor, ReviewSortType.LATEST, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -94,10 +96,10 @@ public class ReviewController {
     public ApiResponse<ReviewListResponseDto> getMyReviewListByStoreId(
         @RequestParam(required = false) String cursor,
         @PathVariable Long storeId,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewListResponseDto response = reviewService
-            .getMyReviewListByStoreId(cursor, ReviewSortType.LATEST, storeId, authentication);
+            .getMyReviewListByStoreId(cursor, ReviewSortType.LATEST, storeId, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -111,10 +113,10 @@ public class ReviewController {
         @PathVariable Long reviewId,
         @RequestPart("request") @Valid ReviewUpdateRequestDto request,
         @RequestPart(value = "images", required = false) List<MultipartFile> newImages,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewResponseDto response = reviewService
-            .updateReview(reviewId, request, newImages, authentication);
+            .updateReview(reviewId, request, newImages, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -128,10 +130,10 @@ public class ReviewController {
         @RequestParam(defaultValue = "false") boolean withImage,
         @RequestParam(defaultValue = "LATEST") ReviewSortType sortType,
         @RequestParam(required = false) String cursor,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewOneResponseDto response = reviewService
-            .deleteReview(reviewId, withImage, sortType, cursor, authentication);
+            .deleteReview(reviewId, withImage, sortType, cursor, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -146,10 +148,10 @@ public class ReviewController {
         @PathVariable Long reviewId,
         @PathVariable Long storeId,
         @RequestParam(required = false) String cursor,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewOneResponseDto response = reviewService
-            .deleteReviewOnMyReviewsOnStore(reviewId, storeId, ReviewSortType.LATEST, cursor, authentication);
+            .deleteReviewOnMyReviewsOnStore(reviewId, storeId, ReviewSortType.LATEST, cursor, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -163,10 +165,10 @@ public class ReviewController {
     public ApiResponse<ReviewOneResponseDto> deleteReview(
         @PathVariable Long reviewId,
         @RequestParam(required = false) String cursor,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewOneResponseDto response = reviewService
-            .deleteReviewOnMyReviews(reviewId, ReviewSortType.LATEST, cursor, authentication);
+            .deleteReviewOnMyReviews(reviewId, ReviewSortType.LATEST, cursor, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -178,10 +180,10 @@ public class ReviewController {
     public ApiResponse<ReviewReplyResponseDto> createReviewReply(
         @PathVariable Long reviewId,
         @RequestBody @Valid ReviewReplyRequestDto request,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewReplyResponseDto response = reviewReplyService
-            .createReviewReply(request, reviewId, authentication);
+            .createReviewReply(request, reviewId, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -192,9 +194,10 @@ public class ReviewController {
     @GetMapping("/reply")
     public ApiResponse<ReviewListResponseDto> getMyReplyReviewList(
         @RequestParam(required = false) String cursor,
-        Authentication authentication) {
+        @AuthenticationPrincipal JwtUserInfo userInfo
+    ) {
         ReviewListResponseDto response = reviewService
-            .getMyReplyReviewList(cursor, authentication);
+            .getMyReplyReviewList(cursor, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -205,10 +208,10 @@ public class ReviewController {
     public ApiResponse<ReviewReplyResponseDto> updateReviewReply(
         @PathVariable Long replyId,
         @RequestBody @Valid ReviewReplyRequestDto request,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewReplyResponseDto response = reviewReplyService
-            .updateReviewReply(replyId, request, authentication);
+            .updateReviewReply(replyId, request, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -220,9 +223,9 @@ public class ReviewController {
     @DeleteMapping("/reply/{replyId}")
     public ApiResponse<Void> deleteReviewReply(
         @PathVariable Long replyId,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
-        reviewReplyService.deleteReviewReply(replyId, authentication);
+        reviewReplyService.deleteReviewReply(replyId, userInfo);
         return ApiResponse.of(200);
     }
 
@@ -234,10 +237,10 @@ public class ReviewController {
     @PostMapping("/helpful/{reviewId}")
     public ApiResponse<ReviewHelpfulCreateResponseDto> createHelpful(
         @PathVariable Long reviewId,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         ReviewHelpfulCreateResponseDto response = reviewHelpfulService
-            .createReviewHelpful(reviewId, authentication);
+            .createReviewHelpful(reviewId, userInfo);
         return ApiResponse.of(response);
     }
 
@@ -249,10 +252,10 @@ public class ReviewController {
     @DeleteMapping("/helpful/{reviewId}")
     public ApiResponse<Boolean> deleteReviewHelpful(
         @PathVariable Long reviewId,
-        Authentication authentication
+        @AuthenticationPrincipal JwtUserInfo userInfo
     ) {
         boolean response = reviewHelpfulService
-            .deleteReviewHelpful(reviewId, authentication);
+            .deleteReviewHelpful(reviewId, userInfo);
         return ApiResponse.of(response);
     }
 

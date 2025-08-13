@@ -10,7 +10,6 @@ import com.kkulddip.review.repository.ReviewHelpfulRepository;
 import com.kkulddip.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +22,18 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
     private final ReviewRepository reviewRepository;
 
     // ================== 기본 메서드 ==================
-    
+
     @Override
     @Transactional
     public ReviewHelpfulCreateResponseDto createReviewHelpful(
         Long reviewId,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             // 입력값 검증
             validateReviewId(reviewId);
 
-            Long currentUserId = 1L;//getCurrentUserId(authentication);
+            Long currentUserId = Long.parseLong(userInfo.userId());
 
             // 리뷰 존재 확인
             Review review = findReviewById(reviewId);
@@ -48,13 +47,13 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
                 throw new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "리뷰를 찾을 수 없습니다.");
             }
 
-            boolean isHelpful = createReviewHelpfulStatusResponseDto(review, authentication);
+            boolean isHelpful = createReviewHelpfulStatusResponseDto(review, userInfo);
 
             log.info("리뷰 좋아요 생성 완료. reviewId: {}, customerId: {}", reviewId, currentUserId);
 
             return ReviewHelpfulCreateResponseDto.builder()
                 .reviewId(reviewId)
-                .customerId(/*currentUserId*/1L)
+                .customerId(currentUserId)
                 .isHelpful(isHelpful)
                 .build();
 
@@ -71,14 +70,14 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
     @Transactional
     public boolean deleteReviewHelpful(
         Long reviewId,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             // 입력값 검증
             validateReviewId(reviewId);
 
             // 현재 사용자 ID와 요청 userId 일치 확인
-            Long currentUserId = 1L;//getCurrentUserId(authentication);
+            Long currentUserId = Long.parseLong(userInfo.userId());
 
             // 리뷰 존재 확인
             Review review = findReviewById(reviewId);
@@ -96,7 +95,7 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
             }
 
             log.info("리뷰 좋아요 삭제 완료. reviewId: {}, customerId: {}", reviewId, currentUserId);
-            return createReviewHelpfulStatusResponseDto(review, authentication);
+            return createReviewHelpfulStatusResponseDto(review, userInfo);
 
         } catch (BusinessException e) {
             log.error("리뷰 좋아요 삭제 실패 - 비즈니스 에러: {}", e.getMessage(), e);
@@ -111,30 +110,20 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
     @Transactional(readOnly = true)
     public boolean createReviewHelpfulStatusResponseDto(
         Review review,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         if (review == null) {
             return false;
         }
 
-        boolean isHelpful = isHelpfuldByCustomer(review.getReviewId(), authentication);
+        boolean isHelpful = isHelpfuldByCustomer(review.getReviewId(), userInfo);
 
         return isHelpful;
     }
 
-    public boolean isHelpfuldByCustomer(Long reviewId, Authentication authentication) {
-        Long currentUserId = 1L;//getCurrentUserId(authentication);
+    public boolean isHelpfuldByCustomer(Long reviewId, JwtUserInfo userInfo) {
+        Long currentUserId = Long.parseLong(userInfo.userId());
         return reviewHelpfulRepository.existsByReviewReviewIdAndCustomerId(reviewId, currentUserId);
-        /*try {
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return false; // 인증되지 않은 사용자는 좋아요 상태가 false
-            }
-
-
-        } catch (Exception e) {
-            log.warn("좋아요 상태 확인 실패. reviewId: {}", reviewId, e);
-            return false; // 에러 시 false 반환
-        }*/
     }
 
     // ================== 검증 메서드 ==================
@@ -150,17 +139,7 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
             .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "리뷰를 찾을 수 없습니다."));
     }
 
-    // ================== 유틸리티 메서드 ==================
 
-    private Long getCurrentUserId(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof JwtUserInfo userInfo) {
-            //return userInfo.userId();
-        }
-
-        throw new BusinessException(ErrorCode.INVALID_AUTHENTICATION, "인증 정보를 찾을 수 없습니다.");
-    }
 
     // ================== dto 생성 메서드 ==================
 
