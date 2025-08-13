@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from './Sidebar';
 import MobileHeader from './MobileHeader';
-import SettingsModal from '@/components/settings/SettingsModal';
+import SettingsModal from '@/components/settingModal/SettingsModal';
 
 const OwnerLayout = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

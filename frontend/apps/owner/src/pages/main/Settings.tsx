@@ -1,6 +1,5 @@
-import StoreManagement from '@/components/StoreManagement';
-import SettingsCard from '@/components/settings/SettingsCard';
-import SettingsPageSection from '@/components/settings/SettingsPageSection';
+import { SettingsCard, StoreManagement } from '@/components/pages/settings';
+import SettingsPageSection from '@/components/SettingsPageSection';
 import { Store as StoreIcon, Bell, Shield } from 'lucide-react';
 
 const Settings = () => {

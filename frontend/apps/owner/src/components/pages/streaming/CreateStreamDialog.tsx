@@ -21,7 +21,7 @@ interface CreateStreamDialogProps {
   trigger?: React.ReactNode;
 }
 
-export const CreateStreamDialog = ({
+const CreateStreamDialog = ({
   onSubmit,
   isLoading = false,
   trigger,
@@ -128,3 +128,5 @@ export const CreateStreamDialog = ({
     </Dialog>
   );
 };
+
+export default CreateStreamDialog;

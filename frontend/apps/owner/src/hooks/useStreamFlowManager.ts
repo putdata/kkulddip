@@ -3,7 +3,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { type Stream, type CreateStreamRequest } from 'common';
-import { useStoreIdParam } from '@/hooks/useStoreIdParam';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import type { StreamFlowStatus, StreamFlow } from '@/types/stream';
 import {
   useCreateStream,
@@ -36,7 +36,7 @@ export const useStreamFlowManager = ({
   onStreamEnded,
 }: UseStreamFlowManagerProps = {}) => {
   const navigate = useNavigate();
-  const storeId = useStoreIdParam();
+  const { storeId } = useStoreSelection();
 
   const [streamFlow, setStreamFlow] = useState<StreamFlow>({
     id: initialStream?.id,

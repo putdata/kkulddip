@@ -1,13 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { useNumberParam } from 'common';
-import { useStoreIdParam } from '@/hooks/useStoreIdParam';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { ArrowLeft, Video, AlertCircle } from 'lucide-react';
 
 import { useStreamDetails } from '@/queries/stream';
 import { useStreamFlowManager } from '@/hooks/useStreamFlowManager';
-import { StreamStatusCard } from '@/components/stream/StreamStatusCard';
-import { StreamFlowControls } from '@/components/stream/StreamFlowControls';
+import {
+  StreamStatusCard,
+  StreamFlowControls,
+  EndStreamAlertDialog,
+} from '@/components/pages/streaming';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -28,7 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { EndStreamAlertDialog } from '@/components/stream/EndStreamAlertDialog';
 import {
   mapApiStatusToFlowStatus,
   validateStreamStatus,
@@ -37,7 +39,7 @@ import { ROUTE_PATH } from '@/router/route-path';
 
 const StreamingLive = () => {
   const navigate = useNavigate();
-  const storeId = useStoreIdParam();
+  const { storeId } = useStoreSelection();
   const streamId = useNumberParam('streamId');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);

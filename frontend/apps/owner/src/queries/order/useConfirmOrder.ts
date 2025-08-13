@@ -12,16 +12,19 @@ interface UseConfirmOrderParams {
 /**
  * 주문을 확정하거나 거절하는 뮤테이션 훅
  */
-export const useConfirmOrder = ({ orderId, storeId }: UseConfirmOrderParams) => {
+export const useConfirmOrder = ({
+  orderId,
+  storeId,
+}: UseConfirmOrderParams) => {
   const queryClient = useQueryClient();
 
   return useMutation<ConfirmOrderResponse, Error, ConfirmOrderRequest>({
-    mutationFn: (data) => orderService.confirmOrder(orderId, data),
+    mutationFn: data => orderService.confirmOrder(orderId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: orderQueryKeys.pendingByStore(storeId) 
+      queryClient.invalidateQueries({
+        queryKey: orderQueryKeys.pendingByStore(storeId),
       });
-      
+
       if (variables.action === 'CONFIRM') {
         toast.success('주문이 확정되었습니다.');
       } else {

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useStoreIdParam } from '@/hooks/useStoreIdParam';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { Bell, Clock, Search, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePendingOrders } from '@/queries/order';
-import OrderCard from '@/components/OrderCard';
+import { OrderCard } from '@/components/pages/orderManagement';
 import { toast } from 'sonner';
 
 const OrdersManagement = () => {
-  const storeId = useStoreIdParam();
+  const { storeId } = useStoreSelection();
   const [searchTerm, setSearchTerm] = useState('');
   const [autoRefresh, setAutoRefresh] = useState(true);
 

@@ -74,7 +74,7 @@ const getStatusDescription = (status: StreamFlowStatus): string => {
   }
 };
 
-export const StreamStatusCard = ({
+const StreamStatusCard = ({
   title,
   description,
   status,
@@ -157,3 +157,5 @@ export const StreamStatusCard = ({
     </Card>
   );
 };
+
+export default StreamStatusCard;

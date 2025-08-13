@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStoreIdParam } from '@/hooks/useStoreIdParam';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { Plus, Search, Filter } from 'lucide-react';
 import type { DdipBox } from '@/types/ddipbox';
 import { Button } from '@/components/ui/button';
@@ -12,11 +12,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDdipboxList } from '@/queries/ddipbox';
-import DdipboxListItem from '@/components/DdipboxListItem';
-import AddDdipboxDialog from '@/components/AddDdipboxDialog';
+import {
+  AddDdipboxDialog,
+  DdipboxListItem,
+} from '@/components/pages/ddipboxManagement';
 
 const MenuManagement = () => {
-  const storeId = useStoreIdParam();
+  const { storeId } = useStoreSelection();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
@@ -44,7 +46,9 @@ const MenuManagement = () => {
 
   const totalCount = ddipboxes.length;
   const activeCount = ddipboxes.filter((item: DdipBox) => item.isActive).length;
-  const inactiveCount = ddipboxes.filter((item: DdipBox) => !item.isActive).length;
+  const inactiveCount = ddipboxes.filter(
+    (item: DdipBox) => !item.isActive,
+  ).length;
 
   // 검색 및 필터링
   const filteredDdipboxes = ddipboxes.filter((ddipbox: DdipBox) => {

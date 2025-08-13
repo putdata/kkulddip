@@ -15,10 +15,9 @@ export const orderService = {
    * 사장님이 확인해야 할 주문들을 조회합니다 (AWAITING_CONFIRMATION)
    */
   getPendingOrders: (storeId: number): Promise<PendingOrdersResponse> => {
-    return apiClient.get<PendingOrdersResponse>(
-      API_PATH.ORDERS.PENDING,
-      { storeId },
-    );
+    return apiClient.get<PendingOrdersResponse>(API_PATH.ORDERS.PENDING, {
+      storeId,
+    });
   },
 
   /**

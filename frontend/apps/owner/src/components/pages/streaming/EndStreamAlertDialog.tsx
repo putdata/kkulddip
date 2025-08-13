@@ -21,7 +21,7 @@ interface EndStreamAlertDialogProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export const EndStreamAlertDialog = ({
+const EndStreamAlertDialog = ({
   onConfirm,
   isLoading = false,
   trigger,
@@ -81,3 +81,5 @@ export const EndStreamAlertDialog = ({
     </AlertDialog>
   );
 };
+
+export default EndStreamAlertDialog;

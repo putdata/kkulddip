@@ -38,7 +38,7 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-shadow">
+      <Card className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -52,7 +52,10 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
                 </div>
               </CardDescription>
             </div>
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+            <Badge
+              variant="secondary"
+              className="bg-yellow-100 text-yellow-800"
+            >
               대기중
             </Badge>
           </div>
@@ -60,7 +63,7 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
         <CardContent className="space-y-4">
           {/* 주문 상품 목록 */}
           <div className="space-y-2">
-            <div className="text-sm font-medium text-muted-foreground">
+            <div className="text-muted-foreground text-sm font-medium">
               주문 상품
             </div>
             <div className="space-y-1">
@@ -83,14 +86,13 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
           {/* 주문 정보 */}
           <div className="space-y-2 border-t pt-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1 text-muted-foreground">
-                <Package className="h-3 w-3" />
-                총 수량
+              <span className="text-muted-foreground flex items-center gap-1">
+                <Package className="h-3 w-3" />총 수량
               </span>
               <span className="font-medium">{totalQuantity}개</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1 text-sm text-muted-foreground">
+              <span className="text-muted-foreground flex items-center gap-1 text-sm">
                 <User className="h-3 w-3" />
                 고객 ID
               </span>
@@ -98,7 +100,7 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">총 금액</span>
-              <span className="text-lg font-bold text-primary">
+              <span className="text-primary text-lg font-bold">
                 {order.originalPrice.toLocaleString()}원
               </span>
             </div>

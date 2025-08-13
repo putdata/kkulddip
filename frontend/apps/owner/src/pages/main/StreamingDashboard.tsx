@@ -1,9 +1,11 @@
 import { generatePath, useNavigate } from 'react-router-dom';
-import { useStoreIdParam } from '@/hooks/useStoreIdParam';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { useMyStreams } from '@/queries/stream';
 import { useStreamFlowManager } from '@/hooks/useStreamFlowManager';
-import { CreateStreamDialog } from '@/components/stream/CreateStreamDialog';
-import { StreamStatusCard } from '@/components/stream/StreamStatusCard';
+import {
+  CreateStreamDialog,
+  StreamStatusCard,
+} from '@/components/pages/streaming';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,7 +23,7 @@ import { ROUTE_PATH } from '@/router/route-path';
 
 const StreamingDashboard = () => {
   const navigate = useNavigate();
-  const storeId = useStoreIdParam();
+  const { storeId } = useStoreSelection();
 
   const { data: streams, isLoading, error } = useMyStreams();
   const streamFlowManager = useStreamFlowManager();

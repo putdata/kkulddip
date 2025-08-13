@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Power, MapPin, Phone, Clock, Edit } from 'lucide-react';
 import { useToggleStoreStatus, useDeleteStore } from '@/queries/store';
-import DeleteStoreDialog from './DeleteStoreDialog';
+import DeleteStoreDialog from './pages/settings/DeleteStoreDialog';
 import type { Store } from '@/types/store';
 
 interface StoreCardProps {

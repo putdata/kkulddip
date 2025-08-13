@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { Card, CardContent } from '@/components/ui/card';
 import StoreCard from '@/components/StoreCard';
-import StoreEditDialog from '@/components/StoreEditDialog';
+import StoreEditDialog from './StoreEditDialog';
 
 const StoreManagement = () => {
   const { selectedStore } = useStoreSelection();
@@ -17,7 +17,7 @@ const StoreManagement = () => {
       <Card>
         <CardContent className="pt-6">
           <div className="py-8 text-center text-gray-500">
-            관리할 가게를 먼저 선택해주세요.
+            가게 정보를 불러오는 중...
           </div>
         </CardContent>
       </Card>

@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useUserStore } from 'common';
 import { useUserSelection } from '@/hooks/useUserSelection';
-import SettingsModal from '@/components/settings/SettingsModal';
+import SettingsModal from '@/components/settingModal/SettingsModal';
 
 /**
  * 사용자 메뉴 드롭다운 컴포넌트

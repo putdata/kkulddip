@@ -33,8 +33,11 @@ const OrderConfirmDialog = ({
   const [activeTab, setActiveTab] = useState<'confirm' | 'reject'>('confirm');
   const [pickupTime, setPickupTime] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
-  
-  const confirmOrderMutation = useConfirmOrder({ orderId: order.orderId, storeId });
+
+  const confirmOrderMutation = useConfirmOrder({
+    orderId: order.orderId,
+    storeId,
+  });
 
   const handleConfirm = async () => {
     if (!pickupTime) {
@@ -87,7 +90,10 @@ const OrderConfirmDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'confirm' | 'reject')}>
+        <Tabs
+          value={activeTab}
+          onValueChange={v => setActiveTab(v as 'confirm' | 'reject')}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="confirm">주문 확정</TabsTrigger>
             <TabsTrigger value="reject">주문 거절</TabsTrigger>
@@ -97,32 +103,36 @@ const OrderConfirmDialog = ({
             <div className="space-y-2">
               <Label htmlFor="pickup-time">픽업 예상 시간</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Clock className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                 <Input
                   id="pickup-time"
                   type="datetime-local"
                   value={pickupTime}
-                  onChange={(e) => setPickupTime(e.target.value)}
+                  onChange={e => setPickupTime(e.target.value)}
                   min={new Date().toISOString().slice(0, 16)}
                   defaultValue={getDefaultPickupTime()}
                   className="pl-10"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 고객에게 안내될 픽업 예상 시간을 설정해주세요.
               </p>
             </div>
 
             {/* 주문 요약 */}
-            <div className="rounded-lg bg-muted p-3 space-y-2">
+            <div className="bg-muted space-y-2 rounded-lg p-3">
               <div className="text-sm font-medium">주문 내역</div>
               {order.orderItems.map((item, index) => (
                 <div key={index} className="flex justify-between text-sm">
-                  <span>{item.productName} x {item.quantity}</span>
-                  <span>{(item.unitPrice * item.quantity).toLocaleString()}원</span>
+                  <span>
+                    {item.productName} x {item.quantity}
+                  </span>
+                  <span>
+                    {(item.unitPrice * item.quantity).toLocaleString()}원
+                  </span>
                 </div>
               ))}
-              <div className="border-t pt-2 flex justify-between font-medium">
+              <div className="flex justify-between border-t pt-2 font-medium">
                 <span>총 금액</span>
                 <span>{order.originalPrice.toLocaleString()}원</span>
               </div>
@@ -136,21 +146,25 @@ const OrderConfirmDialog = ({
                 id="rejection-reason"
                 placeholder="예: 재료 소진, 영업 종료 등..."
                 value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
+                onChange={e => setRejectionReason(e.target.value)}
                 className="min-h-[100px]"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 고객에게 전달될 거절 사유를 입력해주세요.
               </p>
             </div>
 
             {/* 주문 요약 */}
-            <div className="rounded-lg bg-muted p-3 space-y-2">
+            <div className="bg-muted space-y-2 rounded-lg p-3">
               <div className="text-sm font-medium">거절할 주문</div>
               {order.orderItems.map((item, index) => (
                 <div key={index} className="flex justify-between text-sm">
-                  <span>{item.productName} x {item.quantity}</span>
-                  <span>{(item.unitPrice * item.quantity).toLocaleString()}원</span>
+                  <span>
+                    {item.productName} x {item.quantity}
+                  </span>
+                  <span>
+                    {(item.unitPrice * item.quantity).toLocaleString()}원
+                  </span>
                 </div>
               ))}
             </div>
@@ -162,14 +176,14 @@ const OrderConfirmDialog = ({
             취소
           </Button>
           {activeTab === 'confirm' ? (
-            <Button 
+            <Button
               onClick={handleConfirm}
               disabled={confirmOrderMutation.isPending}
             >
               {confirmOrderMutation.isPending ? '처리 중...' : '주문 확정'}
             </Button>
           ) : (
-            <Button 
+            <Button
               variant="destructive"
               onClick={handleReject}
               disabled={confirmOrderMutation.isPending}

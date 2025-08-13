@@ -16,7 +16,7 @@ interface StreamControlButtonProps {
   onEndStreaming?: () => void;
 }
 
-export const StreamControlButton = ({
+const StreamControlButton = ({
   status,
   isLoading = false,
   onConnect,
@@ -164,3 +164,5 @@ export const StreamControlButton = ({
     </Button>
   );
 };
+
+export default StreamControlButton;

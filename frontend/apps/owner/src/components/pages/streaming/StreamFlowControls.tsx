@@ -1,5 +1,5 @@
 import type { StreamFlowStatus } from '@/types/stream';
-import { StreamControlButton } from './StreamControlButton';
+import StreamControlButton from './StreamControlButton';
 
 interface StreamFlowControlsProps {
   status: StreamFlowStatus;
@@ -10,7 +10,7 @@ interface StreamFlowControlsProps {
   className?: string;
 }
 
-export const StreamFlowControls = ({
+const StreamFlowControls = ({
   status,
   isLoading,
   onConnect,
@@ -54,3 +54,5 @@ export const StreamFlowControls = ({
     </div>
   );
 };
+
+export default StreamFlowControls;
