@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNumberParam } from 'common';
+import { useStoreIdParam } from '@/hooks/useStoreIdParam';
 import { Bell, Clock, Search, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import OrderCard from '@/components/OrderCard';
 import { toast } from 'sonner';
 
 const OrdersManagement = () => {
-  const storeId = useNumberParam('storeId');
+  const storeId = useStoreIdParam();
   const [searchTerm, setSearchTerm] = useState('');
   const [autoRefresh, setAutoRefresh] = useState(true);
 
@@ -17,11 +17,11 @@ const OrdersManagement = () => {
     isLoading,
     error,
     refetch,
-  } = usePendingOrders(storeId || 0);
+  } = usePendingOrders(storeId);
 
   // 자동 새로고침 (30초마다)
   useEffect(() => {
-    if (!autoRefresh || !storeId) {
+    if (!autoRefresh) {
       return;
     }
 
@@ -30,16 +30,7 @@ const OrdersManagement = () => {
     }, 30000); // 30초
 
     return () => clearInterval(interval);
-  }, [autoRefresh, storeId, refetch]);
-
-  // storeId가 없으면 에러 처리
-  if (!storeId) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-destructive">잘못된 가게 ID입니다.</div>
-      </div>
-    );
-  }
+  }, [autoRefresh, refetch]);
 
   if (isLoading) {
     return (
@@ -59,13 +50,7 @@ const OrdersManagement = () => {
     );
   }
 
-  // apiClient.get은 이미 response.data.body를 반환하므로 ordersData가 바로 주문 배열
   const orders = ordersData || [];
-
-  // 디버깅용 로그
-  console.log('Raw ordersData:', ordersData);
-  console.log('Processed orders:', orders);
-  console.log('Orders count:', orders.length);
 
   // 검색 필터링
   const filteredOrders = orders.filter(order => {

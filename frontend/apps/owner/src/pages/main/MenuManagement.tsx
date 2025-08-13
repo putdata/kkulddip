@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNumberParam } from 'common';
+import { useStoreIdParam } from '@/hooks/useStoreIdParam';
 import { Plus, Search, Filter } from 'lucide-react';
 import type { DdipBox } from '@/types/ddipbox';
 import { Button } from '@/components/ui/button';
@@ -16,22 +16,13 @@ import DdipboxListItem from '@/components/DdipboxListItem';
 import AddDdipboxDialog from '@/components/AddDdipboxDialog';
 
 const MenuManagement = () => {
-  const storeId = useNumberParam('storeId');
+  const storeId = useStoreIdParam();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'active' | 'inactive'
   >('all');
 
-  const { data: ddipboxData, isLoading, error } = useDdipboxList(storeId || 0);
-
-  // storeId가 없으면 에러 처리
-  if (!storeId) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-destructive">잘못된 가게 ID입니다.</div>
-      </div>
-    );
-  }
+  const { data: ddipboxData, isLoading, error } = useDdipboxList(storeId);
 
   if (isLoading) {
     return (
@@ -49,29 +40,11 @@ const MenuManagement = () => {
     );
   }
 
-  console.log('ddipboxData:', ddipboxData);
+  const ddipboxes = ddipboxData || [];
 
-  // API 응답 구조에 맞게 수정 - 실제 응답이 배열일 수 있음
-  const ddipboxes = Array.isArray(ddipboxData)
-    ? ddipboxData
-    : ddipboxData?.ddipboxes || [];
-
-  console.log('ddipboxes:', ddipboxes);
-
-  // 통계 데이터 처리
-  const totalCount = Array.isArray(ddipboxData)
-    ? ddipboxData.length
-    : ddipboxData?.totalCount || ddipboxes.length;
-
-  const activeCount = Array.isArray(ddipboxData)
-    ? ddipboxData.filter((item: DdipBox) => item.isActive).length
-    : ddipboxData?.activeCount ||
-      ddipboxes.filter((item: DdipBox) => item.isActive).length;
-
-  const inactiveCount = Array.isArray(ddipboxData)
-    ? ddipboxData.filter((item: DdipBox) => !item.isActive).length
-    : ddipboxData?.inactiveCount ||
-      ddipboxes.filter((item: DdipBox) => !item.isActive).length;
+  const totalCount = ddipboxes.length;
+  const activeCount = ddipboxes.filter((item: DdipBox) => item.isActive).length;
+  const inactiveCount = ddipboxes.filter((item: DdipBox) => !item.isActive).length;
 
   // 검색 및 필터링
   const filteredDdipboxes = ddipboxes.filter((ddipbox: DdipBox) => {
