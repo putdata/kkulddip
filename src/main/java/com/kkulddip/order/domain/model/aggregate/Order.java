@@ -23,6 +23,8 @@ public class Order {
     private List<OrderItem> orderItems;
     private Money originalPrice;
     private Money finalPrice;
+    private Money savedMoney;
+    private Double savedCo2;
     private OrderStatus orderStatus;
     private LocalDateTime orderDate;
     private LocalDateTime pickupTime;
@@ -39,8 +41,10 @@ public class Order {
         this.storeId = storeId;
 
         this.orderItems = new ArrayList<>();
-        this.originalPrice = Money.of(0);
-        this.finalPrice = Money.of(0);
+        this.originalPrice = Money.of(0L);
+        this.finalPrice = Money.of(0L);
+        this.savedMoney = Money.of(0L);
+        this.savedCo2 = 0.0;
 
         this.orderStatus = OrderStatus.CREATED;
         this.orderDate = orderDate;
@@ -70,13 +74,16 @@ public class Order {
      * @param orderItems 주문 아이템 목록
      * @param originalPrice 원래 가격
      * @param finalPrice 최종 가격
+     * @param savedMoney 절약 금액
+     * @param savedCo2 절약 CO2량
      * @param orderStatus 주문 상태
      * @param orderDate 주문 날짜
      * @param pickupTime 픽업 시간
      * @return 복원된 Order
      */
     public static Order restore(OrderId orderId, CustomerId customerId, StoreId storeId,
-        List<OrderItem> orderItems, Money originalPrice, Money finalPrice,
+        List<OrderItem> orderItems, Money originalPrice, Money finalPrice, 
+        Money savedMoney, Double savedCo2,
         OrderStatus orderStatus, LocalDateTime orderDate, LocalDateTime pickupTime) {
 
         Order order = new Order();
@@ -86,6 +93,8 @@ public class Order {
         order.orderItems = orderItems != null ? orderItems : new ArrayList<>();
         order.originalPrice = originalPrice;
         order.finalPrice = finalPrice;
+        order.savedMoney = savedMoney != null ? savedMoney : Money.of(0L);
+        order.savedCo2 = savedCo2 != null ? savedCo2 : 0.0;
         order.orderStatus = orderStatus;
         order.orderDate = orderDate;
         order.pickupTime = pickupTime;
@@ -158,6 +167,20 @@ public class Order {
             throw new IllegalStateException("AWAITING_CONFIRMATION 상태에서만 픽업 시간을 설정할 수 있습니다.");
         }
         this.pickupTime = pickupTime;
+    }
+
+    /**
+     * 절약 값 설정 (주문 생성 시에만 사용)
+     * 
+     * @param savedMoney 절약 금액
+     * @param savedCo2 절약 CO2량
+     */
+    public void setSavedValues(Money savedMoney, Double savedCo2) {
+        if (this.orderStatus != OrderStatus.CREATED) {
+            throw new IllegalStateException("CREATED 상태에서만 절약 값을 설정할 수 있습니다.");
+        }
+        this.savedMoney = savedMoney != null ? savedMoney : Money.of(0L);
+        this.savedCo2 = savedCo2 != null ? savedCo2 : 0.0;
     }
 
     private boolean canTransitionTo(OrderStatus newStatus) {

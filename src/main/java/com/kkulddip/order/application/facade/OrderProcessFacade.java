@@ -16,6 +16,9 @@ import com.kkulddip.order.application.service.EventPublisher;
 import com.kkulddip.order.application.service.PriceValidationService;
 import com.kkulddip.order.application.service.StoreAuthService;
 import com.kkulddip.order.application.service.StoreService;
+import com.kkulddip.order.application.service.CustomerStatsUpdateService;
+import com.kkulddip.order.domain.service.OrderSavingsCalculationService;
+import com.kkulddip.order.domain.model.vo.SavingsResult;
 import com.kkulddip.order.domain.model.aggregate.Order;
 import com.kkulddip.order.domain.model.command.AddOrderItemCommand;
 import com.kkulddip.order.domain.model.enums.OrderStatus;
@@ -52,6 +55,8 @@ public class OrderProcessFacade {
     private final OrderMapper orderMapper;
     private final PriceValidationService priceValidationService;
     private final DistributedLock distributedLock;
+    private final OrderSavingsCalculationService savingsCalculationService;
+    private final CustomerStatsUpdateService customerStatsUpdateService;
     
     /**
      * 1. 사용자로부터 주문 요청 처리
@@ -85,16 +90,22 @@ public class OrderProcessFacade {
             // 3. 주문 생성 (주문 아이템 추가)
             Order order = orderService.createOrder(customerId, storeId, orderItemCommands);
             log.info("주문 생성 완료 - orderId: {}", order.getOrderId().value());
+
+            // 4. 절약 값 계산 및 설정
+            SavingsResult savingsResult = savingsCalculationService.calculateSavings(order);
+            order.setSavedValues(savingsResult.savedMoney(), savingsResult.savedCo2());
+            log.info("절약 값 계산 완료 - orderId: {}, savedMoney: {}, savedCo2: {}g", 
+                order.getOrderId().value(), savingsResult.savedMoney().amount(), savingsResult.savedCo2());
             
-            // 4. 주문 저장
+            // 5. 주문 저장
             Order savedOrder = orderService.save(order);
 
-            // 5. 주문 상태 변경 (결제 Pending)
+            // 6. 주문 상태 변경 (결제 Pending)
             orderService.changeOrderStatus(savedOrder, OrderStatus.PAYMENT_PENDING);
             log.info("주문 상태 변경 완료 - orderId: {}, status: PAYMENT_PENDING", 
                 savedOrder.getOrderId().value());
             
-            // 6. 주문 생성 이벤트 발행 (결제 서버로 알림)
+            // 7. 주문 생성 이벤트 발행 (결제 서버로 알림)
             OrderCreatedEvent orderCreatedEvent = OrderCreatedEvent.builder()
                 .orderId(savedOrder.getOrderId().value())
                 .amount(savedOrder.getFinalPrice().amount())
@@ -104,7 +115,7 @@ public class OrderProcessFacade {
             log.info("주문 생성 이벤트 발행 완료 - orderId: {}, amount: {}, customerId: {}", 
                 savedOrder.getOrderId().value(), savedOrder.getFinalPrice().amount(), savedOrder.getCustomerId().value());
             
-            // 7. 응답 반환
+            // 8. 응답 반환
             return orderMapper.toCreateOrderResponse(savedOrder);
             
         } catch (Exception e) {
@@ -220,6 +231,9 @@ public class OrderProcessFacade {
                 orderService.confirmOrder(order, request.pickupTime());
                 log.info("주문 확정 완료 - orderId: {}, pickupTime: {}", 
                     orderId.value(), request.pickupTime());
+
+                // 고객 통계 업데이트
+                customerStatsUpdateService.updateCustomerStatsOnOrderConfirmation(order);
                 
                 // 고객에게 확정 알림
                 String notificationMessage = "주문이 확정되었습니다.";

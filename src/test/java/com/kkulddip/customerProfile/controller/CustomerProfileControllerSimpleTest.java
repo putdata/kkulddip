@@ -110,7 +110,7 @@ class CustomerProfileControllerSimpleTest {
             .lastActiveAt(LocalDateTime.now())
             .build();
         
-        when(customerProfileService.getProfileWithUpdatedStats(anyLong())).thenReturn(response);
+        when(customerProfileService.getProfile(anyLong())).thenReturn(response);
         
         // When & Then
         mockMvc.perform(get("/v1/customers/profile")
@@ -208,7 +208,7 @@ class CustomerProfileControllerSimpleTest {
             .nextLevel(CustomerLevel.WORKER_BEE)
             .build();
         
-        when(customerProfileService.getUpdatedStats(anyLong())).thenReturn(response);
+        when(customerProfileService.getStats(anyLong())).thenReturn(response);
         
         // When & Then
         mockMvc.perform(get("/v1/customers/stats")

@@ -11,7 +11,7 @@ public record OwnerOrderHistoryResponse(
     Long customerId,
     String customerName,
     List<OrderItemResponse> orderItems,
-    Integer originalPrice,
+    Long originalPrice,
     String orderStatus,
     LocalDateTime orderDate,
     LocalDateTime pickupTime
@@ -22,6 +22,6 @@ public record OwnerOrderHistoryResponse(
         Long productId,
         String productName,
         Integer quantity,
-        Integer unitPrice
+        Long unitPrice
     ) {}
 }

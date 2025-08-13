@@ -9,8 +9,8 @@ public record CreateOrderResponse(
     String orderId,      // Long -> String으로 변경
     Long customerId,
     Long storeId,
-    Integer originalPrice,
-    Integer finalPrice,
+    Long originalPrice,
+    Long finalPrice,
     String orderStatus,
     LocalDateTime orderDate
 ) {}

@@ -70,8 +70,8 @@ public class CustomerStatsCalculator {
     private long calculateTotalMoneySaved(List<OrderEntity> orders) {
         return orders.stream()
             .mapToLong(order -> {
-                Integer originalPrice = order.getOriginalPrice();
-                Integer finalPrice = order.getFinalPrice();
+                Long originalPrice = order.getOriginalPrice();
+                Long finalPrice = order.getFinalPrice();
                 
                 if (originalPrice == null || finalPrice == null) {
                     return 0L;
@@ -125,24 +125,4 @@ public class CustomerStatsCalculator {
         return Math.round(co2Saved * 100.0) / 100.0;
     }
     
-    /**
-     * 빠른 통계 조회 (DB 집계 함수 사용)
-     * 
-     * @param customerId 고객 ID
-     * @return 계산된 통계 정보
-     */
-    public CustomerStatsDto calculateStatsFast(Long customerId) {
-        Long orderCount = orderRepository.countConfirmedOrdersByCustomerId(customerId);
-        Long moneySaved = orderRepository.calculateTotalMoneySavedByCustomerId(customerId);
-        
-        List<OrderEntity> confirmedOrders = orderRepository
-            .findConfirmedOrdersByCustomerId(customerId);
-        double co2Saved = calculateCo2Saved(confirmedOrders);
-        
-        return CustomerStatsDto.builder()
-            .totalOrder(orderCount != null ? orderCount.intValue() : 0)
-            .totalMoneySaved(moneySaved != null ? moneySaved : 0L)
-            .totalCo2Saved(co2Saved)
-            .build();
-    }
 }

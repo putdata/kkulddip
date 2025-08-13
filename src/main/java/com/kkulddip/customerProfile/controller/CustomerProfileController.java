@@ -54,7 +54,7 @@ public class CustomerProfileController implements CustomerProfileApi {
         Long customerId = getCurrentCustomerId();
         log.info("프로필 조회 요청 - customerId: {}", customerId);
         
-        CustomerProfileResponse response = customerProfileService.getProfileWithUpdatedStats(customerId);
+        CustomerProfileResponse response = customerProfileService.getProfile(customerId);
         return ApiResponse.of(response);
     }
     
@@ -87,7 +87,7 @@ public class CustomerProfileController implements CustomerProfileApi {
         Long customerId = getCurrentCustomerId();
         log.info("통계 조회 요청 - customerId: {}", customerId);
         
-        CustomerStatsResponse response = customerProfileService.getUpdatedStats(customerId);
+        CustomerStatsResponse response = customerProfileService.getStats(customerId);
         return ApiResponse.of(response);
     }
     

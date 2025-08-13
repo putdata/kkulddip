@@ -64,8 +64,8 @@ class CustomerStatsCalculatorTest {
     @Test
     @DisplayName("절약 금액이 정확하게 계산되어야 한다")
     void calculateStats_WithOrders_CalculatesMoneySaved() {
-        OrderEntity order1 = createOrder(10000, 7000);
-        OrderEntity order2 = createOrder(20000, 15000);
+        OrderEntity order1 = createOrder(10000L, 7000L);
+        OrderEntity order2 = createOrder(20000L, 15000L);
         
         when(orderRepository.findConfirmedOrdersByCustomerId(customerId))
             .thenReturn(Arrays.asList(order1, order2));
@@ -93,24 +93,6 @@ class CustomerStatsCalculatorTest {
         assertThat(stats.totalCo2Saved()).isEqualTo(0.0);
     }
     
-    @Test
-    @DisplayName("빠른 통계 계산이 정확해야 한다")
-    void calculateStatsFast_ReturnsCorrectStats() {
-        when(orderRepository.countConfirmedOrdersByCustomerId(customerId))
-            .thenReturn(5L);
-        when(orderRepository.calculateTotalMoneySavedByCustomerId(customerId))
-            .thenReturn(15000L);
-        when(orderRepository.findConfirmedOrdersByCustomerId(customerId))
-            .thenReturn(Collections.singletonList(createOrderWithItems()));
-        when(orderItemRepository.findByOrderOrderId(any()))
-            .thenReturn(Collections.emptyList());
-        
-        CustomerStatsDto stats = statsCalculator.calculateStatsFast(customerId);
-        
-        assertThat(stats.totalOrder()).isEqualTo(5);
-        assertThat(stats.totalMoneySaved()).isEqualTo(15000L);
-        assertThat(stats.totalCo2Saved()).isEqualTo(0.0);
-    }
     
     @Test
     @DisplayName("null 값 처리가 정확해야 한다")
@@ -144,18 +126,20 @@ class CustomerStatsCalculatorTest {
         assertThat(stats.totalCo2Saved()).isEqualTo(0.0);
     }
     
-    private OrderEntity createOrder(Integer originalPrice, Integer finalPrice) {
+    private OrderEntity createOrder(Long originalPrice, Long finalPrice) {
         return OrderEntity.builder()
             .orderId(1L)
             .customerId(customerId)
             .originalPrice(originalPrice)
             .finalPrice(finalPrice)
+            .savedMoney(0L)
+            .savedCo2(0.0)
             .orderStatus(OrderStatus.CONFIRMED)
             .orderDate(java.time.LocalDateTime.now())
             .build();
     }
     
     private OrderEntity createOrderWithItems() {
-        return createOrder(10000, 7000);
+        return createOrder(10000L, 7000L);
     }
 }
