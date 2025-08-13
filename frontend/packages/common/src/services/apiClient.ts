@@ -117,7 +117,9 @@ class ApiClient {
    * @returns 응답 데이터
    */
   async delete<T>(url: string, params?: object): Promise<T> {
-    const response = await this.instance.delete<ApiResponse<T>>(url, { params });
+    const response = await this.instance.delete<ApiResponse<T>>(url, {
+      params,
+    });
     return (response.data as ApiSuccessResponse<T>).body;
   }
 }
