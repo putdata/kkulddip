@@ -23,7 +23,7 @@ public record OAuth2TokenResponse(
 ) {
     @Builder
     public record UserInfo(
-        Long userid,
+        Long userId,
         String email,
         String name,
         String role,
