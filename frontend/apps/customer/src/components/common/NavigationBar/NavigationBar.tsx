@@ -1,5 +1,5 @@
 import { ROUTE_PATH } from '@/router';
-import { MapPin, Bell, Menu } from 'lucide-react';
+import { MapPin, Bell, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NavigationBar = () => {
@@ -23,7 +23,10 @@ const NavigationBar = () => {
           <Bell className="mr-1 h-4 w-4" />
         </button>
         <button className="text-sm text-gray-700">
-          <Menu className="mr-1 h-4 w-4" />
+          <ShoppingCart
+            className="mr-1 h-4 w-4"
+            onClick={() => navigate(ROUTE_PATH.PAY)}
+          />
         </button>
       </div>
     </nav>

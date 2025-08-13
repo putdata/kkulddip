@@ -26,17 +26,20 @@ export const registerFCMToken = async (fcmToken: string): Promise<void> => {
   console.log('FCM Token registered with server');
 };
 
-export const sendTestNotification = async (): Promise<void> => {
-  const testData: NotificationRequest = {
+export const sendTestNotification = async (
+  testData?: Partial<NotificationRequest>,
+): Promise<void> => {
+  const defaultData: NotificationRequest = {
     title: '알림 테스트',
     content: '테스트 알림 내용',
     publisherId: 1001,
     publisherType: 'SYSTEM',
-    subscriberId: 1,
+    subscriberId: 5,
     subscriberType: 'OWNER',
     notificationType: 'ORDER',
     actionUrl: '/orders/12345',
   };
 
-  await apiClient.post('/v1/notifications', testData);
+  const finalData = { ...defaultData, ...testData };
+  await apiClient.post('/v1/notifications', finalData);
 };
