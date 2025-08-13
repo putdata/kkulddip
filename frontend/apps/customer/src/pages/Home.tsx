@@ -1,7 +1,16 @@
+import FilterBar from '@/components/pages/home/FilterBar';
+import HomeMainContainer from '@/components/pages/home/HomeMainContainer';
+import { dummyStoreData } from '@/constants/homeMockData';
+
 const Home = () => {
+  const stores = dummyStoreData.body.content;
+
   return (
-    <div className="flex flex-col items-center justify-between bg-orange-50 p-0">
-      <div>메인 화면</div>
+    <div>
+      <div className="sticky pt-5">
+        <FilterBar />
+      </div>
+      <HomeMainContainer stores={stores}></HomeMainContainer>
     </div>
   );
 };
