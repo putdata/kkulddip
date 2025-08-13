@@ -21,7 +21,9 @@ const OrderCard = ({ item }: OrderCardProps) => {
         </span>
         <button
           className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          onClick={() => navigate(ROUTE_PATH.ORDER_DETAIL.replace(':orderId', item.orderId))}
+          onClick={() =>
+            navigate(ROUTE_PATH.ORDER_DETAIL.replace(':orderId', item.orderId))
+          }
         >
           주문상세
         </button>
