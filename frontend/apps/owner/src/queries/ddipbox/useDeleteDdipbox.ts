@@ -9,7 +9,8 @@ export const useDeleteDdipbox = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, { storeId: number; ddipboxId: number }>({
-    mutationFn: ({ storeId, ddipboxId }) => ddipboxService.deleteDdipbox(storeId, ddipboxId),
+    mutationFn: ({ storeId, ddipboxId }) =>
+      ddipboxService.deleteDdipbox(storeId, ddipboxId),
     onSuccess: (_, { ddipboxId, storeId }) => {
       // 딥박스 목록을 새로고침하고 해당 딥박스의 상세 정보 캐시 제거
       queryClient.invalidateQueries({

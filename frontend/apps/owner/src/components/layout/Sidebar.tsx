@@ -15,6 +15,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { sidebarItems } from '@/constants/sidebarItems';
 import StoreSwitcher from '@/components/StoreSelector';
@@ -23,11 +25,21 @@ import UserSwitcher from '@/components/UserSwitcher';
 const AppSidebar = () => {
   const location = useLocation();
   const { storeId } = useParams();
+  const { state } = useSidebar();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader>
-        <StoreSwitcher />
+      <SidebarHeader className="hidden md:flex">
+        <div className="flex items-center gap-2">
+          {state === 'collapsed' ? (
+            <SidebarTrigger className="h-8 w-8" />
+          ) : (
+            <>
+              <StoreSwitcher />
+              <SidebarTrigger className="ml-auto h-8 w-8" />
+            </>
+          )}
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
