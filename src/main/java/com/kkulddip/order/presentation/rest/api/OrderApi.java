@@ -12,9 +12,11 @@ import jakarta.validation.Valid;
 import com.kkulddip.common.response.ApiResponse;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
 import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
+import com.kkulddip.order.presentation.rest.dto.request.OrderPickupRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderPickupResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
@@ -53,6 +55,14 @@ public interface OrderApi {
     @GetMapping("/store-history")
     public ApiResponse<List<OwnerOrderHistoryResponse>> getStoreOrderHistory(
         @RequestParam Long storeId,
+        @AuthenticationPrincipal JwtUserInfo userInfo
+    );
+
+    @Operation(summary = "주문 픽업 완료", description = "사장님이 주문의 픽업 완료를 처리합니다")
+    @PostMapping("/{orderId}/pickup")
+    public ApiResponse<OrderPickupResponse> markOrderAsPickedUp(
+        @PathVariable String orderId,
+        @RequestBody @Valid OrderPickupRequest request,
         @AuthenticationPrincipal JwtUserInfo userInfo
     );
 }

@@ -591,4 +591,75 @@ class FavoriteRepositoryTest {
             .noneMatch(f -> f.getStoreId().equals(storeWithoutRating.getStoreId())))
             .isTrue();
     }
+
+    @Test
+    @DisplayName("특정 가게를 즐겨찾기한 모든 고객 ID를 조회한다")
+    void findCustomerIdsByStoreId() {
+        // when
+        List<Long> customerIds = favoriteRepository.findCustomerIdsByStoreId(testStore1.getStoreId());
+
+        // then
+        assertThat(customerIds).hasSize(2);
+        assertThat(customerIds).containsExactlyInAnyOrder(1L, 2L); // testFavorite1과 testFavorite3의 고객 ID
+    }
+
+    @Test
+    @DisplayName("즐겨찾기가 없는 가게의 고객 ID 조회시 빈 목록을 반환한다")
+    void findCustomerIdsByStoreIdForStoreWithNoFavorites() {
+        // given
+        Store storeWithNoFavorites = Store.builder()
+            .ownerId(400L)
+            .storeName("즐겨찾기 없는 가게")
+            .storeAddress("서울시 마포구")
+            .latitude(37.5665)
+            .longitude(126.9780)
+            .isActive(true)
+            .ratingAverage(4.0)
+            .build();
+        storeRepository.save(storeWithNoFavorites);
+
+        // when
+        List<Long> customerIds = favoriteRepository.findCustomerIdsByStoreId(storeWithNoFavorites.getStoreId());
+
+        // then
+        assertThat(customerIds).isEmpty();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 가게의 고객 ID 조회시 빈 목록을 반환한다")
+    void findCustomerIdsByStoreIdForNonExistentStore() {
+        // given
+        Long nonExistentStoreId = 999L;
+
+        // when
+        List<Long> customerIds = favoriteRepository.findCustomerIdsByStoreId(nonExistentStoreId);
+
+        // then
+        assertThat(customerIds).isEmpty();
+    }
+
+    @Test
+    @DisplayName("여러 고객이 즐겨찾기한 가게의 고객 ID를 모두 조회한다")
+    void findCustomerIdsByStoreIdForMultipleCustomers() {
+        // given - 추가 고객들이 testStore1을 즐겨찾기
+        Favorite additionalFavorite1 = Favorite.builder()
+            .customerId(3L)
+            .storeId(testStore1.getStoreId())
+            .build();
+        
+        Favorite additionalFavorite2 = Favorite.builder()
+            .customerId(4L)
+            .storeId(testStore1.getStoreId())
+            .build();
+
+        favoriteRepository.save(additionalFavorite1);
+        favoriteRepository.save(additionalFavorite2);
+
+        // when
+        List<Long> customerIds = favoriteRepository.findCustomerIdsByStoreId(testStore1.getStoreId());
+
+        // then
+        assertThat(customerIds).hasSize(4);
+        assertThat(customerIds).containsExactlyInAnyOrder(1L, 2L, 3L, 4L);
+    }
 }

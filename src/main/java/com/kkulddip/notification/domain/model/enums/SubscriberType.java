@@ -9,7 +9,7 @@ public enum SubscriberType {
     ALL("전체", "ALL"),
     CUSTOMER("고객", "CUSTOMER"),
     OWNER("사장", "OWNER"),
-    SPECIFIC("특정 사용자", "SPECIFIC");
+    STORE("가게", "STORE");
 
     private final String description;
     private final String value;
