@@ -1,5 +1,6 @@
 package com.kkulddip.order.domain.model.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class OrderItem {
         this.productId = productId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
+        this.discountInfos = new ArrayList<>(); // 빈 리스트로 초기화
     }
 
     public static OrderItem create(Order order, AddOrderItemCommand addOrderItemCommand) {
