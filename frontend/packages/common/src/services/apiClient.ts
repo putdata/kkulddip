@@ -58,7 +58,8 @@ class ApiClient {
       },
       error => {
         if (error.response?.status === 401) {
-          useAuthStore.getState().clearAuth();
+          console.log('401 에러');
+          // useAuthStore.getState().clearAuth();
         }
 
         if (error.isAxiosError) {

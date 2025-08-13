@@ -26,12 +26,14 @@ const ReviewCreate = () => {
     imagePreviewUrls: [],
   });
 
-  // const onSetRating = (rating: number) => {
-  //   setReviewForm({
-  //     ...reviewForm,
-  //     rating: rating,
-  //   });
-  // };
+  const onSetRating = (rating: number) => {
+    console.log('Rating updated:', rating); // 디버깅용
+
+    setReviewForm({
+      ...reviewForm,
+      rating: rating,
+    });
+  };
 
   const onSetReviewText = (reviewText: string) => {
     setReviewForm({
@@ -81,7 +83,11 @@ const ReviewCreate = () => {
   return (
     <div className="flex h-screen flex-col items-center gap-5 bg-gray-100 p-5">
       {/* 리뷰 작성 페이지 상단 */}
-      <ReviewCreateHeader store={store} />
+      <ReviewCreateHeader
+        store={store}
+        rating={reviewForm.rating}
+        setRating={onSetRating}
+      />
       {/* 리뷰 텍스트 입력 컴포넌트에 필요한 props 전달 */}
       <ReviewCreateTextInput
         reviewText={reviewForm.reviewText}

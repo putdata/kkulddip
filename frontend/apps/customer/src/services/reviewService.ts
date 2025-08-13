@@ -38,6 +38,27 @@ export class ReviewService {
 
     return apiClient.post(`/stores/${data.storeId}/reviews`, formData);
   }
+
+  /**
+   * 리뷰에 도움돼요 추가
+   */
+  static async addHelpful(reviewId: number): Promise<void> {
+    return apiClient.post(`/v1/reviews/${reviewId}/helpful`);
+  }
+
+  /**
+   * 리뷰에서 도움돼요 제거
+   */
+  static async removeHelpful(reviewId: number): Promise<void> {
+    return apiClient.delete(`/v1/reviews/${reviewId}/helpful`);
+  }
+
+  /**
+   * 사용자가 해당 리뷰에 도움돼요를 눌렀는지 확인
+   */
+  static async checkHelpful(reviewId: number): Promise<boolean> {
+    return apiClient.get(`/v1/reviews/${reviewId}/helpful/check`);
+  }
 }
 
 /**
