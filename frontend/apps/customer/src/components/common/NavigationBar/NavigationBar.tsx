@@ -1,3 +1,4 @@
+import SearchBar from '@/components/pages/home/SearchBar';
 import { ROUTE_PATH } from '@/router';
 import { MapPin, Bell, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
