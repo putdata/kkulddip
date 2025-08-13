@@ -39,15 +39,6 @@ export interface Order {
 }
 
 /**
- * 대기 중인 주문 목록 응답
- */
-export interface PendingOrdersResponse {
-  success: boolean;
-  status: number;
-  body: Order[];
-}
-
-/**
  * 주문 확정/거절 요청
  */
 export interface ConfirmOrderRequest {
@@ -65,3 +56,8 @@ export interface ConfirmOrderResponse {
   pickupTime?: string;
   confirmedAt: string;
 }
+
+/**
+ * 주문 정보
+ */
+export type PendingOrdersResponse = Order[];

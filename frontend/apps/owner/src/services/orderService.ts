@@ -1,7 +1,7 @@
 import { apiClient } from 'common';
 import { API_PATH } from '@/constants/api-path';
 import type {
-  Order,
+  PendingOrdersResponse,
   ConfirmOrderRequest,
   ConfirmOrderResponse,
 } from '@/types/order';
@@ -14,8 +14,8 @@ export const orderService = {
    * 대기 중인 주문 조회
    * 사장님이 확인해야 할 주문들을 조회합니다 (AWAITING_CONFIRMATION)
    */
-  getPendingOrders: (storeId: number): Promise<Order[]> => {
-    return apiClient.get<Order[]>(
+  getPendingOrders: (storeId: number): Promise<PendingOrdersResponse> => {
+    return apiClient.get<PendingOrdersResponse>(
       API_PATH.ORDERS.PENDING,
       { storeId },
     );

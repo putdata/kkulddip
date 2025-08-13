@@ -1,3 +1,6 @@
+/**
+ * 스토어 정보
+ */
 export interface Store {
   storeId: number;
   storeName: string;
@@ -18,6 +21,9 @@ export interface Store {
   totalRevenue: number;
 }
 
+/**
+ * 페이지네이션 응답
+ */
 export interface PaginatedResponse {
   totalCount: number;
   activeCount: number;
@@ -26,10 +32,16 @@ export interface PaginatedResponse {
   nextCursor: string | null;
 }
 
+/**
+ * 스토어 목록 응답
+ */
 export interface StoreListResponse extends PaginatedResponse {
   stores: Store[];
 }
 
+/**
+ * 스토어 생성 요청
+ */
 export interface CreateStoreRequest {
   storeName: string;
   phone: string;
@@ -41,6 +53,9 @@ export interface CreateStoreRequest {
   longitude: number;
 }
 
+/**
+ * 스토어 관리 응답
+ */
 export interface StoreManagementResponse {
   storeId: number;
   ownerId: number;
@@ -60,6 +75,9 @@ export interface StoreManagementResponse {
   updatedAt: string;
 }
 
+/**
+ * 스토어 수정 요청
+ */
 export interface UpdateStoreRequest {
   storeName?: string;
   phone?: string;
@@ -70,12 +88,25 @@ export interface UpdateStoreRequest {
   longitude?: number;
 }
 
+/**
+ * 스토어 상태 변경 요청
+ */
 export interface UpdateStoreStatusRequest {
   isActive: boolean;
   reason?: string;
 }
 
-// 하위 호환성을 위한 별칭
+/**
+ * 스토어 생성 응답
+ */
 export type CreateStoreResponse = StoreManagementResponse;
+
+/**
+ * 스토어 수정 응답
+ */
 export type UpdateStoreResponse = StoreManagementResponse;
+
+/**
+ * 스토어 상태 변경 응답
+ */
 export type UpdateStoreStatusResponse = StoreManagementResponse;

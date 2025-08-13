@@ -4,7 +4,7 @@ import { storeService } from '@/services/storeService';
 import { storeQueryKeys } from './storeQueryKeys';
 
 /**
- * 내 스토어 목록을 조회
+ * 내 스토어 목록을 조회하는 쿼리 훅
  */
 export const useMyStores = () => {
   return useQuery<StoreListResponse>({
