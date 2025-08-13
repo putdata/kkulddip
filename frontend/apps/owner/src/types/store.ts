@@ -32,16 +32,16 @@ export interface StoreListResponse extends PaginatedResponse {
 
 export interface CreateStoreRequest {
   storeName: string;
+  phone?: string;
+  description?: string;
+  operatingHours?: string;
+  businessNumber?: string;
   storeAddress: string;
-  description: string;
-  operatingHours: string;
-  phone: string;
-  businessNumber: string;
   latitude: number;
   longitude: number;
 }
 
-export interface CreateStoreResponse {
+export interface StoreManagementResponse {
   storeId: number;
   ownerId: number;
   storeName: string;
@@ -53,7 +53,7 @@ export interface CreateStoreResponse {
   reviewCount: number;
   businessNumber: string;
   storeAddress: string;
-  storeProfileImage: string | null;
+  storeProfileImage: string;
   latitude: number;
   longitude: number;
   createdAt: string;
@@ -62,40 +62,20 @@ export interface CreateStoreResponse {
 
 export interface UpdateStoreRequest {
   storeName?: string;
-  storeAddress?: string;
+  phone?: string;
   description?: string;
   operatingHours?: string;
-  phone?: string;
-  businessNumber?: string;
+  storeAddress?: string;
   latitude?: number;
   longitude?: number;
 }
 
-export interface UpdateStoreResponse {
-  storeId: number;
-  ownerId: number;
-  storeName: string;
-  phone: string;
-  description: string;
-  operatingHours: string;
+export interface UpdateStoreStatusRequest {
   isActive: boolean;
-  ratingAverage: number;
-  reviewCount: number;
-  businessNumber: string;
-  storeAddress: string;
-  storeProfileImage: string | null;
-  latitude: number;
-  longitude: number;
-  createdAt: string;
-  updatedAt: string;
+  reason?: string;
 }
 
-export interface ToggleStoreStatusRequest {
-  isActive: boolean;
-}
-
-export interface ToggleStoreStatusResponse {
-  storeId: number;
-  isActive: boolean;
-  updatedAt: string;
-}
+// 하위 호환성을 위한 별칭
+export type CreateStoreResponse = StoreManagementResponse;
+export type UpdateStoreResponse = StoreManagementResponse;
+export type UpdateStoreStatusResponse = StoreManagementResponse;

@@ -3,23 +3,13 @@ export interface DdipBox {
   storeId: number;
   ddipboxName: string;
   description: string;
+  category: string;
   originalPrice: number;
   salePrice: number;
-  discountRate: number;
+  dailyQuantity: number;
   remainingQuantity: number;
-  totalQuantity: number;
+  maxPerCustomer: number;
   isActive: boolean;
-  ddipboxImages: string[];
-  ingredients: string[];
-  allergyInfo: string | null;
-  nutritionInfo: string | null;
-  expirationDate: string;
-  pickupStartTime: string;
-  pickupEndTime: string;
-  category: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface DdipBoxListResponse {
@@ -31,112 +21,53 @@ export interface DdipBoxListResponse {
   nextCursor: string | null;
 }
 
+// API 스펙에 따른 요청/응답 타입
 export interface CreateDdipBoxRequest {
   ddipboxName: string;
-  description: string;
+  description?: string;
+  category: string;
   originalPrice: number;
   salePrice: number;
-  totalQuantity: number;
-  ingredients: string[];
-  allergyInfo?: string;
-  nutritionInfo?: string;
-  expirationDate: string;
-  pickupStartTime: string;
-  pickupEndTime: string;
-  category: string;
-  tags?: string[];
-  ddipboxImages?: string[];
-}
-
-export interface CreateDdipBoxResponse {
-  ddipboxId: number;
-  storeId: number;
-  ddipboxName: string;
-  description: string;
-  originalPrice: number;
-  salePrice: number;
-  discountRate: number;
-  remainingQuantity: number;
-  totalQuantity: number;
-  isActive: boolean;
-  ddipboxImages: string[];
-  ingredients: string[];
-  allergyInfo: string | null;
-  nutritionInfo: string | null;
-  expirationDate: string;
-  pickupStartTime: string;
-  pickupEndTime: string;
-  category: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
+  dailyQuantity: number;
+  maxPerCustomer: number;
 }
 
 export interface UpdateDdipBoxRequest {
   ddipboxName?: string;
   description?: string;
+  category?: string;
   originalPrice?: number;
   salePrice?: number;
-  totalQuantity?: number;
-  ingredients?: string[];
-  allergyInfo?: string;
-  nutritionInfo?: string;
-  expirationDate?: string;
-  pickupStartTime?: string;
-  pickupEndTime?: string;
-  category?: string;
-  tags?: string[];
-  ddipboxImages?: string[];
+  dailyQuantity?: number;
+  maxPerCustomer?: number;
 }
 
-export interface UpdateDdipBoxResponse {
+export interface UpdateDdipBoxQuantityRequest {
+  remainingQuantity?: number;
+  dailyQuantity?: number;
+  resetRemaining?: boolean;
+}
+
+export type UpdateDdipBoxStatusRequest = {
+  isActive: boolean;
+  reason?: string;
+};
+
+export interface DdipBoxManagementResponse {
   ddipboxId: number;
   storeId: number;
   ddipboxName: string;
   description: string;
+  category: string;
   originalPrice: number;
   salePrice: number;
-  discountRate: number;
+  dailyQuantity: number;
   remainingQuantity: number;
-  totalQuantity: number;
-  isActive: boolean;
-  ddipboxImages: string[];
-  ingredients: string[];
-  allergyInfo: string | null;
-  nutritionInfo: string | null;
-  expirationDate: string;
-  pickupStartTime: string;
-  pickupEndTime: string;
-  category: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ToggleDdipBoxStatusRequest {
+  maxPerCustomer: number;
   isActive: boolean;
 }
 
-export interface ToggleDdipBoxStatusResponse {
-  ddipboxId: number;
-  isActive: boolean;
-  updatedAt: string;
-}
-
-export interface BulkUpdateDdipBoxRequest {
-  ddipboxIds: number[];
-  updates: {
-    isActive?: boolean;
-    salePrice?: number;
-    totalQuantity?: number;
-    expirationDate?: string;
-    pickupStartTime?: string;
-    pickupEndTime?: string;
-  };
-}
-
-export interface BulkUpdateDdipBoxResponse {
-  updatedCount: number;
-  updatedDdipboxIds: number[];
-  updatedAt: string;
-}
+export type CreateDdipBoxResponse = DdipBoxManagementResponse;
+export type UpdateDdipBoxResponse = DdipBoxManagementResponse;
+export type UpdateDdipBoxQuantityResponse = DdipBoxManagementResponse;
+export type UpdateDdipBoxStatusResponse = DdipBoxManagementResponse;

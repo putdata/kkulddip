@@ -1,16 +1,15 @@
 import { apiClient } from 'common';
 import { API_PATH } from '@/constants/api-path';
 import type {
-  DdipBox,
   DdipBoxListResponse,
   CreateDdipBoxRequest,
   CreateDdipBoxResponse,
   UpdateDdipBoxRequest,
   UpdateDdipBoxResponse,
-  ToggleDdipBoxStatusRequest,
-  ToggleDdipBoxStatusResponse,
-  BulkUpdateDdipBoxRequest,
-  BulkUpdateDdipBoxResponse,
+  UpdateDdipBoxQuantityRequest,
+  UpdateDdipBoxQuantityResponse,
+  UpdateDdipBoxStatusRequest,
+  UpdateDdipBoxStatusResponse,
 } from '@/types/ddipbox';
 
 /**
@@ -28,16 +27,6 @@ export const ddipboxService = {
     return apiClient.get<DdipBoxListResponse>(
       API_PATH.DDIPBOX_MANAGEMENT.LIST(storeId),
       params,
-    );
-  },
-
-  /**
-   * 딥박스 상세 조회
-   * 특정 딥박스의 상세 정보를 조회합니다.
-   */
-  getDdipbox: (ddipboxId: number): Promise<DdipBox> => {
-    return apiClient.get<DdipBox>(
-      API_PATH.DDIPBOX_MANAGEMENT.DETAIL(ddipboxId),
     );
   },
 
@@ -60,11 +49,27 @@ export const ddipboxService = {
    * 기존 딥박스의 정보를 수정합니다. 사장님만 사용할 수 있습니다.
    */
   updateDdipbox: (
+    storeId: number,
     ddipboxId: number,
     data: UpdateDdipBoxRequest,
   ): Promise<UpdateDdipBoxResponse> => {
     return apiClient.put<UpdateDdipBoxResponse>(
-      API_PATH.DDIPBOX_MANAGEMENT.UPDATE(ddipboxId),
+      API_PATH.DDIPBOX_MANAGEMENT.UPDATE(storeId, ddipboxId),
+      data,
+    );
+  },
+
+  /**
+   * 딥박스 재고 수량 업데이트
+   * 딥박스의 재고 수량을 업데이트합니다.
+   */
+  updateDdipboxQuantity: (
+    storeId: number,
+    ddipboxId: number,
+    data: UpdateDdipBoxQuantityRequest,
+  ): Promise<UpdateDdipBoxQuantityResponse> => {
+    return apiClient.patch<UpdateDdipBoxQuantityResponse>(
+      API_PATH.DDIPBOX_MANAGEMENT.UPDATE_QUANTITY(storeId, ddipboxId),
       data,
     );
   },
@@ -73,9 +78,9 @@ export const ddipboxService = {
    * 딥박스 삭제
    * 딥박스를 삭제합니다. 사장님만 사용할 수 있습니다.
    */
-  deleteDdipbox: (ddipboxId: number): Promise<void> => {
+  deleteDdipbox: (storeId: number, ddipboxId: number): Promise<void> => {
     return apiClient.delete<void>(
-      API_PATH.DDIPBOX_MANAGEMENT.DELETE(ddipboxId),
+      API_PATH.DDIPBOX_MANAGEMENT.DELETE(storeId, ddipboxId),
     );
   },
 
@@ -84,25 +89,12 @@ export const ddipboxService = {
    * 딥박스의 판매 상태를 변경합니다. 사장님만 사용할 수 있습니다.
    */
   toggleDdipboxStatus: (
-    ddipboxId: number,
-    data: ToggleDdipBoxStatusRequest,
-  ): Promise<ToggleDdipBoxStatusResponse> => {
-    return apiClient.put<ToggleDdipBoxStatusResponse>(
-      API_PATH.DDIPBOX_MANAGEMENT.TOGGLE_STATUS(ddipboxId),
-      data,
-    );
-  },
-
-  /**
-   * 딥박스 일괄 수정
-   * 여러 딥박스의 정보를 한 번에 수정합니다. 사장님만 사용할 수 있습니다.
-   */
-  bulkUpdateDdipboxes: (
     storeId: number,
-    data: BulkUpdateDdipBoxRequest,
-  ): Promise<BulkUpdateDdipBoxResponse> => {
-    return apiClient.put<BulkUpdateDdipBoxResponse>(
-      API_PATH.DDIPBOX_MANAGEMENT.BULK_UPDATE(storeId),
+    ddipboxId: number,
+    data: UpdateDdipBoxStatusRequest,
+  ): Promise<UpdateDdipBoxStatusResponse> => {
+    return apiClient.patch<UpdateDdipBoxStatusResponse>(
+      API_PATH.DDIPBOX_MANAGEMENT.TOGGLE_STATUS(storeId, ddipboxId),
       data,
     );
   },

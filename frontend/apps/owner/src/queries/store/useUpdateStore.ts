@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type { UpdateStoreRequest, UpdateStoreResponse } from '@/types/store';
 import { storeService } from '@/services/storeService';
 import { storeQueryKeys } from './storeQueryKeys';
@@ -21,6 +22,10 @@ export const useUpdateStore = () => {
       queryClient.invalidateQueries({
         queryKey: storeQueryKeys.detail(response.storeId.toString()),
       });
+      toast.success('가게 정보가 성공적으로 수정되었습니다.');
+    },
+    onError: (error: Error) => {
+      toast.error(`가게 정보 수정에 실패했습니다: ${error.message}`);
     },
   });
 };

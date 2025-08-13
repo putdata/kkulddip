@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { storeService } from '@/services/storeService';
 import { storeQueryKeys } from './storeQueryKeys';
 
@@ -16,6 +17,10 @@ export const useDeleteStore = () => {
       queryClient.removeQueries({
         queryKey: storeQueryKeys.detail(storeId.toString()),
       });
+      toast.success('가게가 성공적으로 삭제되었습니다.');
+    },
+    onError: (error: Error) => {
+      toast.error(`가게 삭제에 실패했습니다: ${error.message}`);
     },
   });
 };

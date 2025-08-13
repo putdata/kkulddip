@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
-  ToggleDdipBoxStatusRequest,
-  ToggleDdipBoxStatusResponse,
+  UpdateDdipBoxStatusRequest,
+  UpdateDdipBoxStatusResponse,
 } from '@/types/ddipbox';
 import { ddipboxService } from '@/services/ddipboxService';
 import { ddipboxQueryKeys } from './ddipboxQueryKeys';
@@ -13,12 +13,12 @@ export const useToggleDdipboxStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    ToggleDdipBoxStatusResponse,
+    UpdateDdipBoxStatusResponse,
     Error,
-    { ddipboxId: number; data: ToggleDdipBoxStatusRequest; storeId: number }
+    { storeId: number; ddipboxId: number; data: UpdateDdipBoxStatusRequest }
   >({
-    mutationFn: ({ ddipboxId, data }) =>
-      ddipboxService.toggleDdipboxStatus(ddipboxId, data),
+    mutationFn: ({ storeId, ddipboxId, data }) =>
+      ddipboxService.toggleDdipboxStatus(storeId, ddipboxId, data),
     onSuccess: (response, { storeId }) => {
       // 딥박스 목록과 상세 정보를 새로고침
       queryClient.invalidateQueries({

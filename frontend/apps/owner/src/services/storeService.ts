@@ -7,8 +7,8 @@ import type {
   CreateStoreResponse,
   UpdateStoreRequest,
   UpdateStoreResponse,
-  ToggleStoreStatusRequest,
-  ToggleStoreStatusResponse,
+  UpdateStoreStatusRequest,
+  UpdateStoreStatusResponse,
 } from '@/types/store';
 
 /**
@@ -70,9 +70,9 @@ export const storeService = {
    */
   toggleStoreStatus: (
     storeId: number,
-    data: ToggleStoreStatusRequest,
-  ): Promise<ToggleStoreStatusResponse> => {
-    return apiClient.put<ToggleStoreStatusResponse>(
+    data: UpdateStoreStatusRequest,
+  ): Promise<UpdateStoreStatusResponse> => {
+    return apiClient.patch<UpdateStoreStatusResponse>(
       API_PATH.STORE_MANAGEMENT.TOGGLE_STATUS(storeId),
       data,
     );

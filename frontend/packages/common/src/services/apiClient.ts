@@ -110,6 +110,19 @@ class ApiClient {
   }
 
   /**
+   * PATCH 요청 수행
+   *
+   * @template T - 응답 데이터의 타입
+   * @param url - 요청할 URL
+   * @param data - 요청 본문 데이터
+   * @returns 응답 데이터
+   */
+  async patch<T>(url: string, data?: object): Promise<T> {
+    const response = await this.instance.patch<ApiResponse<T>>(url, data);
+    return (response.data as ApiSuccessResponse<T>).body;
+  }
+
+  /**
    * DELETE 요청 수행
    *
    * @template T - 응답 데이터의 타입

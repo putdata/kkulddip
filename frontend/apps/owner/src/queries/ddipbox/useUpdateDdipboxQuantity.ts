@@ -1,24 +1,25 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type {
-  UpdateDdipBoxRequest,
-  UpdateDdipBoxResponse,
+  UpdateDdipBoxQuantityRequest,
+  UpdateDdipBoxQuantityResponse,
 } from '@/types/ddipbox';
 import { ddipboxService } from '@/services/ddipboxService';
 import { ddipboxQueryKeys } from './ddipboxQueryKeys';
 
 /**
- * 딥박스 정보를 수정하는 뮤테이션 훅
+ * 딥박스 재고 수량을 업데이트하는 뮤테이션 훅
  */
-export const useUpdateDdipbox = () => {
+export const useUpdateDdipboxQuantity = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    UpdateDdipBoxResponse,
+    UpdateDdipBoxQuantityResponse,
     Error,
-    { storeId: number; ddipboxId: number; data: UpdateDdipBoxRequest }
+    { storeId: number; ddipboxId: number; data: UpdateDdipBoxQuantityRequest }
   >({
     mutationFn: ({ storeId, ddipboxId, data }) =>
-      ddipboxService.updateDdipbox(storeId, ddipboxId, data),
+      ddipboxService.updateDdipboxQuantity(storeId, ddipboxId, data),
     onSuccess: response => {
       // 딥박스 목록과 상세 정보를 새로고침
       queryClient.invalidateQueries({
@@ -28,6 +29,10 @@ export const useUpdateDdipbox = () => {
       queryClient.invalidateQueries({
         queryKey: ddipboxQueryKeys.detail(response.ddipboxId),
       });
+      toast.success('딥박스 수량이 성공적으로 업데이트되었습니다.');
+    },
+    onError: (error: Error) => {
+      toast.error(`딥박스 수량 업데이트에 실패했습니다: ${error.message}`);
     },
   });
 };

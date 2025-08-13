@@ -14,19 +14,17 @@ export const API_PATH = {
 
   DDIPBOX_MANAGEMENT: {
     LIST: (storeId: number) =>
-      `/v1/ddipbox-management/stores/${storeId}/ddipboxes`,
-    DETAIL: (ddipboxId: number) =>
-      `/v1/ddipbox-management/ddipboxes/${ddipboxId}`,
+      `/v1/store-management/stores/${storeId}/ddipboxes`,
     CREATE: (storeId: number) =>
-      `/v1/ddipbox-management/stores/${storeId}/ddipboxes`,
-    UPDATE: (ddipboxId: number) =>
-      `/v1/ddipbox-management/ddipboxes/${ddipboxId}`,
-    DELETE: (ddipboxId: number) =>
-      `/v1/ddipbox-management/ddipboxes/${ddipboxId}`,
-    TOGGLE_STATUS: (ddipboxId: number) =>
-      `/v1/ddipbox-management/ddipboxes/${ddipboxId}/status`,
-    BULK_UPDATE: (storeId: number) =>
-      `/v1/ddipbox-management/stores/${storeId}/ddipboxes/bulk`,
+      `/v1/store-management/stores/${storeId}/ddipboxes`,
+    UPDATE: (storeId: number, ddipboxId: number) =>
+      `/v1/store-management/stores/${storeId}/ddipboxes/${ddipboxId}`,
+    DELETE: (storeId: number, ddipboxId: number) =>
+      `/v1/store-management/stores/${storeId}/ddipboxes/${ddipboxId}`,
+    UPDATE_QUANTITY: (storeId: number, ddipboxId: number) =>
+      `/v1/store-management/stores/${storeId}/ddipboxes/${ddipboxId}/quantity`,
+    TOGGLE_STATUS: (storeId: number, ddipboxId: number) =>
+      `/v1/store-management/stores/${storeId}/ddipboxes/${ddipboxId}/status`,
   },
 
   STREAMS: {
