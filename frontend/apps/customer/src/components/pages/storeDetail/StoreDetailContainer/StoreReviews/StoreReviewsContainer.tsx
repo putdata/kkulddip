@@ -1,19 +1,25 @@
 import type { ReviewResponse } from '@/types/review';
 import { Button } from '@/components/ui/button'; // Button 컴포넌트 import 추가
 import StoreReviewItem from './StoreReviewItem';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '@/router';
 
 interface StoreReviewsProps {
+  storeId: string;
   reviews?: ReviewResponse[];
   reviewTotalCount: number;
 }
 
 export const StoreReviewsContainer = ({
+  storeId,
   reviews,
   reviewTotalCount,
 }: StoreReviewsProps) => {
-  const handleLoadMore = () => {
-    // 모든 리뷰 보기 로직 구현
-    console.log('모든 리뷰 보기 클릭');
+  const navigate = useNavigate();
+
+  const handleLoadAllReviews = () => {
+    // navigate(ROUTE_PATH.REVIEW.replace(':storeId', storeId.toString()));
+    navigate(generatePath(ROUTE_PATH.REVIEW, { storeId }));
   };
 
   // TODO: 리뷰 없을 경우 문구 수정 필요
@@ -36,7 +42,7 @@ export const StoreReviewsContainer = ({
             <Button
               variant="outline"
               className="h-14 w-2/3 cursor-pointer rounded-xl border border-gray-200 bg-white text-gray-500"
-              onClick={handleLoadMore}
+              onClick={handleLoadAllReviews}
             >
               모든 리뷰 보기
             </Button>

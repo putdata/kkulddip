@@ -1,8 +1,8 @@
-import type { StoreDetailDto } from '@/types/store';
+import type { StoreDetail } from '@/types/store';
 import StoreDetailMap from './StoreDetailMap';
 
 interface StoreDetailHeaderProps {
-  store: StoreDetailDto;
+  store: StoreDetail;
 }
 
 export const StoreDescription = ({ store }: StoreDetailHeaderProps) => {
