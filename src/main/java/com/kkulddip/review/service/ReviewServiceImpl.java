@@ -4,9 +4,8 @@ import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.common.util.RedisNotificationUtil;
-import com.kkulddip.notification.domain.model.enums.NotificationType;
-import com.kkulddip.store.repository.StoreRepository;
 import com.kkulddip.domain.customer.repository.CustomerRepository;
+import com.kkulddip.notification.domain.model.enums.NotificationType;
 import com.kkulddip.review.common.CursorUtil;
 import com.kkulddip.review.dto.request.ReviewCreateRequestDto;
 import com.kkulddip.review.dto.request.ReviewUpdateRequestDto;
@@ -20,11 +19,11 @@ import com.kkulddip.review.entity.Review;
 import com.kkulddip.review.entity.ReviewReply;
 import com.kkulddip.review.entity.enums.ReviewSortType;
 import com.kkulddip.review.repository.ReviewRepository;
+import com.kkulddip.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,7 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
         Long storeId,
         ReviewCreateRequestDto request,
         List<MultipartFile> images,
-        Authentication authentication) {
+        JwtUserInfo userInfo) {
 
         try {
             // 입력값 검증
@@ -87,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
             sendReviewCreatedNotification(storeId, request.customerId());
 
             log.info("리뷰 생성 완료. reviewId: {}, customerId: {}", savedReview.getReviewId(), request.customerId());
-            return createReviewResponseDto(reviewWithImages, imageList, replyDto, authentication);
+            return createReviewResponseDto(reviewWithImages, imageList, replyDto, userInfo);
 
         } catch (BusinessException e) {
             log.error("리뷰 생성 실패 - 비즈니스 에러: {}", e.getMessage(), e);
@@ -104,7 +103,7 @@ public class ReviewServiceImpl implements ReviewService {
         Long reviewId,
         ReviewUpdateRequestDto request,
         List<MultipartFile> newImages,
-        Authentication authentication) {
+        JwtUserInfo userInfo) {
 
         try {
             // 입력값 검증
@@ -117,7 +116,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "리뷰를 찾을 수 없습니다."));
 
             // 권한 검증
-            validateReviewWriter(existingReview, authentication);
+            validateReviewWriter(existingReview, userInfo);
             validateUpdatePermission(existingReview);
 
             // 리뷰 내용 업데이트
@@ -141,7 +140,7 @@ public class ReviewServiceImpl implements ReviewService {
             ReviewReplyResponseDto replyDto = getReplyDto(updatedReview.getReply());
 
             log.info("리뷰 수정 완료. reviewId: {}", reviewId);
-            return createReviewResponseDto(updatedReview, imageList, replyDto, authentication);
+            return createReviewResponseDto(updatedReview, imageList, replyDto, userInfo);
 
         } catch (BusinessException e) {
             log.error("리뷰 수정 실패 - 비즈니스 에러: {}", e.getMessage(), e);
@@ -159,7 +158,7 @@ public class ReviewServiceImpl implements ReviewService {
         boolean withImage,
         ReviewSortType sortType,
         String cursor,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateStoreId(storeId);
@@ -185,7 +184,7 @@ public class ReviewServiceImpl implements ReviewService {
             }
 
             log.info("매장 리뷰 목록 조회 완료. storeId: {}, sortType: {}, cursor: {}", storeId, sortType, nextCursor);
-            return createReviewListResponseDto(reviews, nextCursor, hasNext, authentication);
+            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo);
 
         } catch (BusinessException e) {
             log.error("매장 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -201,10 +200,10 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewListResponseDto getMyReviewList(
         String cursor,
         ReviewSortType sortType,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
-            Long currentUserId = 1L;//getCurrentUserId(authentication);
+            Long currentUserId = Long.parseLong(userInfo.userId());
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, sortType);
             // 커서에서 날짜 타입과 숫자 타입 분리하여 값 추출
@@ -226,7 +225,7 @@ public class ReviewServiceImpl implements ReviewService {
                 nextCursor = cursorUtil.createCursor(lastReview, ReviewSortType.LATEST);
             }
             log.info("내 리뷰 목록 조회 완료. customerId: {}, cursor: {}", currentUserId, nextCursor);
-            return createReviewListResponseDto(reviews, nextCursor, hasNext, authentication);
+            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo);
 
         } catch (BusinessException e) {
             log.error("내 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -243,11 +242,11 @@ public class ReviewServiceImpl implements ReviewService {
         String cursor,
         ReviewSortType sortType,
         Long storeId,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateStoreId(storeId);
-            Long currentUserId = 1L;//getCurrentUserId(authentication);
+            Long currentUserId = Long.parseLong(userInfo.userId());
 
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, sortType);
@@ -271,7 +270,7 @@ public class ReviewServiceImpl implements ReviewService {
             }
 
             log.info("매장별 내 리뷰 목록 조회 완료. customerId: {}, storeId: {}, cursor: {}", currentUserId, storeId, nextCursor);
-            return createReviewListResponseDto(reviews, nextCursor, hasNext, authentication);
+            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo);
 
         } catch (BusinessException e) {
             log.error("매장별 내 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -284,9 +283,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReviewListResponseDto getMyReplyReviewList(String cursor, Authentication authentication) {
+    public ReviewListResponseDto getMyReplyReviewList(String cursor, JwtUserInfo userInfo) {
         try {
-            Long currentOwnerId = 1L;
+            Long currentOwnerId = Long.parseLong(userInfo.userId());
 
             List<Long> reviewIdsWithMyReplies = reviewRepository.findReviewIdsByOwnerId(currentOwnerId);
             // Base64 디코딩 및 파싱
@@ -304,7 +303,7 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewsWithMyReplies = reviewsWithMyReplies.subList(0, size10);
             }
 
-            return createReviewListResponseDto(reviewsWithMyReplies, cursor, hasNext, authentication);
+            return createReviewListResponseDto(reviewsWithMyReplies, cursor, hasNext, userInfo);
 
         } catch (BusinessException e) {
             log.error("내 답글 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -322,7 +321,7 @@ public class ReviewServiceImpl implements ReviewService {
         boolean withImage,
         ReviewSortType sortType,
         String cursor,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateReviewId(reviewId);
@@ -331,14 +330,14 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "삭제할 리뷰를 찾을 수 없습니다."));
 
             // 권한 검증
-            validateReviewWriter(deletedReview, authentication);
+            validateReviewWriter(deletedReview, userInfo);
 
             // 이미지 삭제
             reviewImageService.deleteImagesBeforeDeleteReview(deletedReview);
 
             // 답글 있을 때, 답글 삭제
             if(deletedReview.getReply()!=null){
-                reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), authentication);
+                reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), userInfo);
             }
 
             Long storeId = deletedReview.getStoreId();
@@ -376,7 +375,7 @@ public class ReviewServiceImpl implements ReviewService {
             Review nextReview = reviews.getFirst();
 
             log.info("리뷰 삭제 완료. reviewId: {}, storeId: {}, customerId: {}", reviewId, storeId, deletedReview.getCustomerId());
-            return createReviewOneResponseDto(nextReview, hasNext, nextCursor, authentication);
+            return createReviewOneResponseDto(nextReview, hasNext, nextCursor, userInfo);
 
         } catch (BusinessException e) {
             log.error("리뷰 삭제 실패: {}", e.getMessage(), e);
@@ -392,7 +391,7 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewOneResponseDto deleteReviewOnMyReviews(
         Long reviewId,
         ReviewSortType sortType, String cursor,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateReviewId(reviewId);
@@ -401,7 +400,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "삭제할 리뷰를 찾을 수 없습니다."));
 
             // 권한 검증
-            validateReviewWriter(deletedReview, authentication);
+            validateReviewWriter(deletedReview, userInfo);
 
             Long customerId = deletedReview.getCustomerId();
 
@@ -410,7 +409,7 @@ public class ReviewServiceImpl implements ReviewService {
 
             // 답글 있을 때, 답글 삭제
             if(deletedReview.getReply()!=null){
-                reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), authentication);
+                reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), userInfo);
             }
 
             // 리뷰 삭제
@@ -440,7 +439,7 @@ public class ReviewServiceImpl implements ReviewService {
             Review nextReview = reviews.getFirst();
 
             log.info("내 리뷰에서 리뷰 삭제 완료. reviewId: {}, customerId: {}", reviewId);
-            return createReviewOneResponseDto(nextReview, hasNext, nextCursor, authentication);
+            return createReviewOneResponseDto(nextReview, hasNext, nextCursor, userInfo);
 
         } catch (BusinessException e) {
             log.error("내 리뷰에서 리뷰 삭제 실패: {}", e.getMessage(), e);
@@ -457,7 +456,7 @@ public class ReviewServiceImpl implements ReviewService {
         Long storeId,
         ReviewSortType sortType,
         String cursor,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateReviewId(reviewId);
@@ -466,7 +465,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "삭제할 리뷰를 찾을 수 없습니다."));
 
             // 권한 검증
-            validateReviewWriter(deletedReview, authentication);
+            validateReviewWriter(deletedReview, userInfo);
 
             Long customerId = deletedReview.getCustomerId();
 
@@ -475,7 +474,7 @@ public class ReviewServiceImpl implements ReviewService {
 
             // 답글 있을 때, 답글 삭제
             if(deletedReview.getReply()!=null){
-                reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), authentication);
+                reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), userInfo);
             }
 
             // 리뷰 삭제
@@ -505,7 +504,7 @@ public class ReviewServiceImpl implements ReviewService {
             Review nextReview = reviews.getFirst();
 
             log.info("해당가게 내 리뷰리스트에서 리뷰 삭제 완료. reviewId: {}, customerId: {}", reviewId);
-            return createReviewOneResponseDto(nextReview, hasNext, nextCursor, authentication);
+            return createReviewOneResponseDto(nextReview, hasNext, nextCursor, userInfo);
 
         } catch (BusinessException e) {
             log.error("해당가게 내 리뷰리스트에서 리뷰 삭제 실패: {}", e.getMessage(), e);
@@ -516,8 +515,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private ReviewOneResponseDto createReviewOneResponseDto(Review nextReview, boolean hasNext, String nextCursor, Authentication authentication) {
-        ReviewWithHelpfulStatusResponseDto dto = createReviewDetailResponseDto(nextReview, authentication);
+    private ReviewOneResponseDto createReviewOneResponseDto(Review nextReview, boolean hasNext, String nextCursor, JwtUserInfo userInfo) {
+        ReviewWithHelpfulStatusResponseDto dto = createReviewDetailResponseDto(nextReview, userInfo);
         return ReviewOneResponseDto.builder()
             .review(dto)
             .cursor(nextCursor)
@@ -557,8 +556,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private void validateReviewWriter(Review review, Authentication authentication) {
-        Long currentUserId = 1L;//getCurrentUserId(authentication);
+    private void validateReviewWriter(Review review, JwtUserInfo userInfo) {
+        Long currentUserId = Long.parseLong(userInfo.userId());
         if (!review.getCustomerId().equals(currentUserId)) {
             throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED_ACCESS, "본인이 작성한 리뷰만 수정/삭제할 수 있습니다.");
         }
@@ -592,16 +591,6 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     // ================== 유틸리티 메서드 ==================
-
-    private Long getCurrentUserId(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof JwtUserInfo userInfo) {
-            //return userInfo.userId();
-        }
-
-        throw new BusinessException(ErrorCode.INVALID_AUTHENTICATION, "인증 정보를 찾을 수 없습니다.");
-    }
 
     /**
      *
@@ -659,7 +648,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review,
         List<ReviewImageResponseDto> imageList,
         ReviewReplyResponseDto replyDto,
-        Authentication authentication) {
+        JwtUserInfo userInfo) {
         return ReviewResponseDto.builder()
             .reviewId(review.getReviewId())
             .customerId(review.getCustomerId())
@@ -679,7 +668,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private ReviewWithHelpfulStatusResponseDto createReviewDetailResponseDto(
         Review review,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         if (review == null) {
             return null;
@@ -688,7 +677,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewImageResponseDto> imageList = reviewImageService.getImageDtoList(review.getImages());
         ReviewReplyResponseDto replyDto = getReplyDto(review.getReply());
 
-        boolean isHelpful = reviewHelpfulService.createReviewHelpfulStatusResponseDto(review, authentication);
+        boolean isHelpful = reviewHelpfulService.createReviewHelpfulStatusResponseDto(review, userInfo);
 
         return ReviewWithHelpfulStatusResponseDto.builder()
             .reviewId(review.getReviewId())
@@ -709,10 +698,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     protected List<ReviewWithHelpfulStatusResponseDto> createReviewWithHelpfulStatusResponseDtoList(
         List<Review> reviews,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         return reviews.stream()
-            .map(review -> createReviewDetailResponseDto(review, authentication))
+            .map(review -> createReviewDetailResponseDto(review, userInfo))
             .toList();
     }
 
@@ -731,11 +720,11 @@ public class ReviewServiceImpl implements ReviewService {
         List<Review> reviews,
         String cursor,
         boolean hasNext,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
 
         return ReviewListResponseDto.builder()
-            .reviewList(createReviewWithHelpfulStatusResponseDtoList(reviews, authentication))
+            .reviewList(createReviewWithHelpfulStatusResponseDtoList(reviews, userInfo))
             .cursor(cursor)
             .hasNext(hasNext)
             .build();
@@ -767,7 +756,7 @@ public class ReviewServiceImpl implements ReviewService {
                 NotificationType.REVIEW_CREATED
             );
 
-            log.info("리뷰 작성 알림 발송 완료 - storeId: {}, customerId: {}, storeName: {}, customerName: {}", 
+            log.info("리뷰 작성 알림 발송 완료 - storeId: {}, customerId: {}, storeName: {}, customerName: {}",
                 storeId, customerId, storeName, customerName);
 
         } catch (Exception e) {
