@@ -19,6 +19,8 @@ import ReviewCreate from '@/pages/review/ReviewCreate';
 // import PaymentFail from '@/pages/PaymentFail';
 import AuthCallback from '@/pages/AuthCallback';
 import Notification from '@/pages/Notification';
+import StoreDetail from '@/pages/StoreDetail';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -74,6 +76,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.REVIEW,
             element: <ReviewsPage />,
+          },
+          {
+            path: ROUTE_PATH.STORE,
+            element: <StoreDetail />,
           },
         ],
       },

@@ -15,4 +15,5 @@ export const ROUTE_PATH = {
   NOT_FOUND: '*',
   REVIEW: '/store/:storeId/reviews',
   REVIEW_CREATE: '/review/create',
+  STORE: '/stores/:storeId',
 } as const;
