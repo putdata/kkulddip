@@ -7,6 +7,8 @@ export const API_PATH = {
   ORDERS_MY_HISTORY: '/v1/orders/my-history',
   FAVORITES: '/v1/favorites',
   FAVORITES_DELETE: '/v1/favorites/by-customer-store',
+  PROFILE: '/v1/customers/profile',
+  STATS: '/v1/customers/stats',
 
   STORE_DETAIL: (storeId: string) => `/v1/stores/${storeId}`,
   STORE_DDIPBOXES: (storeId: string) => `/v1/stores/${storeId}/ddipboxes`,
