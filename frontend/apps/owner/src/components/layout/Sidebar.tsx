@@ -1,8 +1,4 @@
-import {
-  NavLink,
-  useLocation,
-  generatePath,
-} from 'react-router-dom';
+import { NavLink, useLocation, generatePath } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
