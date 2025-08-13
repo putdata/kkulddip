@@ -16,7 +16,10 @@ const NavigationBar = () => {
           <MapPin className="mr-1 h-4 w-4" />
           강남구
         </button>
-        <button className="flex items-center text-gray-700">
+        <button
+          className="flex items-center text-gray-700"
+          onClick={() => navigate(ROUTE_PATH.NOTIFICATION)}
+        >
           <Bell className="mr-1 h-4 w-4" />
         </button>
         <button className="text-sm text-gray-700">

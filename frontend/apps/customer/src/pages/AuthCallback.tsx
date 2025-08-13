@@ -19,7 +19,10 @@ const AuthCallback = () => {
     mutationFn: AuthService.exchangeCodeForToken,
     onSuccess: data => {
       setAccessToken(data.accessToken);
-      setUser(data.user);
+      setUser({
+        ...data.user,
+        userid: data.user.id,
+      });
       navigate(ROUTE_PATH.HOME);
     },
     onError: error => {
