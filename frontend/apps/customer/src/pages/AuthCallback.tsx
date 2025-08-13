@@ -21,7 +21,7 @@ const AuthCallback = () => {
       setAccessToken(data.accessToken);
       setUser({
         ...data.user,
-        userid: data.user.id,
+        userId: data.user.id,
       });
       navigate(ROUTE_PATH.HOME);
     },

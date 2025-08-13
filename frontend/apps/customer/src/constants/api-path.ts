@@ -5,4 +5,8 @@ export const API_PATH = {
   PAYMENT_CONFIRM: '/v1/payments/confirm',
   AUTH_EXCHANGE_TOKEN: '/v1/auth/customer/token',
   ORDERS_MY_HISTORY: '/v1/orders/my-history',
+  FAVORITES: '/v1/favorites',
+  FAVORITES_DELETE: '/v1/favorites/by-customer-store',
+  PROFILE: '/v1/customers/profile',
+  STATS: '/v1/customers/stats',
 };
