@@ -25,7 +25,7 @@ import UserSwitcher from '@/components/UserSwitcher';
 const AppSidebar = () => {
   const location = useLocation();
   const { storeId } = useParams();
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -36,7 +36,7 @@ const AppSidebar = () => {
           ) : (
             <>
               <StoreSwitcher />
-              <SidebarTrigger className="ml-auto h-8 w-8 hidden md:flex" />
+              <SidebarTrigger className="ml-auto hidden h-8 w-8 md:flex" />
             </>
           )}
         </div>
@@ -51,6 +51,12 @@ const AppSidebar = () => {
                 const targetPath = generatePath(item.path, { storeId });
                 const isActive = location.pathname === targetPath;
 
+                const handleItemClick = () => {
+                  if (isMobile) {
+                    setOpenMobile(false);
+                  }
+                };
+
                 return (
                   <SidebarMenuItem key={item.key}>
                     <SidebarMenuButton
@@ -58,7 +64,7 @@ const AppSidebar = () => {
                       tooltip={item.tooltip}
                       isActive={isActive}
                     >
-                      <NavLink to={targetPath}>
+                      <NavLink to={targetPath} onClick={handleItemClick}>
                         <item.icon />
                         <span>{item.label}</span>
                       </NavLink>
