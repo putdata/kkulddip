@@ -44,6 +44,7 @@ public class Order {
 
         this.orderStatus = OrderStatus.CREATED;
         this.orderDate = orderDate;
+        this.pickupTime = null; // 주문 생성 시에는 null, 픽업 시에만 설정
     }
 
     /**
