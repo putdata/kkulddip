@@ -29,14 +29,14 @@ const AppSidebar = () => {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="hidden md:flex">
+      <SidebarHeader>
         <div className="flex items-center gap-2">
           {state === 'collapsed' ? (
             <SidebarTrigger className="h-8 w-8" />
           ) : (
             <>
               <StoreSwitcher />
-              <SidebarTrigger className="ml-auto h-8 w-8" />
+              <SidebarTrigger className="ml-auto h-8 w-8 hidden md:flex" />
             </>
           )}
         </div>
