@@ -1,9 +1,21 @@
 import LikeFoodCard from '@/components/pages/likes/LikeFoodCard/LikeFoodCard';
-import { useLikes } from '@/hooks/useLikes';
+import { useLikes, useDeleteFavorite } from '@/hooks/useLikes';
+import { useUserStore } from 'common';
 import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const Likes = () => {
-  const { data: stores, isLoading, isFetching, isSuccess } = useLikes(5);
+  const user = useUserStore(state => state.user);
+  const {
+    data: stores,
+    isLoading,
+    isFetching,
+    isSuccess,
+  } = useLikes(user?.userId || 0);
+  const deleteFavoriteMutation = useDeleteFavorite();
+  const [deletedStores, setDeletedStores] = useState<Set<string | number>>(
+    new Set(),
+  );
 
   const transformedStores = stores?.map(store => ({
     id: store.storeId,
@@ -22,7 +34,23 @@ const Likes = () => {
     discountRate: 0,
   }));
 
-  // 로딩 중이거나 데이터를 가져오는 중일 때
+  const filteredStores = transformedStores?.filter(
+    store => !deletedStores.has(store.id),
+  );
+
+  const handleDelete = (storeId: string | number) => {
+    if (!user?.userId) {
+      return;
+    }
+
+    setDeletedStores(prev => new Set([...prev, storeId]));
+
+    deleteFavoriteMutation.mutate({
+      customerId: user.userId,
+      storeId: Number(storeId),
+    });
+  };
+
   if (isLoading || isFetching) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -34,8 +62,7 @@ const Likes = () => {
     );
   }
 
-  // 데이터가 성공적으로 로드되었지만 비어있을 때만
-  if (isSuccess && (!stores || stores.length === 0)) {
+  if (isSuccess && (!filteredStores || filteredStores.length === 0)) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center space-y-4 px-4">
         <div className="text-4xl">💔</div>
@@ -54,15 +81,14 @@ const Likes = () => {
   return (
     <div>
       <div className="space-y-2 px-2 pb-16 pt-16">
-        {transformedStores?.map(item => {
-          return (
-            <LikeFoodCard
-              key={item.id}
-              item={item}
-              onClick={() => console.log('매장 클릭')}
-            />
-          );
-        })}
+        {filteredStores?.map(item => (
+          <LikeFoodCard
+            key={item.id}
+            item={item}
+            onClick={() => console.log('매장 클릭:', item.id)}
+            onDelete={handleDelete}
+          />
+        ))}
       </div>
     </div>
   );

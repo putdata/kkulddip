@@ -2,6 +2,7 @@
  * 카드 아이템 인터페이스 (실제 사용 필드만)
  */
 export interface CardItem {
+  id: number;
   img: {
     src: string;
     alt: string;

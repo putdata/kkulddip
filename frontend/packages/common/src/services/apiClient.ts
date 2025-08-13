@@ -113,10 +113,11 @@ class ApiClient {
    *
    * @template T - 응답 데이터의 타입
    * @param url - 요청할 URL
+   * @param params - 요청 파라미터 (query string으로 전송)
    * @returns 응답 데이터
    */
-  async delete<T>(url: string): Promise<T> {
-    const response = await this.instance.delete<ApiResponse<T>>(url);
+  async delete<T>(url: string, params?: object): Promise<T> {
+    const response = await this.instance.delete<ApiResponse<T>>(url, { params });
     return (response.data as ApiSuccessResponse<T>).body;
   }
 }

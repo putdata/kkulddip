@@ -53,3 +53,15 @@ export interface StoreApiResponse {
   status: number;
   body: StoreResponseBody;
 }
+
+// 좋아요 삭제 요청 파라미터
+export interface DeleteLikeParams {
+  customerId: number;
+  storeId: number;
+}
+
+// 좋아요 삭제 응답
+export interface DeleteLikeResponse {
+  success: boolean;
+  message?: string;
+}
