@@ -36,4 +36,9 @@ export const API_PATH = {
     DETAIL: (streamId: number) => `/v1/streams/${streamId}`,
     STORE: (storeId: number) => `/v1/streams/stores/${storeId}`,
   },
+
+  ORDERS: {
+    PENDING: '/v1/orders/pending',
+    CONFIRM: (orderId: string) => `/v1/orders/${orderId}/confirm`,
+  },
 } as const;
