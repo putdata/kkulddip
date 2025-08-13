@@ -2,7 +2,6 @@ import SearchBar from '@/components/pages/home/SearchBar';
 import { ROUTE_PATH } from '@/router';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Bell, ShoppingCart } from 'lucide-react';
-import SearchBar from '@/components/pages/home/SearchBar';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
