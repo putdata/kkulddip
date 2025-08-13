@@ -11,6 +11,8 @@ public enum NotificationType {
     ORDER("주문", "ORDER"),
     PICKUP("픽업", "PICKUP"),
     REVIEW("리뷰", "REVIEW"),
+    REVIEW_CREATED("리뷰 작성", "REVIEW_CREATED"),
+    REVIEW_REPLY_CREATED("리뷰 답글", "REVIEW_REPLY_CREATED"),
     SYSTEM("시스템", "SYSTEM");
 
     private final String description;

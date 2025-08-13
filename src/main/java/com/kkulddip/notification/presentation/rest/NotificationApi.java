@@ -38,8 +38,8 @@ public interface NotificationApi {
             **알림 타입별 동작:**
             - `ALL`: 모든 사용자(고객+사장)에게 브로드캐스트
             - `CUSTOMER`: subscriberId가 있으면 특정 고객, 없으면 모든 고객
-            - `OWNER`: subscriberId가 있으면 특정 가게 사장, 없으면 모든 사장
-            - `SPECIFIC`: subscriberId로 지정된 특정 사용자
+            - `OWNER`: subscriberId가 있으면 특정 사장, 없으면 모든 사장
+            - `STORE`: subscriberId가 있으면 특정 가게의 사장들, 없으면 모든 사장
             """,
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "알림 요청 정보",
@@ -65,7 +65,23 @@ public interface NotificationApi {
                             """
                     ),
                     @ExampleObject(
-                        name = "특정 가게 사장 알림",
+                        name = "특정 사장 개인 알림",
+                        description = "특정 사장에게 개인 알림",
+                        value = """
+                            {
+                              "title": "계정 업데이트 안내",
+                              "content": "사장님의 계정 정보가 업데이트되었습니다.",
+                              "publisherId": 1001,
+                              "publisherType": "SYSTEM",
+                              "subscriberId": 2001,
+                              "subscriberType": "OWNER",
+                              "notificationType": "ACCOUNT_UPDATE",
+                              "actionUrl": "/profile"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "특정 가게 알림",
                         description = "특정 가게에 새 주문 알림",
                         value = """
                             {
@@ -74,7 +90,7 @@ public interface NotificationApi {
                               "publisherId": 1001,
                               "publisherType": "SYSTEM",
                               "subscriberId": 3001,
-                              "subscriberType": "OWNER",
+                              "subscriberType": "STORE",
                               "notificationType": "NEW_ORDER",
                               "actionUrl": "/orders/manage"
                             }
@@ -146,11 +162,12 @@ public interface NotificationApi {
             
             **권한 제어:**
             - **Customer**: 자신의 user_id와 일치하는 CUSTOMER 알림만 조회 가능
-            - **Owner**: 자신이 관리하는 가게의 OWNER 알림만 조회 가능
+            - **Owner**: 자신의 OWNER 알림 또는 자신이 관리하는 가게의 STORE 알림 조회 가능
             
             **조회 예시:**
             - Customer (user_id=123): `subscriberId=123&subscriberType=CUSTOMER`
-            - Owner (관리하는 storeId=456): `subscriberId=456&subscriberType=OWNER`
+            - Owner 개인 알림 (ownerId=456): `subscriberId=456&subscriberType=OWNER`
+            - Owner 가게 알림 (storeId=789): `subscriberId=789&subscriberType=STORE`
             """,
         security = @SecurityRequirement(name = "JWT")
     )

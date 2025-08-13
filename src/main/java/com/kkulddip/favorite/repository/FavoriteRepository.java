@@ -207,4 +207,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
         @Param("cursorId") Long cursorId,
         @Param("limit") int limit
     );
+
+    /**
+     * 특정 가게를 즐겨찾기한 모든 고객 ID 조회
+     */
+    @Query("""
+        SELECT f.customerId FROM Favorite f 
+        WHERE f.storeId = :storeId
+        """)
+    List<Long> findCustomerIdsByStoreId(@Param("storeId") Long storeId);
 }

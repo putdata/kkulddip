@@ -47,7 +47,7 @@ public class OrderEntity {
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;
 
-    @Column(name = "pickup_time", nullable = false)
+    @Column(name = "pickup_time", nullable = true)
     private LocalDateTime pickupTime;
     
     @Builder

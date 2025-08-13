@@ -180,4 +180,18 @@ public class OrderService {
             throw OrderException.orderUpdateFailed(String.valueOf(order.getOrderId().value()), e);
         }
     }
+    
+    /**
+     * 주문 픽업 완료 처리
+     * 
+     * @param order 주문
+     */
+    public void markOrderAsPickedUp(Order order) {
+        try {
+            order.changeStatus(OrderStatus.PICKED_UP);
+            orderRepository.save(order);
+        } catch (Exception e) {
+            throw OrderException.orderUpdateFailed(String.valueOf(order.getOrderId().value()), e);
+        }
+    }
 }

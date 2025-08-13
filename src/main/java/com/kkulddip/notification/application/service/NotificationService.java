@@ -10,7 +10,7 @@ import com.kkulddip.notification.domain.model.enums.SubscriberType;
 import com.kkulddip.notification.domain.repository.NotificationLogRepository;
 import com.kkulddip.notification.domain.repository.NotificationRepository;
 import com.kkulddip.notification.domain.service.NotificationDomainService;
-import com.kkulddip.order.infrastructure.persistence.redis.RedisNotificationPublisher;
+import com.kkulddip.common.util.RedisNotificationUtil;
 import com.kkulddip.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationLogRepository notificationLogRepository;
     private final NotificationDomainService notificationDomainService;
-    private final RedisNotificationPublisher redisNotificationPublisher;
+    private final RedisNotificationUtil redisNotificationUtil;
     private final StoreRepository storeRepository;
 
     /**
@@ -54,7 +54,7 @@ public class NotificationService {
 
         // Redis에 알림 요청 발행
         try {
-            redisNotificationPublisher.publishNotification(request);
+            redisNotificationUtil.publishNotification(request);
             log.info("Redis 알림 발행 완료 - title: {}", request.getTitle());
         } catch (Exception e) {
             log.error("Redis 알림 발행 실패 - title: {}, error: {}", 
@@ -168,10 +168,10 @@ public class NotificationService {
      * @return 권한 여부
      */
     private boolean hasPermissionToViewNotifications(
-            Long subscriberId,
-            SubscriberType subscriberType,
-            Long authenticatedUserId,
-            String authenticatedRole) {
+        Long subscriberId,
+        SubscriberType subscriberType,
+        Long authenticatedUserId,
+        String authenticatedRole) {
 
         switch (authenticatedRole.toUpperCase()) {
             case "CUSTOMER":
@@ -180,16 +180,17 @@ public class NotificationService {
                     && subscriberId.equals(authenticatedUserId);
 
             case "OWNER":
-                // Owner는 자신이 관리하는 가게의 알림 조회 가능
-                if (subscriberType != SubscriberType.OWNER) {
+                // Owner는 자신의 알림 또는 자신이 관리하는 가게의 알림 조회 가능
+                if (subscriberType == SubscriberType.OWNER) {
+                    // OWNER 타입: 본인의 사장 알림만 조회 가능
+                    return subscriberId.equals(authenticatedUserId);
+                } else if (subscriberType == SubscriberType.STORE) {
+                    // STORE 타입: 자신이 관리하는 가게의 알림 조회 가능
+                    List<Long> managedStoreIds = storeRepository.findStoreIdsByOwnerId(authenticatedUserId);
+                    return managedStoreIds.contains(subscriberId);
+                } else {
                     return false;
                 }
-
-                // Owner가 관리하는 가게 ID 목록 조회
-                List<Long> managedStoreIds = storeRepository.findStoreIdsByOwnerId(authenticatedUserId);
-                
-                // 요청한 subscriberId가 관리하는 가게 중 하나인지 확인
-                return managedStoreIds.contains(subscriberId);
 
             default:
                 log.warn("알 수 없는 사용자 역할: {}", authenticatedRole);

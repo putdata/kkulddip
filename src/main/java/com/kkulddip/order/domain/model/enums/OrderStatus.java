@@ -17,6 +17,9 @@ public enum OrderStatus {
     // 주문 확정
     CONFIRMED,
 
+    // 픽업 완료
+    PICKED_UP,
+
     // 주문 취소
     CANCELLED,
 

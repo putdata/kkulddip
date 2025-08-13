@@ -30,12 +30,14 @@ import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
 import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderPickupResponse;
 
 /**
  * 주문 처리 흐름 담당 Facade
  * - 주문 생성
  * - 결제 결과 처리  
  * - 주문 확정/거절 처리
+ * - 주문 픽업 완료 처리
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -259,6 +261,61 @@ public class OrderProcessFacade {
             log.error("주문 확정/거절 처리 중 오류 발생 - ownerId: {}, orderId: {}", 
                 ownerId, orderId.value(), e);
             throw OrderException.orderUpdateFailed(String.valueOf(orderId.value()), e);
+        }
+    }
+    
+    /**
+     * 주문 픽업 완료 처리
+     * - 권한 검증: 사장님이 해당 주문의 가게를 소유하고 있는지 확인
+     * - 주문 상태를 PICKED_UP으로 변경
+     * - 고객에게 픽업 완료 알림 발송
+     */
+    @Transactional
+    public OrderPickupResponse markOrderAsPickedUp(Long ownerId, OrderId orderId) {
+        log.info("주문 픽업 완료 처리 시작 - ownerId: {}, orderId: {}", ownerId, orderId.value());
+        
+        try {
+            // 주문 조회
+            Order order = orderService.findByOrderId(orderId);
+            
+            // 권한 검증: 사장님이 해당 주문의 가게를 소유하고 있는지 확인
+            storeAuthService.validateOwnerPermission(ownerId, order.getStoreId());
+            
+            // 주문 상태 검증: CONFIRMED 상태인지 확인
+            if (!order.isConfirmed()) {
+                throw OrderException.orderInvalidStatus(
+                    String.valueOf(orderId.value()), 
+                    order.getOrderStatus().name()
+                );
+            }
+            
+            // 주문 상태를 PICKED_UP으로 변경
+            orderService.markOrderAsPickedUp(order);
+            
+            // 고객에게 픽업 완료 알림 발송
+            try {
+                notificationService.sendOrderPickupNotificationToCustomer(
+                    order.getCustomerId().value(), 
+                    orderId.value()
+                );
+                log.info("픽업 완료 알림 발송 성공 - customerId: {}, orderId: {}", 
+                    order.getCustomerId().value(), orderId.value());
+            } catch (Exception e) {
+                log.error("픽업 완료 알림 발송 실패 - customerId: {}, orderId: {}, error: {}", 
+                    order.getCustomerId().value(), orderId.value(), e.getMessage(), e);
+                // 알림 발송 실패는 주문 처리를 중단시키지 않음
+            }
+            
+            log.info("주문 픽업 완료 처리 성공 - ownerId: {}, orderId: {}", ownerId, orderId.value());
+            
+            return orderMapper.toOrderPickupResponse(order);
+            
+        } catch (Exception e) {
+            if (e instanceof OrderException) {
+                throw e;
+            }
+            log.error("주문 픽업 완료 처리 중 오류 발생 - ownerId: {}, orderId: {}", ownerId, orderId.value(), e);
+            throw OrderException.orderDatabaseError(e);
         }
     }
 }

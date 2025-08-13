@@ -13,6 +13,7 @@ import com.kkulddip.order.presentation.rest.dto.request.OrderItemRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderPickupResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
@@ -71,5 +72,9 @@ public class OrderMapper {
     
     public List<OwnerOrderHistoryResponse> toOwnerOrderHistoryResponses(List<Order> orders) {
         return orderResponseMapper.toOwnerOrderHistoryResponses(orders);
+    }
+    
+    public OrderPickupResponse toOrderPickupResponse(Order order) {
+        return orderResponseMapper.toOrderPickupResponse(order);
     }
 }
