@@ -6,9 +6,9 @@ export const useNotifications = () => {
   const { user } = useUserStore();
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['notifications', user?.userid],
-    queryFn: () => getNotifications(user!.userid),
-    enabled: Boolean(user?.userid),
+    queryKey: ['notifications', user?.userId],
+    queryFn: () => getNotifications(user!.userId),
+    enabled: Boolean(user?.userId),
   });
 
   const notifications = data || [];
