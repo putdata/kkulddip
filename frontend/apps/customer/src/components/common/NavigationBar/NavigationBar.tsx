@@ -1,6 +1,7 @@
 import { ROUTE_PATH } from '@/router';
-import { MapPin, Bell, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { MapPin, Bell, ShoppingCart } from 'lucide-react';
+import SearchBar from '@/components/pages/home/SearchBar';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const NavigationBar = () => {
           />
         </button>
       </div>
+      <SearchBar />
     </nav>
   );
 };
