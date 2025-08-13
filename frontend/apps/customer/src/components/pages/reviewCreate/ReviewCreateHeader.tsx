@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react';
 import { useStarRating } from '@/hooks/useStarRating'; // 1. import 추가
+import { useEffect } from 'react';
 
 // 2. 기존 useState 삭제하고 커스텀 훅 사용
 
@@ -12,10 +13,32 @@ interface Store {
 
 interface ReviewCreateHeaderProps {
   store: Store;
+  rating: number; // 추가
+  setRating: (rating: number) => void;
 }
 
-const ReviewCreateHeader = ({ store }: ReviewCreateHeaderProps) => {
-  const { handleStarClick, isStarFilled } = useStarRating(0);
+const ReviewCreateHeader = ({
+  store,
+  rating,
+  setRating,
+}: ReviewCreateHeaderProps) => {
+  const {
+    handleStarClick,
+    isStarFilled,
+    setRating: setLocalRating,
+  } = useStarRating(rating);
+
+  // 부모의 rating이 변경되면 로컬 상태도 동기화
+  useEffect(() => {
+    setLocalRating(rating);
+  }, [rating, setLocalRating]);
+
+  // 별점 클릭 핸들러
+  const onStarClick = (star: number) => {
+    handleStarClick(star); // 훅의 로컬 상태 업데이트
+    setRating(star); // 부모 컴포넌트로 값 전달
+    console.log('선택된 별점:', star);
+  };
 
   return (
     <div className="flex w-full items-center justify-between">
@@ -39,10 +62,7 @@ const ReviewCreateHeader = ({ store }: ReviewCreateHeaderProps) => {
                   ? 'fill-yellow-400 text-yellow-400'
                   : 'text-gray-300'
               }`}
-              onClick={() => {
-                handleStarClick(star);
-                console.log('선택된 별점:', star);
-              }}
+              onClick={() => onStarClick(star)}
             />
           ))}
         </div>

@@ -22,6 +22,22 @@ const ReviewsContainer = ({ reviews }: ReviewsComponentProps) => {
     );
   };
 
+  if (totalReviews === 0) {
+    return (
+      <div className="flex w-full flex-col items-center justify-center space-y-4 bg-gray-100 py-12">
+        <div className="text-4xl">📝</div>
+        <div className="text-center">
+          <h3 className="mb-2 text-lg font-semibold text-gray-800">
+            아직 등록된 리뷰가 없어요
+          </h3>
+          <p className="text-sm text-gray-500">
+            이 가게의 첫 번째 리뷰를 남겨보세요!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     // TODO: [font-family:segoe_ui] 폰트 스타일 전역으로 이동
     <div className="flex w-full flex-col items-start gap-2 bg-gray-100 [font-family:segoe_ui]">
