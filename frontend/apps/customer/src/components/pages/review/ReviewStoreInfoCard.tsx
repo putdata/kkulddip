@@ -1,9 +1,9 @@
 import { StarRating } from '@/components/common/StarRating';
 import { Card, CardTitle } from '@/components/ui/card';
-import type { StoreDetailDto } from '@/types/store';
+import type { StoreDetail } from '@/types/store';
 
 interface StoreInfoProps {
-  store: StoreDetailDto;
+  store: StoreDetail;
   totalReviews: number;
 }
 

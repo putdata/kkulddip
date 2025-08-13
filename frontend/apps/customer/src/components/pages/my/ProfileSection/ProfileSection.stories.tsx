@@ -37,10 +37,11 @@ export const Default: Story = {
   args: {
     profile: {
       name: '홍길동',
-      level: '말벌',
+      level: 'WORKER_BEE',
       orderCount: 127,
       points: 2450,
       couponCount: 5,
+      co2: 15.5,
     },
   },
 };

@@ -1,7 +1,7 @@
-import type { StoreDetailDto } from '@/types/store';
+import type { StoreDetail } from '@/types/store';
 
 interface StoreDetailMapProps {
-  store: StoreDetailDto;
+  store: StoreDetail;
 }
 
 const StoreDetailMap = ({ store }: StoreDetailMapProps) => {
