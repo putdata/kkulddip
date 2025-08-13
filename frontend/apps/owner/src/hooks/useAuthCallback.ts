@@ -39,7 +39,7 @@ export const useAuthCallback = () => {
     setAccessToken(data.accessToken);
     setUser({
       ...data.user,
-      userid: data.user.id,
+      userId: data.user.id,
     });
     toast.success('로그인 성공!');
 

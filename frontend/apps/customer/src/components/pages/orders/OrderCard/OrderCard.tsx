@@ -49,7 +49,7 @@ const OrderCard = ({ item }: OrderCardProps) => {
         <div className="space-y-1">
           {orderItems.map((orderItem, idx) => (
             <div
-              key={orderItem.productId || idx}
+              key={`${orderItem.productId}-${idx}`}
               className="flex items-center justify-between text-xs"
             >
               <span className="flex-1 truncate pr-2 text-gray-700">
