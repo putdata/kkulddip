@@ -39,11 +39,11 @@ public class OrderItemEntity {
     private Integer quantity;
     
     @Column(name = "unit_price", nullable = false)
-    private Integer unitPrice;
+    private Long unitPrice;
     
     @Builder
     public OrderItemEntity(Long orderItemId, OrderEntity order,
-        Long productId, Integer quantity, Integer unitPrice) {
+        Long productId, Integer quantity, Long unitPrice) {
             
         this.orderItemId = orderItemId;
         this.order = order;

@@ -76,7 +76,7 @@ public class OrderItem {
         Money totalDiscount = discountInfos.stream()
             .map(DiscountInfo::getDiscountAmount)
             .filter(discount -> discount != null)
-            .reduce(Money.of(0), Money::add);
+            .reduce(Money.of(0L), Money::add);
         
         
         // 총 가격 = 기본 가격 - 총 할인 금액

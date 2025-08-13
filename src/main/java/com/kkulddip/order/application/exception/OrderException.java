@@ -105,4 +105,13 @@ public class OrderException extends BusinessException {
     public static OrderException accessDenied(String message) {
         return new OrderException(ErrorCode.ORDER_ACCESS_DENIED, message);
     }
+
+    public static OrderException customerNotFound(Long customerId) {
+        return new OrderException(ErrorCode.CUSTOMER_NOT_FOUND,
+            String.format("고객을 찾을 수 없습니다. customerId: %s", customerId));
+    }
+
+    public static OrderException customerStatsUpdateFailed(Long customerId, Throwable cause) {
+        return new OrderException(ErrorCode.CUSTOMER_STATS_UPDATE_FAILED, cause);
+    }
 }

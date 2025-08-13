@@ -11,7 +11,7 @@ public record PendingOrderResponse(
     Long customerId,
     Long storeId,
     List<OrderItemResponse> orderItems,
-    Integer originalPrice,
+    Long originalPrice,
     String orderStatus,
     LocalDateTime orderDate
 ) {
@@ -21,6 +21,6 @@ public record PendingOrderResponse(
         Long productId,
         String productName,
         Integer quantity,
-        Integer unitPrice
+        Long unitPrice
     ) {}
 }

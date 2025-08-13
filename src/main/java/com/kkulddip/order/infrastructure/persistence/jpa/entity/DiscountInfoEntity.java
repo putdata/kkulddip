@@ -44,11 +44,11 @@ public class DiscountInfoEntity {
     private DiscountType discountType;
     
     @Column(name = "discount_amount", nullable = false)
-    private Integer discountAmount;
+    private Long discountAmount;
     
     @Builder
     public DiscountInfoEntity(Long discountInfoId, String discountCode, 
-            DiscountType discountType, Integer discountAmount) {
+            DiscountType discountType, Long discountAmount) {
         this.discountInfoId = discountInfoId;
         this.discountCode = discountCode;
         this.discountType = discountType;

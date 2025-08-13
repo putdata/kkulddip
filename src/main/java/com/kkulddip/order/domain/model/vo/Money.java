@@ -4,7 +4,7 @@ package com.kkulddip.order.domain.model.vo;
  * 금액을 나타내는 값 객체
  */
 public record Money(
-    Integer amount
+    Long amount
 ) {
     
     public Money {
@@ -16,7 +16,7 @@ public record Money(
         }
     }
     
-    public static Money of(Integer amount) {
+    public static Money of(Long amount) {
         Money money = new Money(amount);
         return money;
     }

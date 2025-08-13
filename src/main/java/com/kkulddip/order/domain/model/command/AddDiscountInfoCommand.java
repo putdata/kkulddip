@@ -19,7 +19,7 @@ public record AddDiscountInfoCommand(
         if (discountAmount == null) {
             throw new IllegalArgumentException("할인 금액은 필수입니다.");
         }
-        if (discountAmount.isLessThan(Money.of(1))) {
+        if (discountAmount.isLessThan(Money.of(1L))) {
             throw new IllegalArgumentException("할인 금액은 0보다 커야 합니다.");
         }
     }
