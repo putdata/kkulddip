@@ -24,9 +24,11 @@ import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.presentation.rest.dto.request.CreateOrderRequest;
 import com.kkulddip.order.presentation.rest.dto.request.OrderConfirmationRequest;
+import com.kkulddip.order.presentation.rest.dto.request.OrderPickupRequest;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderPickupResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 import com.kkulddip.order.presentation.rest.api.OrderApi;
@@ -115,5 +117,24 @@ public class OrderController implements OrderApi {
         
         List<OwnerOrderHistoryResponse> storeOrderHistory = ownerOrderFacade.getStoreOrderHistory(ownerId, storeIdVO);
         return ApiResponse.of(200, storeOrderHistory);
+    }
+
+    @Override
+    @PostMapping("/{orderId}/pickup")
+    public ApiResponse<OrderPickupResponse> markOrderAsPickedUp(
+        @PathVariable String orderId,
+        @RequestBody @Valid OrderPickupRequest request,
+        @AuthenticationPrincipal JwtUserInfo userInfo) {
+        
+        // JWT에서 ownerId 추출 및 권한 확인
+        if (!"OWNER".equals(userInfo.role())) {
+            throw OrderException.accessDenied("사장님만 주문 픽업 완료를 처리할 수 있습니다.");
+        }
+        
+        Long ownerId = Long.valueOf(userInfo.userId());
+        OrderId orderIdVO = OrderId.of(Long.parseLong(orderId));
+        
+        OrderPickupResponse response = orderProcessFacade.markOrderAsPickedUp(ownerId, orderIdVO);
+        return ApiResponse.of(200, response);
     }
 }

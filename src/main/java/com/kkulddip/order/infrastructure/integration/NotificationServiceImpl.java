@@ -232,4 +232,29 @@ public class NotificationServiceImpl implements NotificationService {
             throw OrderException.orderExternalApiError(e);
         }
     }
+
+    @Override
+    public void sendOrderPickupNotificationToCustomer(Long customerId, Long orderId) {
+        try {
+            log.info("고객에게 픽업 완료 알림 전송 시작 - customerId: {}, orderId: {}", customerId, orderId);
+            
+            String title = "픽업 완료";
+            String message = String.format("주문 번호 #%d 음식이 픽업 완료되었습니다. 맛있게 드세요!", orderId);
+            String actionUrl = String.format("/orders/%d", orderId);
+            
+            sendNotificationToCustomerWithAction(
+                customerId,
+                title,
+                message,
+                NotificationType.ORDER,
+                actionUrl
+            );
+            
+            log.info("고객에게 픽업 완료 알림 전송 완료 - customerId: {}, orderId: {}", customerId, orderId);
+        } catch (Exception e) {
+            log.error("픽업 완료 알림 전송 실패 - customerId: {}, orderId: {}, details: {}", 
+                customerId, orderId, e.getMessage(), e);
+            throw OrderException.orderExternalApiError(e);
+        }
+    }
 }

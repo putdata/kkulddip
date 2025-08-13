@@ -6,20 +6,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.kkulddip.order.application.mapper.OrderMapper;
 import com.kkulddip.order.application.service.OrderService;
 import com.kkulddip.order.application.service.StoreAuthService;
 import com.kkulddip.order.domain.model.aggregate.Order;
-import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.application.exception.OrderException;
 import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
 /**
- * 사장님 관련 주문 기능 담당 Facade
+ * 사장님 관련 주문 조회 기능 담당 Facade
  * - 대기 중인 주문 조회
  * - 가게 주문 내역 조회
  */

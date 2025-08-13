@@ -15,6 +15,7 @@ import com.kkulddip.store.repository.StoreRepository;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
 import com.kkulddip.order.presentation.rest.dto.response.CustomerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OrderConfirmationResponse;
+import com.kkulddip.order.presentation.rest.dto.response.OrderPickupResponse;
 import com.kkulddip.order.presentation.rest.dto.response.OwnerOrderHistoryResponse;
 import com.kkulddip.order.presentation.rest.dto.response.PendingOrderResponse;
 
@@ -209,6 +210,17 @@ public class OrderResponseMapper {
             .productName(productName)
             .quantity(orderItem.getQuantity())
             .unitPrice(orderItem.getUnitPrice().amount().intValue())
+            .build();
+    }
+    
+    /**
+     * Order를 OrderPickupResponse로 변환
+     */
+    public OrderPickupResponse toOrderPickupResponse(Order order) {
+        return OrderPickupResponse.builder()
+            .orderId(String.valueOf(order.getOrderId().value()))
+            .orderStatus(order.getOrderStatus().name())
+            .pickedUpAt(java.time.LocalDateTime.now())
             .build();
     }
 }

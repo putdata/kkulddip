@@ -139,6 +139,10 @@ public class Order {
         return this.orderStatus == OrderStatus.AWAITING_CONFIRMATION;
     }
 
+    public boolean isPickedUp() {
+        return this.orderStatus == OrderStatus.PICKED_UP;
+    }
+
     public boolean isCancelled() {
         return this.orderStatus == OrderStatus.CANCELLED;
     }
@@ -169,7 +173,10 @@ public class Order {
             case AWAITING_CONFIRMATION -> newStatus == OrderStatus.CONFIRMED
                 || newStatus == OrderStatus.CANCELLED;
 
-            case CONFIRMED -> newStatus == OrderStatus.CANCELLED;
+            case CONFIRMED -> newStatus == OrderStatus.PICKED_UP
+                || newStatus == OrderStatus.CANCELLED;
+
+            case PICKED_UP -> false;
 
             case CANCELLED, FAILED -> false;
 

@@ -168,10 +168,10 @@ public class NotificationService {
      * @return 권한 여부
      */
     private boolean hasPermissionToViewNotifications(
-            Long subscriberId,
-            SubscriberType subscriberType,
-            Long authenticatedUserId,
-            String authenticatedRole) {
+        Long subscriberId,
+        SubscriberType subscriberType,
+        Long authenticatedUserId,
+        String authenticatedRole) {
 
         switch (authenticatedRole.toUpperCase()) {
             case "CUSTOMER":

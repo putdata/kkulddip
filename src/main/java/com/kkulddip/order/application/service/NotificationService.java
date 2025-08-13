@@ -25,4 +25,12 @@ public interface NotificationService {
      * @param message 알림 메시지
      */
     void sendNotificationToStore(Long storeId, String message);
+    
+    /**
+     * 주문 픽업 완료 알림을 고객에게 전송
+     * 
+     * @param customerId 고객 ID
+     * @param orderId 주문 ID
+     */
+    void sendOrderPickupNotificationToCustomer(Long customerId, Long orderId);
 }
