@@ -12,16 +12,6 @@ export interface DdipBox {
   isActive: boolean;
 }
 
-export interface DdipBoxListResponse {
-  ddipboxes: DdipBox[];
-  totalCount: number;
-  activeCount: number;
-  inactiveCount: number;
-  hasNext: boolean;
-  nextCursor: string | null;
-}
-
-// API 스펙에 따른 요청/응답 타입
 export interface CreateDdipBoxRequest {
   ddipboxName: string;
   description?: string;
@@ -67,6 +57,7 @@ export interface DdipBoxManagementResponse {
   isActive: boolean;
 }
 
+export type DdipBoxListResponse = DdipBox[];
 export type CreateDdipBoxResponse = DdipBoxManagementResponse;
 export type UpdateDdipBoxResponse = DdipBoxManagementResponse;
 export type UpdateDdipBoxQuantityResponse = DdipBoxManagementResponse;

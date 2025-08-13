@@ -20,10 +20,6 @@ interface OrderCardProps {
 const OrderCard = ({ order, storeId }: OrderCardProps) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  // 디버깅용 로그
-  console.log('OrderCard - order:', order);
-  console.log('OrderCard - storeId:', storeId);
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString('ko-KR', {
