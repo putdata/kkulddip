@@ -18,7 +18,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
   // 도움돼요 상태 관리
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
   const [isHelpful, setIsHelpful] = useState(false); // 사용자가 이미 눌렀는지 여부
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // 컴포넌트 마운트 시 도움돼요 상태 확인
   useEffect(() => {
@@ -34,49 +34,52 @@ const ReviewItem = ({ review }: ReviewProps) => {
     checkHelpfulStatus();
   }, [review.reviewId]);
 
-  // 도움돼요 버튼 클릭 핸들러
-  // const handleHelpfulClick = async () => {
-  //   if (isLoading) {
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   try {
-  //     if (isHelpful) {
-  //       await ReviewService.removeHelpful(review.reviewId);
-  //       // 이미 눌렀다면 취소
-  //       setHelpfulCount(prev => prev - 1);
-  //       setIsHelpful(false);
-  //       console.log('도움돼요 취소:', review.reviewId);
-  //     } else {
-  //       // 처음 누르는 경우
-  //       setHelpfulCount(prev => prev + 1);
-  //       setIsHelpful(true);
-  //       console.log('도움돼요 추가:', review.reviewId);
-
-  //       // TODO: API 호출 - 도움돼요 추가
-  //       // await ReviewService.addHelpful(review.reviewId);
-  //     }
-  //   } catch (error) {
-  //     console.error('도움돼요 처리 실패:', error);
-  //     // 에러 시 상태 롤백
-
-  //     setHelpfulCount(review.helpfulCount);
+  // TODO: api 연동 필요
+  // const handleHelpfulClick = () => {
+  //   if (isHelpful) {
+  //     setHelpfulCount(prev => prev - 1);
   //     setIsHelpful(false);
-  //     toast.error('처리 중 오류가 발생했습니다.');
-  //   } finally {
-  //     setIsLoading(false);
+  //   } else {
+  //     setHelpfulCount(prev => prev + 1);
+  //     setIsHelpful(true);
   //   }
   // };
 
-  const handleHelpfulClick = () => {
-    if (isHelpful) {
-      setHelpfulCount(prev => prev - 1);
-      setIsHelpful(false);
-    } else {
-      setHelpfulCount(prev => prev + 1);
-      setIsHelpful(true);
+  const handleHelpfulClick = async () => {
+    if (isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (isHelpful) {
+        // 즉시 UI 업데이트
+        setHelpfulCount(prev => prev - 1);
+        setIsHelpful(false);
+
+        // API 호출
+        await ReviewService.removeHelpful(review.reviewId.toString());
+        console.log('도움돼요 제거 성공:', review.reviewId);
+      } else {
+        setHelpfulCount(prev => prev + 1);
+        setIsHelpful(true);
+
+        await ReviewService.addHelpful(review.reviewId.toString());
+        console.log('도움돼요 추가 성공:', review.reviewId);
+      }
+    } catch (error) {
+      if (isHelpful) {
+        setHelpfulCount(prev => prev + 1);
+        setIsHelpful(true);
+      } else {
+        setHelpfulCount(prev => prev - 1);
+        setIsHelpful(false);
+      }
+
+      console.error('도움돼요 처리 실패:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

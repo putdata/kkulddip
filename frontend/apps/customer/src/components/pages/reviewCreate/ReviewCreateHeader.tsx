@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 // 2. 기존 useState 삭제하고 커스텀 훅 사용
 
 interface Store {
-  storeId: number;
+  storeId: string;
   storeName: string;
   img: string;
   imgAlt: string;

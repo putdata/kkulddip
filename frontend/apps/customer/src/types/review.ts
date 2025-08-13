@@ -1,12 +1,27 @@
 /**
- * 리뷰 등록 요청 데이터 타입
+ * 클라 리뷰 등록 요청 데이터 타입
  */
-export type ReviewCreateRequest = {
-  storeId: number;
+export interface ReviewCreateRequest {
+  storeId: string;
+  customerId: number;
+  content: string;
+  orderId: number;
   rating: number;
-  reviewText: string;
-  images: File[];
-};
+  images: File[]; // 클라이언트에서는 File 배열로 관리
+}
+
+/**
+ * 서버 리뷰 등록 요청 데이터 타입
+ */
+export interface ReviewCreateApiRequest {
+  request: {
+    customerId: number;
+    content: string;
+    orderId: number;
+    rating: number;
+  };
+  images: string[]; // 서버에서는 string 배열로 요구
+}
 
 /**
  * 리뷰 이미지 데이터 타입

@@ -13,4 +13,7 @@ export const API_PATH = {
   STORE_DETAIL: (storeId: string) => `/v1/stores/${storeId}`,
   STORE_DDIPBOXES: (storeId: string) => `/v1/stores/${storeId}/ddipboxes`,
   STORE_REVIEWS: (storeId: string) => `/v1/review/${storeId}`,
+
+  REVIEWS: (storeId: string) => `/v1/review/${storeId}`,
+  REVIEW_HELPFUL: (reviewId: string) => `/v1/review/helpful/${reviewId}`,
 };

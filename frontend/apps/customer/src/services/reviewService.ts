@@ -27,35 +27,44 @@ export class ReviewService {
    * @param data - 등록할 리뷰 정보
    * @returns 등록된 리뷰 정보
    */
-  static async create(data: ReviewCreateRequest): Promise<ReviewResponse> {
+  static async createReview(
+    data: ReviewCreateRequest,
+  ): Promise<ReviewResponse> {
     const formData = new FormData();
-    formData.append('rating', data.rating.toString());
-    formData.append('reviewText', data.reviewText);
 
+    // request 객체를 JSON 문자열로 변환하여 추가
+    const requestData = {
+      customerId: data.customerId,
+      content: data.content,
+      orderId: data.orderId,
+      rating: data.rating,
+    };
+
+    formData.append('request', JSON.stringify(requestData));
+
+    // 이미지 파일을 추가
     data.images.forEach(image => {
       formData.append('images', image);
     });
-
-    return apiClient.post(`/stores/${data.storeId}/reviews`, formData);
+    // TODO: storeID 변경 필요
+    // return apiClient.post(API_PATH.STORE_REVIEWS(storeId), formData)
+    return apiClient.post(API_PATH.STORE_REVIEWS('1'), formData);
   }
 
   /**
    * 리뷰에 도움돼요 추가
    */
-  static async addHelpful(reviewId: number): Promise<void> {
-    return apiClient.post(`/v1/reviews/${reviewId}/helpful`);
+  static async addHelpful(reviewId: string): Promise<void> {
+    return apiClient.post(API_PATH.REVIEW_HELPFUL(reviewId));
   }
 
   /**
    * 리뷰에서 도움돼요 제거
    */
-  static async removeHelpful(reviewId: number): Promise<void> {
-    return apiClient.delete(`/v1/reviews/${reviewId}/helpful`);
+  static async removeHelpful(reviewId: string): Promise<void> {
+    return apiClient.delete(API_PATH.REVIEW_HELPFUL(reviewId));
   }
 
-  /**
-   * 사용자가 해당 리뷰에 도움돼요를 눌렀는지 확인
-   */
   static async checkHelpful(reviewId: number): Promise<boolean> {
     return apiClient.get(`/v1/reviews/${reviewId}/helpful/check`);
   }
@@ -70,7 +79,7 @@ export const useCreateReviewMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ReviewService.create,
+    mutationFn: ReviewService.createReview,
     onSuccess: data => {
       // 사용자 관련 쿼리들을 무효화하여 최신 데이터로 업데이트
       queryClient.invalidateQueries({ queryKey: ['reviews'] });

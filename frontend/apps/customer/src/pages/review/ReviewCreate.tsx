@@ -7,6 +7,8 @@ import { reviewCreateMockData } from '@/constants/mockData';
 import ReviewCreateHeader from '@/components/pages/reviewCreate/ReviewCreateHeader';
 import ReviewCreatePhotoInput from '@/components/pages/reviewCreate/ReviewCreatePhotoInput';
 import ReviewCreateTextInput from '@/components/pages/reviewCreate/ReviewCreateTextInput';
+import { useCreateReviewMutation } from '@/services/reviewService';
+import type { ReviewCreateRequest } from '@/types/review';
 
 interface ReviewFormState {
   rating: number;
@@ -25,6 +27,8 @@ const ReviewCreate = () => {
     selectedImages: [],
     imagePreviewUrls: [],
   });
+
+  const createReviewMutation = useCreateReviewMutation();
 
   const onSetRating = (rating: number) => {
     console.log('Rating updated:', rating); // 디버깅용
@@ -49,33 +53,100 @@ const ReviewCreate = () => {
     setReviewForm({
       ...reviewForm,
       selectedImages: selectedImages,
-      imagePreviewUrls: imagePreviewUrls, // 동시에 업데이트
+      imagePreviewUrls: imagePreviewUrls,
     });
   };
 
   // 전송 부분
-  // TODO: 요청으로 변경 필요
-  const handleSubmit = () => {
-    // 먼저 최신값 확보
-    const textarea = document.querySelector('textarea');
-    const currentValue = textarea?.value || reviewForm.reviewText;
-
+  const handleSubmit = async () => {
     // 유효성 검사
     if (reviewForm.rating === 0) {
       toast.error('별점을 선택해주세요.');
       return;
     }
 
-    if (currentValue.trim() === '') {
+    const trimmedContent = reviewForm.reviewText.trim();
+    if (trimmedContent === '') {
       toast.error('리뷰 내용을 입력해주세요.');
       return;
     }
 
+    const reviewData: ReviewCreateRequest = {
+      storeId: store.storeId,
+      // TODO: 실제 로그인한 사용자 ID로 변경 필요
+      customerId: 1,
+      content: trimmedContent,
+      // TODO: 실제 주문 ID로 변경 필요 (주문 연동 시)
+      orderId: 123,
+      rating: reviewForm.rating,
+      images: reviewForm.selectedImages,
+    };
+
     toast(
-      `별점: ${reviewForm.rating}\n리뷰: ${currentValue}\n사진 개수:${reviewForm.imagePreviewUrls.length}`,
+      `별점: ${reviewForm.rating}\n리뷰: ${reviewForm.reviewText}\n사진 개수:${reviewForm.imagePreviewUrls.length}`,
     );
-    console.log(currentValue);
+
+    console.log('전송할 리뷰 데이터:', {
+      ...reviewData,
+      images: reviewData.images.map(img => ({
+        name: img.name,
+        size: img.size,
+        type: img.type,
+      })),
+    });
+
+    try {
+      const result = await createReviewMutation.mutateAsync(reviewData);
+
+      toast.success('리뷰가 성공적으로 등록되었습니다! 🎉');
+
+      // 폼 초기화 및 메모리 정리
+      reviewForm.imagePreviewUrls.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+
+      setReviewForm({
+        rating: 0,
+        reviewText: '',
+        selectedImages: [],
+        imagePreviewUrls: [],
+      });
+
+      console.log('등록된 리뷰 정보:', {
+        reviewId: result.reviewId,
+        customerId: result.customerId,
+        storeId: result.storeId,
+        rating: result.rating,
+        content: result.content,
+        imageCount: result.images.length,
+        createdAt: result.createdAt,
+      });
+    } catch (error) {
+      console.error('리뷰 제출 오류:', error);
+
+      // 에러 타입에 따른 메시지 처리
+      if (error instanceof Error) {
+        // 네트워크 에러나 서버 에러 구분
+        if (error.message.includes('Failed to fetch')) {
+          toast.error('네트워크 연결을 확인해주세요.');
+        } else if (error.message.includes('400')) {
+          toast.error('입력 정보를 다시 확인해주세요.');
+        } else if (error.message.includes('401')) {
+          toast.error('로그인이 필요합니다.');
+        } else if (error.message.includes('500')) {
+          toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } else {
+          toast.error(`리뷰 등록에 실패했습니다: ${error.message}`);
+        }
+      } else {
+        toast.error('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
   };
+
+  // 폼 유효성 검사
+  const isFormValid =
+    reviewForm.rating > 0 && reviewForm.reviewText.trim().length > 0;
 
   return (
     <div className="flex h-screen flex-col items-center gap-5 bg-gray-100 p-5">
@@ -97,9 +168,10 @@ const ReviewCreate = () => {
       />
       <Button
         onClick={handleSubmit}
-        className="w-50 flex h-10 cursor-pointer bg-amber-500 text-center text-lg font-bold text-white [font-family:Helvetica] hover:bg-amber-600"
+        disabled={createReviewMutation.isPending || !isFormValid}
+        className="w-50 flex h-10 cursor-pointer bg-amber-500 text-center text-lg font-bold text-white [font-family:Helvetica] hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        등록하기
+        {createReviewMutation.isPending ? '등록 중...' : '등록하기'}
       </Button>
     </div>
   );
