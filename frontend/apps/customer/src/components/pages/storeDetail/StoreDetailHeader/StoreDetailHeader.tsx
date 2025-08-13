@@ -23,7 +23,7 @@ export const StoreDetailHeader = ({ store }: StoreDetailHeaderProps) => {
   return (
     <div className="flex flex-col">
       <img className="h-60 w-full object-cover" src={store.storeProfileImage} />
-      <div className="flex w-full flex-col items-start justify-start bg-white">
+      <div className="flex w-full flex-col items-start justify-start bg-white px-5 py-2">
         {/* 가게 이름, 주소, 별점 */}
         <div className="flex w-full justify-between">
           {/* 가게 이름, 주소 */}
