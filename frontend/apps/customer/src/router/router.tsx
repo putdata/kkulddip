@@ -15,12 +15,9 @@ import OrderDetail from '@/pages/OrderDetail';
 import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
-// import PaymentSuccess from '@/pages/PaymentSuccess';
-// import PaymentFail from '@/pages/PaymentFail';
 import AuthCallback from '@/pages/AuthCallback';
 import Notification from '@/pages/Notification';
 import StoreDetail from '@/pages/StoreDetail';
-
 export const router = createBrowserRouter([
   {
     path: '/',
