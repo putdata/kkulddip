@@ -5,15 +5,13 @@ import { toast } from 'sonner';
 interface ReviewCreatePhotoInputProps {
   selectedImages: File[];
   imagePreviewUrls: string[];
-  setSelectedImages: (images: File[]) => void;
-  setImagePreviewUrls: (urls: string[]) => void;
+  onImagesChange: (images: File[], previewUrls: string[]) => void;
 }
 
 const ReviewCreatePhotoInput = ({
   selectedImages,
   imagePreviewUrls,
-  setSelectedImages,
-  setImagePreviewUrls,
+  onImagesChange,
 }: ReviewCreatePhotoInputProps) => {
   // 파일 선택창 열기
   const openFileDialog = () => {
@@ -42,11 +40,11 @@ const ReviewCreatePhotoInput = ({
       return;
     }
 
-    setSelectedImages(totalImages);
-
     // 미리보기 URL 생성
     const newPreviewUrls = newImages.map(file => URL.createObjectURL(file));
-    setImagePreviewUrls([...imagePreviewUrls, ...newPreviewUrls]);
+    const totalPreviewUrls = [...imagePreviewUrls, ...newPreviewUrls];
+
+    onImagesChange(totalImages, totalPreviewUrls);
   };
 
   // 이미지 삭제 핸들러
@@ -62,8 +60,7 @@ const ReviewCreatePhotoInput = ({
       URL.revokeObjectURL(urlToRevoke);
     }
 
-    setSelectedImages(newImages);
-    setImagePreviewUrls(newPreviewUrls);
+    onImagesChange(newImages, newPreviewUrls);
   };
 
   return (

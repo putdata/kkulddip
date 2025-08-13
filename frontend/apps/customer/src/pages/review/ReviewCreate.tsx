@@ -42,17 +42,14 @@ const ReviewCreate = () => {
     });
   };
 
-  const onImagesChange = (selectedImages: File[]) => {
+  const onImagesChange = (
+    selectedImages: File[],
+    imagePreviewUrls: string[],
+  ) => {
     setReviewForm({
       ...reviewForm,
       selectedImages: selectedImages,
-    });
-  };
-
-  const onPreviewUrlsChange = (imagePreviewUrls: string[]) => {
-    setReviewForm({
-      ...reviewForm,
-      imagePreviewUrls: imagePreviewUrls,
+      imagePreviewUrls: imagePreviewUrls, // 동시에 업데이트
     });
   };
 
@@ -96,8 +93,7 @@ const ReviewCreate = () => {
       <ReviewCreatePhotoInput
         selectedImages={reviewForm.selectedImages}
         imagePreviewUrls={reviewForm.imagePreviewUrls}
-        setSelectedImages={onImagesChange}
-        setImagePreviewUrls={onPreviewUrlsChange}
+        onImagesChange={onImagesChange}
       />
       <Button
         onClick={handleSubmit}
