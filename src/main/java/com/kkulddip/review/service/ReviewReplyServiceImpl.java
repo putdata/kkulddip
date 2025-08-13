@@ -3,19 +3,15 @@ package com.kkulddip.review.service;
 import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
-import com.kkulddip.common.util.RedisNotificationUtil;
-import com.kkulddip.notification.domain.model.enums.NotificationType;
-import com.kkulddip.store.repository.StoreRepository;
-import com.kkulddip.domain.customer.repository.CustomerRepository;
 import com.kkulddip.review.dto.request.ReviewReplyRequestDto;
 import com.kkulddip.review.dto.response.ReviewReplyResponseDto;
 import com.kkulddip.review.entity.Review;
 import com.kkulddip.review.entity.ReviewReply;
 import com.kkulddip.review.repository.ReviewReplyRepository;
 import com.kkulddip.review.repository.ReviewRepository;
+import com.kkulddip.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,23 +24,22 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 
     private final ReviewReplyRepository reviewReplyRepository;
     private final ReviewRepository reviewRepository;
-    private final RedisNotificationUtil redisNotificationUtil;
     private final StoreRepository storeRepository;
-    private final CustomerRepository customerRepository;
     // ================== 기본 메서드 ==================
-    
+
     @Override
     @Transactional
     public ReviewReplyResponseDto createReviewReply(
         ReviewReplyRequestDto request,
         Long reviewId,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateReplyRequest(request);
-            validateStoreId(request.storeId());
 
-            Long currentOwnerId = 1L;
+            Long currentOwnerId = Long.parseLong(userInfo.userId());
+
+            validateStoreId(request.storeId(), currentOwnerId);
 
             Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."));
@@ -53,9 +48,6 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 
             ReviewReply reviewReply = createReviewReplyEntity(request, review, currentOwnerId);
             ReviewReply savedReply = reviewReplyRepository.save(reviewReply);
-
-            // 리뷰 작성자(고객)에게 답글 알림 발송
-            sendReviewReplyCreatedNotification(review.getCustomerId(), review.getStoreId());
 
             log.info("리뷰 답글 생성 성공 - replyId: {}", savedReply.getReplyId());  // ✅ 성공 로그 추가
 
@@ -75,13 +67,13 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
     public ReviewReplyResponseDto updateReviewReply(
         Long replyId,
         ReviewReplyRequestDto request,
-        Authentication authentication
+        JwtUserInfo userInfo
     ) {
         try {
             validateReplyId(replyId);
             validateReplyRequest(request);
 
-            Long currentOwnerId = 1L;
+            Long currentOwnerId = Long.parseLong(userInfo.userId());
 
             ReviewReply existingReply = reviewReplyRepository.findById(replyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_REPLY_NOT_FOUND, "답글을 찾을 수 없습니다."));
@@ -106,11 +98,11 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 
     @Override
     @Transactional
-    public void deleteReviewReply(Long replyId, Authentication authentication) {
+    public void deleteReviewReply(Long replyId, JwtUserInfo userInfo) {
         try {
             validateReplyId(replyId);
 
-            Long currentOwnerId = 1L;//user.getUserId(authentication);
+            Long currentOwnerId = Long.parseLong(userInfo.userId());
 
             ReviewReply existingReply = reviewReplyRepository.findById(replyId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_REPLY_NOT_FOUND, "삭제할 답글을 찾을 수 없습니다."));
@@ -138,11 +130,11 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
         }
     }
 
-    private void validateStoreId(Long storeId) {
+    private void validateStoreId(Long storeId, Long currentOwnerId) {
         if (storeId == null || storeId <= 0) {
             throw new BusinessException(ErrorCode.INVALID_STORE_ID, "유효하지 않은 매장 ID입니다.");
         }
-        if(!storeId.equals(1L/*storeService.getStoreId(ownerService.getOwnerId(authentication.getName())*/)){
+        if(!storeRepository.findStoreIdsByOwnerId(currentOwnerId).contains(storeId)){
             throw new BusinessException(ErrorCode.REPLY_UNAUTHORIZED_ACCESS, "본인의 매장에만 답글을 작성할 수 있습니다.");
         }
     }
@@ -185,22 +177,6 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
         }
     }
 
-    // ================== 유틸리티 메서드 ==================
-
-    private Long getCurrentOwnerId(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof JwtUserInfo userInfo) {
-            // TODO: 점주 역할 확인 로직 추가
-            /*if (!"OWNER".equals(userInfo.role())) {
-                throw new BusinessException(ErrorCode.INSUFFICIENT_PERMISSION, "점주만 답글을 작성할 수 있습니다.");
-            }*/
-            //return userInfo.userId();
-            return 1L;
-        }
-
-        throw new BusinessException(ErrorCode.INVALID_AUTHENTICATION, "인증 정보를 찾을 수 없습니다.");
-    }
 
     // ================== dto 생성 메서드 ==================
 
@@ -228,38 +204,5 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
             .createdAt(reply.getCreatedAt())
             .updatedAt(reply.getUpdatedAt())
             .build();
-    }
-
-    // ================== 알림 관련 메서드 ==================
-
-    /**
-     * 답글 작성 시 리뷰 작성자(고객)에게 알림 전송
-     */
-    private void sendReviewReplyCreatedNotification(Long customerId, Long storeId) {
-        try {
-            // 가게 이름만 조회 (효율적)
-            String storeName = storeRepository.findStoreNameByStoreId(storeId)
-                .orElse("가게");
-
-            // 고객 이름만 조회 (효율적)
-            String customerName = customerRepository.findCustomerNameByCustomerId(customerId)
-                .orElse("고객");
-
-            String title = "리뷰에 답글이 달렸습니다";
-            String content = String.format("%s에서 %s님의 리뷰에 답글을 달았습니다.", storeName, customerName);
-
-            redisNotificationUtil.publishCustomerNotification(
-                customerId,
-                title,
-                content,
-                NotificationType.REVIEW_REPLY_CREATED
-            );
-
-            log.info("답글 작성 알림 발송 완료 - customerId: {}, storeId: {}, storeName: {}, customerName: {}", 
-                customerId, storeId, storeName, customerName);
-
-        } catch (Exception e) {
-            log.error("답글 작성 알림 발송 실패 - customerId: {}, storeId: {}", customerId, storeId, e);
-        }
     }
 }
