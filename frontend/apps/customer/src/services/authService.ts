@@ -1,13 +1,14 @@
 import { apiClient } from 'common';
 import { API_PATH } from '@/constants/api-path';
 import { type GoogleAuthResponse } from '@/types/auth';
+import type { AxiosResponse, AxiosError } from 'axios';
 
 export const AuthService = {
   setupAuthInterceptor: () => {
     // Response interceptor 추가
     apiClient['instance'].interceptors.response.use(
-      response => response,
-      error => {
+      (response: AxiosResponse) => response,
+      (error: AxiosError) => {
         // 401 에러 시 로그인 페이지로 리다이렉트
         if (error.response?.status === 401) {
           if (
