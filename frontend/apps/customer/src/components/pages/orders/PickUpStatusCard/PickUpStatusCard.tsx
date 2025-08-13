@@ -4,6 +4,7 @@ import {
   type PickupStatusType,
 } from '@/constants/pickupStatus';
 import { Calendar, Clock, Hash } from 'lucide-react';
+import { formatDateTime } from '@/utils/dateFormat';
 
 export interface StatusItem {
   orderId: number;
@@ -25,26 +26,28 @@ const PickUpStatusCard = ({ item }: StatusProps) => {
     <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white shadow-md">
       <div className="space-y-4 p-4">
         {/* 상태 뱃지 + 주문번호 */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <span
             className={`rounded-full px-3 py-1 text-sm font-semibold ${statusColor} bg-opacity-20`}
           >
             {statusMessage}
           </span>
-          <div className="flex items-center space-x-1 text-xs text-gray-400">
-            <Hash className="h-3.5 w-3.5" />
-            <span>주문번호 {orderId}</span>
-          </div>
         </div>
 
         {/* 시간 정보 */}
+        <div className="flex items-center space-x-1 text-xs text-gray-400">
+          <Hash className="h-3.5 w-3.5" />
+          <span>주문번호 {orderId}</span>
+        </div>
         <div className="space-y-2 text-sm text-gray-600">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-1 text-gray-500">
               <Calendar className="h-4 w-4" />
               <span className="text-xs">주문일시</span>
             </div>
-            <span className="font-medium text-gray-800">{createdAt}</span>
+            <span className="font-medium text-gray-800">
+              {formatDateTime(createdAt)}
+            </span>
           </div>
 
           {pickupCompletedAt && (
@@ -54,7 +57,7 @@ const PickUpStatusCard = ({ item }: StatusProps) => {
                 <span className="text-xs">픽업시간</span>
               </div>
               <span className="font-medium text-gray-800">
-                {pickupCompletedAt}
+                {formatDateTime(pickupCompletedAt)}
               </span>
             </div>
           )}
