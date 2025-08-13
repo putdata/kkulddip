@@ -25,10 +25,12 @@ This is a microservices-oriented Spring Boot application implementing **Domain-D
 ### Core Domains
 - **Order Domain** (DDD) - Complete order management with aggregates, value objects, and domain services
 - **Payment Domain** (DDD) - Payment processing with Toss Payments integration  
+- **Notification Domain** (DDD) - Push notification system with Redis-based queuing and FCM integration
+- **Store Domain** (Layered) - Store and product management with search capabilities
 - **User Domain** (Layered) - User management with Customer/Owner entities
 
 ### Domain Structure (DDD)
-Each DDD domain (order, payment) follows this structure:
+Each DDD domain (order, payment, notification) follows this structure:
 ```
 domain/
 ├── presentation/
@@ -64,12 +66,15 @@ domain/
 - **Framework**: Spring Boot 3.5.3, Spring Security, Spring Data JPA
 - **Authentication**: OAuth2 (Google) with JWT tokens
 - **Database**: MySQL with Redis for caching and event publishing
+- **Push Notifications**: Firebase Cloud Messaging (FCM)
 - **Payment**: Toss Payments API integration
+- **Real-time Features**: OpenVidu for video streaming
+- **File Storage**: AWS S3
 - **Documentation**: SpringDoc OpenAPI
 - **Testing**: JUnit 5, Spring Boot Test
 
 ### Key Business Rules
-- Order state transitions: CREATED → PAYMENT_PENDING → PAID → AWAITING_CONFIRMATION → CONFIRMED
+- Order state transitions: CREATED → PAYMENT_PENDING → PAID → AWAITING_CONFIRMATION → CONFIRMED → PICKED_UP
 - Orders can only be modified in CREATED state
 - Payment processing is asynchronous with event-driven confirmation
 - OAuth2 supports separate customer and owner login flows
@@ -261,3 +266,34 @@ The application uses environment variables for configuration:
 - OAuth2: `GOOGLE_OAUTH2_CLIENT_ID`, `GOOGLE_OAUTH2_CLIENT_SECRET`
 - JWT: `JWT_SECRET_KEY`, `JWT_ACCESS_TOKEN_EXPIRATION`
 - Toss Payments: `TOSS_SECRET_KEY`, `TOSS_CLIENT_KEY`
+- Firebase: `FIREBASE_CREDENTIALS_PATH`
+- AWS S3: `AWS_ACCESS_KEY`, `AWS_SECRET_KEY`, `AWS_BUCKET`
+- OpenVidu: `OPENVIDU_URL`, `OPENVIDU_SECRET`
+
+## Notification System Architecture
+
+The application features a sophisticated push notification system:
+
+### Redis-based Notification Queue
+- **RedisNotificationUtil**: Common utility for publishing notifications to Redis ZSet
+- **NotificationRedisConsumer**: Processes notifications from Redis queue with scheduled polling
+- **SubscriberType**: CUSTOMER, OWNER, STORE, ALL for different notification targets
+
+### Push Notification Flow
+1. Business logic publishes notification requests to Redis using `RedisNotificationUtil`
+2. `NotificationRedisConsumer` polls Redis queue and processes requests
+3. `NotificationProcessor` routes to appropriate sender based on subscriber type
+4. `NotificationSenderService` sends FCM notifications and logs results
+5. Database stores notification history and delivery logs
+
+### Key Notification Classes
+- **RedisNotificationUtil**: Centralized notification publishing (`publishCustomerNotification`, `publishStoreNotification`)
+- **NotificationProcessor**: Routes notifications based on subscriber type
+- **NotificationSenderService**: Handles FCM delivery and active token verification
+- **FcmService**: Firebase Cloud Messaging integration
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
