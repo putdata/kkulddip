@@ -32,10 +32,10 @@ export interface StoreListResponse extends PaginatedResponse {
 
 export interface CreateStoreRequest {
   storeName: string;
-  phone?: string;
+  phone: string;
   description?: string;
   operatingHours?: string;
-  businessNumber?: string;
+  businessNumber: string;
   storeAddress: string;
   latitude: number;
   longitude: number;

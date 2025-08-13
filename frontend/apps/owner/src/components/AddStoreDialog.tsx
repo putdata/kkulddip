@@ -198,7 +198,7 @@ const AddStoreDialog = () => {
                     maxLength={1000}
                   />
                   <div className="text-muted-foreground text-right text-xs">
-                    {formData.description.length}/1000
+                    {formData.description?.length || 0}/1000
                   </div>
                 </div>
               </div>
@@ -230,7 +230,7 @@ const AddStoreDialog = () => {
                       required
                     />
                     <div className="text-muted-foreground text-right text-xs">
-                      {formData.phone.length}/15
+                      {formData.phone?.length || 0}/15
                     </div>
                   </div>
 
@@ -254,7 +254,7 @@ const AddStoreDialog = () => {
                       maxLength={100}
                     />
                     <div className="text-muted-foreground text-right text-xs">
-                      {formData.operatingHours.length}/100
+                      {formData.operatingHours?.length || 0}/100
                     </div>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ const AddStoreDialog = () => {
                     required
                   />
                   <div className="text-muted-foreground text-right text-xs">
-                    {formData.businessNumber.length}/100
+                    {formData.businessNumber?.length || 0}/100
                   </div>
                 </div>
               </div>
