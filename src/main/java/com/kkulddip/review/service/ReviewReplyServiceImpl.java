@@ -3,6 +3,9 @@ package com.kkulddip.review.service;
 import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
+import com.kkulddip.common.util.RedisNotificationUtil;
+import com.kkulddip.domain.customer.repository.CustomerRepository;
+import com.kkulddip.notification.domain.model.enums.NotificationType;
 import com.kkulddip.review.dto.request.ReviewReplyRequestDto;
 import com.kkulddip.review.dto.response.ReviewReplyResponseDto;
 import com.kkulddip.review.entity.Review;
@@ -24,7 +27,9 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 
     private final ReviewReplyRepository reviewReplyRepository;
     private final ReviewRepository reviewRepository;
+    private final RedisNotificationUtil redisNotificationUtil;
     private final StoreRepository storeRepository;
+    private final CustomerRepository customerRepository;
     // ================== 기본 메서드 ==================
 
     @Override
@@ -48,6 +53,9 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 
             ReviewReply reviewReply = createReviewReplyEntity(request, review, currentOwnerId);
             ReviewReply savedReply = reviewReplyRepository.save(reviewReply);
+
+            // 리뷰 작성자(고객)에게 답글 알림 발송
+            sendReviewReplyCreatedNotification(review.getCustomerId(), review.getStoreId());
 
             log.info("리뷰 답글 생성 성공 - replyId: {}", savedReply.getReplyId());  // ✅ 성공 로그 추가
 
@@ -204,5 +212,38 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
             .createdAt(reply.getCreatedAt())
             .updatedAt(reply.getUpdatedAt())
             .build();
+    }
+
+    // ================== 알림 관련 메서드 ==================
+
+    /**
+     * 답글 작성 시 리뷰 작성자(고객)에게 알림 전송
+     */
+    private void sendReviewReplyCreatedNotification(Long customerId, Long storeId) {
+        try {
+            // 가게 이름만 조회 (효율적)
+            String storeName = storeRepository.findStoreNameByStoreId(storeId)
+                .orElse("가게");
+
+            // 고객 이름만 조회 (효율적)
+            String customerName = customerRepository.findCustomerNameByCustomerId(customerId)
+                .orElse("고객");
+
+            String title = "리뷰에 답글이 달렸습니다";
+            String content = String.format("%s에서 %s님의 리뷰에 답글을 달았습니다.", storeName, customerName);
+
+            redisNotificationUtil.publishCustomerNotification(
+                customerId,
+                title,
+                content,
+                NotificationType.REVIEW_REPLY_CREATED
+            );
+
+            log.info("답글 작성 알림 발송 완료 - customerId: {}, storeId: {}, storeName: {}, customerName: {}",
+                customerId, storeId, storeName, customerName);
+
+        } catch (Exception e) {
+            log.error("답글 작성 알림 발송 실패 - customerId: {}, storeId: {}", customerId, storeId, e);
+        }
     }
 }

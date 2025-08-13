@@ -3,6 +3,9 @@ package com.kkulddip.review.service;
 import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
+import com.kkulddip.common.util.RedisNotificationUtil;
+import com.kkulddip.domain.customer.repository.CustomerRepository;
+import com.kkulddip.notification.domain.model.enums.NotificationType;
 import com.kkulddip.review.common.CursorUtil;
 import com.kkulddip.review.dto.request.ReviewCreateRequestDto;
 import com.kkulddip.review.dto.request.ReviewUpdateRequestDto;
@@ -16,6 +19,7 @@ import com.kkulddip.review.entity.Review;
 import com.kkulddip.review.entity.ReviewReply;
 import com.kkulddip.review.entity.enums.ReviewSortType;
 import com.kkulddip.review.repository.ReviewRepository;
+import com.kkulddip.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +40,9 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewHelpfulService reviewHelpfulService;
     private final ReviewReplyService reviewReplyService;
     private final CursorUtil cursorUtil;
+    private final RedisNotificationUtil redisNotificationUtil;
+    private final StoreRepository storeRepository;
+    private final CustomerRepository customerRepository;
     private final int size10 = 10;
     private final int size1 = 1;
     private final Pageable pageable10 = PageRequest.of(0, size10+1);
@@ -74,6 +81,9 @@ public class ReviewServiceImpl implements ReviewService {
 
             List<ReviewImageResponseDto> imageList = reviewImageService.getImageDtoList(reviewWithImages.getImages());
             ReviewReplyResponseDto replyDto = getReplyDto(reviewWithImages.getReply());
+
+            // 가게 사장님에게 리뷰 작성 알림 발송
+            sendReviewCreatedNotification(storeId, request.customerId());
 
             log.info("리뷰 생성 완료. reviewId: {}, customerId: {}", savedReview.getReviewId(), request.customerId());
             return createReviewResponseDto(reviewWithImages, imageList, replyDto, userInfo);
@@ -719,5 +729,38 @@ public class ReviewServiceImpl implements ReviewService {
             .hasNext(hasNext)
             .build();
 
+    }
+
+    // ================== 알림 관련 메서드 ==================
+
+    /**
+     * 리뷰 작성 시 가게 사장님에게 알림 전송
+     */
+    private void sendReviewCreatedNotification(Long storeId, Long customerId) {
+        try {
+            // 가게 이름만 조회 (효율적)
+            String storeName = storeRepository.findStoreNameByStoreId(storeId)
+                .orElse("가게");
+
+            // 고객 이름만 조회 (효율적)
+            String customerName = customerRepository.findCustomerNameByCustomerId(customerId)
+                .orElse("고객");
+
+            String title = "새로운 리뷰가 등록되었습니다";
+            String content = String.format("%s님이 %s에 리뷰를 남겼습니다.", customerName, storeName);
+
+            redisNotificationUtil.publishStoreNotification(
+                storeId,
+                title,
+                content,
+                NotificationType.REVIEW_CREATED
+            );
+
+            log.info("리뷰 작성 알림 발송 완료 - storeId: {}, customerId: {}, storeName: {}, customerName: {}",
+                storeId, customerId, storeName, customerName);
+
+        } catch (Exception e) {
+            log.error("리뷰 작성 알림 발송 실패 - storeId: {}, customerId: {}", storeId, customerId, e);
+        }
     }
 }
