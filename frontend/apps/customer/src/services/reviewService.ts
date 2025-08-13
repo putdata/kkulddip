@@ -1,4 +1,5 @@
-import type { ReviewCreateRequest, ReviewCreateResponse } from '@/types/review';
+import { API_PATH } from '@/constants/api-path';
+import type { ReviewCreateRequest, ReviewResponse } from '@/types/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from 'common';
 
@@ -7,14 +8,26 @@ import { apiClient } from 'common';
  */
 export class ReviewService {
   /**
+   * 리뷰 목록 조회
+   */
+  static async getReviews(
+    storeId: string,
+    params?: {
+      page?: number;
+      size?: number;
+      sort?: string;
+    },
+  ): Promise<ReviewResponse[]> {
+    return apiClient.get(API_PATH.STORE_REVIEWS(storeId), params);
+  }
+
+  /**
    * 리뷰 등록 API 호출
    *
    * @param data - 등록할 리뷰 정보
    * @returns 등록된 리뷰 정보
    */
-  static async create(
-    data: ReviewCreateRequest,
-  ): Promise<ReviewCreateResponse> {
+  static async create(data: ReviewCreateRequest): Promise<ReviewResponse> {
     const formData = new FormData();
     formData.append('rating', data.rating.toString());
     formData.append('reviewText', data.reviewText);

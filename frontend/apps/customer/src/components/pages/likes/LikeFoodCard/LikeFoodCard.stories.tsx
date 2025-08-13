@@ -12,10 +12,11 @@ export default meta;
 
 type Story = StoryObj<typeof LikeFoodCard>;
 
+// 기본 아이템 (컴포넌트에서 실제로 쓰는 속성만 유지)
 const baseItem: CardItemProps['item'] = {
+  id: 1,
   storeInfo: {
     storeName: '도미노피자 역삼점',
-    description: '페퍼로니, 불고기 피자',
     ratingAverage: 4.3,
   },
   img: {
@@ -23,18 +24,16 @@ const baseItem: CardItemProps['item'] = {
     alt: '음식 이미지',
   },
   price: {
-    original: 22000,
-    discount: 13200,
+    discount: 5000, // 할인 금액
   },
-  timeLeftHour: 3,
-  discountRate: 40,
+  discountRate: 40, // 할인율
   distance: 0.7,
-  remainingQuantity: 5,
 };
 
 export const Default: Story = {
   args: {
     item: baseItem,
+    onClick: () => alert('카드 클릭됨'),
   },
 };
 
@@ -42,37 +41,29 @@ export const NoDiscount: Story = {
   args: {
     item: {
       ...baseItem,
-      price: { original: undefined, discount: 15000 },
-      discountRate: undefined,
+      price: { discount: 0 },
+      discountRate: 0,
     },
   },
 };
 
-export const NoTimeLeft: Story = {
+export const NoImage: Story = {
   args: {
     item: {
       ...baseItem,
-      timeLeftHour: undefined,
+      img: { src: '', alt: '' },
     },
   },
 };
 
-export const LowStock: Story = {
+export const LongStoreName: Story = {
   args: {
     item: {
       ...baseItem,
-      remainingQuantity: 1,
-    },
-  },
-};
-
-export const NoBadges: Story = {
-  args: {
-    item: {
-      ...baseItem,
-      timeLeftHour: undefined,
-      discountRate: undefined,
-      remainingQuantity: undefined,
+      storeInfo: {
+        ...baseItem.storeInfo,
+        storeName: '매장이름이아주아주길어서줄바꿈이되는지확인해봅시다',
+      },
     },
   },
 };

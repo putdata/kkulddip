@@ -1,20 +1,29 @@
-import { Heart, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/utils/priceFormat';
-import { ROUTE_PATH } from '@/router';
+import { formatDate } from '@/utils/dateFormat';
 import { type OrderCardProps } from '@/types/orderFood';
+import { ROUTE_PATH } from '@/router/route-path';
 
 const OrderCard = ({ item }: OrderCardProps) => {
-  const { date, storeInfo, img, price, items, isFavorited } = item;
+  const { orderDate, storeName, orderItems, originalPrice, finalPrice } = item;
+
   const navigate = useNavigate();
+
+  // 할인 금액 계산
+  const discountAmount = originalPrice - finalPrice;
+
   return (
     <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow">
-      {/* Header */}
       <div className="flex items-center justify-between bg-gray-50 px-3 py-2">
-        <span className="text-xs font-medium text-gray-600">{date}</span>
+        <span className="text-xs font-medium text-gray-600">
+          {formatDate(orderDate)}
+        </span>
         <button
           className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          onClick={() => navigate(ROUTE_PATH.ORDER_DETAIL)}
+          onClick={() =>
+            navigate(ROUTE_PATH.ORDER_DETAIL.replace(':orderId', item.orderId))
+          }
         >
           주문상세
         </button>
@@ -24,39 +33,30 @@ const OrderCard = ({ item }: OrderCardProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
-              <img
-                src={img.src}
-                alt={img.alt}
-                className="h-full w-full object-cover"
-              />
+              <div className="text-sm font-semibold text-gray-600">
+                {storeName.charAt(0)}
+              </div>
             </div>
             <h3 className="max-w-[120px] truncate text-sm font-semibold text-gray-900">
-              {storeInfo.storeName}
+              {storeName}
             </h3>
           </div>
           <div className="flex items-center gap-1">
             <ChevronRight className="h-3 w-3 text-gray-400" />
-            <button className="p-0.5">
-              <Heart
-                className="h-4 w-4 transition-colors"
-                color={isFavorited ? '#ef4444' : '#d1d5db'}
-                fill={isFavorited ? '#ef4444' : 'none'}
-              />
-            </button>
           </div>
         </div>
 
         <div className="space-y-1">
-          {items.map((item, idx) => (
+          {orderItems.map((orderItem, idx) => (
             <div
-              key={idx}
+              key={`${orderItem.productId}-${idx}`}
               className="flex items-center justify-between text-xs"
             >
               <span className="flex-1 truncate pr-2 text-gray-700">
-                {item.name}
+                {orderItem.productName}
               </span>
               <span className="font-medium text-gray-500">
-                {item.quantity}개
+                {orderItem.quantity}개
               </span>
             </div>
           ))}
@@ -67,16 +67,16 @@ const OrderCard = ({ item }: OrderCardProps) => {
             <span className="text-xs font-medium text-gray-800">결제금액</span>
             <div className="text-right">
               <div className="text-xs text-gray-400 line-through">
-                {formatPrice(price.original)}
+                {formatPrice(originalPrice)}
               </div>
               <div className="text-sm font-bold text-gray-900">
-                {formatPrice(price.discount)}
+                {formatPrice(finalPrice)}
               </div>
             </div>
           </div>
           <div className="text-right">
             <span className="text-xs font-medium text-blue-600">
-              꿀띱에서만 {formatPrice(price.discountAmount)} 할인
+              꿀띱에서만 {formatPrice(discountAmount)} 할인
             </span>
           </div>
         </div>

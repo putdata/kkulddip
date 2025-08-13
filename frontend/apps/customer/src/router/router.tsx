@@ -10,12 +10,14 @@ import MobileLayout from '@/components/layout/MobileLayout';
 import NotFound from '@/pages/NotFound';
 import GlobalErrorFallback from '@/components/fallback/GlobalErrorFallback';
 import MobileLayoutWithNavbar from '@/components/layout/MobileLayoutWithNavbar';
+import MobileLayoutWithPageNavbar from '@/components/layout/MobileLayoutWithPageNavbar';
 import OrderDetail from '@/pages/OrderDetail';
 import OrderFunnelContainer from '@/pages/OrderFlow';
 import ReviewsPage from '@/pages/review/Reviews';
 import ReviewCreate from '@/pages/review/ReviewCreate';
-import { StoreDetail } from '@/pages/StoreDetail';
-
+import AuthCallback from '@/pages/AuthCallback';
+import Notification from '@/pages/Notification';
+import StoreDetail from '@/pages/StoreDetail';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -29,6 +31,12 @@ export const router = createBrowserRouter([
             index: true,
             element: <Home />,
           },
+        ],
+      },
+      {
+        path: '/',
+        element: <MobileLayoutWithPageNavbar />,
+        children: [
           {
             path: ROUTE_PATH.MY,
             element: <MyPage />,
@@ -45,6 +53,14 @@ export const router = createBrowserRouter([
             path: ROUTE_PATH.ORDER,
             element: <Orders />,
           },
+          {
+            path: ROUTE_PATH.NOTIFICATION,
+            element: <Notification />,
+          },
+          // {
+          //   path: ROUTE_PATH.NOTIFICATIONS,
+          //   element: <Notifications />,
+          // },
           // 임시 - 리뷰 작성 페이지
           {
             path: ROUTE_PATH.ORDER_DETAIL,
@@ -75,6 +91,10 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: ROUTE_PATH.AUTH_CALLBACK,
+        element: <AuthCallback />,
+      },
+      {
         path: ROUTE_PATH.PAY,
         element: <MobileLayout />,
         children: [
@@ -88,9 +108,7 @@ export const router = createBrowserRouter([
         path: '*',
         element: <NotFound />,
       },
-      {
-        path: ROUTE_PATH.NOTIFICATIONS,
-      },
+
       // 임시 - 리뷰 작성 페이지
       {
         path: ROUTE_PATH.REVIEW_CREATE,

@@ -22,29 +22,27 @@ const PageNavbar = () => {
   };
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-50 border-t bg-white">
-      <nav className="flex items-center justify-between bg-white px-4 py-3 shadow-md">
-        <div className="flex items-center space-x-2">
-          <ChevronLeft
-            className="mr-2 h-5 w-5"
-            onClick={() => {
-              navigate(-1);
-            }}
-          />
+    <nav className="fixed left-0 right-0 top-0 z-50 flex h-12 items-center justify-between border-t bg-white px-4 py-3 shadow-md">
+      <div className="flex items-center space-x-2">
+        <ChevronLeft
+          className="mr-2 h-5 w-5"
+          onClick={() => {
+            navigate(-1);
+          }}
+        />
 
-          <span className="text-lg font-semibold text-amber-600">
-            {getPageTitle()}
-          </span>
-        </div>
-        <div className="flex space-x-4">
-          <Bell className="mr-3 h-5 w-5" />
-          <ShoppingCart
-            className="mr-1 h-5 w-5"
-            onClick={() => navigate(ROUTE_PATH.PAY)}
-          />
-        </div>
-      </nav>
-    </div>
+        <span className="text-lg font-semibold text-amber-600">
+          {getPageTitle()}
+        </span>
+      </div>
+      <div className="flex space-x-4">
+        <Bell className="mr-3 h-5 w-5" />
+        <ShoppingCart
+          className="mr-1 h-5 w-5"
+          onClick={() => navigate(ROUTE_PATH.PAY)}
+        />
+      </div>
+    </nav>
   );
 };
 

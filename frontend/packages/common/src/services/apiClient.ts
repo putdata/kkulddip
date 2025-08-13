@@ -22,7 +22,7 @@ class ApiClient {
    */
   constructor(baseURL = import.meta.env.VITE_API_BASE_URL) {
     this.instance = axios.create({
-      baseURL: `${baseURL}/api/v1`,
+      baseURL: `${baseURL}`,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -57,6 +57,10 @@ class ApiClient {
         return response;
       },
       error => {
+        if (error.response?.status === 401) {
+          useAuthStore.getState().clearAuth();
+        }
+
         if (error.isAxiosError) {
           throw new ApiError(error);
         }
@@ -109,10 +113,13 @@ class ApiClient {
    *
    * @template T - 응답 데이터의 타입
    * @param url - 요청할 URL
+   * @param params - 요청 파라미터 (query string으로 전송)
    * @returns 응답 데이터
    */
-  async delete<T>(url: string): Promise<T> {
-    const response = await this.instance.delete<ApiResponse<T>>(url);
+  async delete<T>(url: string, params?: object): Promise<T> {
+    const response = await this.instance.delete<ApiResponse<T>>(url, {
+      params,
+    });
     return (response.data as ApiSuccessResponse<T>).body;
   }
 }
