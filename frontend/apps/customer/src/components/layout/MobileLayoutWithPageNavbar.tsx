@@ -6,7 +6,9 @@ export default function MobileLayoutWithPageNavbar() {
   return (
     <div className="mx-auto min-h-screen w-full max-w-md bg-white">
       <PageNavbar />
-      <Outlet />
+      <div className="pb-14 pt-12">
+        <Outlet />
+      </div>
       <BottomNavbar />
     </div>
   );
