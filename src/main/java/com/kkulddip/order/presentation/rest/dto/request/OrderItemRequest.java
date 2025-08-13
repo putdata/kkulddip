@@ -10,7 +10,7 @@ import lombok.Builder;
 public record OrderItemRequest(
     @NotNull Long productId,
     @NotNull Integer quantity,
-    @NotNull Integer unitPrice,
+    @NotNull Long unitPrice,
     @Valid List<DiscountInfoRequest> discountInfos
 ) {
     
@@ -20,7 +20,7 @@ public record OrderItemRequest(
      * 
      * @return quantity × unitPrice
      */
-    public Integer totalPrice() {
+    public Long totalPrice() {
         if (quantity == null || unitPrice == null) {
             throw new IllegalArgumentException("수량과 단가는 null일 수 없습니다.");
         }

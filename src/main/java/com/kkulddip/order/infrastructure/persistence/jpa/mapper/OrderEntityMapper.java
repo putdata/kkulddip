@@ -36,6 +36,8 @@ public class OrderEntityMapper {
             .storeId(order.getStoreId().value())
             .originalPrice(order.getOriginalPrice().amount())
             .finalPrice(order.getFinalPrice().amount())
+            .savedMoney(order.getSavedMoney().amount())
+            .savedCo2(order.getSavedCo2())
             .orderStatus(order.getOrderStatus())
             .orderDate(order.getOrderDate())
             .pickupTime(order.getPickupTime())
@@ -61,6 +63,8 @@ public class OrderEntityMapper {
             orderItems,
             Money.of(orderEntity.getOriginalPrice()),
             Money.of(orderEntity.getFinalPrice()),
+            Money.of(orderEntity.getSavedMoney()),
+            orderEntity.getSavedCo2(),
             orderEntity.getOrderStatus(),
             orderEntity.getOrderDate(),
             orderEntity.getPickupTime()

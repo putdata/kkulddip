@@ -51,7 +51,7 @@ public class PriceValidationServiceImpl implements PriceValidationService {
             throw PriceValidationException.priceMismatch(
                 item.productId(), 
                 item.unitPrice(), 
-                -1  // 존재하지 않는 상품의 경우 -1로 표시
+                -1L  // 존재하지 않는 상품의 경우 -1로 표시
             );
         }
         
@@ -64,7 +64,7 @@ public class PriceValidationServiceImpl implements PriceValidationService {
             throw PriceValidationException.priceMismatch(
                 item.productId(), 
                 item.unitPrice(), 
-                -1
+                -1L
             );
         }
         
@@ -74,12 +74,12 @@ public class PriceValidationServiceImpl implements PriceValidationService {
             throw PriceValidationException.priceMismatch(
                 item.productId(), 
                 item.unitPrice(), 
-                -1
+                -1L
             );
         }
         
-        // 가격 비교 (Long salePrice -> Integer로 변환)
-        Integer actualPrice = ddipBox.getSalePrice().intValue();
+        // 가격 비교
+        Long actualPrice = ddipBox.getSalePrice();
         
         if (!item.unitPrice().equals(actualPrice)) {
             log.warn("가격 불일치 - storeId: {}, productId: {}, requestPrice: {}, actualPrice: {}", 

@@ -35,10 +35,16 @@ public class OrderEntity {
     private Long storeId;
     
     @Column(name = "original_price", nullable = false)
-    private Integer originalPrice;
+    private Long originalPrice;
     
     @Column(name = "final_price", nullable = false)
-    private Integer finalPrice;
+    private Long finalPrice;
+
+    @Column(name = "saved_money", nullable = false)
+    private Long savedMoney;
+
+    @Column(name = "saved_co2", nullable = false)
+    private Double savedCo2;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
@@ -51,14 +57,17 @@ public class OrderEntity {
     private LocalDateTime pickupTime;
     
     @Builder
-    protected OrderEntity(Long orderId, Long customerId, Long storeId, Integer originalPrice, 
-        Integer finalPrice, OrderStatus orderStatus, LocalDateTime orderDate, LocalDateTime pickupTime) {
+    protected OrderEntity(Long orderId, Long customerId, Long storeId, Long originalPrice, 
+        Long finalPrice, Long savedMoney, Double savedCo2,
+        OrderStatus orderStatus, LocalDateTime orderDate, LocalDateTime pickupTime) {
 
         this.orderId = orderId;
         this.customerId = customerId;
         this.storeId = storeId;
         this.originalPrice = originalPrice;
         this.finalPrice = finalPrice;
+        this.savedMoney = savedMoney;
+        this.savedCo2 = savedCo2;
         this.orderStatus = orderStatus;
         this.orderDate = orderDate;
         this.pickupTime = pickupTime;
@@ -68,8 +77,13 @@ public class OrderEntity {
         this.orderStatus = newStatus;
     }
     
-    public void updatePrices(Integer originalPrice, Integer finalPrice) {
+    public void updatePrices(Long originalPrice, Long finalPrice) {
         this.originalPrice = originalPrice;
         this.finalPrice = finalPrice;
+    }
+
+    public void updateSavedValues(Long savedMoney, Double savedCo2) {
+        this.savedMoney = savedMoney;
+        this.savedCo2 = savedCo2;
     }
 }

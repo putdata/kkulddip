@@ -6,8 +6,6 @@ import com.kkulddip.customerProfile.dto.response.CustomerProfileResponse;
 import com.kkulddip.customerProfile.dto.response.CustomerStatsResponse;
 import com.kkulddip.customerProfile.dto.response.UpdateLocationResponse;
 import com.kkulddip.customerProfile.dto.response.UpdateProfileResponse;
-import com.kkulddip.customerProfile.dto.CustomerStatsDto;
-import com.kkulddip.customerProfile.util.CustomerStatsCalculator;
 import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.customerProfile.mapper.CustomerProfileMapper;
@@ -39,14 +37,12 @@ public class CustomerProfileService {
     
     private final CustomerRepository customerRepository;
     private final CustomerProfileMapper customerProfileMapper;
-    private final CustomerStatsCalculator statsCalculator;
     
     /**
      * 고객 프로필 정보를 조회합니다.
      * 
      * 고객의 기본 정보(이름, 이메일, 프로필 이미지, 주소, 좌표, 레벨 등)를 조회하며,
      * 조회 시점에 마지막 활동 시간을 현재 시간으로 업데이트합니다.
-     * 또한 실시간으로 통계를 계산하여 업데이트합니다.
      * 
      * @param customerId 조회할 고객의 ID
      * @return 고객 프로필 응답 DTO
@@ -57,8 +53,6 @@ public class CustomerProfileService {
         Customer customer = findCustomerById(customerId);
         updateLastActiveTime(customer);
         
-        updateCustomerStatsIfNeeded(customer);
-        
         log.info("고객 프로필 조회 - customerId: {}", customerId);
         return customerProfileMapper.toProfileResponse(customer);
     }
@@ -68,7 +62,6 @@ public class CustomerProfileService {
      * 
      * 고객의 주문 수, 절약 금액, CO2 절약량, 현재 레벨, 다음 레벨까지 필요한 주문 수 등의
      * 통계 정보를 조회합니다. 레벨 시스템은 주문 수에 따라 자동으로 계산됩니다.
-     * 조회 시 실시간으로 통계를 재계산하여 업데이트합니다.
      * 
      * @param customerId 조회할 고객의 ID
      * @return 고객 통계 응답 DTO
@@ -77,8 +70,6 @@ public class CustomerProfileService {
     @Transactional
     public CustomerStatsResponse getStats(Long customerId) {
         Customer customer = findCustomerById(customerId);
-        
-        updateCustomerStatsIfNeeded(customer);
         
         log.info("고객 통계 조회 - customerId: {}, totalOrder: {}", 
             customerId, customer.getTotalOrder());
@@ -174,72 +165,5 @@ public class CustomerProfileService {
         }
     }
     
-    /**
-     * 고객의 통계 정보를 실시간으로 계산하여 업데이트합니다.
-     * 
-     * @param customer 업데이트할 고객 엔티티
-     */
-    private void updateCustomerStatsIfNeeded(Customer customer) {
-        try {
-            CustomerStatsDto currentStats = statsCalculator.calculateStatsFast(customer.getCustomerId());
-            
-            int orderDiff = currentStats.totalOrder() - customer.getTotalOrder();
-            long moneySavedDiff = currentStats.totalMoneySaved() - customer.getTotalMoneySaved();
-            double co2SavedDiff = currentStats.totalCo2Saved() - customer.getTotalCo2Saved();
-            
-            if (orderDiff != 0 || moneySavedDiff != 0 || Math.abs(co2SavedDiff) > 0.01) {
-                customer.updateStats(orderDiff, moneySavedDiff, co2SavedDiff);
-                customerRepository.save(customer);
-                
-                log.info("고객 통계 업데이트 - customerId: {}, orderDiff: {}, moneySavedDiff: {}, co2SavedDiff: {}", 
-                    customer.getCustomerId(), orderDiff, moneySavedDiff, co2SavedDiff);
-            }
-        } catch (Exception e) {
-            log.error("고객 통계 업데이트 실패 - customerId: {}", customer.getCustomerId(), e);
-        }
-    }
     
-    /**
-     * 고객 프로필을 통계와 함께 업데이트된 상태로 조회합니다.
-     * 
-     * @param customerId 조회할 고객의 ID
-     * @return 업데이트된 프로필 응답 DTO
-     */
-    @Transactional
-    public CustomerProfileResponse getProfileWithUpdatedStats(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        
-        CustomerStatsDto stats = statsCalculator.calculateStatsFast(customerId);
-        
-        int orderIncrement = stats.totalOrder() - customer.getTotalOrder();
-        long moneyIncrement = stats.totalMoneySaved() - customer.getTotalMoneySaved();
-        double co2Increment = stats.totalCo2Saved() - customer.getTotalCo2Saved();
-        
-        if (orderIncrement != 0 || moneyIncrement != 0 || Math.abs(co2Increment) > 0.01) {
-            customer.updateStats(orderIncrement, moneyIncrement, co2Increment);
-            customerRepository.save(customer);
-            
-            log.info("고객 프로필 및 통계 갱신 - customerId: {}, orders: +{}, saved: +{}, co2: +{}kg", 
-                customerId, orderIncrement, moneyIncrement, co2Increment);
-        }
-        
-        updateLastActiveTime(customer);
-        
-        return customerProfileMapper.toProfileResponse(customer);
-    }
-    
-    /**
-     * 갱신된 통계 정보만 조회합니다.
-     * 
-     * @param customerId 조회할 고객의 ID
-     * @return 갱신된 통계 응답 DTO
-     */
-    @Transactional
-    public CustomerStatsResponse getUpdatedStats(Long customerId) {
-        Customer customer = findCustomerById(customerId);
-        
-        updateCustomerStatsIfNeeded(customer);
-        
-        return customerProfileMapper.toStatsResponse(customer);
-    }
 }

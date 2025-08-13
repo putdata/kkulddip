@@ -93,7 +93,7 @@ public class OrderResponseMapper {
             .productId(orderItem.getProductId().value())
             .productName(productName)
             .quantity(orderItem.getQuantity())
-            .unitPrice(orderItem.getUnitPrice().amount().intValue())
+            .unitPrice(orderItem.getUnitPrice().amount())
             .build();
     }
     
@@ -122,8 +122,8 @@ public class OrderResponseMapper {
             .storeId(order.getStoreId().value())
             .storeName(storeName)
             .orderItems(toCustomerOrderItemResponses(order.getOrderItems()))
-            .originalPrice(order.getOriginalPrice().amount().intValue())
-            .finalPrice(order.getFinalPrice().amount().intValue())
+            .originalPrice(order.getOriginalPrice().amount())
+            .finalPrice(order.getFinalPrice().amount())
             .orderStatus(order.getOrderStatus().name())
             .orderDate(order.getOrderDate())
             .pickupTime(order.getPickupTime())
@@ -157,8 +157,8 @@ public class OrderResponseMapper {
             .productId(orderItem.getProductId().value())
             .productName(productName)
             .quantity(orderItem.getQuantity())
-            .unitPrice(orderItem.getUnitPrice().amount().intValue())
-            .totalPrice(orderItem.calcDiscountPrice().amount().intValue())
+            .unitPrice(orderItem.getUnitPrice().amount())
+            .totalPrice(orderItem.calcDiscountPrice().amount())
             .build();
     }
     
@@ -175,7 +175,7 @@ public class OrderResponseMapper {
             .customerId(order.getCustomerId().value())
             .customerName(customerName)
             .orderItems(toOwnerOrderItemResponses(order.getOrderItems()))
-            .originalPrice(order.getOriginalPrice().amount().intValue())
+            .originalPrice(order.getOriginalPrice().amount())
             .orderStatus(order.getOrderStatus().name())
             .orderDate(order.getOrderDate())
             .pickupTime(order.getPickupTime())
@@ -209,7 +209,7 @@ public class OrderResponseMapper {
             .productId(orderItem.getProductId().value())
             .productName(productName)
             .quantity(orderItem.getQuantity())
-            .unitPrice(orderItem.getUnitPrice().amount().intValue())
+            .unitPrice(orderItem.getUnitPrice().amount())
             .build();
     }
     
