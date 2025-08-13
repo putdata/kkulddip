@@ -6,7 +6,9 @@ export default function MobileLayoutWithNavbar() {
   return (
     <div className="mx-auto min-h-screen w-full max-w-md bg-white">
       <NavigationBar />
-      <Outlet />
+      <div className="py-14">
+        <Outlet />
+      </div>
       <BottomNavbar />
     </div>
   );
