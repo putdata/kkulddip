@@ -23,16 +23,16 @@ export const useUpdateDdipboxQuantity = () => {
     onSuccess: response => {
       // 딥박스 목록과 상세 정보를 새로고침
       queryClient.invalidateQueries({
-        queryKey: ddipboxQueryKeys.store(response.storeId),
+        queryKey: ddipboxQueryKeys.list(response.storeId),
       });
       queryClient.invalidateQueries({ queryKey: ddipboxQueryKeys.lists() });
       queryClient.invalidateQueries({
         queryKey: ddipboxQueryKeys.detail(response.ddipboxId),
       });
-      toast.success('딥박스 수량이 성공적으로 업데이트되었습니다.');
+      toast.success('재고 수량이 성공적으로 업데이트되었습니다.');
     },
-    onError: (error: Error) => {
-      toast.error(`딥박스 수량 업데이트에 실패했습니다: ${error.message}`);
+    onError: () => {
+      toast.error('재고 업데이트 중 오류가 발생했습니다.');
     },
   });
 };

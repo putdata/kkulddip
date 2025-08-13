@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type {
   UpdateDdipBoxStatusRequest,
   UpdateDdipBoxStatusResponse,
@@ -19,15 +20,24 @@ export const useToggleDdipboxStatus = () => {
   >({
     mutationFn: ({ storeId, ddipboxId, data }) =>
       ddipboxService.toggleDdipboxStatus(storeId, ddipboxId, data),
-    onSuccess: (response, { storeId }) => {
+    onSuccess: (response, { storeId, data }) => {
       // 딥박스 목록과 상세 정보를 새로고침
       queryClient.invalidateQueries({
-        queryKey: ddipboxQueryKeys.store(storeId),
+        queryKey: ddipboxQueryKeys.list(storeId),
       });
       queryClient.invalidateQueries({ queryKey: ddipboxQueryKeys.lists() });
       queryClient.invalidateQueries({
         queryKey: ddipboxQueryKeys.detail(response.ddipboxId),
       });
+
+      toast.success(
+        data.isActive
+          ? '띱박스 판매가 시작되었습니다.'
+          : '띱박스 판매가 중지되었습니다.',
+      );
+    },
+    onError: () => {
+      toast.error('상태 변경 중 오류가 발생했습니다.');
     },
   });
 };

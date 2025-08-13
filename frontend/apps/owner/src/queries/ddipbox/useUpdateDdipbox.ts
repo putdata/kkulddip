@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type {
   UpdateDdipBoxRequest,
   UpdateDdipBoxResponse,
@@ -22,12 +23,16 @@ export const useUpdateDdipbox = () => {
     onSuccess: response => {
       // 딥박스 목록과 상세 정보를 새로고침
       queryClient.invalidateQueries({
-        queryKey: ddipboxQueryKeys.store(response.storeId),
+        queryKey: ddipboxQueryKeys.list(response.storeId),
       });
       queryClient.invalidateQueries({ queryKey: ddipboxQueryKeys.lists() });
       queryClient.invalidateQueries({
         queryKey: ddipboxQueryKeys.detail(response.ddipboxId),
       });
+      toast.success('띱박스 정보가 성공적으로 수정되었습니다.');
+    },
+    onError: () => {
+      toast.error('띱박스 수정 중 오류가 발생했습니다.');
     },
   });
 };
