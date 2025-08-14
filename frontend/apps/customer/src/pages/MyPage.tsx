@@ -20,15 +20,13 @@ const MyPage = () => {
   }
 
   return (
-    <div className="pb-16 pt-12">
-      <div className="flex flex-col items-center justify-between">
-        <div className="w-full max-w-md space-y-1">
-          <ProfileSection profile={profile} />
-          <QuickActions />
-          {MENU_SECTIONS.map(({ title, items }) => (
-            <MenuSection key={title} title={title} items={items} />
-          ))}
-        </div>
+    <div className="flex flex-col items-center justify-between">
+      <div className="w-full max-w-md space-y-1">
+        <ProfileSection profile={profile} />
+        <QuickActions />
+        {MENU_SECTIONS.map(({ title, items }) => (
+          <MenuSection key={title} title={title} items={items} />
+        ))}
       </div>
     </div>
   );

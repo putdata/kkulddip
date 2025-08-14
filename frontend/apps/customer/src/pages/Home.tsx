@@ -7,7 +7,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="sticky pt-5">
+      <div className="pt-5">
         <FilterBar />
       </div>
       <HomeMainContainer stores={stores}></HomeMainContainer>
