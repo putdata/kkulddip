@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,21 +172,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
 
-    /**
-     * ProductId(DdipBoxId)로 상품명 조회
-     */
-    private String getProductName(Long productId) {
-        Optional<DdipBox> ddipBox = ddipBoxRepository.findById(productId);
-        return ddipBox.map(DdipBox::getDdipboxName).orElse("띱박스");
-    }
-
-    /**
-     * ProductId(DdipBoxId)로 단위 원가 조회
-     */
-    private Long getUnitCostPrice(Long productId) {
-        Optional<DdipBox> ddipBox = ddipBoxRepository.findById(productId);
-        return ddipBox.map(DdipBox::getOriginalPrice).orElse(0L);
-    }
 
     /**
      * 날짜 범위 내 각 날짜별 재고 데이터 수집 (가게 전체 총합)
@@ -250,13 +236,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     /**
-     * 인기 띱박스 TOP 5를 계산 (매출액 기준 정렬)
+     * 인기 띱박스 TOP 5를 계산 (매출액 기준 정렬) - 성능 최적화
      * @param orders 분석할 주문 목록
      * @return 매출액 순으로 정렬된 상위 5개 띱박스 목록
      */
     private List<TopSellingDdipBoxDto> calculateTopSellingDdipBoxes(List<Order> orders) {
         Map<Long, TopSellingDdipBoxData> ddipBoxSalesMap = new HashMap<>();
 
+        // 1. 매출 데이터 집계
         for (Order order : orders) {
             for (OrderItem orderItem : order.getOrderItems()) {
                 Long ddipBoxId = orderItem.getProductId().value();
@@ -274,12 +261,26 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
-        return ddipBoxSalesMap.values().stream()
+        // 2. TOP 5 선별
+        List<TopSellingDdipBoxData> top5Data = ddipBoxSalesMap.values().stream()
             .sorted((a, b) -> Long.compare(b.totalSalesAmount, a.totalSalesAmount))
             .limit(5)
+            .collect(Collectors.toList());
+
+        // 3. 상품명 배치 로딩
+        Set<Long> top5Ids = top5Data.stream()
+            .map(data -> data.ddipBoxId)
+            .collect(Collectors.toSet());
+        
+        Map<Long, String> nameMap = ddipBoxRepository.findAllById(top5Ids)
+            .stream()
+            .collect(Collectors.toMap(DdipBox::getDdipboxId, DdipBox::getDdipboxName));
+
+        // 4. DTO 변환
+        return top5Data.stream()
             .map(data -> new TopSellingDdipBoxDto(
                 data.ddipBoxId,
-                getProductName(data.ddipBoxId),
+                nameMap.getOrDefault(data.ddipBoxId, "띱박스"),
                 data.quantitySold,
                 data.totalSalesAmount
             ))
@@ -333,6 +334,17 @@ public class AnalyticsServiceImpl implements AnalyticsService {
      * @return 총 매출, 총 원가, 총 이익, 수익률, 범위별 수익 분석을 포함한 수익성 분석 결과
      */
     private ProfitMarginAnalysisDto calculateProfitMarginAnalysis(List<Order> orders) {
+        // 1. 모든 DdipBox ID 수집
+        Set<Long> ddipBoxIds = orders.stream()
+            .flatMap(order -> order.getOrderItems().stream())
+            .map(item -> item.getProductId().value())
+            .collect(Collectors.toSet());
+
+        // 2. 한 번에 모든 DdipBox 조회
+        Map<Long, DdipBox> ddipBoxMap = ddipBoxRepository.findAllById(ddipBoxIds)
+            .stream()
+            .collect(Collectors.toMap(DdipBox::getDdipboxId, Function.identity()));
+
         long totalRevenue = 0L;
         long totalCost = 0L;
         Map<String, ProfitRangeData> profitRanges = new HashMap<>();
@@ -340,10 +352,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         for (Order order : orders) {
             for (OrderItem orderItem : order.getOrderItems()) {
                 Long ddipBoxId = orderItem.getProductId().value();
-                Optional<DdipBox> ddipBoxOpt = ddipBoxRepository.findById(ddipBoxId);
-                
-                if (ddipBoxOpt.isPresent()) {
-                    DdipBox ddipBox = ddipBoxOpt.get();
+                DdipBox ddipBox = ddipBoxMap.get(ddipBoxId); // 메모리에서 조회
+
+                if (ddipBox != null) {
                     long salesPrice = orderItem.calcDiscountPrice().amount().longValue();
                     long costPrice = ddipBox.getOriginalPrice().longValue() * orderItem.getQuantity();
                     long profit = salesPrice - costPrice;
@@ -360,6 +371,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                             existing.productCount + newData.productCount
                         )
                     );
+                } else {
+                    // DdipBox를 찾을 수 없는 경우 로깅
+                    log.warn("DdipBox not found for ID: {}", ddipBoxId);
                 }
             }
         }
@@ -428,20 +442,39 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     // ================== dto 생성 메서드 ==================
     
     /**
-     * Domain Aggregate 리스트를 DTO 리스트로 변환
+     * Domain Aggregate 리스트를 DTO 리스트로 변환 (배치 로딩으로 성능 최적화)
      */
     private List<AnalyticsOrderDataDto> convertToOrderDataDto(List<Order> orders) {
+        // 1. 모든 ProductId(DdipBoxId) 수집
+        Set<Long> allProductIds = orders.stream()
+            .flatMap(order -> order.getOrderItems().stream())
+            .map(item -> item.getProductId().value())
+            .collect(Collectors.toSet());
+
+        // 2. 한 번에 모든 DdipBox 정보 조회 (배치 로딩)
+        Map<Long, DdipBox> ddipBoxMap = ddipBoxRepository.findAllById(allProductIds)
+            .stream()
+            .collect(Collectors.toMap(DdipBox::getDdipboxId, Function.identity()));
+
+        // 3. 한 번에 모든 DdipBoxItem 정보 조회 (배치 로딩)
+        Map<Long, List<DdipBoxItem>> ddipBoxItemsMap = ddipBoxItemRepository.findByDdipBoxIdIn(allProductIds)
+            .stream()
+            .collect(Collectors.groupingBy(item -> item.getDdipBox().getDdipboxId()));
+
+        // 4. 메모리에서 조회하여 변환
         return orders.stream()
-            .map(this::convertSingleOrderToDto)
+            .map(order -> convertSingleOrderToDto(order, ddipBoxMap, ddipBoxItemsMap))
             .collect(Collectors.toList());
     }
 
     /**
-     * 단일 Domain Aggregate를 DTO로 변환
+     * 단일 Domain Aggregate를 DTO로 변환 (메모리 기반 조회로 성능 최적화)
      */
-    private AnalyticsOrderDataDto convertSingleOrderToDto(Order order) {
+    private AnalyticsOrderDataDto convertSingleOrderToDto(Order order, 
+                                                          Map<Long, DdipBox> ddipBoxMap, 
+                                                          Map<Long, List<DdipBoxItem>> ddipBoxItemsMap) {
         List<AnalyticsOrderItemDataDto> orderItems = order.getOrderItems().stream()
-            .map(this::convertOrderItemToDto)
+            .map(item -> convertOrderItemToDto(item, ddipBoxMap, ddipBoxItemsMap))
             .collect(Collectors.toList());
 
         return new AnalyticsOrderDataDto(
@@ -453,23 +486,27 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     /**
-     * Domain Entity를 DTO로 변환
+     * Domain Entity를 DTO로 변환 (메모리 기반 조회로 성능 최적화)
      */
-    private AnalyticsOrderItemDataDto convertOrderItemToDto(OrderItem orderItem) {
+    private AnalyticsOrderItemDataDto convertOrderItemToDto(OrderItem orderItem, 
+                                                            Map<Long, DdipBox> ddipBoxMap, 
+                                                            Map<Long, List<DdipBoxItem>> ddipBoxItemsMap) {
         // ProductId Value Object에서 실제 값 추출
         Long productId = orderItem.getProductId().value();
 
-        // DdipBoxItem 데이터 조회
-        List<AnalyticsDdipBoxItemDto> ddipBoxItems = getDdipBoxItems(productId);
+        // 메모리에서 DdipBox 정보 조회
+        DdipBox ddipBox = ddipBoxMap.get(productId);
+        String productName = ddipBox != null ? ddipBox.getDdipboxName() : "띱박스";
+        Long unitCostPrice = ddipBox != null ? ddipBox.getOriginalPrice() : 0L;
 
-        // 상품명 조회
-        String productName = getProductName(productId);
+        // 메모리에서 DdipBoxItem 정보 조회
+        List<DdipBoxItem> ddipBoxItems = ddipBoxItemsMap.getOrDefault(productId, Collections.emptyList());
+        List<AnalyticsDdipBoxItemDto> ddipBoxItemDtos = ddipBoxItems.stream()
+            .map(this::convertDdipBoxItemToDto)
+            .collect(Collectors.toList());
 
         // Domain 비즈니스 로직 활용 (할인이 적용된 최종 가격)
         Long totalPrice = orderItem.calcDiscountPrice().amount().longValue();
-
-        // 원가 정보 조회
-        Long unitCostPrice = getUnitCostPrice(productId);
         Long totalCostPrice = unitCostPrice * orderItem.getQuantity();
 
         return new AnalyticsOrderItemDataDto(
@@ -481,20 +518,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             totalPrice,
             unitCostPrice,
             totalCostPrice,
-            ddipBoxItems
+            ddipBoxItemDtos
         );
     }
 
-    /**
-     * 특정 띱박스의 아이템 리스트를 조회하여 DTO로 변환
-     */
-    private List<AnalyticsDdipBoxItemDto> getDdipBoxItems(Long ddipboxId) {
-        List<DdipBoxItem> items = ddipBoxItemRepository.findByDdipBoxId(ddipboxId);
-
-        return items.stream()
-            .map(this::convertDdipBoxItemToDto)
-            .collect(Collectors.toList());
-    }
 
     /**
      * DdipBoxItem 엔티티를 DTO로 변환 (실제 필드 구조 반영)
