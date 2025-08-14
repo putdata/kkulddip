@@ -136,8 +136,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         log.info("Searching for CONFIRMED orders for store: {}", storeId);
 
-        // CONFIRMED 상태의 주문들만 조회
-        List<Order> confirmedOrders = orderRepository.findByStoreIdAndOrderStatus(storeIdVo, OrderStatus.CONFIRMED);
+        // CONFIRMED, PICKED_UP 상태의 주문들만 조회
+        List<Order> confirmedOrders = orderRepository.findByStoreIdAfterPaymentPending(storeIdVo);
 
         log.info("Found {} CONFIRMED orders for store {}", confirmedOrders.size(), storeId);
 
@@ -207,7 +207,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     private List<Order> getDailyConfirmedOrders(StoreId storeId, LocalDate targetDate) {
-        List<Order> confirmedOrders = orderRepository.findByStoreIdAndOrderStatus(storeId, OrderStatus.CONFIRMED);
+        List<Order> confirmedOrders = orderRepository.findByStoreIdAfterPaymentPending(storeId);
 
         return confirmedOrders.stream()
             .filter(order -> order.getOrderDate().toLocalDate().equals(targetDate))
