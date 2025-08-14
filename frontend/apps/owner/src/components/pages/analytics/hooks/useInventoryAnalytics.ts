@@ -60,7 +60,9 @@ export const useInventoryAnalytics = (
    * 평균 재고율 계산값
    */
   const avgInventoryRatio = useMemo(() => {
-    if (predictionChartData.length === 0) return 0;
+    if (predictionChartData.length === 0) {
+      return 0;
+    }
     return predictionChartData.reduce((sum, item) => sum + item.inventoryRatio, 0) / predictionChartData.length;
   }, [predictionChartData]);
 
@@ -68,7 +70,9 @@ export const useInventoryAnalytics = (
    * 재고 현황 차트용 데이터 (판매완료, 남은재고)
    */
   const statusChartData = useMemo(() => {
-    if (!inventoryStatus) return [];
+    if (!inventoryStatus) {
+      return [];
+    }
     
     const soldQuantity = inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
     
@@ -90,7 +94,9 @@ export const useInventoryAnalytics = (
    * 재고 상태 평가 정보
    */
   const inventoryStatusInfo = useMemo(() => {
-    if (!inventoryStatus) return null;
+    if (!inventoryStatus) {
+      return null;
+    }
     
     const percentage = inventoryStatus.remainingPercentage;
     if (percentage >= 70) {
@@ -151,7 +157,9 @@ export const useInventoryAnalytics = (
    * 위험도 높은 순서로 정렬된 재고 과다 상품 목록
    */
   const sortedHighInventoryItems = useMemo(() => {
-    if (!highInventoryItems) return [];
+    if (!highInventoryItems) {
+      return [];
+    }
     
     return [...highInventoryItems].sort((a, b) => {
       const ratioA = a.remainingCount / a.dailyCount;

@@ -57,7 +57,7 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>할인율별 판매 현황</CardTitle>
         <CardDescription>
@@ -106,7 +106,7 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
             </div>
           </>
         ) : (
-          <div className="text-muted-foreground flex h-80 items-center justify-center">
+          <div className="text-muted-foreground flex min-h-80 flex-1 items-center justify-center">
             할인별 판매 데이터가 없습니다
           </div>
         )}

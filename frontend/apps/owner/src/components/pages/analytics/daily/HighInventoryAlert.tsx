@@ -25,7 +25,7 @@ const HighInventoryAlert = ({
   } = useInventoryAnalytics(undefined, undefined, highInventoryItems);
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5" />
@@ -35,7 +35,7 @@ const HighInventoryAlert = ({
           재고가 많이 남은 상품들에 대한 할인 적용을 고려해보세요
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-1 flex-col">
         {highInventoryItems.length > 0 ? (
           <div className="space-y-4">
             {/* 전체 알림 상태 */}
@@ -122,7 +122,7 @@ const HighInventoryAlert = ({
             )}
           </div>
         ) : (
-          <div className="text-muted-foreground flex h-32 flex-col items-center justify-center">
+          <div className="text-muted-foreground flex h-full min-h-32 flex-col items-center justify-center">
             <Package className="mb-2 h-8 w-8" />
             <p className="text-sm">재고 과다 상품이 없습니다</p>
             <p className="text-xs">재고 관리가 잘 되고 있습니다!</p>

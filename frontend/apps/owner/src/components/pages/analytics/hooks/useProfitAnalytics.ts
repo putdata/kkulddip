@@ -14,12 +14,12 @@ export const useProfitAnalytics = (profitAnalysis?: ProfitMarginAnalysis) => {
   /*
    * 차트 색상 배열 (높은 수익 -> 손실 순서)
    */
-  const COLORS = [
+  const COLORS = useMemo(() => [
     '#10b981', // emerald-500 - 높은 수익
     '#3b82f6', // blue-500 - 보통 수익
     '#f59e0b', // amber-500 - 낮은 수익
     '#ef4444', // red-500 - 손실
-  ];
+  ], []);
 
   /*
    * 수익률 구간별 도넛 차트용 데이터

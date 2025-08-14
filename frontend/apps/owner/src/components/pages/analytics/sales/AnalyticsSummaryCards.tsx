@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { DollarSign, ShoppingCart, Weight } from 'lucide-react';
 import { useDailyAnalytics } from '../hooks/useDailyAnalytics';
 
@@ -14,10 +13,9 @@ const AnalyticsSummaryCards = ({
   totalOrders,
   totalWeight,
 }: AnalyticsSummaryCardsProps) => {
-  const { averageOrderValue, getRevenueStatus } = useDailyAnalytics(
+  const { averageOrderValue } = useDailyAnalytics(
     totalRevenue,
     totalOrders,
-    totalWeight || undefined,
   );
 
   return (
@@ -65,30 +63,12 @@ const AnalyticsSummaryCards = ({
           <Weight className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>
-          {totalWeight !== null ? (
-            <>
-              <div className="text-2xl font-bold">
-                {totalWeight}kg
-              </div>
-              <p className="text-muted-foreground text-xs">
-                판매된 총 상품 중량
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-2">
-                <Badge 
-                  variant={getRevenueStatus()?.color as 'default' | 'secondary' | 'outline' || 'secondary'} 
-                  className="text-xs"
-                >
-                  매출 효율성: {getRevenueStatus()?.text || '보통'}
-                </Badge>
-              </div>
-              <p className="text-muted-foreground mt-2 text-xs">
-                {getRevenueStatus()?.description || '안정적인 매출 상태입니다'}
-              </p>
-            </>
-          )}
+          <div className="text-2xl font-bold">
+            {totalWeight !== null ? `${totalWeight}kg` : '0kg'}
+          </div>
+          <p className="text-muted-foreground text-xs">
+            판매된 총 상품 중량
+          </p>
         </CardContent>
       </Card>
     </div>

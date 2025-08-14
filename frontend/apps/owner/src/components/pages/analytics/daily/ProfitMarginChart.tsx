@@ -23,11 +23,8 @@ interface ProfitMarginChartProps {
 }
 
 const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
-  const {
-    chartData,
-    profitStatus,
-    calculateSalesPercentage,
-  } = useProfitAnalytics(profitAnalysis);
+  const { chartData, profitStatus, calculateSalesPercentage } =
+    useProfitAnalytics(profitAnalysis);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -67,7 +64,7 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
@@ -149,7 +146,7 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="text-muted-foreground flex h-32 items-center justify-center">
+            <div className="text-muted-foreground flex min-h-64 flex-1 items-center justify-center">
               수익률 분석 데이터가 없습니다
             </div>
           )}

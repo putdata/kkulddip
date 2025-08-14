@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import AnalyticsSummaryCards from '../common/AnalyticsSummaryCards';
+import AnalyticsSummaryCards from './AnalyticsSummaryCards';
 import TopSellingChart from './TopSellingChart';
 import DiscountRangeChart from './DiscountRangeChart';
 import SalesPredictionChart from './SalesPredictionChart';

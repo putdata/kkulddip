@@ -76,7 +76,7 @@ const InventoryPredictionChart = ({
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Package className="h-5 w-5" />
@@ -169,7 +169,7 @@ const InventoryPredictionChart = ({
             </div>
           </>
         ) : (
-          <div className="text-muted-foreground flex h-80 items-center justify-center">
+          <div className="text-muted-foreground flex min-h-80 flex-1 items-center justify-center">
             {predictions === null
               ? '재고 예측 서비스를 사용할 수 없습니다'
               : '재고 예측 데이터가 없습니다'}

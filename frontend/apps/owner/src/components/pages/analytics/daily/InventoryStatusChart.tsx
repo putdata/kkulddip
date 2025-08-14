@@ -18,12 +18,11 @@ interface InventoryStatusChartProps {
 const InventoryStatusChart = ({
   inventoryStatus,
 }: InventoryStatusChartProps) => {
-  const {
-    statusChartData: chartData,
-    inventoryStatusInfo: statusInfo,
-  } = useInventoryAnalytics(undefined, inventoryStatus);
+  const { statusChartData: chartData, inventoryStatusInfo: statusInfo } =
+    useInventoryAnalytics(undefined, inventoryStatus);
 
-  const soldQuantity = inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
+  const soldQuantity =
+    inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -55,7 +54,7 @@ const InventoryStatusChart = ({
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Package className="h-5 w-5" />
@@ -151,7 +150,7 @@ const InventoryStatusChart = ({
           {/* 전체 재고 */}
           <div className="border-t pt-2 text-center">
             <div className="text-muted-foreground text-sm">
-              일일 총 재고:{' '}
+              일일 총 재고:
               <span className="font-medium">
                 {inventoryStatus.totalDailyCount}개
               </span>

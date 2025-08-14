@@ -32,10 +32,8 @@ const COLORS = [
 ];
 
 const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
-  const {
-    itemsChartData: itemsData,
-    productsChartData: productsData,
-  } = useSalesAnalytics(undefined, items, products);
+  const { itemsChartData: itemsData, productsChartData: productsData } =
+    useSalesAnalytics(undefined, items, products);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -72,17 +70,17 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
           가장 많이 팔린 상품들의 판매량과 비중을 확인해보세요
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="items" className="w-full">
+      <CardContent className="flex flex-col">
+        <Tabs defaultValue="items" className="flex w-full flex-1 flex-col">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="items">상품별</TabsTrigger>
             <TabsTrigger value="products">제품별</TabsTrigger>
           </TabsList>
 
           {/* 상품별 차트 */}
-          <TabsContent value="items" className="mt-6">
+          <TabsContent value="items" className="mt-6 flex-1">
             {itemsData.length > 0 ? (
-              <div className="h-80">
+              <div className="min-h-80 flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -107,16 +105,16 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="text-muted-foreground flex h-80 items-center justify-center">
+              <div className="text-muted-foreground flex min-h-80 flex-1 items-center justify-center">
                 상품별 판매 데이터가 없습니다
               </div>
             )}
           </TabsContent>
 
           {/* 제품별 차트 */}
-          <TabsContent value="products" className="mt-6">
+          <TabsContent value="products" className="mt-6 flex-1">
             {productsData.length > 0 ? (
-              <div className="h-80">
+              <div className="min-h-80 flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -141,7 +139,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="text-muted-foreground flex h-80 items-center justify-center">
+              <div className="text-muted-foreground flex min-h-80 flex-1 items-center justify-center">
                 제품별 판매 데이터가 없습니다
               </div>
             )}

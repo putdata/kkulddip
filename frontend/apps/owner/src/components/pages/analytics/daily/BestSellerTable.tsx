@@ -37,7 +37,7 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="h-5 w-5" />
@@ -131,7 +131,7 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
             </Table>
           </div>
         ) : (
-          <div className="text-muted-foreground flex h-32 items-center justify-center">
+          <div className="text-muted-foreground flex h-full items-center justify-center">
             베스트셀러 데이터가 없습니다
           </div>
         )}

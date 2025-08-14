@@ -22,14 +22,13 @@ export const useSalesAnalytics = (
   topProducts?: TopSellingProduct[],
 ) => {
   /*
-   * 매출 예측 차트용 데이터 (날짜, 예측값, 실제값, 신뢰도)
+   * 매출 예측 차트용 데이터 (날짜, 예측값, 신뢰도)
    */
   const predictionChartData = useMemo(
     () =>
       predictions?.map(prediction => ({
         date: prediction.date,
-        predicted: prediction.predictedRevenue,
-        actual: prediction.actualRevenue,
+        revenue: prediction.predictedRevenue,
         confidence: prediction.confidence * 100,
       })) || [],
     [predictions],
@@ -53,7 +52,9 @@ export const useSalesAnalytics = (
    * 평균 예측 매출 계산값
    */
   const avgPredictedRevenue = useMemo(() => {
-    if (!predictions || predictions.length === 0) return 0;
+    if (!predictions || predictions.length === 0) {
+      return 0;
+    }
     return predictions.reduce((sum, p) => sum + p.predictedRevenue, 0) / predictions.length;
   }, [predictions]);
 

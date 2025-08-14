@@ -68,7 +68,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
@@ -146,7 +146,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
             </div>
           </>
         ) : (
-          <div className="text-muted-foreground flex h-80 items-center justify-center">
+          <div className="text-muted-foreground flex min-h-80 flex-1 items-center justify-center">
             매출 예측 데이터가 없습니다
           </div>
         )}
