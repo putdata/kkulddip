@@ -175,7 +175,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     /**
      * 날짜 범위 내 각 날짜별 재고 데이터 수집 (가게 전체 총합)
-     * 성능 최적화: 한 번만 DB 조회하여 모든 날짜에 동일한 값 적용
+     * 추후 수정 필요
      */
     private List<DailyInventoryDataDto> collectDailyInventoryData(Long storeId, LocalDate startDate, LocalDate endDate) {
         // 한 번만 DB 조회
@@ -191,7 +191,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         List<DailyInventoryDataDto> dailyInventoryList = new ArrayList<>();
 
-        // 각 날짜에 동일한 재고 총합 적용 (현재는 일별 히스토리가 없으므로)
+        // 각 날짜에 동일한 재고 총합 적용 (현재는 일별로 판매할 양, 남은 양을 저장하는 테이블이 없음)
         LocalDate currentDate = startDate;
         while (!currentDate.isAfter(endDate)) {
             dailyInventoryList.add(DailyInventoryDataDto.builder()
