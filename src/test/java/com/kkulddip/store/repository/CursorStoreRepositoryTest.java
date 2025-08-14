@@ -106,6 +106,69 @@ class CursorStoreRepositoryTest {
         cursorStoreRepository.save(store3);
         cursorStoreRepository.save(store4);
         cursorStoreRepository.save(store5);
+
+        // 각 활성 가게에 ddipbox 생성 (ddipbox 필터링 조건을 만족시키기 위해)
+        createTestDdipBoxes();
+    }
+
+    private void createTestDdipBoxes() {
+        // Store1용 ddipbox
+        DdipBox ddipBox1 = DdipBox.builder()
+            .store(store1)
+            .ddipboxName("가게A 띱박스")
+            .category("한식")
+            .originalPrice(10000L)
+            .salePrice(8000L)
+            .dailyQuantity(10L)
+            .remainingQuantity(10L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+
+        // Store2용 ddipbox
+        DdipBox ddipBox2 = DdipBox.builder()
+            .store(store2)
+            .ddipboxName("가게B 띱박스")
+            .category("샐러드")
+            .originalPrice(8000L)
+            .salePrice(6000L)
+            .dailyQuantity(15L)
+            .remainingQuantity(15L)
+            .maxPerCustomer(2L)
+            .isActive(true)
+            .build();
+
+        // Store3용 ddipbox
+        DdipBox ddipBox3 = DdipBox.builder()
+            .store(store3)
+            .ddipboxName("가게C 띱박스")
+            .category("한식")
+            .originalPrice(12000L)
+            .salePrice(9000L)
+            .dailyQuantity(8L)
+            .remainingQuantity(8L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+
+        // Store4용 ddipbox
+        DdipBox ddipBox4 = DdipBox.builder()
+            .store(store4)
+            .ddipboxName("가게D 띱박스")
+            .category("이탈리안")
+            .originalPrice(15000L)
+            .salePrice(12000L)
+            .dailyQuantity(5L)
+            .remainingQuantity(5L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+
+        ddipBoxRepository.save(ddipBox1);
+        ddipBoxRepository.save(ddipBox2);
+        ddipBoxRepository.save(ddipBox3);
+        ddipBoxRepository.save(ddipBox4);
+        // store5는 비활성화되어 있고, ddipbox도 생성하지 않음
     }
 
     @Test
@@ -400,7 +463,7 @@ class CursorStoreRepositoryTest {
         long count = cursorStoreRepository.countActiveStores();
 
         // then
-        assertThat(count).isEqualTo(4L); // store5는 비활성화되어 제외
+        assertThat(count).isEqualTo(4L); // store5는 비활성화되어 제외되고, 나머지 4개 store는 ddipbox가 있어서 포함
     }
 
     @Test
@@ -410,7 +473,7 @@ class CursorStoreRepositoryTest {
         long count = cursorStoreRepository.countBySearchKeyword("한식");
 
         // then
-        assertThat(count).isEqualTo(2L); // store1, store3만 "한식" 키워드 포함
+        assertThat(count).isEqualTo(2L); // store1, store3만 "한식" 키워드 포함하고 ddipbox가 있음
     }
 
     @Test
@@ -435,7 +498,7 @@ class CursorStoreRepositoryTest {
         long count = cursorStoreRepository.countByCategory("양식");
 
         // then
-        assertThat(count).isEqualTo(1L);
+        assertThat(count).isEqualTo(1L); // store1만 "양식" 카테고리 ddipbox가 있음
     }
 
     @Test
@@ -461,6 +524,34 @@ class CursorStoreRepositoryTest {
         cursorStoreRepository.save(sameRatingStore1);
         cursorStoreRepository.save(sameRatingStore2);
 
+        // 새로 생성한 가게들에도 ddipbox 추가
+        DdipBox ddipBox1 = DdipBox.builder()
+            .store(sameRatingStore1)
+            .ddipboxName("평점가게1 띱박스")
+            .category("기타")
+            .originalPrice(5000L)
+            .salePrice(4000L)
+            .dailyQuantity(5L)
+            .remainingQuantity(5L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+
+        DdipBox ddipBox2 = DdipBox.builder()
+            .store(sameRatingStore2)
+            .ddipboxName("평점가게2 띱박스")
+            .category("기타")
+            .originalPrice(6000L)
+            .salePrice(5000L)
+            .dailyQuantity(7L)
+            .remainingQuantity(7L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+
+        ddipBoxRepository.save(ddipBox1);
+        ddipBoxRepository.save(ddipBox2);
+
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
@@ -484,6 +575,52 @@ class CursorStoreRepositoryTest {
     }
 
     @Test
+    @DisplayName("ddipbox가 없는 가게는 모든 조회에서 제외")
+    void storesWithoutDdipBoxExcluded() {
+        // given - ddipbox가 없는 가게 생성
+        Store storeWithoutDdipBox = Store.builder()
+            .ownerId(401L)
+            .storeName("ddipbox 없는 가게")
+            .storeAddress("서울시 노원구")
+            .isActive(true)
+            .ratingAverage(4.0)
+            .latitude(37.5665)
+            .longitude(126.9780)
+            .build();
+
+        cursorStoreRepository.save(storeWithoutDdipBox);
+        // ddipbox는 생성하지 않음
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when - ID 기준 조회
+        List<Store> idResult = cursorStoreRepository.findStoresWithCursorById(null, pageable);
+        
+        // when - 생성일시 기준 조회
+        List<Store> dateResult = cursorStoreRepository.findStoresWithCursorByCreatedAtDesc(null, null, pageable);
+        
+        // when - 평점 기준 조회
+        List<Store> ratingResult = cursorStoreRepository.findStoresWithCursorByRatingDesc(null, null, pageable);
+        
+        // when - 검색 기준 조회
+        List<Store> searchResult = cursorStoreRepository.findStoresWithCursorBySearch("가게", null, pageable);
+
+        // then - ddipbox가 없는 가게는 모든 결과에서 제외
+        assertThat(idResult.stream().noneMatch(s -> s.getStoreId().equals(storeWithoutDdipBox.getStoreId()))).isTrue();
+        assertThat(dateResult.stream().noneMatch(s -> s.getStoreId().equals(storeWithoutDdipBox.getStoreId()))).isTrue();
+        assertThat(ratingResult.stream().noneMatch(s -> s.getStoreId().equals(storeWithoutDdipBox.getStoreId()))).isTrue();
+        assertThat(searchResult.stream().noneMatch(s -> s.getStoreId().equals(storeWithoutDdipBox.getStoreId()))).isTrue();
+        
+        // ddipbox가 있는 가게들만 결과에 포함된다
+        assertThat(idResult.stream().allMatch(s -> 
+            s.getStoreId().equals(store1.getStoreId()) ||
+            s.getStoreId().equals(store2.getStoreId()) ||
+            s.getStoreId().equals(store3.getStoreId()) ||
+            s.getStoreId().equals(store4.getStoreId())
+        )).isTrue();
+    }
+
+    @Test
     @DisplayName("위치 정보가 없는 가게는 거리 검색에서 제외")
     void storesWithoutLocationExcludedFromDistanceSearch() {
         // given - 위치 정보가 없는 가게 생성
@@ -498,6 +635,21 @@ class CursorStoreRepositoryTest {
             .build();
 
         cursorStoreRepository.save(storeWithoutLocation);
+
+        // 위치 없는 가게에도 ddipbox 추가 (ddipbox 필터링 조건 만족)
+        DdipBox ddipBox = DdipBox.builder()
+            .store(storeWithoutLocation)
+            .ddipboxName("위치없는가게 띱박스")
+            .category("기타")
+            .originalPrice(7000L)
+            .salePrice(5500L)
+            .dailyQuantity(3L)
+            .remainingQuantity(3L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+
+        ddipBoxRepository.save(ddipBox);
 
         Double userLat = 37.5665;
         Double userLng = 126.9780;
