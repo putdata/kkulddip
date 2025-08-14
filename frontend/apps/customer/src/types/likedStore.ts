@@ -65,3 +65,22 @@ export interface DeleteLikeResponse {
   success: boolean;
   message?: string;
 }
+
+// 좋아요 요청
+export interface AddLikeParams {
+  customerId: number;
+  storeId: number;
+}
+
+// 좋아요 응답
+export interface AddFavoriteResponse {
+  success: boolean;
+  status: number;
+  body: {
+    favoriteId: number;
+    customerId: number;
+    storeId: number;
+    storeName: string;
+    addedAt: string;
+  };
+}

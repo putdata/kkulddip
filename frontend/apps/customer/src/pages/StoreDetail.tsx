@@ -8,10 +8,15 @@ import { useStoreDdipBoxes } from '@/hooks/useStoreDdipBoxes';
 import { useStoreReviews } from '@/hooks/useStoreReviews';
 
 import { useParams } from 'react-router-dom';
+import { useCustomerProfile } from '@/hooks/useProfile';
 
 const StoreDetail = () => {
   const params = useParams();
   const storeId = params.storeId!;
+
+  // customerId 받기
+  const { data: profile } = useCustomerProfile();
+  const customerId = profile?.customerId;
 
   const {
     data: store,
@@ -41,7 +46,11 @@ const StoreDetail = () => {
 
   return (
     <div className="bg-gray-100 font-[segoe_ui]">
-      <StoreDetailHeader store={store} ddipboxes={ddipBoxes} />
+      <StoreDetailHeader
+        store={store}
+        ddipboxes={ddipBoxes}
+        customerId={customerId}
+      />
 
       <Tabs className="w-full gap-0" defaultValue="details">
         <TabsList className="bg-background w-full justify-start rounded-none border-b p-0">
