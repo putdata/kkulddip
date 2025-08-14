@@ -37,6 +37,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final DdipBoxItemRepository ddipBoxItemRepository;
     private final PythonAnalyticsClient pythonAnalyticsClient;
 
+    // ================== 기본 메서드 =================
+    
     /**
      * 매출 분석을 수행합니다.
      * Domain Repository를 통해 비즈니스 로직 수행
@@ -122,6 +124,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             .build();
     }
 
+    // ================== 유틸리티 메서드 ==================
+    
     /**
      * Domain Repository를 통해 성공한 주문들을 조회
      * 기존 Repository 메서드를 활용하여 비즈니스 로직 구현
@@ -140,7 +144,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         List<Order> allOrders = orderRepository.findByStoreId(storeIdVo);
         log.info("Total orders for store {}: {}", storeId, allOrders.size());
 
-        // 각 상태별 주문 수 확인
+        // 각 상태별 주문 수 확인 (추후 수정 필요)
         allOrders.stream()
             .collect(Collectors.groupingBy(Order::getOrderStatus, Collectors.counting()))
             .forEach((status, count) -> {
@@ -166,6 +170,263 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return !orderDate.isBefore(startDate) && !orderDate.isAfter(endDate);
     }
 
+
+    /**
+     * ProductId(DdipBoxId)로 상품명 조회
+     */
+    private String getProductName(Long productId) {
+        Optional<DdipBox> ddipBox = ddipBoxRepository.findById(productId);
+        return ddipBox.map(DdipBox::getDdipboxName).orElse("띱박스");
+    }
+
+    /**
+     * ProductId(DdipBoxId)로 단위 원가 조회
+     */
+    private Long getUnitCostPrice(Long productId) {
+        Optional<DdipBox> ddipBox = ddipBoxRepository.findById(productId);
+        return ddipBox.map(DdipBox::getOriginalPrice).orElse(0L);
+    }
+
+    /**
+     * 날짜 범위 내 각 날짜별 재고 데이터 수집 (가게 전체 총합)
+     * 성능 최적화: 한 번만 DB 조회하여 모든 날짜에 동일한 값 적용
+     */
+    private List<DailyInventoryDataDto> collectDailyInventoryData(Long storeId, LocalDate startDate, LocalDate endDate) {
+        // 한 번만 DB 조회
+        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
+
+        long totalDailyQuantity = ddipBoxes.stream()
+            .mapToLong(DdipBox::getDailyQuantity)
+            .sum();
+
+        long totalRemainingQuantity = ddipBoxes.stream()
+            .mapToLong(DdipBox::getRemainingQuantity)
+            .sum();
+
+        List<DailyInventoryDataDto> dailyInventoryList = new ArrayList<>();
+
+        // 각 날짜에 동일한 재고 총합 적용 (현재는 일별 히스토리가 없으므로)
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            dailyInventoryList.add(DailyInventoryDataDto.builder()
+                .date(currentDate)
+                .totalDailyQuantity(totalDailyQuantity)
+                .totalRemainingQuantity(totalRemainingQuantity)
+                .build());
+            currentDate = currentDate.plusDays(1);
+        }
+
+        log.info("Collected inventory data for {} days (optimized single query)", dailyInventoryList.size());
+        return dailyInventoryList;
+    }
+
+    private List<Order> getDailyConfirmedOrders(StoreId storeId, LocalDate targetDate) {
+        List<Order> confirmedOrders = orderRepository.findByStoreIdAndOrderStatus(storeId, OrderStatus.CONFIRMED);
+
+        return confirmedOrders.stream()
+            .filter(order -> order.getOrderDate().toLocalDate().equals(targetDate))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 일일 매출 개요를 계산
+     * @param orders 당일 주문 목록
+     * @return 총 매출, 총 주문 수, 평균 주문 금액을 포함한 매출 개요
+     */
+    private DailySalesOverviewDto calculateDailySalesOverview(List<Order> orders) {
+        if (orders.isEmpty()) {
+            log.debug("No orders found for daily sales overview calculation");
+            return new DailySalesOverviewDto(0L, 0, 0L);
+        }
+
+        long totalSales = orders.stream()
+            .mapToLong(order -> order.getFinalPrice().amount().longValue())
+            .sum();
+
+        int totalOrderCount = orders.size();
+        long averageOrderAmount = totalSales / totalOrderCount;
+
+        return new DailySalesOverviewDto(totalSales, totalOrderCount, averageOrderAmount);
+    }
+
+    /**
+     * 인기 띱박스 TOP 5를 계산 (매출액 기준 정렬)
+     * @param orders 분석할 주문 목록
+     * @return 매출액 순으로 정렬된 상위 5개 띱박스 목록
+     */
+    private List<TopSellingDdipBoxDto> calculateTopSellingDdipBoxes(List<Order> orders) {
+        Map<Long, TopSellingDdipBoxData> ddipBoxSalesMap = new HashMap<>();
+
+        for (Order order : orders) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                Long ddipBoxId = orderItem.getProductId().value();
+                int quantity = orderItem.getQuantity();
+                long salesAmount = orderItem.calcDiscountPrice().amount().longValue();
+
+                ddipBoxSalesMap.merge(ddipBoxId, 
+                    new TopSellingDdipBoxData(ddipBoxId, quantity, salesAmount),
+                    (existing, newData) -> new TopSellingDdipBoxData(
+                        ddipBoxId,
+                        existing.quantitySold + newData.quantitySold,
+                        existing.totalSalesAmount + newData.totalSalesAmount
+                    )
+                );
+            }
+        }
+
+        return ddipBoxSalesMap.values().stream()
+            .sorted((a, b) -> Long.compare(b.totalSalesAmount, a.totalSalesAmount))
+            .limit(5)
+            .map(data -> new TopSellingDdipBoxDto(
+                data.ddipBoxId,
+                getProductName(data.ddipBoxId),
+                data.quantitySold,
+                data.totalSalesAmount
+            ))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 매장의 전체 재고 현황을 계산
+     * @param storeId 매장 ID
+     * @return 일일 총 수량, 남은 총 수량, 재고 비율을 포함한 재고 현황
+     */
+    private DailyInventoryStatusDto calculateInventoryStatus(Long storeId) {
+        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
+
+        long totalDailyCount = ddipBoxes.stream()
+            .mapToLong(DdipBox::getDailyQuantity)
+            .sum();
+
+        long totalRemainingCount = ddipBoxes.stream()
+            .mapToLong(DdipBox::getRemainingQuantity)
+            .sum();
+
+        double remainingPercentage = totalDailyCount > 0 
+            ? (double) totalRemainingCount / totalDailyCount * 100 
+            : 0.0;
+
+        return new DailyInventoryStatusDto(totalDailyCount, totalRemainingCount, remainingPercentage);
+    }
+
+    /**
+     * 재고가 많이 남은 띱박스 TOP 5를 계산
+     * @param storeId 매장 ID
+     * @return 남은 재고량 순으로 정렬된 상위 5개 띱박스 목록
+     */
+    private List<HighInventoryDdipBoxDto> calculateHighInventoryDdipBoxes(Long storeId) {
+        return ddipBoxRepository.findByStore_StoreId(storeId).stream()
+            .sorted((a, b) -> Long.compare(b.getRemainingQuantity(), a.getRemainingQuantity()))
+            .limit(5)
+            .map(ddipBox -> new HighInventoryDdipBoxDto(
+                ddipBox.getDdipboxId(),
+                ddipBox.getDdipboxName(),
+                ddipBox.getRemainingQuantity(),
+                ddipBox.getDailyQuantity()
+            ))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 수익성 분석을 수행하여 총 수익률과 범위별 수익 분석 결과를 계산
+     * @param orders 분석할 주문 목록
+     * @return 총 매출, 총 원가, 총 이익, 수익률, 범위별 수익 분석을 포함한 수익성 분석 결과
+     */
+    private ProfitMarginAnalysisDto calculateProfitMarginAnalysis(List<Order> orders) {
+        long totalRevenue = 0L;
+        long totalCost = 0L;
+        Map<String, ProfitRangeData> profitRanges = new HashMap<>();
+
+        for (Order order : orders) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                Long ddipBoxId = orderItem.getProductId().value();
+                Optional<DdipBox> ddipBoxOpt = ddipBoxRepository.findById(ddipBoxId);
+                
+                if (ddipBoxOpt.isPresent()) {
+                    DdipBox ddipBox = ddipBoxOpt.get();
+                    long salesPrice = orderItem.calcDiscountPrice().amount().longValue();
+                    long costPrice = ddipBox.getOriginalPrice().longValue() * orderItem.getQuantity();
+                    long profit = salesPrice - costPrice;
+                    double profitMargin = salesPrice > 0 ? (double) profit / salesPrice * 100 : 0;
+
+                    totalRevenue += salesPrice;
+                    totalCost += costPrice;
+
+                    String marginRange = categorizeMargin(profitMargin);
+                    profitRanges.merge(marginRange,
+                        new ProfitRangeData(salesPrice, 1),
+                        (existing, newData) -> new ProfitRangeData(
+                            existing.salesAmount + newData.salesAmount,
+                            existing.productCount + newData.productCount
+                        )
+                    );
+                }
+            }
+        }
+
+        long totalProfit = totalRevenue - totalCost;
+        double profitMarginPercentage = totalRevenue > 0 ? (double) totalProfit / totalRevenue * 100 : 0;
+
+        List<ProfitMarginByRangeDto> profitByRanges = profitRanges.entrySet().stream()
+            .map(entry -> new ProfitMarginByRangeDto(
+                entry.getKey(),
+                entry.getValue().salesAmount,
+                entry.getValue().productCount
+            ))
+            .collect(Collectors.toList());
+
+        return new ProfitMarginAnalysisDto(
+            totalRevenue,
+            totalCost,
+            totalProfit,
+            profitMarginPercentage,
+            profitByRanges
+        );
+    }
+
+    /**
+     * 수익률을 범위별로 분류
+     * @param profitMargin 수익률 (백분율)
+     * @return 수익률 범위 문자열 (예: "0-10%", "10-20%", "50%+")
+     */
+    private String categorizeMargin(double profitMargin) {
+        if (profitMargin < 10) return "0-10%";
+        if (profitMargin < 20) return "10-20%";
+        if (profitMargin < 30) return "20-30%";
+        if (profitMargin < 50) return "30-50%";
+        return "50%+";
+    }
+
+    /**
+     * 인기 띱박스 계산을 위한 임시 데이터 클래스
+     */
+    private static class TopSellingDdipBoxData {
+        final Long ddipBoxId;
+        final int quantitySold;
+        final long totalSalesAmount;
+
+        TopSellingDdipBoxData(Long ddipBoxId, int quantitySold, long totalSalesAmount) {
+            this.ddipBoxId = ddipBoxId;
+            this.quantitySold = quantitySold;
+            this.totalSalesAmount = totalSalesAmount;
+        }
+    }
+
+    /**
+     * 수익률 범위별 데이터 집계를 위한 임시 데이터 클래스
+     */
+    private static class ProfitRangeData {
+        final long salesAmount;
+        final int productCount;
+
+        ProfitRangeData(long salesAmount, int productCount) {
+            this.salesAmount = salesAmount;
+            this.productCount = productCount;
+        }
+    }
+
+    // ================== dto 생성 메서드 ==================
+    
     /**
      * Domain Aggregate 리스트를 DTO 리스트로 변환
      */
@@ -248,222 +509,5 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         );
     }
 
-    /**
-     * ProductId(DdipBoxId)로 상품명 조회
-     */
-    private String getProductName(Long productId) {
-        Optional<DdipBox> ddipBox = ddipBoxRepository.findById(productId);
-        return ddipBox.map(DdipBox::getDdipboxName).orElse("띱박스");
-    }
-
-    /**
-     * ProductId(DdipBoxId)로 단위 원가 조회
-     */
-    private Long getUnitCostPrice(Long productId) {
-        Optional<DdipBox> ddipBox = ddipBoxRepository.findById(productId);
-        return ddipBox.map(DdipBox::getOriginalPrice).orElse(0L);
-    }
-
-    /**
-     * 날짜 범위 내 각 날짜별 재고 데이터 수집 (가게 전체 총합)
-     * 성능 최적화: 한 번만 DB 조회하여 모든 날짜에 동일한 값 적용
-     */
-    private List<DailyInventoryDataDto> collectDailyInventoryData(Long storeId, LocalDate startDate, LocalDate endDate) {
-        // 한 번만 DB 조회
-        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
-
-        long totalDailyQuantity = ddipBoxes.stream()
-            .mapToLong(DdipBox::getDailyQuantity)
-            .sum();
-
-        long totalRemainingQuantity = ddipBoxes.stream()
-            .mapToLong(DdipBox::getRemainingQuantity)
-            .sum();
-
-        List<DailyInventoryDataDto> dailyInventoryList = new ArrayList<>();
-
-        // 각 날짜에 동일한 재고 총합 적용 (현재는 일별 히스토리가 없으므로)
-        LocalDate currentDate = startDate;
-        while (!currentDate.isAfter(endDate)) {
-            dailyInventoryList.add(DailyInventoryDataDto.builder()
-                .date(currentDate)
-                .totalDailyQuantity(totalDailyQuantity)
-                .totalRemainingQuantity(totalRemainingQuantity)
-                .build());
-            currentDate = currentDate.plusDays(1);
-        }
-
-        log.info("Collected inventory data for {} days (optimized single query)", dailyInventoryList.size());
-        return dailyInventoryList;
-    }
-
-    private List<Order> getDailyConfirmedOrders(StoreId storeId, LocalDate targetDate) {
-        List<Order> confirmedOrders = orderRepository.findByStoreIdAndOrderStatus(storeId, OrderStatus.CONFIRMED);
-
-        return confirmedOrders.stream()
-            .filter(order -> order.getOrderDate().toLocalDate().equals(targetDate))
-            .collect(Collectors.toList());
-    }
-
-    private DailySalesOverviewDto calculateDailySalesOverview(List<Order> orders) {
-        if (orders.isEmpty()) {
-            System.out.println("why");
-            return new DailySalesOverviewDto(0L, 0, 0L);
-        }
-
-        long totalSales = orders.stream()
-            .mapToLong(order -> order.getFinalPrice().amount().longValue())
-            .sum();
-
-        int totalOrderCount = orders.size();
-        long averageOrderAmount = totalSales / totalOrderCount;
-
-        return new DailySalesOverviewDto(totalSales, totalOrderCount, averageOrderAmount);
-    }
-
-    private List<TopSellingDdipBoxDto> calculateTopSellingDdipBoxes(List<Order> orders) {
-        Map<Long, TopSellingDdipBoxData> ddipBoxSalesMap = new HashMap<>();
-
-        for (Order order : orders) {
-            for (OrderItem orderItem : order.getOrderItems()) {
-                Long ddipBoxId = orderItem.getProductId().value();
-                int quantity = orderItem.getQuantity();
-                long salesAmount = orderItem.calcDiscountPrice().amount().longValue();
-
-                ddipBoxSalesMap.merge(ddipBoxId, 
-                    new TopSellingDdipBoxData(ddipBoxId, quantity, salesAmount),
-                    (existing, newData) -> new TopSellingDdipBoxData(
-                        ddipBoxId,
-                        existing.quantitySold + newData.quantitySold,
-                        existing.totalSalesAmount + newData.totalSalesAmount
-                    )
-                );
-            }
-        }
-
-        return ddipBoxSalesMap.values().stream()
-            .sorted((a, b) -> Long.compare(b.totalSalesAmount, a.totalSalesAmount))
-            .limit(5)
-            .map(data -> new TopSellingDdipBoxDto(
-                data.ddipBoxId,
-                getProductName(data.ddipBoxId),
-                data.quantitySold,
-                data.totalSalesAmount
-            ))
-            .collect(Collectors.toList());
-    }
-
-    private DailyInventoryStatusDto calculateInventoryStatus(Long storeId) {
-        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
-
-        long totalDailyCount = ddipBoxes.stream()
-            .mapToLong(DdipBox::getDailyQuantity)
-            .sum();
-
-        long totalRemainingCount = ddipBoxes.stream()
-            .mapToLong(DdipBox::getRemainingQuantity)
-            .sum();
-
-        double remainingPercentage = totalDailyCount > 0 
-            ? (double) totalRemainingCount / totalDailyCount * 100 
-            : 0.0;
-
-        return new DailyInventoryStatusDto(totalDailyCount, totalRemainingCount, remainingPercentage);
-    }
-
-    private List<HighInventoryDdipBoxDto> calculateHighInventoryDdipBoxes(Long storeId) {
-        return ddipBoxRepository.findByStore_StoreId(storeId).stream()
-            .sorted((a, b) -> Long.compare(b.getRemainingQuantity(), a.getRemainingQuantity()))
-            .limit(5)
-            .map(ddipBox -> new HighInventoryDdipBoxDto(
-                ddipBox.getDdipboxId(),
-                ddipBox.getDdipboxName(),
-                ddipBox.getRemainingQuantity(),
-                ddipBox.getDailyQuantity()
-            ))
-            .collect(Collectors.toList());
-    }
-
-    private ProfitMarginAnalysisDto calculateProfitMarginAnalysis(List<Order> orders) {
-        long totalRevenue = 0L;
-        long totalCost = 0L;
-        Map<String, ProfitRangeData> profitRanges = new HashMap<>();
-
-        for (Order order : orders) {
-            for (OrderItem orderItem : order.getOrderItems()) {
-                Long ddipBoxId = orderItem.getProductId().value();
-                Optional<DdipBox> ddipBoxOpt = ddipBoxRepository.findById(ddipBoxId);
-                
-                if (ddipBoxOpt.isPresent()) {
-                    DdipBox ddipBox = ddipBoxOpt.get();
-                    long salesPrice = orderItem.calcDiscountPrice().amount().longValue();
-                    long costPrice = ddipBox.getOriginalPrice().longValue() * orderItem.getQuantity();
-                    long profit = salesPrice - costPrice;
-                    double profitMargin = salesPrice > 0 ? (double) profit / salesPrice * 100 : 0;
-
-                    totalRevenue += salesPrice;
-                    totalCost += costPrice;
-
-                    String marginRange = categorizeMargin(profitMargin);
-                    profitRanges.merge(marginRange,
-                        new ProfitRangeData(salesPrice, 1),
-                        (existing, newData) -> new ProfitRangeData(
-                            existing.salesAmount + newData.salesAmount,
-                            existing.productCount + newData.productCount
-                        )
-                    );
-                }
-            }
-        }
-
-        long totalProfit = totalRevenue - totalCost;
-        double profitMarginPercentage = totalRevenue > 0 ? (double) totalProfit / totalRevenue * 100 : 0;
-
-        List<ProfitMarginByRangeDto> profitByRanges = profitRanges.entrySet().stream()
-            .map(entry -> new ProfitMarginByRangeDto(
-                entry.getKey(),
-                entry.getValue().salesAmount,
-                entry.getValue().productCount
-            ))
-            .collect(Collectors.toList());
-
-        return new ProfitMarginAnalysisDto(
-            totalRevenue,
-            totalCost,
-            totalProfit,
-            profitMarginPercentage,
-            profitByRanges
-        );
-    }
-
-    private String categorizeMargin(double profitMargin) {
-        if (profitMargin < 10) return "0-10%";
-        if (profitMargin < 20) return "10-20%";
-        if (profitMargin < 30) return "20-30%";
-        if (profitMargin < 50) return "30-50%";
-        return "50%+";
-    }
-
-    private static class TopSellingDdipBoxData {
-        final Long ddipBoxId;
-        final int quantitySold;
-        final long totalSalesAmount;
-
-        TopSellingDdipBoxData(Long ddipBoxId, int quantitySold, long totalSalesAmount) {
-            this.ddipBoxId = ddipBoxId;
-            this.quantitySold = quantitySold;
-            this.totalSalesAmount = totalSalesAmount;
-        }
-    }
-
-    private static class ProfitRangeData {
-        final long salesAmount;
-        final int productCount;
-
-        ProfitRangeData(long salesAmount, int productCount) {
-            this.salesAmount = salesAmount;
-            this.productCount = productCount;
-        }
-    }
 }
 
