@@ -1,5 +1,9 @@
 import { API_PATH } from '@/constants/api-path';
-import type { ReviewCreateRequest, ReviewResponse } from '@/types/review';
+import type {
+  ReviewCreateRequest,
+  ReviewListResponse,
+  ReviewResponse,
+} from '@/types/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from 'common';
 
@@ -17,7 +21,7 @@ export class ReviewService {
       size?: number;
       sort?: string;
     },
-  ): Promise<ReviewResponse[]> {
+  ): Promise<ReviewListResponse> {
     return apiClient.get(API_PATH.STORE_REVIEWS(storeId), params);
   }
 

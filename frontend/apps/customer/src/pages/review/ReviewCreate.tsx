@@ -80,10 +80,10 @@ const ReviewCreate = () => {
     const reviewData: ReviewCreateRequest = {
       storeId: storeId,
       // TODO: 실제 로그인한 사용자 ID로 변경 필요
-      customerId: 1,
+      customerId: 6,
       content: trimmedContent,
       // TODO: 실제 주문 ID로 변경 필요 (주문 연동 시)
-      orderId: 120,
+      orderId: 119,
       rating: reviewForm.rating,
       images: reviewForm.selectedImages,
     };

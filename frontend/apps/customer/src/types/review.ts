@@ -11,19 +11,6 @@ export interface ReviewCreateRequest {
 }
 
 /**
- * 서버 리뷰 등록 요청 데이터 타입
- */
-export interface ReviewCreateApiRequest {
-  request: {
-    customerId: number;
-    content: string;
-    orderId: number;
-    rating: number;
-  };
-  images: string[]; // 서버에서는 string 배열로 요구
-}
-
-/**
  * 리뷰 이미지 데이터 타입
  */
 export type ReviewImage = {
@@ -64,4 +51,13 @@ export type ReviewResponse = {
   images: ReviewImage[];
   reply: ReviewReply | null; // 답글이 없을 수도 있음
   isHelpful: boolean;
+};
+
+/**
+ * 리뷰 목록 응답 데이터 타입 (페이지네이션 포함)
+ */
+export type ReviewListResponse = {
+  reviewList: ReviewResponse[];
+  cursor: string | null;
+  hasNext: boolean;
 };

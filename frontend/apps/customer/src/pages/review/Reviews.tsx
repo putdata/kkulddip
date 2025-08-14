@@ -15,7 +15,7 @@ const ReviewsPage = () => {
   } = useStoreDetail(storeId);
 
   const {
-    data: reviews = [],
+    data: reviewResponse,
     isLoading: reviewsLoading,
     error: reviewsError,
   } = useStoreReviews(storeId);
@@ -33,6 +33,9 @@ const ReviewsPage = () => {
   if (!store) {
     return <div>가게 정보를 불러올 수 없습니다.</div>;
   }
+
+  const reviews = reviewResponse?.reviewList || []; // 기본값 설정
+
   const totalReviews = reviews.length;
 
   console.log(reviews);
