@@ -42,7 +42,7 @@ const GlobalErrorFallback = ({
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-full items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg">
         <h1 className="mb-4 text-2xl font-bold text-red-600">
           오류가 발생했습니다

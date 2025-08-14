@@ -5,11 +5,16 @@ export const useScrollHeader = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const scrollElement = document.querySelector(
+        '.simplebar-content-wrapper',
+      );
+      setIsScrolled((scrollElement?.scrollTop || 0) > 10);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const scrollElement = document.querySelector('.simplebar-content-wrapper');
+    scrollElement?.addEventListener('scroll', handleScroll);
+
+    return () => scrollElement?.removeEventListener('scroll', handleScroll);
   }, []);
 
   return isScrolled;

@@ -2,6 +2,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from '@/router/router';
 import { useEffect } from 'react';
 import { getMessagingInstance, onMessage } from '@/firebase/config';
+import SimpleBar from 'simplebar-react';
 
 function App() {
   useEffect(() => {
@@ -38,7 +39,11 @@ function App() {
     }
   }, []);
 
-  return <RouterProvider router={router} />;
+  return (
+    <SimpleBar className="h-dvh" autoHide={true}>
+      <RouterProvider router={router} />
+    </SimpleBar>
+  );
 }
 
 export default App;

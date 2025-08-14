@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import SimpleBar from 'simplebar-react';
 import {
   Dialog,
   DialogContent,
@@ -93,9 +94,9 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
             </div>
             {/* 메인 콘텐츠 */}
             <div className="flex h-full min-w-0 flex-1 flex-col">
-              <div className="min-h-0 flex-1 overflow-y-auto p-6">
-                {renderContent()}
-              </div>
+              <SimpleBar className="min-h-0 flex-1" autoHide={true}>
+                <div className="p-6">{renderContent()}</div>
+              </SimpleBar>
             </div>
           </div>
         </DialogContent>
@@ -122,9 +123,9 @@ const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
             />
           </div>
           {/* 메인 콘텐츠 */}
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <SimpleBar className="min-h-0 flex-1" autoHide={true}>
             <div className="p-4">{renderContent()}</div>
-          </div>
+          </SimpleBar>
         </div>
       </DrawerContent>
     </Drawer>

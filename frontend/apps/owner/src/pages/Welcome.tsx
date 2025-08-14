@@ -47,7 +47,7 @@ const Welcome = () => {
   const ctaSection = useIntersectionObserver();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-full overflow-x-hidden bg-gradient-to-br from-amber-50 via-white to-orange-50">
       {/* Header */}
       <header
         className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
@@ -56,7 +56,7 @@ const Welcome = () => {
             : 'bg-transparent py-5'
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <div
               className={`rounded-lg p-2 transition-all duration-300 ${
@@ -69,11 +69,11 @@ const Welcome = () => {
             </div>
             <div>
               <h1
-                className={`text-2xl font-bold transition-all duration-300 ${
+                className={`bg-gradient-to-r text-2xl font-bold transition-all duration-300 ${
                   isScrolled
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent'
-                    : 'text-amber-700'
-                }`}
+                    ? 'from-amber-600 to-orange-600'
+                    : 'from-amber-700 to-amber-700'
+                } bg-clip-text text-transparent`}
               >
                 꿀띱
               </h1>
@@ -83,10 +83,10 @@ const Welcome = () => {
           <div className="flex items-center gap-4">
             <Button
               size="sm"
-              className="hidden bg-gradient-to-r from-amber-500 to-orange-500 font-semibold text-white shadow-md transition-all duration-300 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg sm:inline-flex"
-              onClick={() => navigate(ROUTE_PATH.LOGIN)}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 font-semibold text-white shadow-md transition-all duration-300 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg"
+              onClick={() => navigate(ROUTE_PATH.INDEX)}
             >
-              가게 등록하기
+              지금 시작하기
               <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
 
@@ -126,13 +126,13 @@ const Welcome = () => {
       >
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="animate-blob absolute -left-48 top-1/4 h-96 w-96 rounded-full bg-amber-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
-          <div className="animate-blob animation-delay-2000 absolute -right-48 top-1/3 h-96 w-96 rounded-full bg-orange-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
-          <div className="animate-blob animation-delay-4000 absolute bottom-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-yellow-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
+          <div className="animate-blob absolute -left-24 top-1/4 h-64 w-64 rounded-full bg-amber-300 opacity-20 mix-blend-multiply blur-xl filter sm:-left-48 sm:h-96 sm:w-96"></div>
+          <div className="animate-blob animation-delay-2000 absolute -right-24 top-1/3 h-64 w-64 rounded-full bg-orange-300 opacity-20 mix-blend-multiply blur-xl filter sm:-right-48 sm:h-96 sm:w-96"></div>
+          <div className="animate-blob animation-delay-4000 absolute bottom-1/4 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-yellow-300 opacity-20 mix-blend-multiply blur-xl filter sm:h-96 sm:w-96"></div>
         </div>
 
         <div
-          className={`relative z-10 mx-auto max-w-6xl px-4 text-center transition-all duration-1000 ${
+          className={`relative z-10 mx-auto max-w-6xl px-6 text-center transition-all duration-1000 ${
             heroSection.isVisible
               ? 'translate-y-0 opacity-100'
               : 'translate-y-10 opacity-0'
@@ -166,7 +166,7 @@ const Welcome = () => {
               <Button
                 size="lg"
                 className="group transform bg-gradient-to-r from-amber-500 to-orange-500 px-10 py-6 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:from-amber-600 hover:to-orange-600 hover:shadow-2xl"
-                onClick={() => navigate(ROUTE_PATH.LOGIN)}
+                onClick={() => navigate(ROUTE_PATH.INDEX)}
               >
                 지금 시작하기
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -189,7 +189,7 @@ const Welcome = () => {
         ref={feature1Section.ref as React.RefObject<HTMLDivElement>}
         className="flex min-h-screen items-center py-20"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div
               className={`transition-all duration-1000 ${
@@ -350,7 +350,7 @@ const Welcome = () => {
         ref={feature2Section.ref as React.RefObject<HTMLDivElement>}
         className="flex min-h-screen items-center bg-gradient-to-br from-green-50 to-emerald-50 py-20"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div
               className={`order-2 transition-all duration-1000 lg:order-1 ${
@@ -470,7 +470,7 @@ const Welcome = () => {
         ref={feature3Section.ref as React.RefObject<HTMLDivElement>}
         className="flex min-h-screen items-center py-20"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div
               className={`transition-all duration-1000 ${
@@ -647,7 +647,7 @@ const Welcome = () => {
         ref={howItWorksSection.ref as React.RefObject<HTMLDivElement>}
         className="bg-gradient-to-br from-amber-50 to-orange-50 py-20"
       >
-        <div className="mx-auto w-full max-w-7xl px-4">
+        <div className="mx-auto w-full max-w-7xl px-6">
           <div
             className={`duration-1500 mb-16 text-center transition-all ${
               howItWorksSection.isVisible
@@ -745,10 +745,10 @@ const Welcome = () => {
             </div>
 
             {/* Enhanced Decorative elements */}
-            <div className="absolute -left-6 -top-6 h-12 w-12 rounded-full bg-amber-300 opacity-20"></div>
-            <div className="absolute -bottom-6 -right-6 h-10 w-10 rounded-full bg-orange-300 opacity-30"></div>
-            <div className="absolute -left-4 top-1/4 h-6 w-6 rounded-full bg-yellow-300 opacity-25"></div>
-            <div className="absolute -right-4 bottom-1/4 h-8 w-8 rounded-full bg-red-300 opacity-20"></div>
+            <div className="absolute left-2 top-2 h-8 w-8 rounded-full bg-amber-300 opacity-20 sm:-left-6 sm:-top-6 sm:h-12 sm:w-12"></div>
+            <div className="absolute bottom-2 right-2 h-6 w-6 rounded-full bg-orange-300 opacity-30 sm:-bottom-6 sm:-right-6 sm:h-10 sm:w-10"></div>
+            <div className="absolute left-4 top-1/4 h-4 w-4 rounded-full bg-yellow-300 opacity-25 sm:-left-4 sm:h-6 sm:w-6"></div>
+            <div className="absolute bottom-1/4 right-4 h-6 w-6 rounded-full bg-red-300 opacity-20 sm:-right-4 sm:h-8 sm:w-8"></div>
           </div>
         </div>
       </section>
@@ -758,7 +758,7 @@ const Welcome = () => {
         ref={additionalFeaturesSection.ref as React.RefObject<HTMLDivElement>}
         className="bg-gradient-to-br from-slate-50 to-gray-100 py-20"
       >
-        <div className="mx-auto max-w-6xl px-4">
+        <div className="mx-auto max-w-6xl px-6">
           <div
             className={`duration-1500 mb-12 text-center transition-all ${
               additionalFeaturesSection.isVisible
@@ -845,7 +845,7 @@ const Welcome = () => {
         ref={ctaSection.ref as React.RefObject<HTMLDivElement>}
         className="py-20"
       >
-        <div className="mx-auto max-w-4xl px-4 text-center">
+        <div className="mx-auto max-w-4xl px-6 text-center">
           <div
             className={`transition-all duration-1000 ${
               ctaSection.isVisible
@@ -880,9 +880,9 @@ const Welcome = () => {
                 <Button
                   size="lg"
                   className="bg-white px-10 py-4 text-lg font-bold text-amber-600 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-xl"
-                  onClick={() => navigate(ROUTE_PATH.LOGIN)}
+                  onClick={() => navigate(ROUTE_PATH.INDEX)}
                 >
-                  무료로 시작하기
+                  지금 시작하기
                   <Package className="ml-2 h-5 w-5" />
                 </Button>
               </CardContent>

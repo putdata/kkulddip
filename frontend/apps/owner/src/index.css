@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import 'simplebar-react/dist/simplebar.min.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -166,32 +167,54 @@
   }
 }
 
-@layer base {
-  /* Chrome, Edge, Safari */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px; /* 가로 스크롤 있을 때 */
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: oklch(0.7 0 0 / 0.5);
-    border-radius: 4px;
-    transition: background 0.2s ease;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.6 0 0 / 0.8);
-  }
+/* SimpleBar 자동 숨김 커스터마이징 */
+.simplebar-track.simplebar-vertical {
+  width: 12px;
+  right: 0;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-/* 다크 모드용 */
-.dark {
-  /* Chrome, Edge, Safari */
-  &::-webkit-scrollbar-thumb {
-    background: oklch(0.5 0 0 / 0.6);
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.6 0 0 / 0.8);
-  }
+.simplebar-track.simplebar-vertical.simplebar-hover,
+.simplebar-track.simplebar-vertical:hover {
+  opacity: 1;
+}
+
+.simplebar-scrollbar::before {
+  background-color: oklch(0.7 0 0 / 0.6);
+  border-radius: 6px;
+  width: 8px;
+  right: 2px;
+  transition: all 0.2s ease;
+}
+
+.simplebar-scrollbar:hover::before {
+  background-color: oklch(0.6 0 0 / 0.9);
+  width: 10px;
+  right: 1px;
+}
+
+/* 스크롤 중일 때 표시 */
+.simplebar-scrolling .simplebar-track.simplebar-vertical {
+  opacity: 1;
+}
+
+/* 다크 모드 */
+.dark .simplebar-scrollbar::before {
+  background-color: oklch(0.4 0 0 / 0.6);
+}
+
+.dark .simplebar-scrollbar:hover::before {
+  background-color: oklch(0.5 0 0 / 0.9);
+}
+
+/* 브라우저 기본 스크롤바 숨김 */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

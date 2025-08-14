@@ -11,10 +11,14 @@ export const indexLoader = async () => {
     throw redirect(ROUTE_PATH.LOGIN);
   }
 
-  const storeList = await queryClient.ensureQueryData({
-    queryKey: storeQueryKeys.list(),
-    queryFn: storeService.getMyStores,
-  });
+  const storeList = await queryClient
+    .ensureQueryData({
+      queryKey: storeQueryKeys.list(),
+      queryFn: storeService.getMyStores,
+    })
+    .catch(() => {
+      throw redirect(ROUTE_PATH.LOGIN);
+    });
 
   if (storeList.stores.length === 0) {
     throw redirect(ROUTE_PATH.WELCOME);
