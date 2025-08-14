@@ -53,6 +53,11 @@ public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
      * 주문 ID 존재 여부 확인
      */
     boolean existsByOrderId(Long orderId);
+    
+    /**
+     * 주문 ID와 고객 ID로 주문 조회
+     */
+    Optional<OrderEntity> findByOrderIdAndCustomerId(Long orderId, Long customerId);
 
     /**
      * 고객별 CONFIRMED 상태의 주문 수 조회
@@ -183,5 +188,12 @@ public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
         Long getTotalRevenue();
         Long getOrderCount();
     }
+
+    /**
+     * 가게 ID로 PAYMENT_PENDING 이후 상태의 주문 목록 조회
+     * (PAID, AWAITING_CONFIRMATION, CONFIRMED, PICKED_UP 상태)
+     */
+    @Query("SELECT o FROM OrderEntity o WHERE o.storeId = :storeId AND o.orderStatus IN ('PAID', 'AWAITING_CONFIRMATION', 'CONFIRMED', 'PICKED_UP') ORDER BY o.orderDate DESC")
+    List<OrderEntity> findByStoreIdAfterPaymentPending(@Param("storeId") Long storeId);
 
 }
