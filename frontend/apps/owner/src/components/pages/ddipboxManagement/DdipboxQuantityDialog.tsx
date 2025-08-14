@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUpdateDdipboxQuantity } from '@/queries/ddipbox';
+import { useDdipboxPricing } from '@/hooks/useDdipboxPricing';
 import type { DdipBox, UpdateDdipBoxQuantityRequest } from '@/types/ddipbox';
 
 interface DdipboxQuantityDialogProps {
@@ -39,6 +40,7 @@ const DdipboxQuantityDialog = ({
   const [dailyQuantity, setDailyQuantity] = useState(ddipbox.dailyQuantity);
 
   const updateQuantityMutation = useUpdateDdipboxQuantity();
+  const { getStockStatus } = useDdipboxPricing();
 
   // 다이얼로그가 열릴 때마다 초기화
   useEffect(() => {
@@ -90,20 +92,6 @@ const DdipboxQuantityDialog = ({
         },
       },
     );
-  };
-
-  const getStockStatus = (remaining: number, daily: number) => {
-    const percentage = (remaining / daily) * 100;
-    if (percentage === 0) {
-      return { status: 'out', color: 'destructive' as const, text: '품절' };
-    }
-    if (percentage <= 20) {
-      return { status: 'low', color: 'destructive' as const, text: '부족' };
-    }
-    if (percentage <= 50) {
-      return { status: 'medium', color: 'outline' as const, text: '보통' };
-    }
-    return { status: 'high', color: 'secondary' as const, text: '충분' };
   };
 
   const currentStatus = getStockStatus(

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Plus, Package, Tag, DollarSign, Hash } from 'lucide-react';
 import {
   Dialog,
@@ -14,89 +14,34 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useCreateDdipbox } from '@/queries/ddipbox';
+import { useDdipboxForm } from '@/hooks/useDdipboxForm';
 import type { CreateDdipBoxRequest } from '@/types/ddipbox';
 
 interface AddDdipboxDialogProps {
   storeId: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   children?: ReactNode;
 }
 
-const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<CreateDdipBoxRequest>({
-    ddipboxName: '',
-    description: '',
-    category: '',
-    originalPrice: 0,
-    salePrice: 0,
-    dailyQuantity: 1,
-    maxPerCustomer: 1,
-  });
-
+const AddDdipboxDialog = ({
+  storeId,
+  open,
+  onOpenChange,
+  children,
+}: AddDdipboxDialogProps) => {
   const createDdipboxMutation = useCreateDdipbox();
 
-  const handleInputChange = (
-    field: keyof CreateDdipBoxRequest,
-    value: string | number,
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]:
-        field.includes('Price') ||
-        field.includes('Quantity') ||
-        field === 'maxPerCustomer'
-          ? Number(value) || 0
-          : value,
-    }));
-  };
+  const {
+    formData,
+    handleInputChange,
+    validateForm,
+    getDiscountRate,
+    resetForm,
+    getSubmitData,
+  } = useDdipboxForm({ mode: 'create' });
 
-  const validateForm = () => {
-    if (!formData.ddipboxName.trim()) {
-      return false;
-    }
-
-    if (!formData.category.trim()) {
-      return false;
-    }
-
-    if (formData.originalPrice <= 0) {
-      return false;
-    }
-
-    if (formData.salePrice <= 0) {
-      return false;
-    }
-
-    if (formData.salePrice > formData.originalPrice) {
-      return false;
-    }
-
-    if (formData.dailyQuantity < 1) {
-      return false;
-    }
-
-    if (formData.maxPerCustomer < 1) {
-      return false;
-    }
-
-    if (formData.maxPerCustomer > formData.dailyQuantity) {
-      return false;
-    }
-
-    if (formData.ddipboxName.length > 100) {
-      return false;
-    }
-
-    if (formData.description && formData.description.length > 1000) {
-      return false;
-    }
-
-    if (formData.category.length > 50) {
-      return false;
-    }
-
-    return true;
-  };
+  const createFormData = formData as CreateDdipBoxRequest;
 
   const handleSubmit = () => {
     if (!validateForm()) {
@@ -106,48 +51,22 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
     createDdipboxMutation.mutate(
       {
         storeId,
-        data: {
-          ...formData,
-          ddipboxName: formData.ddipboxName.trim(),
-          category: formData.category.trim(),
-          description: formData.description?.trim() || undefined,
-        },
+        data: getSubmitData() as CreateDdipBoxRequest,
       },
       {
         onSuccess: () => {
-          // 폼 초기화 및 다이얼로그 닫기
-          setFormData({
-            ddipboxName: '',
-            description: '',
-            category: '',
-            originalPrice: 0,
-            salePrice: 0,
-            dailyQuantity: 1,
-            maxPerCustomer: 1,
-          });
-          setOpen(false);
+          resetForm();
+          onOpenChange(false);
         },
       },
     );
-  };
-
-  const resetForm = () => {
-    setFormData({
-      ddipboxName: '',
-      description: '',
-      category: '',
-      originalPrice: 0,
-      salePrice: 0,
-      dailyQuantity: 1,
-      maxPerCustomer: 1,
-    });
   };
 
   return (
     <Dialog
       open={open}
       onOpenChange={newOpen => {
-        setOpen(newOpen);
+        onOpenChange(newOpen);
         if (!newOpen) {
           resetForm();
         }
@@ -184,7 +103,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                 <Input
                   id="ddipboxName"
                   placeholder="띱박스 이름을 입력하세요"
-                  value={formData.ddipboxName}
+                  value={createFormData.ddipboxName}
                   onChange={e =>
                     handleInputChange('ddipboxName', e.target.value)
                   }
@@ -193,7 +112,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                 />
               </div>
               <div className="text-muted-foreground text-xs">
-                {formData.ddipboxName.length}/100자
+                {createFormData.ddipboxName.length}/100자
               </div>
             </div>
 
@@ -206,14 +125,14 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                 <Input
                   id="category"
                   placeholder="예: 한식, 양식, 디저트 등"
-                  value={formData.category}
+                  value={createFormData.category}
                   onChange={e => handleInputChange('category', e.target.value)}
                   className="pl-10"
                   maxLength={50}
                 />
               </div>
               <div className="text-muted-foreground text-xs">
-                {formData.category.length}/50자
+                {createFormData.category.length}/50자
               </div>
             </div>
 
@@ -222,13 +141,13 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
               <Textarea
                 id="description"
                 placeholder="띱박스 설명을 입력하세요 (선택사항)"
-                value={formData.description}
+                value={createFormData.description}
                 onChange={e => handleInputChange('description', e.target.value)}
                 rows={3}
                 maxLength={1000}
               />
               <div className="text-muted-foreground text-xs">
-                {formData.description?.length || 0}/1000자
+                {createFormData.description?.length || 0}/1000자
               </div>
             </div>
           </div>
@@ -248,7 +167,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                     id="originalPrice"
                     type="number"
                     placeholder="0"
-                    value={formData.originalPrice || ''}
+                    value={createFormData.originalPrice || ''}
                     onChange={e =>
                       handleInputChange('originalPrice', e.target.value)
                     }
@@ -268,7 +187,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                     id="salePrice"
                     type="number"
                     placeholder="0"
-                    value={formData.salePrice || ''}
+                    value={createFormData.salePrice || ''}
                     onChange={e =>
                       handleInputChange('salePrice', e.target.value)
                     }
@@ -279,17 +198,12 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
               </div>
             </div>
 
-            {formData.originalPrice > 0 && formData.salePrice > 0 && (
-              <div className="text-muted-foreground text-sm">
-                할인율:{' '}
-                {Math.round(
-                  ((formData.originalPrice - formData.salePrice) /
-                    formData.originalPrice) *
-                    100,
-                )}
-                %
-              </div>
-            )}
+            {createFormData.originalPrice > 0 &&
+              createFormData.salePrice > 0 && (
+                <div className="text-muted-foreground text-sm">
+                  할인율: {getDiscountRate()}%
+                </div>
+              )}
           </div>
 
           {/* 수량 정보 */}
@@ -307,7 +221,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                     id="dailyQuantity"
                     type="number"
                     placeholder="1"
-                    value={formData.dailyQuantity || ''}
+                    value={createFormData.dailyQuantity || ''}
                     onChange={e =>
                       handleInputChange('dailyQuantity', e.target.value)
                     }
@@ -327,7 +241,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
                     id="maxPerCustomer"
                     type="number"
                     placeholder="1"
-                    value={formData.maxPerCustomer || ''}
+                    value={createFormData.maxPerCustomer || ''}
                     onChange={e =>
                       handleInputChange('maxPerCustomer', e.target.value)
                     }
@@ -343,7 +257,7 @@ const AddDdipboxDialog = ({ storeId, children }: AddDdipboxDialogProps) => {
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => setOpen(false)}
+            onClick={() => onOpenChange(false)}
             disabled={createDdipboxMutation.isPending}
           >
             취소

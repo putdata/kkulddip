@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDeleteDdipbox } from '@/queries/ddipbox';
+import { useDdipboxPricing } from '@/hooks/useDdipboxPricing';
 import type { DdipBox } from '@/types/ddipbox';
 
 interface DeleteDdipboxDialogProps {
@@ -26,6 +27,7 @@ const DeleteDdipboxDialog = ({
   storeId,
 }: DeleteDdipboxDialogProps) => {
   const deleteDdipboxMutation = useDeleteDdipbox();
+  const { formatPrice } = useDdipboxPricing();
 
   const handleDelete = () => {
     deleteDdipboxMutation.mutate(
@@ -39,10 +41,6 @@ const DeleteDdipboxDialog = ({
         },
       },
     );
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ko-KR').format(price);
   };
 
   return (
@@ -105,19 +103,6 @@ const DeleteDdipboxDialog = ({
                   </li>
                   <li>• 이 작업은 되돌릴 수 없습니다</li>
                 </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* 대안 제안 */}
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <div className="text-sm">
-              <div className="mb-1 font-medium text-blue-800">
-                💡 대안: 임시로 판매를 중지해보세요
-              </div>
-              <div className="text-blue-700">
-                완전히 삭제하는 대신 판매를 중지하면 나중에 언제든 다시 활성화할
-                수 있습니다.
               </div>
             </div>
           </div>

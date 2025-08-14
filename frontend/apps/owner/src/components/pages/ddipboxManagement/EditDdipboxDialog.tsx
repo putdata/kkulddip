@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Package, Tag, DollarSign, Hash } from 'lucide-react';
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useUpdateDdipbox } from '@/queries/ddipbox';
+import { useDdipboxForm } from '@/hooks/useDdipboxForm';
 import type { DdipBox, UpdateDdipBoxRequest } from '@/types/ddipbox';
 
 interface EditDdipboxDialogProps {
@@ -28,167 +29,37 @@ const EditDdipboxDialog = ({
   ddipbox,
   storeId,
 }: EditDdipboxDialogProps) => {
-  const [formData, setFormData] = useState<UpdateDdipBoxRequest>({
-    ddipboxName: ddipbox.ddipboxName,
-    description: ddipbox.description,
-    category: ddipbox.category,
-    originalPrice: ddipbox.originalPrice,
-    salePrice: ddipbox.salePrice,
-    dailyQuantity: ddipbox.dailyQuantity,
-    maxPerCustomer: ddipbox.maxPerCustomer,
-  });
-
   const updateDdipboxMutation = useUpdateDdipbox();
+
+  const {
+    formData,
+    handleInputChange,
+    validateForm,
+    hasChanges,
+    resetForm,
+    getSubmitData,
+  } = useDdipboxForm({
+    mode: 'edit',
+    originalDdipbox: ddipbox,
+  });
 
   // 다이얼로그가 열릴 때마다 폼 데이터 초기화
   useEffect(() => {
     if (open) {
-      setFormData({
-        ddipboxName: ddipbox.ddipboxName,
-        description: ddipbox.description,
-        category: ddipbox.category,
-        originalPrice: ddipbox.originalPrice,
-        salePrice: ddipbox.salePrice,
-        dailyQuantity: ddipbox.dailyQuantity,
-        maxPerCustomer: ddipbox.maxPerCustomer,
-      });
+      resetForm();
     }
-  }, [open, ddipbox]);
-
-  const handleInputChange = (
-    field: keyof UpdateDdipBoxRequest,
-    value: string | number,
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]:
-        field.includes('Price') ||
-        field.includes('Quantity') ||
-        field === 'maxPerCustomer'
-          ? value === ''
-            ? undefined
-            : Number(value)
-          : value,
-    }));
-  };
-
-  const validateForm = () => {
-    if (formData.ddipboxName && !formData.ddipboxName.trim()) {
-      return false;
-    }
-
-    if (formData.category && !formData.category.trim()) {
-      return false;
-    }
-
-    if (formData.originalPrice !== undefined && formData.originalPrice <= 0) {
-      return false;
-    }
-
-    if (formData.salePrice !== undefined && formData.salePrice <= 0) {
-      return false;
-    }
-
-    const originalPrice = formData.originalPrice ?? ddipbox.originalPrice;
-    const salePrice = formData.salePrice ?? ddipbox.salePrice;
-
-    if (salePrice > originalPrice) {
-      return false;
-    }
-
-    if (formData.dailyQuantity !== undefined && formData.dailyQuantity < 1) {
-      return false;
-    }
-
-    if (formData.maxPerCustomer !== undefined && formData.maxPerCustomer < 1) {
-      return false;
-    }
-
-    const dailyQuantity = formData.dailyQuantity ?? ddipbox.dailyQuantity;
-    const maxPerCustomer = formData.maxPerCustomer ?? ddipbox.maxPerCustomer;
-
-    if (maxPerCustomer > dailyQuantity) {
-      return false;
-    }
-
-    if (formData.ddipboxName && formData.ddipboxName.length > 100) {
-      return false;
-    }
-
-    if (formData.description && formData.description.length > 1000) {
-      return false;
-    }
-
-    if (formData.category && formData.category.length > 50) {
-      return false;
-    }
-
-    return true;
-  };
-
-  const hasChanges = () => {
-    return (
-      formData.ddipboxName !== ddipbox.ddipboxName ||
-      formData.description !== ddipbox.description ||
-      formData.category !== ddipbox.category ||
-      formData.originalPrice !== ddipbox.originalPrice ||
-      formData.salePrice !== ddipbox.salePrice ||
-      formData.dailyQuantity !== ddipbox.dailyQuantity ||
-      formData.maxPerCustomer !== ddipbox.maxPerCustomer
-    );
-  };
+  }, [open, resetForm]);
 
   const handleSubmit = () => {
-    if (!validateForm()) {
+    if (!validateForm() || !hasChanges()) {
       return;
-    }
-
-    if (!hasChanges()) {
-      return;
-    }
-
-    // undefined 값들을 제거하여 실제 변경된 필드만 전송
-    const updateData: UpdateDdipBoxRequest = {};
-
-    if (formData.ddipboxName !== ddipbox.ddipboxName && formData.ddipboxName) {
-      updateData.ddipboxName = formData.ddipboxName.trim();
-    }
-    if (formData.description !== ddipbox.description) {
-      updateData.description = formData.description?.trim() || undefined;
-    }
-    if (formData.category !== ddipbox.category && formData.category) {
-      updateData.category = formData.category.trim();
-    }
-    if (
-      formData.originalPrice !== ddipbox.originalPrice &&
-      formData.originalPrice !== undefined
-    ) {
-      updateData.originalPrice = formData.originalPrice;
-    }
-    if (
-      formData.salePrice !== ddipbox.salePrice &&
-      formData.salePrice !== undefined
-    ) {
-      updateData.salePrice = formData.salePrice;
-    }
-    if (
-      formData.dailyQuantity !== ddipbox.dailyQuantity &&
-      formData.dailyQuantity !== undefined
-    ) {
-      updateData.dailyQuantity = formData.dailyQuantity;
-    }
-    if (
-      formData.maxPerCustomer !== ddipbox.maxPerCustomer &&
-      formData.maxPerCustomer !== undefined
-    ) {
-      updateData.maxPerCustomer = formData.maxPerCustomer;
     }
 
     updateDdipboxMutation.mutate(
       {
         storeId,
         ddipboxId: ddipbox.ddipboxId,
-        data: updateData,
+        data: getSubmitData() as UpdateDdipBoxRequest,
       },
       {
         onSuccess: () => {
@@ -309,14 +180,14 @@ const EditDdipboxDialog = ({
               </div>
             </div>
 
-            {(formData.originalPrice || ddipbox.originalPrice) > 0 &&
-              (formData.salePrice || ddipbox.salePrice) > 0 && (
+            {(formData.originalPrice ?? ddipbox.originalPrice) > 0 &&
+              (formData.salePrice ?? ddipbox.salePrice) > 0 && (
                 <div className="text-muted-foreground text-sm">
-                  할인율:{' '}
+                  할인율:
                   {Math.round(
-                    (((formData.originalPrice || ddipbox.originalPrice) -
-                      (formData.salePrice || ddipbox.salePrice)) /
-                      (formData.originalPrice || ddipbox.originalPrice)) *
+                    (((formData.originalPrice ?? ddipbox.originalPrice) -
+                      (formData.salePrice ?? ddipbox.salePrice)) /
+                      (formData.originalPrice ?? ddipbox.originalPrice)) *
                       100,
                   )}
                   %
