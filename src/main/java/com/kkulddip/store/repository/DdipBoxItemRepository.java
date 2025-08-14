@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -43,14 +42,4 @@ public interface DdipBoxItemRepository extends JpaRepository<DdipBoxItem, Long> 
         WHERE i.ddipBox.ddipboxId IN :ddipboxIds
         """)
     Integer sumWeightByDdipboxIds(@Param("ddipboxIds") List<Long> ddipboxIds);
-    
-    /**
-     * 여러 띱박스의 구성상품 목록을 배치로 조회 (성능 최적화용)
-     */
-    @Query("""
-        SELECT i FROM DdipBoxItem i 
-        WHERE i.ddipBox.ddipboxId IN :ddipboxIds 
-        ORDER BY i.ddipBox.ddipboxId ASC, i.itemId ASC
-        """)
-    List<DdipBoxItem> findByDdipBoxIdIn(@Param("ddipboxIds") Collection<Long> ddipboxIds);
 }
