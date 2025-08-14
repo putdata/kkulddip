@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import type { Store } from '@/constants/homeMockData';
+import type { Store } from '@/types/store';
 
 // 음식 카드 데이터 타입 정의
 
@@ -91,7 +91,7 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
             </div>
           )} */}
           {/* TODO: 픽업 가능 유무 배지로 대체 */}
-          {store.active ? (
+          {store.isActive ? (
             <div className="rounded border border-red-200 bg-white px-2 py-0.5 text-xs text-red-500">
               픽업 가능
             </div>

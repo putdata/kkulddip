@@ -10,6 +10,7 @@ export const API_PATH = {
   PROFILE: '/v1/customers/profile',
   STATS: '/v1/customers/stats',
 
+  STORES: '/v1/stores',
   STORE_DETAIL: (storeId: string) => `/v1/stores/${storeId}`,
   STORE_DDIPBOXES: (storeId: string) => `/v1/stores/${storeId}/ddipboxes`,
   STORE_REVIEWS: (storeId: string) => `/v1/review/${storeId}`,
