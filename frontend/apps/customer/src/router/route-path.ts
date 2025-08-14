@@ -16,4 +16,6 @@ export const ROUTE_PATH = {
   REVIEW: '/stores/:storeId/reviews',
   REVIEW_CREATE: '/review/create',
   STORE: '/stores/:storeId',
+  STREAMS: '/streams',
+  STREAM_DETAIL: '/streams/:streamId',
 } as const;

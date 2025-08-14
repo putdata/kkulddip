@@ -13,4 +13,8 @@ export const API_PATH = {
   STORE_DETAIL: (storeId: string) => `/v1/stores/${storeId}`,
   STORE_DDIPBOXES: (storeId: string) => `/v1/stores/${storeId}/ddipboxes`,
   STORE_REVIEWS: (storeId: string) => `/v1/stores/${storeId}/reviews`,
+
+  STREAMS_LIVE: '/v1/streams/live',
+  STREAMS_JOIN: (streamId: number) => `/v1/streams/${streamId}/join`,
+  STREAMS_DETAIL: (streamId: number) => `/v1/streams/${streamId}`,
 };
