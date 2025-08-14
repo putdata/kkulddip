@@ -1,5 +1,6 @@
 import LikeFoodCard from '@/components/pages/likes/LikeFoodCard/LikeFoodCard';
-import { useLikes, useDeleteFavorite } from '@/hooks/useLikes';
+import { useLikes } from '@/hooks/useLikes';
+import { useDeleteFavorite } from '@/hooks/useDeleteFavorite';
 import { useUserStore } from 'common';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';

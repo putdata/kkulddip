@@ -1,6 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { likeService } from '@/services/likeService';
-import type { AddLikeParams, DeleteLikeParams } from '@/types/likedStore';
 import useGeolocation from './useGeolocation';
 
 export const useLikes = (customerId: number) => {
@@ -18,28 +17,5 @@ export const useLikes = (customerId: number) => {
     },
     enabled:
       location.isLoaded && Boolean(location.coordinate) && !location.error,
-  });
-};
-
-export const useDeleteFavorite = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (params: DeleteLikeParams) =>
-      likeService.deleteFavorite(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['likes'] });
-    },
-  });
-};
-
-export const useAddFavorite = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (params: AddLikeParams) => likeService.addFavorite(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['likes'] });
-    },
   });
 };

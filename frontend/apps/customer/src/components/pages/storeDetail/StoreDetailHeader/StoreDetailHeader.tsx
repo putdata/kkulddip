@@ -1,12 +1,15 @@
+import { generatePath, useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '@/router';
+import { toast } from 'sonner';
+
 import { OperatingHoursBadge } from './OperatingHoursBadge';
 import { OutOfStockBadge } from './OutOfStockBadge';
 import { ChevronRight, Heart } from 'lucide-react';
 import type { DdipBox, StoreDetail } from '@/types/store';
-import { generatePath, useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/router';
-import { useState } from 'react';
-import { likeService } from '@/services/likeService';
-import { toast } from 'sonner';
+
+import { useDeleteFavorite } from '@/hooks/useDeleteFavorite';
+import { useAddFavorite } from '@/hooks/useAddFavorite';
+import { useCheckFavorite } from '@/hooks/useCheckFavorite';
 
 interface StoreDetailHeaderProps {
   store: StoreDetail;
@@ -20,7 +23,12 @@ export const StoreDetailHeader = ({
   customerId,
 }: StoreDetailHeaderProps) => {
   const navigate = useNavigate();
-  const [isFavorite, setIsFavorite] = useState(false);
+
+  const { data: isFavorite = false, isLoading: checkingFavorite } =
+    useCheckFavorite(customerId || 0, store.storeId);
+
+  const addFavoriteHandler = useAddFavorite();
+  const deleteFavoriteHandler = useDeleteFavorite();
 
   const handleLoadAllReviews = () => {
     navigate(generatePath(ROUTE_PATH.REVIEW, { storeId: `${store.storeId}` }));
@@ -35,19 +43,21 @@ export const StoreDetailHeader = ({
 
     try {
       const params = {
-        customerId: customerId, // 실제 구현시 현재 사용자 ID로 변경 필요
+        customerId: customerId,
         storeId: store.storeId,
       };
 
+      // 찜한 가게라면
       if (isFavorite) {
-        await likeService.deleteFavorite(params);
+        await deleteFavoriteHandler.mutateAsync(params);
+        toast.success('찜 목록에서 제거되었습니다.');
       } else {
-        await likeService.addFavorite(params);
+        await addFavoriteHandler.mutateAsync(params);
+        toast.success('찜 목록에 추가되었습니다.');
       }
-
-      setIsFavorite(!isFavorite);
     } catch (error) {
       console.error('Error toggling favorite:', error);
+      toast.error('오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -73,6 +83,11 @@ export const StoreDetailHeader = ({
             <button
               onClick={handleFavoriteToggle}
               className="transition-colors duration-200 hover:scale-110 disabled:opacity-50"
+              disabled={
+                checkingFavorite ||
+                addFavoriteHandler.isPending ||
+                deleteFavoriteHandler.isPending
+              }
             >
               <Heart
                 className={`h-6 w-6 ${
