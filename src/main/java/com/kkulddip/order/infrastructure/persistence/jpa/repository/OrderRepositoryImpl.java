@@ -211,4 +211,30 @@ public class OrderRepositoryImpl implements OrderRepository {
         
         return exists;
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Order> findByOrderIdAndCustomerId(OrderId orderId, CustomerId customerId) {
+        log.debug("주문 조회 시작 - orderId: {}, customerId: {}", 
+            orderId.value(), customerId.value());
+        
+        try {
+            Optional<OrderEntity> orderEntity = orderJpaRepository.findByOrderIdAndCustomerId(
+                orderId.value(), customerId.value());
+            
+            if (orderEntity.isPresent()) {
+                log.debug("주문 조회 성공 - orderId: {}, customerId: {}", 
+                    orderId.value(), customerId.value());
+                return Optional.of(orderEntityMapper.toDomain(orderEntity.get()));
+            } else {
+                log.debug("주문 조회 결과 없음 - orderId: {}, customerId: {}", 
+                    orderId.value(), customerId.value());
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("주문 데이터베이스 조회 작업 실패 - orderId: {}, customerId: {}, operation: findByOrderIdAndCustomerId, details: {}", 
+                orderId.value(), customerId.value(), e.getMessage(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
 }

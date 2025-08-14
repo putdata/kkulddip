@@ -86,4 +86,13 @@ public interface OrderRepository {
      * @return 존재 여부
      */
     boolean existsByOrderId(OrderId orderId);
+    
+    /**
+     * 주문 ID와 고객 ID로 주문 조회
+     * 
+     * @param orderId 주문 ID
+     * @param customerId 고객 ID
+     * @return 주문 (Optional)
+     */
+    Optional<Order> findByOrderIdAndCustomerId(OrderId orderId, CustomerId customerId);
 }

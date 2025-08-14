@@ -6,6 +6,9 @@ import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.common.util.RedisNotificationUtil;
 import com.kkulddip.domain.customer.repository.CustomerRepository;
 import com.kkulddip.notification.domain.model.enums.NotificationType;
+import com.kkulddip.order.domain.repository.OrderRepository;
+import com.kkulddip.order.domain.model.vo.OrderId;
+import com.kkulddip.order.domain.model.vo.CustomerId;
 import com.kkulddip.review.common.CursorUtil;
 import com.kkulddip.review.dto.request.ReviewCreateRequestDto;
 import com.kkulddip.review.dto.request.ReviewUpdateRequestDto;
@@ -43,6 +46,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final RedisNotificationUtil redisNotificationUtil;
     private final StoreRepository storeRepository;
     private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
     private final int size10 = 10;
     private final int size1 = 1;
     private final Pageable pageable10 = PageRequest.of(0, size10+1);
@@ -66,6 +70,9 @@ public class ReviewServiceImpl implements ReviewService {
 
             // 중복 리뷰 검증 (같은 주문에 대한 리뷰)
             validateDuplicateReview(request.customerId(), request.orderId());
+
+            // 주문 소유권 검증
+            validateOrderOwnership(request.orderId(), Long.parseLong(userInfo.userId()));
 
             Review review = createReviewEntity(storeId, request);
             Review savedReview = reviewRepository.save(review);
@@ -554,6 +561,24 @@ public class ReviewServiceImpl implements ReviewService {
         if (orderId != null && reviewRepository.existsByCustomerIdAndOrderId(customerId, orderId)) {
             throw new BusinessException(ErrorCode.DUPLICATE_REVIEW, "이미 해당 주문에 대한 리뷰가 존재합니다.");
         }
+    }
+
+    private void validateOrderOwnership(Long orderId, Long customerId) {
+        if (orderId == null) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "주문 ID는 필수입니다.");
+        }
+        
+        OrderId orderIdVO = OrderId.of(orderId);
+        CustomerId customerIdVO = CustomerId.of(customerId);
+        
+        boolean orderExists = orderRepository.findByOrderIdAndCustomerId(orderIdVO, customerIdVO).isPresent();
+        
+        if (!orderExists) {
+            log.warn("주문 소유권 검증 실패 - orderId: {}, customerId: {}", orderId, customerId);
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "해당 주문을 찾을 수 없거나 접근 권한이 없습니다.");
+        }
+        
+        log.debug("주문 소유권 검증 성공 - orderId: {}, customerId: {}", orderId, customerId);
     }
 
     private void validateReviewWriter(Review review, JwtUserInfo userInfo) {

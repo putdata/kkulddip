@@ -53,6 +53,11 @@ public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
      * 주문 ID 존재 여부 확인
      */
     boolean existsByOrderId(Long orderId);
+    
+    /**
+     * 주문 ID와 고객 ID로 주문 조회
+     */
+    Optional<OrderEntity> findByOrderIdAndCustomerId(Long orderId, Long customerId);
 
     /**
      * 고객별 CONFIRMED 상태의 주문 수 조회
