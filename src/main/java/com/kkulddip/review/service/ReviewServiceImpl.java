@@ -5,6 +5,7 @@ import com.kkulddip.common.exception.ErrorCode;
 import com.kkulddip.common.security.jwt.JwtUserInfo;
 import com.kkulddip.common.util.RedisNotificationUtil;
 import com.kkulddip.domain.customer.repository.CustomerRepository;
+import com.kkulddip.domain.customer.dto.CustomerNameAndImage;
 import com.kkulddip.notification.domain.model.enums.NotificationType;
 import com.kkulddip.order.domain.repository.OrderRepository;
 import com.kkulddip.order.domain.model.vo.OrderId;
@@ -674,13 +675,17 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewImageResponseDto> imageList,
         ReviewReplyResponseDto replyDto,
         JwtUserInfo userInfo) {
+        
+        CustomerNameAndImage customerInfo = customerRepository.findCustomerNameAndImageByCustomerId(review.getCustomerId())
+            .orElse(new CustomerNameAndImage("유저", null));
+            
         return ReviewResponseDto.builder()
             .reviewId(review.getReviewId())
             .customerId(review.getCustomerId())
             .storeId(review.getStoreId())
             .orderId(review.getOrderId())
-            .userName("유저"/*userService.getUserName()*/)
-            .profileImage("imgUrl"/*userService.getProfileImage()*/)
+            .userName(customerInfo.name())
+            .profileImage(customerInfo.profileImageUrl())
             .content(review.getContent())
             .rating(review.getRating())
             .createdAt(review.getCreatedAt())
@@ -704,13 +709,16 @@ public class ReviewServiceImpl implements ReviewService {
 
         boolean isHelpful = reviewHelpfulService.createReviewHelpfulStatusResponseDto(review, userInfo);
 
+        CustomerNameAndImage customerInfo = customerRepository.findCustomerNameAndImageByCustomerId(review.getCustomerId())
+            .orElse(new CustomerNameAndImage("유저", null));
+
         return ReviewWithHelpfulStatusResponseDto.builder()
             .reviewId(review.getReviewId())
             .customerId(review.getCustomerId())
             .storeId(review.getStoreId())
             .orderId(review.getOrderId())
-            .userName("유저"/*userService.getUserName()*/)
-            .profileImage("imgUrl"/*userService.getProfileImage()*/)
+            .userName(customerInfo.name())
+            .profileImage(customerInfo.profileImageUrl())
             .content(review.getContent())
             .rating(review.getRating())
             .createdAt(review.getCreatedAt())
