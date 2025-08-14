@@ -16,58 +16,18 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Percent } from 'lucide-react';
 import type { ProfitMarginAnalysis } from '@/types/analytics';
+import { useProfitAnalytics } from '../hooks/useProfitAnalytics';
 
 interface ProfitMarginChartProps {
   profitAnalysis: ProfitMarginAnalysis;
 }
 
 const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
-  // 차트 색상
-  const COLORS = [
-    '#10b981', // emerald-500 - 높은 수익
-    '#3b82f6', // blue-500 - 보통 수익
-    '#f59e0b', // amber-500 - 낮은 수익
-    '#ef4444', // red-500 - 손실
-  ];
-
-  // 도넛 차트 데이터 변환
-  const chartData = profitAnalysis.profitByMarginRanges.map((range, index) => ({
-    name: range.marginRange,
-    value: range.salesAmount,
-    productCount: range.productCount,
-    color: COLORS[index % COLORS.length],
-  }));
-
-  // 수익률 상태 평가
-  const getProfitStatus = () => {
-    const percentage = profitAnalysis.profitMarginPercentage;
-    if (percentage >= 30) {
-      return {
-        status: 'excellent',
-        color: 'default',
-        text: '우수',
-        icon: TrendingUp,
-      };
-    } else if (percentage >= 20) {
-      return {
-        status: 'good',
-        color: 'secondary',
-        text: '양호',
-        icon: TrendingUp,
-      };
-    } else if (percentage >= 10) {
-      return { status: 'fair', color: 'outline', text: '보통', icon: Percent };
-    } else {
-      return {
-        status: 'poor',
-        color: 'destructive',
-        text: '개선필요',
-        icon: TrendingUp,
-      };
-    }
-  };
-
-  const profitStatus = getProfitStatus();
+  const {
+    chartData,
+    profitStatus,
+    calculateSalesPercentage,
+  } = useProfitAnalytics(profitAnalysis);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -89,13 +49,13 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
       if (!data) {
         return null;
       }
-      const percentage = (data.value / profitAnalysis.totalRevenue) * 100;
+      const percentage = calculateSalesPercentage(data.value);
 
       return (
         <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-blue-600">
-            매출: ₩{data.value.toLocaleString()} ({percentage}%)
+            매출: ₩{data.value.toLocaleString()} ({percentage.toFixed(2)}%)
           </p>
           <p className="text-muted-foreground text-sm">
             상품 수: {data.productCount}개
@@ -129,9 +89,15 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1">
-                <profitStatus.icon className="h-5 w-5" />
+                {profitStatus?.status === 'poor' ? (
+                  <TrendingUp className="h-5 w-5" />
+                ) : profitStatus?.status === 'fair' ? (
+                  <Percent className="h-5 w-5" />
+                ) : (
+                  <TrendingUp className="h-5 w-5" />
+                )}
                 <span className="text-2xl font-bold">
-                  {profitAnalysis.profitMarginPercentage}%
+                  {profitAnalysis.profitMarginPercentage.toFixed(2)}%
                 </span>
               </div>
               <div className="text-muted-foreground text-xs">수익률</div>
@@ -139,20 +105,22 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
           </div>
 
           {/* 수익률 상태 */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">수익률 평가</span>
-            <Badge
-              variant={
-                profitStatus.color as
-                  | 'default'
-                  | 'destructive'
-                  | 'outline'
-                  | 'secondary'
-              }
-            >
-              {profitStatus.text}
-            </Badge>
-          </div>
+          {profitStatus && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">수익률 평가</span>
+              <Badge
+                variant={
+                  profitStatus.color as
+                    | 'default'
+                    | 'destructive'
+                    | 'outline'
+                    | 'secondary'
+                }
+              >
+                {profitStatus.text}
+              </Badge>
+            </div>
+          )}
 
           {/* 수익률 구간별 차트 */}
           {chartData.length > 0 ? (

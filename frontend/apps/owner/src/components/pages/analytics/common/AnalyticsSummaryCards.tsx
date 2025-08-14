@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DollarSign, ShoppingCart, Weight } from 'lucide-react';
+import { useDailyAnalytics } from '../hooks/useDailyAnalytics';
 
 interface AnalyticsSummaryCardsProps {
   totalRevenue: number;
@@ -13,7 +14,11 @@ const AnalyticsSummaryCards = ({
   totalOrders,
   totalWeight,
 }: AnalyticsSummaryCardsProps) => {
-  const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const { averageOrderValue, getRevenueStatus } = useDailyAnalytics(
+    totalRevenue,
+    totalOrders,
+    totalWeight || undefined,
+  );
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -72,12 +77,15 @@ const AnalyticsSummaryCards = ({
           ) : (
             <>
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">
-                  매출 효율성
+                <Badge 
+                  variant={getRevenueStatus()?.color as 'default' | 'secondary' | 'outline' || 'secondary'} 
+                  className="text-xs"
+                >
+                  매출 효율성: {getRevenueStatus()?.text || '보통'}
                 </Badge>
               </div>
               <p className="text-muted-foreground mt-2 text-xs">
-                주문당 평균 매출이 높습니다
+                {getRevenueStatus()?.description || '안정적인 매출 상태입니다'}
               </p>
             </>
           )}

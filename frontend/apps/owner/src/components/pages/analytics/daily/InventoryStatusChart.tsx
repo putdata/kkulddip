@@ -9,6 +9,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Package, AlertCircle, CheckCircle } from 'lucide-react';
 import type { InventoryStatus } from '@/types/analytics';
+import { useInventoryAnalytics } from '../hooks/useInventoryAnalytics';
 
 interface InventoryStatusChartProps {
   inventoryStatus: InventoryStatus;
@@ -17,54 +18,12 @@ interface InventoryStatusChartProps {
 const InventoryStatusChart = ({
   inventoryStatus,
 }: InventoryStatusChartProps) => {
-  // 차트 데이터 준비
-  const soldQuantity =
-    inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
+  const {
+    statusChartData: chartData,
+    inventoryStatusInfo: statusInfo,
+  } = useInventoryAnalytics(undefined, inventoryStatus);
 
-  const chartData = [
-    {
-      name: '판매완료',
-      value: soldQuantity,
-      color: '#10b981', // green-500
-    },
-    {
-      name: '남은재고',
-      value: inventoryStatus.totalRemainingCount,
-      color: '#3b82f6', // blue-500
-    },
-  ];
-
-  // 재고 상태 평가
-  const getInventoryStatus = () => {
-    const percentage = inventoryStatus.remainingPercentage;
-    if (percentage >= 70) {
-      return {
-        status: 'good',
-        color: 'secondary',
-        icon: CheckCircle,
-        text: '양호',
-        description: '재고가 충분합니다',
-      };
-    } else if (percentage >= 30) {
-      return {
-        status: 'warning',
-        color: 'default',
-        icon: AlertCircle,
-        text: '주의',
-        description: '재고 보충을 고려해보세요',
-      };
-    } else {
-      return {
-        status: 'critical',
-        color: 'destructive',
-        icon: AlertCircle,
-        text: '부족',
-        description: '재고 보충이 필요합니다',
-      };
-    }
-  };
-
-  const statusInfo = getInventoryStatus();
+  const soldQuantity = inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -87,7 +46,7 @@ const InventoryStatusChart = ({
         <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{data.name}</p>
           <p className="text-sm" style={{ color: data.color }}>
-            {data.value}개 ({percentage}%)
+            {data.value}개 ({percentage.toFixed(2)}%)
           </p>
         </div>
       );
@@ -132,7 +91,7 @@ const InventoryStatusChart = ({
                   dominantBaseline="middle"
                   className="fill-foreground text-lg font-bold"
                 >
-                  {inventoryStatus.remainingPercentage}%
+                  {inventoryStatus.remainingPercentage.toFixed(2)}%
                 </text>
               )}
             </PieChart>
@@ -142,28 +101,36 @@ const InventoryStatusChart = ({
         {/* 재고 상태 정보 */}
         <div className="mt-4 space-y-3">
           {/* 상태 배지 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <statusInfo.icon className="h-4 w-4" />
-              <span className="text-sm font-medium">재고 상태</span>
+          {statusInfo && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {statusInfo.status === 'good' ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                <span className="text-sm font-medium">재고 상태</span>
+              </div>
+              <Badge
+                variant={
+                  statusInfo.color as
+                    | 'default'
+                    | 'destructive'
+                    | 'outline'
+                    | 'secondary'
+                }
+              >
+                {statusInfo.text}
+              </Badge>
             </div>
-            <Badge
-              variant={
-                statusInfo.color as
-                  | 'default'
-                  | 'destructive'
-                  | 'outline'
-                  | 'secondary'
-              }
-            >
-              {statusInfo.text}
-            </Badge>
-          </div>
+          )}
 
           {/* 상태 설명 */}
-          <p className="text-muted-foreground text-xs">
-            {statusInfo.description}
-          </p>
+          {statusInfo && (
+            <p className="text-muted-foreground text-xs">
+              {statusInfo.description}
+            </p>
+          )}
 
           {/* 수량 요약 */}
           <div className="grid grid-cols-2 gap-4 border-t pt-2">

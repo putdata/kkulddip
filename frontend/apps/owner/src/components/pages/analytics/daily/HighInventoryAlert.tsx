@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Package, TrendingDown } from 'lucide-react';
 import type { HighInventoryDdipBox } from '@/types/analytics';
+import { useInventoryAnalytics } from '../hooks/useInventoryAnalytics';
 
 interface HighInventoryAlertProps {
   highInventoryItems: HighInventoryDdipBox[];
@@ -17,76 +18,11 @@ interface HighInventoryAlertProps {
 const HighInventoryAlert = ({
   highInventoryItems,
 }: HighInventoryAlertProps) => {
-  // 재고 위험도 계산
-  const getInventoryRisk = (item: HighInventoryDdipBox) => {
-    const remainingRatio = item.remainingCount / item.dailyCount;
-
-    if (remainingRatio >= 0.8) {
-      return {
-        level: 'high',
-        color: 'destructive',
-        text: '긴급',
-        percentage: remainingRatio * 100,
-      };
-    } else if (remainingRatio >= 0.6) {
-      return {
-        level: 'medium',
-        color: 'default',
-        text: '주의',
-        percentage: remainingRatio * 100,
-      };
-    } else {
-      return {
-        level: 'low',
-        color: 'secondary',
-        text: '보통',
-        percentage: remainingRatio * 100,
-      };
-    }
-  };
-
-  // 위험도 높은 순서로 정렬
-  const sortedItems = [...highInventoryItems].sort((a, b) => {
-    const ratioA = a.remainingCount / a.dailyCount;
-    const ratioB = b.remainingCount / b.dailyCount;
-    return ratioB - ratioA;
-  });
-
-  // 전체 알림 수준 계산
-  const getOverallAlertLevel = () => {
-    if (highInventoryItems.length === 0) {
-      return null;
-    }
-
-    const highRiskCount = highInventoryItems.filter(
-      item => getInventoryRisk(item).level === 'high',
-    ).length;
-
-    if (highRiskCount > 0) {
-      return {
-        level: 'high',
-        color: 'destructive',
-        message: `${highRiskCount}개 상품이 재고 과다 상태입니다`,
-        icon: AlertTriangle,
-      };
-    } else if (highInventoryItems.length > 3) {
-      return {
-        level: 'medium',
-        color: 'default',
-        message: '재고 관리가 필요한 상품들이 있습니다',
-        icon: Package,
-      };
-    } else {
-      return {
-        level: 'low',
-        color: 'secondary',
-        message: '재고 상태가 양호합니다',
-        icon: Package,
-      };
-    }
-  };
-
-  const overallAlert = getOverallAlertLevel();
+  const {
+    getHighInventoryRisk,
+    sortedHighInventoryItems: sortedItems,
+    overallAlertLevel: overallAlert,
+  } = useInventoryAnalytics(undefined, undefined, highInventoryItems);
 
   return (
     <Card>
@@ -109,7 +45,11 @@ const HighInventoryAlert = ({
                   overallAlert.level === 'high' ? 'border-destructive' : ''
                 }
               >
-                <overallAlert.icon className="h-4 w-4" />
+                {overallAlert.level === 'high' ? (
+                  <AlertTriangle className="h-4 w-4" />
+                ) : (
+                  <Package className="h-4 w-4" />
+                )}
                 <AlertDescription>{overallAlert.message}</AlertDescription>
               </Alert>
             )}
@@ -117,7 +57,7 @@ const HighInventoryAlert = ({
             {/* 재고 과다 상품 목록 */}
             <div className="space-y-3">
               {sortedItems.slice(0, 5).map(item => {
-                const risk = getInventoryRisk(item);
+                const risk = getHighInventoryRisk(item);
 
                 return (
                   <div
@@ -148,7 +88,7 @@ const HighInventoryAlert = ({
 
                     <div className="text-right">
                       <div className="font-bold text-orange-600">
-                        {risk.percentage}%
+                        {risk.percentage.toFixed(2)}%
                       </div>
                       <div className="text-muted-foreground text-xs">
                         재고율

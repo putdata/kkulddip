@@ -17,6 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Package, AlertTriangle } from 'lucide-react';
 import type { InventoryPrediction } from '@/types/analytics';
+import { useInventoryAnalytics } from '../hooks/useInventoryAnalytics';
 
 interface InventoryPredictionChartProps {
   predictions: InventoryPrediction[] | null;
@@ -25,34 +26,11 @@ interface InventoryPredictionChartProps {
 const InventoryPredictionChart = ({
   predictions,
 }: InventoryPredictionChartProps) => {
-  // null 체크 및 데이터 변환
-  const chartData =
-    predictions?.map(prediction => ({
-      date: prediction.date,
-      dailyQuantity: prediction.predictedDailyQuantity,
-      remainingQuantity: prediction.predictedRemainingQuantity,
-      inventoryRatio: prediction.inventoryRatio,
-      confidence: prediction.confidence * 100,
-    })) || [];
-
-  // 재고 위험도 계산
-  const getInventoryRisk = () => {
-    if (chartData.length === 0) {
-      return null;
-    }
-    const avgRatio =
-      chartData.reduce((sum, item) => sum + item.inventoryRatio, 0) /
-      chartData.length;
-    if (avgRatio < 20) {
-      return { level: 'high', color: 'destructive', text: '높음' };
-    }
-    if (avgRatio < 50) {
-      return { level: 'medium', color: 'default', text: '보통' };
-    }
-    return { level: 'low', color: 'secondary', text: '낮음' };
-  };
-
-  const riskLevel = chartData.length > 0 ? getInventoryRisk() : null;
+  const {
+    predictionChartData: chartData,
+    inventoryRiskLevel: riskLevel,
+    avgInventoryRatio,
+  } = useInventoryAnalytics(predictions);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -86,10 +64,10 @@ const InventoryPredictionChart = ({
             잔여 예상량: {data.remainingQuantity}개
           </p>
           <p className="text-muted-foreground text-sm">
-            재고율: {data.inventoryRatio}%
+            재고율: {data.inventoryRatio.toFixed(2)}%
           </p>
           <p className="text-muted-foreground text-sm">
-            신뢰도: {data.confidence}%
+            신뢰도: {data.confidence.toFixed(2)}%
           </p>
         </div>
       );
@@ -173,10 +151,7 @@ const InventoryPredictionChart = ({
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">평균 재고율</span>
                 <span className="text-lg font-bold text-green-600">
-                  {(chartData.reduce(
-                      (sum, item) => sum + item.inventoryRatio,
-                      0,
-                    ) / chartData.length).toFixed(2)}%
+                  {avgInventoryRatio.toFixed(2)}%
                 </span>
               </div>
 

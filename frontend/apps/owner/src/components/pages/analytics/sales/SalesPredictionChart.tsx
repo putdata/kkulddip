@@ -18,36 +18,18 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp } from 'lucide-react';
 import type { SalesPrediction } from '@/types/analytics';
+import { useSalesAnalytics } from '../hooks/useSalesAnalytics';
 
 interface SalesPredictionChartProps {
   predictions: SalesPrediction[];
 }
 
 const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
-  // 데이터 변환
-  const chartData = predictions.map(prediction => ({
-    date: prediction.date,
-    revenue: prediction.predictedRevenue,
-    confidence: prediction.confidence,
-  }));
-
-  // 신뢰도별 색상 결정
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) {
-      return '#10b981'; // green-500
-    }
-    if (confidence >= 60) {
-      return '#f59e0b'; // amber-500
-    }
-    return '#ef4444'; // red-500
-  };
-
-  // 평균 예측 매출
-  const avgPredictedRevenue =
-    predictions.length > 0
-      ? predictions.reduce((sum, p) => sum + p.predictedRevenue, 0) /
-        predictions.length
-      : 0;
+  const {
+    predictionChartData: chartData,
+    getConfidenceColor,
+    avgPredictedRevenue,
+  } = useSalesAnalytics(predictions);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -77,7 +59,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
             예상 매출: ₩{data.revenue.toLocaleString()}
           </p>
           <p className="text-muted-foreground text-sm">
-            신뢰도: {data.confidence}%
+            신뢰도: {data.confidence.toFixed(2)}%
           </p>
         </div>
       );
@@ -156,7 +138,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
                       }}
                       className="text-xs"
                     >
-                      {item.date}: {Math.round(item.confidence)}%
+                      {item.date}: {item.confidence.toFixed(2)}%
                     </Badge>
                   ))}
                 </div>
