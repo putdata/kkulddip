@@ -78,12 +78,12 @@ class CursorPaginationIntegrationTest {
             testStores.add(storeRepository.save(store));
         }
 
-        // 일부 가게에 띱박스 추가
-        for (int i = 0; i < 5; i++) {
+        // 모든 가게에 띱박스 추가 (ddipbox 필터링 조건을 만족시키기 위해)
+        for (int i = 0; i < testStores.size(); i++) {
             DdipBox ddipBox = DdipBox.builder()
                 .store(testStores.get(i))
                 .ddipboxName("띱박스 " + (i + 1))
-                .category(i % 2 == 0 ? "한식" : "양식")
+                .category(i % 3 == 0 ? "한식" : (i % 3 == 1 ? "양식" : "기타"))
                 .originalPrice(10000L + i * 1000)
                 .salePrice(8000L + i * 800)
                 .dailyQuantity(10L + i)
@@ -345,7 +345,22 @@ class CursorPaginationIntegrationTest {
             .createdAt(LocalDateTime.now())
             .build();
         
-        storeRepository.save(newStore);
+        Store savedNewStore = storeRepository.save(newStore);
+        
+        // 새로운 가게에도 ddipbox 추가 (필터링 조건 만족)
+        DdipBox newDdipBox = DdipBox.builder()
+            .store(savedNewStore)
+            .ddipboxName("새로운띱박스")
+            .category("기타")
+            .originalPrice(7000L)
+            .salePrice(5500L)
+            .dailyQuantity(5L)
+            .remainingQuantity(5L)
+            .maxPerCustomer(1L)
+            .isActive(true)
+            .build();
+        
+        ddipBoxRepository.save(newDdipBox);
 
         // 두 번째 페이지 조회 (커서 사용)
         StoreListRequest secondRequest = StoreListRequest.of(null, null, "id", 3, cursor);
@@ -384,7 +399,22 @@ class CursorPaginationIntegrationTest {
                 .createdAt(baseTime.minusHours(i))
                 .build();
             
-            storeRepository.save(store);
+            Store savedStore = storeRepository.save(store);
+            
+            // 각 store에 ddipbox 추가 (필터링 조건 만족)
+            DdipBox ddipBox = DdipBox.builder()
+                .store(savedStore)
+                .ddipboxName("대용량띱박스 " + i)
+                .category(i % 3 == 0 ? "한식" : (i % 3 == 1 ? "양식" : "기타"))
+                .originalPrice(5000L + (i % 10) * 500)
+                .salePrice(4000L + (i % 10) * 400)
+                .dailyQuantity((long) (5 + i % 10))
+                .remainingQuantity((long) (5 + i % 10))
+                .maxPerCustomer(1L)
+                .isActive(true)
+                .build();
+            
+            ddipBoxRepository.save(ddipBox);
         }
 
         long startTime = System.currentTimeMillis();
