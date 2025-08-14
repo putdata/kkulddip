@@ -37,7 +37,7 @@ export interface SalesAnalyticsResponse {
   topSellingProducts: TopSellingProduct[];
   topDiscountRanges: TopDiscountRange[];
   salesPrediction: SalesPrediction[];
-  inventoryPrediction: InventoryPrediction[];
+  inventoryPrediction: InventoryPrediction[] | null;
   totalRevenue: number;
   totalOrders: number;
   totalWeight: number | null;

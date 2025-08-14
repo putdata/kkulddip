@@ -1,0 +1,194 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp, Percent } from 'lucide-react';
+import type { ProfitMarginAnalysis } from '@/types/analytics';
+
+interface ProfitMarginChartProps {
+  profitAnalysis: ProfitMarginAnalysis;
+}
+
+const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
+  // 차트 색상
+  const COLORS = [
+    '#10b981', // emerald-500 - 높은 수익
+    '#3b82f6', // blue-500 - 보통 수익  
+    '#f59e0b', // amber-500 - 낮은 수익
+    '#ef4444', // red-500 - 손실
+  ];
+
+  // 도넛 차트 데이터 변환
+  const chartData = profitAnalysis.profitByMarginRanges.map((range, index) => ({
+    name: range.marginRange,
+    value: range.salesAmount,
+    productCount: range.productCount,
+    color: COLORS[index % COLORS.length],
+  }));
+
+  // 수익률 상태 평가
+  const getProfitStatus = () => {
+    const percentage = profitAnalysis.profitMarginPercentage;
+    if (percentage >= 30) {
+      return { status: 'excellent', color: 'default', text: '우수', icon: TrendingUp };
+    } else if (percentage >= 20) {
+      return { status: 'good', color: 'secondary', text: '양호', icon: TrendingUp };
+    } else if (percentage >= 10) {
+      return { status: 'fair', color: 'outline', text: '보통', icon: Percent };
+    } else {
+      return { status: 'poor', color: 'destructive', text: '개선필요', icon: TrendingUp };
+    }
+  };
+
+  const profitStatus = getProfitStatus();
+
+  // 커스텀 툴팁
+  const CustomTooltip = ({ active, payload }: {
+    active?: boolean;
+    payload?: Array<{ payload: { name: string; value: number; productCount: number; color: string } }>;
+  }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0]?.payload;
+      if (!data) {
+        return null;
+      }
+      const percentage = ((data.value / profitAnalysis.totalRevenue) * 100).toFixed(1);
+      
+      return (
+        <div className="rounded-lg border bg-background p-3 shadow-md">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-sm text-blue-600">
+            매출: ₩{data.value.toLocaleString()} ({percentage}%)
+          </p>
+          <p className="text-sm text-muted-foreground">
+            상품 수: {data.productCount}개
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
+          수익률 분석
+        </CardTitle>
+        <CardDescription>
+          수익률 구간별 매출 분포를 확인해보세요
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* 전체 수익 요약 */}
+          <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                ₩{profitAnalysis.totalProfit.toLocaleString()}
+              </div>
+              <div className="text-xs text-muted-foreground">총 수익</div>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <profitStatus.icon className="h-5 w-5" />
+                <span className="text-2xl font-bold">
+                  {profitAnalysis.profitMarginPercentage.toFixed(1)}%
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground">수익률</div>
+            </div>
+          </div>
+
+          {/* 수익률 상태 */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">수익률 평가</span>
+            <Badge variant={profitStatus.color as "default" | "destructive" | "outline" | "secondary"}>
+              {profitStatus.text}
+            </Badge>
+          </div>
+
+          {/* 수익률 구간별 차트 */}
+          {chartData.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={90}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend 
+                    wrapperStyle={{ fontSize: '12px' }}
+                    iconType="circle"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="flex h-32 items-center justify-center text-muted-foreground">
+              수익률 분석 데이터가 없습니다
+            </div>
+          )}
+
+          {/* 구간별 상세 정보 */}
+          {chartData.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">구간별 매출 현황</h4>
+              <div className="space-y-2">
+                {chartData.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span>{item.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium">
+                        ₩{item.value.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {item.productCount}개 상품
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 매출 vs 비용 비교 */}
+          <div className="pt-2 border-t">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">총 매출</span>
+                <span className="font-medium">
+                  ₩{profitAnalysis.totalRevenue.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">총 비용</span>
+                <span className="font-medium">
+                  ₩{profitAnalysis.totalCost.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default ProfitMarginChart;
