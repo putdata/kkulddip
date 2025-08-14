@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { formatTime } from '@/utils/dateUtils';
 import {
   mockDashboardStats,
   mockDiscountSalesData,
@@ -211,11 +212,7 @@ const Dashboard = () => {
                     할인 권장
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {new Date(item.expiryTime).toLocaleTimeString('ko-KR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    까지
+                    {formatTime(item.expiryTime)}까지
                   </div>
                 </div>
               ))}
@@ -302,10 +299,7 @@ const Dashboard = () => {
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">
-                      {new Date(order.orderTime).toLocaleTimeString('ko-KR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {formatTime(order.orderTime)}
                     </span>
                     <span className="font-medium">
                       ₩{order.totalAmount.toLocaleString()}

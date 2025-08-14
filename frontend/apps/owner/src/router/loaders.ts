@@ -1,8 +1,8 @@
 import { redirect, generatePath } from 'react-router-dom';
 import { useAuthStore, queryClient } from 'common';
 import { ROUTE_PATH } from './route-path';
-import { storeQueryKeys } from '@/queries/storeQueryKeys';
 import { storeService } from '@/services/storeService';
+import { storeQueryKeys } from '@/queries/store';
 
 export const indexLoader = async () => {
   const accessToken = useAuthStore.getState().accessToken;
