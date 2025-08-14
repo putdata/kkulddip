@@ -11,9 +11,9 @@ interface UseConfirmOrderParams {
 
 /**
  * 주문을 확정하거나 거절하는 뮤테이션 훅
- * 
+ *
  * @param orderId - 주문 ID
- * @param storeId - 매장 ID  
+ * @param storeId - 매장 ID
  * @returns 주문 확정/거절 뮤테이션 객체
  */
 export const useConfirmOrder = ({

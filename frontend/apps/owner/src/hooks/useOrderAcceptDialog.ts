@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import type { Order } from '@/types/order';
 import { useConfirmOrder } from '@/queries/order';
-import { addMinutes, createKoreanTime, getTimeOptions } from '@/utils/dateUtils';
+import {
+  addMinutes,
+  createKoreanTime,
+  getTimeOptions,
+} from '@/utils/dateUtils';
 
 interface UseOrderAcceptDialogProps {
   order: Order;
@@ -11,7 +15,7 @@ interface UseOrderAcceptDialogProps {
 
 /**
  * OrderAcceptDialog 비즈니스 로직을 관리하는 커스텀 훅
- * 
+ *
  * @param order - 확정할 주문 정보
  * @param storeId - 매장 ID
  * @param onOpenChange - 다이얼로그 열림/닫힘 상태 변경 콜백
@@ -57,10 +61,7 @@ export const useOrderAcceptDialog = ({
   const resetToDefault = () => {
     const newDefaultTime = addMinutes(30);
     setPickupTime(
-      createKoreanTime(
-        newDefaultTime.getHours(),
-        newDefaultTime.getMinutes(),
-      ),
+      createKoreanTime(newDefaultTime.getHours(), newDefaultTime.getMinutes()),
     );
     setManualHour(newDefaultTime.getHours().toString().padStart(2, '0'));
     setManualMinute(newDefaultTime.getMinutes().toString().padStart(2, '0'));

@@ -7,7 +7,7 @@ import type { Store } from '@/types/store';
 
 /**
  * 매장 선택 및 라우팅을 관리하는 커스텀 훅
- * 
+ *
  * @returns 매장 목록, 선택된 매장, 매장 변경 함수, 현재 매장 ID
  */
 export const useStoreSelection = () => {

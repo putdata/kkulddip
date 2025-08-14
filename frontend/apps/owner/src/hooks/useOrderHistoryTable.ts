@@ -3,7 +3,7 @@ import type { Order } from '@/types/order';
 
 /**
  * OrderHistoryTable 비즈니스 로직을 관리하는 커스텀 훅
- * 
+ *
  * @param onPickupClick - 픽업 완료 버튼 클릭 시 호출할 콜백 함수
  * @returns 주문 상태 관리, 주문 정보 포맷팅 관련 상태와 핸들러들
  */
