@@ -1,77 +1,147 @@
-# GitLab CI/CD 파이프라인 설정
 image: oven/bun:1
-
-# 캐시 설정으로 빌드 속도 향상
-cache:
-  key: "${CI_COMMIT_REF_SLUG}"
-  paths:
-    - frontend/node_modules/
-    - frontend/apps/user/node_modules/
-    - frontend/apps/owner/node_modules/
-    - frontend/packages/common/node_modules/
 
 # 파이프라인 단계 정의
 stages:
-  - install
-  - lint
-  - format
-  - build
+  - env
+  - test_and_build
+  - deploy
 
-# 의존성 설치
-install_dependencies:
-  stage: install
+# 캐시 비활성화로 매 파이프라인마다 새로 설치
+variables:
+  BUN_CACHE_DIR: ""
+
+# 환경 변수 설정
+setup_environment:
+  stage: env
   script:
-    - cd frontend
-    - bun install
+    # 공통 환경 변수
+    - |
+      cat > frontend/.env << EOF
+      VITE_API_BASE_URL=${API_SERVER_ADDRESS}
+      VITE_GOOGLE_OAUTH2_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
+      VITE_OAUTH2_SUCCESS_REDIRECT_URL=${OAUTH2_SUCCESS_REDIRECT_URL}
+      VITE_OAUTH2_SUCCESS_REDIRECT_URL_OWNER=${OAUTH2_SUCCESS_REDIRECT_URL_OWNER}
+      EOF
+    
+    # Customer 앱 .env
+    - |
+      cat > frontend/apps/customer/.env << EOF
+      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI}
+      EOF
+    
+    # Owner 앱 .env
+    - |
+      cat > frontend/apps/owner/.env << EOF
+      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI_OWNER}
+      EOF
   artifacts:
     paths:
-      - frontend/node_modules/
-      - frontend/apps/user/node_modules/
-      - frontend/apps/owner/node_modules/
-      - frontend/packages/common/node_modules/
+      - frontend/.env
+      - frontend/apps/customer/.env
+      - frontend/apps/owner/.env
     expire_in: 1 hour
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
-# 린트 검사
+# 환경 변수 설정
+setup_environment:
+  stage: env
+  script:
+    # 공통 환경 변수
+    - |
+      cat > frontend/.env << EOF
+      VITE_API_BASE_URL=${API_SERVER_ADDRESS}
+      VITE_GOOGLE_OAUTH2_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
+      VITE_OAUTH2_SUCCESS_REDIRECT_URL=${OAUTH2_SUCCESS_REDIRECT_URL}
+      VITE_OAUTH2_SUCCESS_REDIRECT_URL_OWNER=${OAUTH2_SUCCESS_REDIRECT_URL_OWNER}
+      EOF
+    
+    # Customer 앱 .env
+    - |
+      cat > frontend/apps/customer/.env << EOF
+      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI}
+      EOF
+    
+    # Owner 앱 .env
+    - |
+      cat > frontend/apps/owner/.env << EOF
+      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI_OWNER}
+      EOF
+  artifacts:
+    paths:
+      - frontend/.env
+      - frontend/apps/customer/.env
+      - frontend/apps/owner/.env
+    expire_in: 1 hour
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# 린트 검사 (병렬 실행)
 lint_check:
-  stage: lint
+  stage: test_and_build
   script:
     - cd frontend
+    - bun install  # 파이프라인마다 새로 설치
     - bun run lint
   dependencies:
-    - install_dependencies
+    - setup_environment
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
-# 포맷팅 검사
+# 포맷팅 검사 (병렬 실행)
 format_check:
-  stage: format
+  stage: test_and_build
   script:
     - cd frontend
+    - bun install  # 파이프라인마다 새로 설치
     - bun run format:check
   dependencies:
-    - install_dependencies
+    - setup_environment
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
-# 빌드 테스트
+# 빌드 (병렬 실행)
 build_project:
-  stage: build
+  stage: test_and_build
   script:
     - cd frontend
+    - bun install  # 파이프라인마다 새로 설치
     - bun run build
   artifacts:
     paths:
-      - frontend/apps/user/dist/
+      - frontend/apps/customer/dist/
       - frontend/apps/owner/dist/
       - frontend/packages/common/dist/
     expire_in: 1 week
   dependencies:
-    - install_dependencies
+    - setup_environment
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# 배포
+deploy_to_server:
+  stage: deploy
+  before_script:
+    - apt-get update && apt-get install -y rsync
+  script:
+    - rsync -av --delete frontend/apps/customer/dist/ /var/www/kkulddip/customer/
+    - rsync -av --delete frontend/apps/owner/dist/ /var/www/kkulddip/owner/
+    - chown -R www-data:www-data /var/www/kkulddip || true
+  dependencies:
+    - build_project
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+  environment:
+    name: production
+    url: https://kkulddip.store

@@ -34,7 +34,7 @@
   },
   "references": [
     { "path": "./packages/common" },
-    { "path": "./apps/user" },
+    { "path": "./apps/customer" },
     { "path": "./apps/owner" }
   ],
   "include": [],
