@@ -47,7 +47,7 @@ const Welcome = () => {
   const ctaSection = useIntersectionObserver();
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-full overflow-x-hidden bg-gradient-to-br from-amber-50 via-white to-orange-50">
       {/* Header */}
       <header
         className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${

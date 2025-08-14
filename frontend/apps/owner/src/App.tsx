@@ -40,7 +40,7 @@ function App() {
   }, []);
 
   return (
-    <SimpleBar style={{ maxHeight: '100vh', height: '100vh' }} autoHide={true}>
+    <SimpleBar className="h-dvh" autoHide={true}>
       <RouterProvider router={router} />
     </SimpleBar>
   );
