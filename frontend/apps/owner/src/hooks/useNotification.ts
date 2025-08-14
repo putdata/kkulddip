@@ -1,9 +1,19 @@
 import { VAPID_KEY, getToken, getMessagingInstance } from '@/firebase/config';
 import { useNotificationStore } from 'common';
 
+/**
+ * 푸시 알림 관리 Hook
+ *
+ * @description
+ * Firebase Cloud Messaging을 사용하여 푸시 알림을 관리합니다.
+ * 알림 권한 요청과 FCM 토큰 발급 기능을 제공합니다.
+ */
 export const useNotification = () => {
   const { fcmToken, setFcmToken } = useNotificationStore();
 
+  /**
+   * 알림 권한 요청 및 FCM 토큰 발급
+   */
   const requestPermission = async (): Promise<boolean> => {
     try {
       const permission = await Notification.requestPermission();

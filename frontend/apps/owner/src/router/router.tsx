@@ -25,6 +25,7 @@ export const router = createBrowserRouter([
       {
         index: true,
         loader: indexLoader,
+        element: <GlobalSuspenseFallback />,
         hydrateFallbackElement: <GlobalSuspenseFallback />,
       },
       {
