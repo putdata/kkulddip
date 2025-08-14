@@ -2,6 +2,7 @@ import SearchBar from '@/components/pages/home/SearchBar';
 import { ROUTE_PATH } from '@/router';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Bell, ShoppingCart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -32,7 +33,18 @@ const NavigationBar = () => {
           </button>
         </div>
       </div>
-      <SearchBar />
+      <div className="flex items-center justify-between">
+        <SearchBar />
+        {/* TODO: 일단은 마이페이지로 이동, STREAMS 로 이동 필요 */}
+        {/* <Button variant="destructive" onClick={() => navigate(ROUTE_PATH.STERAMS)}> */}
+        <Button
+          variant="destructive"
+          className="rounded-xl"
+          onClick={() => navigate(ROUTE_PATH.MY)}
+        >
+          LIVE
+        </Button>
+      </div>
     </nav>
   );
 };
