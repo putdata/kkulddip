@@ -81,10 +81,7 @@ const InventoryStatusChart = ({
       if (!data) {
         return null;
       }
-      const percentage = (
-        (data.value / inventoryStatus.totalDailyCount) *
-        100
-      ).toFixed(1);
+      const percentage = (data.value / inventoryStatus.totalDailyCount) * 100;
 
       return (
         <div className="bg-background rounded-lg border p-3 shadow-md">
@@ -135,7 +132,7 @@ const InventoryStatusChart = ({
                   dominantBaseline="middle"
                   className="fill-foreground text-lg font-bold"
                 >
-                  {inventoryStatus.remainingPercentage.toFixed(1)}%
+                  {inventoryStatus.remainingPercentage}%
                 </text>
               )}
             </PieChart>

@@ -89,10 +89,7 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
       if (!data) {
         return null;
       }
-      const percentage = (
-        (data.value / profitAnalysis.totalRevenue) *
-        100
-      ).toFixed(1);
+      const percentage = (data.value / profitAnalysis.totalRevenue) * 100;
 
       return (
         <div className="bg-background rounded-lg border p-3 shadow-md">
@@ -134,7 +131,7 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
               <div className="flex items-center justify-center gap-1">
                 <profitStatus.icon className="h-5 w-5" />
                 <span className="text-2xl font-bold">
-                  {profitAnalysis.profitMarginPercentage.toFixed(1)}%
+                  {profitAnalysis.profitMarginPercentage}%
                 </span>
               </div>
               <div className="text-muted-foreground text-xs">수익률</div>

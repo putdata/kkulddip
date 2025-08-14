@@ -12,18 +12,12 @@ const DailyOverviewCards = ({
   analysisDate,
   salesOverview,
 }: DailyOverviewCardsProps) => {
-  const formattedDate = new Date(analysisDate).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
   return (
     <>
       {/* 날짜 표시 */}
       <div className="mb-4">
         <Badge variant="outline" className="text-sm">
-          {formattedDate} 기준 분석
+          {analysisDate} 기준 분석
         </Badge>
       </div>
 

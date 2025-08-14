@@ -28,15 +28,11 @@ const InventoryPredictionChart = ({
   // null 체크 및 데이터 변환
   const chartData =
     predictions?.map(prediction => ({
-      date: new Date(prediction.date).toLocaleDateString('ko-KR', {
-        month: 'short',
-        day: 'numeric',
-      }),
+      date: prediction.date,
       dailyQuantity: prediction.predictedDailyQuantity,
       remainingQuantity: prediction.predictedRemainingQuantity,
-      inventoryRatio: prediction.inventoryRatio * 100, // 백분율로 변환
+      inventoryRatio: prediction.inventoryRatio,
       confidence: prediction.confidence * 100,
-      fullDate: prediction.date,
     })) || [];
 
   // 재고 위험도 계산
@@ -90,10 +86,10 @@ const InventoryPredictionChart = ({
             잔여 예상량: {data.remainingQuantity}개
           </p>
           <p className="text-muted-foreground text-sm">
-            재고율: {data.inventoryRatio.toFixed(1)}%
+            재고율: {data.inventoryRatio}%
           </p>
           <p className="text-muted-foreground text-sm">
-            신뢰도: {data.confidence.toFixed(1)}%
+            신뢰도: {data.confidence}%
           </p>
         </div>
       );
@@ -177,13 +173,10 @@ const InventoryPredictionChart = ({
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">평균 재고율</span>
                 <span className="text-lg font-bold text-green-600">
-                  {(
-                    chartData.reduce(
+                  {(chartData.reduce(
                       (sum, item) => sum + item.inventoryRatio,
                       0,
-                    ) / chartData.length
-                  ).toFixed(1)}
-                  %
+                    ) / chartData.length).toFixed(2)}%
                 </span>
               </div>
 

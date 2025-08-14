@@ -1,17 +1,16 @@
 import { useSalesAnalytics } from '@/queries/analytics';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import AnalyticsSummaryCards from '../common/AnalyticsSummaryCards';
 import TopSellingChart from './TopSellingChart';
 import DiscountRangeChart from './DiscountRangeChart';
 import SalesPredictionChart from './SalesPredictionChart';
 import InventoryPredictionChart from './InventoryPredictionChart';
+import SalesAnalyticsTabSkeleton from './SalesAnalyticsTabSkeleton';
 
 interface SalesAnalyticsTabProps {
   storeId: number;
@@ -78,42 +77,6 @@ const SalesAnalyticsTab = ({ storeId }: SalesAnalyticsTabProps) => {
 
         {/* 재고 예측 */}
         <InventoryPredictionChart predictions={salesData.inventoryPrediction} />
-      </div>
-    </div>
-  );
-};
-
-// 로딩 스켈레톤 컴포넌트
-const SalesAnalyticsTabSkeleton = () => {
-  return (
-    <div className="space-y-6">
-      {/* 요약 카드 스켈레톤 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {[1, 2, 3].map(i => (
-          <Card key={i}>
-            <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-24" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-32" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* 차트 스켈레톤 */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {[1, 2].map(i => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-              <Skeleton className="h-4 w-60" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-80 w-full" />
-            </CardContent>
-          </Card>
-        ))}
       </div>
     </div>
   );

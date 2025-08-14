@@ -68,7 +68,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
         <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-blue-600">
-            판매량: {data.value}개 ({data.percentage.toFixed(1)}%)
+            판매량: {data.value}개 ({data.percentage}%)
           </p>
         </div>
       );

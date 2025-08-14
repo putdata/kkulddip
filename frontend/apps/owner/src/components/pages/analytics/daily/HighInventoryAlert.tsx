@@ -148,7 +148,7 @@ const HighInventoryAlert = ({
 
                     <div className="text-right">
                       <div className="font-bold text-orange-600">
-                        {risk.percentage.toFixed(1)}%
+                        {risk.percentage}%
                       </div>
                       <div className="text-muted-foreground text-xs">
                         재고율

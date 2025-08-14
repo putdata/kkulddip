@@ -1,17 +1,16 @@
 import { useDailyAnalytics } from '@/queries/analytics';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import DailyOverviewCards from './DailyOverviewCards';
 import BestSellerTable from './BestSellerTable';
 import InventoryStatusChart from './InventoryStatusChart';
 import HighInventoryAlert from './HighInventoryAlert';
 import ProfitMarginChart from './ProfitMarginChart';
+import DailyAnalyticsTabSkeleton from './DailyAnalyticsTabSkeleton';
 
 interface DailyAnalyticsTabProps {
   storeId: number;
@@ -78,47 +77,6 @@ const DailyAnalyticsTab = ({ storeId }: DailyAnalyticsTabProps) => {
 
         {/* 수익률 분석 */}
         <ProfitMarginChart profitAnalysis={dailyData.profitMarginAnalysis} />
-      </div>
-    </div>
-  );
-};
-
-// 로딩 스켈레톤 컴포넌트
-const DailyAnalyticsTabSkeleton = () => {
-  return (
-    <div className="space-y-6">
-      {/* 개요 카드 스켈레톤 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {[1, 2, 3].map(i => (
-          <Card key={i}>
-            <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-24" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-32" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* 테이블과 차트 스켈레톤 */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <Skeleton className="h-6 w-40" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-64 w-full" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-32" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-64 w-full" />
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

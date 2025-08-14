@@ -48,7 +48,7 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
         <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{label}</p>
           <p className="text-sm text-blue-600">
-            판매 건수: {data.count}건 ({data.percentage.toFixed(1)}%)
+            판매 건수: {data.count}건 ({data.percentage}%)
           </p>
         </div>
       );

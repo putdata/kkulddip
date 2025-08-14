@@ -26,13 +26,9 @@ interface SalesPredictionChartProps {
 const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
   // 데이터 변환
   const chartData = predictions.map(prediction => ({
-    date: new Date(prediction.date).toLocaleDateString('ko-KR', {
-      month: 'short',
-      day: 'numeric',
-    }),
+    date: prediction.date,
     revenue: prediction.predictedRevenue,
-    confidence: prediction.confidence * 100, // 백분율로 변환
-    fullDate: prediction.date,
+    confidence: prediction.confidence,
   }));
 
   // 신뢰도별 색상 결정
@@ -65,7 +61,6 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
         date: string;
         revenue: number;
         confidence: number;
-        fullDate: string;
       };
     }>;
     label?: string;
@@ -82,7 +77,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
             예상 매출: ₩{data.revenue.toLocaleString()}
           </p>
           <p className="text-muted-foreground text-sm">
-            신뢰도: {data.confidence.toFixed(1)}%
+            신뢰도: {data.confidence}%
           </p>
         </div>
       );
@@ -115,7 +110,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
                   <XAxis dataKey="date" fontSize={12} />
                   <YAxis
                     fontSize={12}
-                    tickFormatter={value => `₩${(value / 1000).toFixed(0)}K`}
+                    tickFormatter={value => `₩${Math.round(value / 1000)}K`}
                   />
                   <Tooltip content={<CustomTooltip />} />
 
@@ -144,7 +139,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">평균 예상 매출</span>
                 <span className="text-lg font-bold text-blue-600">
-                  ₩{Math.round(avgPredictedRevenue).toLocaleString()}
+                  ₩{avgPredictedRevenue.toFixed(0)}
                 </span>
               </div>
 
@@ -161,7 +156,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
                       }}
                       className="text-xs"
                     >
-                      {item.date}: {item.confidence.toFixed(0)}%
+                      {item.date}: {Math.round(item.confidence)}%
                     </Badge>
                   ))}
                 </div>

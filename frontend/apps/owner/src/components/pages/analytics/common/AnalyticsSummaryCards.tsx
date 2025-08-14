@@ -46,7 +46,7 @@ const AnalyticsSummaryCards = ({
             {totalOrders.toLocaleString()}건
           </div>
           <p className="text-muted-foreground text-xs">
-            평균 주문 금액: ₩{Math.round(averageOrderValue).toLocaleString()}
+            평균 주문 금액: ₩{averageOrderValue.toFixed(0)}
           </p>
         </CardContent>
       </Card>
@@ -63,7 +63,7 @@ const AnalyticsSummaryCards = ({
           {totalWeight !== null ? (
             <>
               <div className="text-2xl font-bold">
-                {totalWeight.toFixed(1)}kg
+                {totalWeight}kg
               </div>
               <p className="text-muted-foreground text-xs">
                 판매된 총 상품 중량
