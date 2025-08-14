@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import FoodCard from './FoodCard';
-import { dummyStoreData } from '@/constants/homeMockData';
+// import { dummyStoreData } from '@/constants/homeMockData';
 
 const meta: Meta<typeof FoodCard> = {
   title: 'Components/common/FoodCard',
@@ -22,12 +22,12 @@ type Story = StoryObj<typeof FoodCard>;
 
 export const Default: Story = {
   args: {
-    store: dummyStoreData.body.content[0], // 첫 번째 매장 데이터 사용
+    // store: dummyStoreData.body.content[0], // 첫 번째 매장 데이터 사용
   },
 };
 
 export const SecondStore: Story = {
   args: {
-    store: dummyStoreData.body.content[1], // 두 번째 매장 데이터 사용
+    // store: dummyStoreData.body.content[1], // 두 번째 매장 데이터 사용
   },
 };
