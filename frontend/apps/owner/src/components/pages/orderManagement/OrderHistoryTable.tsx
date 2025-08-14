@@ -71,80 +71,90 @@ const OrderHistoryTable = ({
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[140px]">주문번호</TableHead>
-            <TableHead>고객정보</TableHead>
-            <TableHead>주문상품</TableHead>
-            <TableHead className="text-center">수량</TableHead>
-            <TableHead className="text-right">금액</TableHead>
-            <TableHead className="text-center">상태</TableHead>
-            <TableHead>주문일시</TableHead>
-            <TableHead>픽업시간</TableHead>
-            <TableHead className="text-center">액션</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map(order => (
-            <TableRow key={order.orderId}>
-              <TableCell className="font-mono text-sm">
-                {order.orderId.slice(-8)}
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-medium">
-                    {order.customerName || `고객 #${order.customerId}`}
-                  </span>
-                  {order.customerName && (
-                    <span className="text-muted-foreground text-xs">
-                      ID: {order.customerId}
-                    </span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="max-w-[200px]">
-                  <span className="text-sm">
-                    {getOrderItemsText(order.orderItems)}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                {getTotalQuantity(order.orderItems)}개
-              </TableCell>
-              <TableCell className="text-right font-medium">
-                {order.originalPrice.toLocaleString()}원
-              </TableCell>
-              <TableCell className="text-center">
-                {getStatusBadge(order.orderStatus)}
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {formatDateTime(order.orderDate)}
-              </TableCell>
-              <TableCell className="text-sm">
-                {order.pickupTime ? (
-                  <div className="flex items-center gap-1 text-green-600">
-                    <CheckCircle className="h-3 w-3" />
-                    {formatDateTime(order.pickupTime)}
-                  </div>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell className="text-center">
-                <PickupStatusButton
-                  order={order}
-                  isProcessing={processingIds.has(order.orderId)}
-                  isCompleted={completedIds.has(order.orderId)}
-                  onPickupClick={handlePickupClick}
-                />
-              </TableCell>
+    <div className="w-full overflow-auto">
+      <div className="min-w-[320px] rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px] sm:w-[100px] lg:w-[140px]">
+                주문번호
+              </TableHead>
+              <TableHead className="hidden xl:table-cell">고객정보</TableHead>
+              <TableHead className="hidden lg:table-cell">주문상품</TableHead>
+              <TableHead className="hidden text-center md:table-cell">
+                수량
+              </TableHead>
+              <TableHead className="hidden text-right sm:table-cell">
+                금액
+              </TableHead>
+              <TableHead className="text-center">상태</TableHead>
+              <TableHead className="hidden lg:table-cell">주문일시</TableHead>
+              <TableHead className="hidden xl:table-cell">픽업시간</TableHead>
+              <TableHead className="w-[80px] text-center sm:w-[100px]">
+                액션
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {orders.map(order => (
+              <TableRow key={order.orderId}>
+                <TableCell className="text-s font-mono sm:text-sm">
+                  {order.orderId.slice(-8)}
+                </TableCell>
+                <TableCell className="hidden xl:table-cell">
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      {order.customerName || `고객 #${order.customerId}`}
+                    </span>
+                    {order.customerName && (
+                      <span className="text-muted-foreground text-xs">
+                        ID: {order.customerId}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  <div className="max-w-[200px]">
+                    <span className="text-sm">
+                      {getOrderItemsText(order.orderItems)}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden text-center md:table-cell">
+                  {getTotalQuantity(order.orderItems)}개
+                </TableCell>
+                <TableCell className="hidden text-right font-medium sm:table-cell">
+                  {order.originalPrice.toLocaleString()}원
+                </TableCell>
+                <TableCell className="text-center">
+                  {getStatusBadge(order.orderStatus)}
+                </TableCell>
+                <TableCell className="text-muted-foreground hidden text-sm lg:table-cell">
+                  {formatDateTime(order.orderDate)}
+                </TableCell>
+                <TableCell className="hidden text-sm xl:table-cell">
+                  {order.pickupTime ? (
+                    <div className="flex items-center gap-1 text-green-600">
+                      <CheckCircle className="h-3 w-3" />
+                      {formatDateTime(order.pickupTime)}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-center">
+                  <PickupStatusButton
+                    order={order}
+                    isProcessing={processingIds.has(order.orderId)}
+                    isCompleted={completedIds.has(order.orderId)}
+                    onPickupClick={handlePickupClick}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
