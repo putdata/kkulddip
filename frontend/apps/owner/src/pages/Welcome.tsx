@@ -47,7 +47,7 @@ const Welcome = () => {
   const ctaSection = useIntersectionObserver();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-amber-50 via-white to-orange-50">
       {/* Header */}
       <header
         className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
@@ -126,9 +126,9 @@ const Welcome = () => {
       >
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="animate-blob absolute -left-48 top-1/4 h-96 w-96 rounded-full bg-amber-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
-          <div className="animate-blob animation-delay-2000 absolute -right-48 top-1/3 h-96 w-96 rounded-full bg-orange-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
-          <div className="animate-blob animation-delay-4000 absolute bottom-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-yellow-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
+          <div className="animate-blob absolute -left-24 top-1/4 h-64 w-64 rounded-full bg-amber-300 opacity-20 mix-blend-multiply blur-xl filter sm:-left-48 sm:h-96 sm:w-96"></div>
+          <div className="animate-blob animation-delay-2000 absolute -right-24 top-1/3 h-64 w-64 rounded-full bg-orange-300 opacity-20 mix-blend-multiply blur-xl filter sm:-right-48 sm:h-96 sm:w-96"></div>
+          <div className="animate-blob animation-delay-4000 absolute bottom-1/4 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-yellow-300 opacity-20 mix-blend-multiply blur-xl filter sm:h-96 sm:w-96"></div>
         </div>
 
         <div
@@ -745,10 +745,10 @@ const Welcome = () => {
             </div>
 
             {/* Enhanced Decorative elements */}
-            <div className="absolute -left-6 -top-6 h-12 w-12 rounded-full bg-amber-300 opacity-20"></div>
-            <div className="absolute -bottom-6 -right-6 h-10 w-10 rounded-full bg-orange-300 opacity-30"></div>
-            <div className="absolute -left-4 top-1/4 h-6 w-6 rounded-full bg-yellow-300 opacity-25"></div>
-            <div className="absolute -right-4 bottom-1/4 h-8 w-8 rounded-full bg-red-300 opacity-20"></div>
+            <div className="absolute left-2 top-2 h-8 w-8 rounded-full bg-amber-300 opacity-20 sm:-left-6 sm:-top-6 sm:h-12 sm:w-12"></div>
+            <div className="absolute bottom-2 right-2 h-6 w-6 rounded-full bg-orange-300 opacity-30 sm:-bottom-6 sm:-right-6 sm:h-10 sm:w-10"></div>
+            <div className="absolute left-4 top-1/4 h-4 w-4 rounded-full bg-yellow-300 opacity-25 sm:-left-4 sm:h-6 sm:w-6"></div>
+            <div className="absolute bottom-1/4 right-4 h-6 w-6 rounded-full bg-red-300 opacity-20 sm:-right-4 sm:h-8 sm:w-8"></div>
           </div>
         </div>
       </section>
