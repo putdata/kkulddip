@@ -33,22 +33,32 @@ export class ReviewService {
     const formData = new FormData();
 
     // request 객체를 JSON 문자열로 변환하여 추가
-    const requestData = {
+    const request = {
       customerId: data.customerId,
       content: data.content,
       orderId: data.orderId,
       rating: data.rating,
     };
 
-    formData.append('request', JSON.stringify(requestData));
+    formData.append(
+      'request',
+      new Blob([JSON.stringify(request)], {
+        type: 'application/json',
+      }),
+    );
 
     // 이미지 파일을 추가
     data.images.forEach(image => {
       formData.append('images', image);
     });
+
+    formData.forEach((value, key) => {
+      console.log(`${key} =>`, value);
+    });
+
     // TODO: storeID 변경 필요
-    // return apiClient.post(API_PATH.STORE_REVIEWS(storeId), formData)
-    return apiClient.post(API_PATH.STORE_REVIEWS('1'), formData);
+    return apiClient.post(API_PATH.STORE_REVIEWS(data.storeId), formData);
+    // return apiClient.post(API_PATH.STORE_REVIEWS('1'), formData);
   }
 
   /**

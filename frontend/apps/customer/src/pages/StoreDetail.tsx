@@ -2,7 +2,6 @@ import { StoreDetailHeader } from '@/components/pages/storeDetail/StoreDetailHea
 import { StoreDetailContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreDetailContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StoreReviewsContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreReviews/StoreReviewsContainer';
-// import { mockReviews } from '@/dummies/reviewDummy';
 
 import { useStoreDetail } from '@/hooks/useStoreDetail';
 import { useStoreDdipBoxes } from '@/hooks/useStoreDdipBoxes';

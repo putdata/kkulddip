@@ -83,7 +83,7 @@ const ReviewCreate = () => {
       customerId: 1,
       content: trimmedContent,
       // TODO: 실제 주문 ID로 변경 필요 (주문 연동 시)
-      orderId: 123,
+      orderId: 120,
       rating: reviewForm.rating,
       images: reviewForm.selectedImages,
     };
