@@ -69,11 +69,11 @@ const Welcome = () => {
             </div>
             <div>
               <h1
-                className={`text-2xl font-bold transition-all duration-300 ${
+                className={`text-2xl font-bold bg-gradient-to-r transition-all duration-300 ${
                   isScrolled
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent'
-                    : 'text-amber-700'
-                }`}
+                    ? 'from-amber-600 to-orange-600'
+                    : 'from-amber-700 to-amber-700'
+                } bg-clip-text text-transparent`}
               >
                 꿀띱
               </h1>
