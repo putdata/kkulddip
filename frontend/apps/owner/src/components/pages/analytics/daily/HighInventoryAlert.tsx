@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Package, TrendingDown } from 'lucide-react';
 import type { HighInventoryDdipBox } from '@/types/analytics';
-import { useInventoryAnalytics } from '../hooks/useInventoryAnalytics';
+import { useInventoryAnalytics } from '@/hooks/useInventoryAnalytics';
 
 interface HighInventoryAlertProps {
   highInventoryItems: HighInventoryDdipBox[];

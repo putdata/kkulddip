@@ -9,7 +9,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Package, AlertCircle, CheckCircle } from 'lucide-react';
 import type { InventoryStatus } from '@/types/analytics';
-import { useInventoryAnalytics } from '../hooks/useInventoryAnalytics';
+import { useInventoryAnalytics } from '@/hooks/useInventoryAnalytics';
 
 interface InventoryStatusChartProps {
   inventoryStatus: InventoryStatus;

@@ -17,7 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Package, AlertTriangle } from 'lucide-react';
 import type { InventoryPrediction } from '@/types/analytics';
-import { useInventoryAnalytics } from '../hooks/useInventoryAnalytics';
+import { useInventoryAnalytics } from '@/hooks/useInventoryAnalytics';
 
 interface InventoryPredictionChartProps {
   predictions: InventoryPrediction[] | null;

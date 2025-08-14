@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, ShoppingCart, Weight } from 'lucide-react';
-import { useDailyAnalytics } from '../hooks/useDailyAnalytics';
+import { useDailyAnalytics } from '@/hooks/useDailyAnalytics';
 
 interface AnalyticsSummaryCardsProps {
   totalRevenue: number;

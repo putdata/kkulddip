@@ -16,7 +16,7 @@ import type {
  * @param topProducts 인기 제품 데이터
  * @returns 매출 분석에 필요한 처리된 데이터와 계산 결과
  */
-export const useSalesAnalytics = (
+export const useSalesChartData = (
   predictions?: SalesPrediction[],
   topItems?: TopSellingItem[],
   topProducts?: TopSellingProduct[],

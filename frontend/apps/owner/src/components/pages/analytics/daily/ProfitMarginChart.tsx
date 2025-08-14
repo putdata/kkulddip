@@ -16,7 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Percent } from 'lucide-react';
 import type { ProfitMarginAnalysis } from '@/types/analytics';
-import { useProfitAnalytics } from '../hooks/useProfitAnalytics';
+import { useProfitAnalytics } from '@/hooks/useProfitAnalytics';
 
 interface ProfitMarginChartProps {
   profitAnalysis: ProfitMarginAnalysis;

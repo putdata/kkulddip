@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from 'recharts';
 import type { TopSellingItem, TopSellingProduct } from '@/types/analytics';
-import { useSalesAnalytics } from '../hooks/useSalesAnalytics';
+import { useSalesChartData } from '@/hooks/useSalesChartData';
 
 interface TopSellingChartProps {
   items: TopSellingItem[];
@@ -33,7 +33,7 @@ const COLORS = [
 
 const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
   const { itemsChartData: itemsData, productsChartData: productsData } =
-    useSalesAnalytics(undefined, items, products);
+    useSalesChartData(undefined, items, products);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -80,7 +80,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
           {/* 상품별 차트 */}
           <TabsContent value="items" className="mt-6 flex-1">
             {itemsData.length > 0 ? (
-              <div className="min-h-80 flex-1">
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -92,7 +92,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
                       paddingAngle={2}
                       dataKey="value"
                     >
-                      {itemsData.map((entry, index) => (
+                      {itemsData.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
@@ -114,7 +114,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
           {/* 제품별 차트 */}
           <TabsContent value="products" className="mt-6 flex-1">
             {productsData.length > 0 ? (
-              <div className="min-h-80 flex-1">
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -126,7 +126,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
                       paddingAngle={2}
                       dataKey="value"
                     >
-                      {productsData.map((entry, index) => (
+                      {productsData.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}

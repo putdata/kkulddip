@@ -18,7 +18,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp } from 'lucide-react';
 import type { SalesPrediction } from '@/types/analytics';
-import { useSalesAnalytics } from '../hooks/useSalesAnalytics';
+import { useSalesChartData } from '@/hooks/useSalesChartData';
 
 interface SalesPredictionChartProps {
   predictions: SalesPrediction[];
@@ -29,7 +29,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
     predictionChartData: chartData,
     getConfidenceColor,
     avgPredictedRevenue,
-  } = useSalesAnalytics(predictions);
+  } = useSalesChartData(predictions);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
