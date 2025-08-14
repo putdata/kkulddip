@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Clock, Package, User } from 'lucide-react';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/button';
@@ -6,30 +5,20 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import OrderConfirmDialog from './OrderConfirmDialog';
+import { formatDateTime } from '@/utils/dateUtils';
 
 interface OrderCardProps {
   order: Order;
-  storeId: number;
+  onAcceptClick: () => void;
+  onRejectClick: () => void;
 }
 
-const OrderCard = ({ order, storeId }: OrderCardProps) => {
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    });
-  };
+const OrderCard = ({ order, onAcceptClick, onRejectClick }: OrderCardProps) => {
 
   const totalQuantity = order.orderItems.reduce(
     (sum, item) => sum + item.quantity,
@@ -41,15 +30,13 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
       <Card className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-lg">
-                주문번호: {order.orderId.slice(0, 8)}
+            <div className="min-w-0 flex-1">
+              <CardTitle className="break-all text-base">
+                주문번호: {order.orderId}
               </CardTitle>
-              <CardDescription className="mt-1">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {formatDate(order.orderDate)}
-                </div>
+              <CardDescription className="mt-1 flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatDateTime(order.orderDate)}
               </CardDescription>
             </div>
             <Badge
@@ -61,7 +48,6 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* 주문 상품 목록 */}
           <div className="space-y-2">
             <div className="text-muted-foreground text-sm font-medium">
               주문 상품
@@ -83,7 +69,6 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
             </div>
           </div>
 
-          {/* 주문 정보 */}
           <div className="space-y-2 border-t pt-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1">
@@ -105,35 +90,23 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
               </span>
             </div>
           </div>
-
-          {/* 액션 버튼 */}
-          <div className="flex gap-2 pt-2">
-            <Button
-              className="flex-1"
-              variant="outline"
-              onClick={() => setShowConfirmDialog(true)}
-            >
-              주문 거절
-            </Button>
-            <Button
-              className="flex-1"
-              onClick={() => setShowConfirmDialog(true)}
-            >
-              주문 확정
-            </Button>
-          </div>
         </CardContent>
+        <CardFooter className="flex gap-2">
+          <Button
+            className="flex-1"
+            variant="outline"
+            onClick={onRejectClick}
+          >
+            주문 거절
+          </Button>
+          <Button
+            className="flex-1"
+            onClick={onAcceptClick}
+          >
+            주문 확정
+          </Button>
+        </CardFooter>
       </Card>
-
-      {/* 주문 확정/거절 다이얼로그 */}
-      {showConfirmDialog && (
-        <OrderConfirmDialog
-          order={order}
-          storeId={storeId}
-          open={showConfirmDialog}
-          onOpenChange={setShowConfirmDialog}
-        />
-      )}
     </>
   );
 };
