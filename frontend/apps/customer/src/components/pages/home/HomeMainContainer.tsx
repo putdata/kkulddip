@@ -1,5 +1,5 @@
 import FoodCard from '@/components/common/FoodCard/FoodCard';
-import type { Store } from '@/constants/homeMockData';
+import type { Store } from '@/types/store';
 import { useNavigate } from 'react-router-dom';
 
 interface HomeMainProps {

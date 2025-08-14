@@ -2,7 +2,6 @@ import { StoreDetailHeader } from '@/components/pages/storeDetail/StoreDetailHea
 import { StoreDetailContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreDetailContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StoreReviewsContainer } from '@/components/pages/storeDetail/StoreDetailContainer/StoreReviews/StoreReviewsContainer';
-// import { mockReviews } from '@/dummies/reviewDummy';
 
 import { useStoreDetail } from '@/hooks/useStoreDetail';
 import { useStoreDdipBoxes } from '@/hooks/useStoreDdipBoxes';
@@ -26,8 +25,7 @@ const StoreDetail = () => {
     error: ddipBoxError,
   } = useStoreDdipBoxes(storeId);
 
-  // const reviews = mockReviews[Number(storeId)];
-  const { data: reviews } = useStoreReviews(storeId);
+  const { data: reviewResponse } = useStoreReviews(storeId);
 
   // 둘 중 하나라도 로딩 중이면 로딩 표시
   if (storeLoading || ddipBoxLoading) {
@@ -67,7 +65,7 @@ const StoreDetail = () => {
         <TabsContent value="reviews">
           <StoreReviewsContainer
             storeId={storeId}
-            reviews={reviews}
+            reviewResponse={reviewResponse}
             reviewTotalCount={reviewTotalCount}
           />
         </TabsContent>

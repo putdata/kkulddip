@@ -58,7 +58,8 @@ class ApiClient {
       },
       error => {
         if (error.response?.status === 401) {
-          useAuthStore.getState().clearAuth();
+          console.log('401 에러');
+          // useAuthStore.getState().clearAuth();
         }
 
         if (error.isAxiosError) {
@@ -90,8 +91,22 @@ class ApiClient {
    * @param data - 요청 본문 데이터
    * @returns 응답 데이터
    */
-  async post<T>(url: string, data?: object): Promise<T> {
-    const response = await this.instance.post<ApiResponse<T>>(url, data);
+  async post<T>(url: string, data?: object | FormData): Promise<T> {
+    // FormData인 경우 Content-Type 헤더 제거 (브라우저가 자동 설정하도록)
+    let config = {};
+    if (data instanceof FormData) {
+      config = {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 또는 delete 사용
+        },
+      };
+    }
+
+    const response = await this.instance.post<ApiResponse<T>>(
+      url,
+      data,
+      config,
+    );
     return (response.data as ApiSuccessResponse<T>).body;
   }
 

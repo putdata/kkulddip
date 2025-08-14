@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 export default function MobileLayoutWithPageNavbar() {
   return (
-    <div className="mx-auto min-h-screen w-full max-w-md bg-white">
+    <div className="mx-auto h-dvh w-full max-w-md bg-white">
       <PageNavbar />
       <div className="pb-14 pt-12">
         <Outlet />

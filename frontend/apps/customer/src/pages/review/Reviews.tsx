@@ -1,15 +1,12 @@
 import ReviewsContainer from '@/components/pages/review/ReviewsContainer';
 import ReviewStoreInfoCard from '@/components/pages/review/ReviewStoreInfoCard';
-import { mockReviews } from '@/dummies/reviewDummy';
 import { useStoreDetail } from '@/hooks/useStoreDetail';
+import { useStoreReviews } from '@/hooks/useStoreReviews';
 import { useParams } from 'react-router-dom';
 
 const ReviewsPage = () => {
   const params = useParams();
   const storeId = params.storeId!;
-
-  // TODO: 데이터 API 요청 추가 필요
-  const reviews = mockReviews[Number(storeId)];
 
   const {
     data: store,
@@ -17,26 +14,38 @@ const ReviewsPage = () => {
     error: storeError,
   } = useStoreDetail(storeId);
 
-  // 둘 중 하나라도 로딩 중이면 로딩 표시
-  if (storeLoading) {
+  const {
+    data: reviewResponse,
+    isLoading: reviewsLoading,
+    error: reviewsError,
+  } = useStoreReviews(storeId);
+
+  if (storeLoading || reviewsLoading) {
     return <div>로딩 중...</div>;
   }
 
-  // 에러 처리
-  if (storeError || !store) {
+  // 에러 상태 추가
+  if (storeError || reviewsError) {
     return <div>에러가 발생했습니다.</div>;
   }
 
-  if (reviews) {
-    const totalReviews = reviews.length;
-
-    return (
-      <div>
-        <ReviewStoreInfoCard store={store} totalReviews={totalReviews} />
-        <ReviewsContainer reviews={reviews} />
-      </div>
-    );
+  // store 데이터가 없는 경우 처리
+  if (!store) {
+    return <div>가게 정보를 불러올 수 없습니다.</div>;
   }
+
+  const reviews = reviewResponse?.reviewList || []; // 기본값 설정
+
+  const totalReviews = reviews.length;
+
+  console.log(reviews);
+
+  return (
+    <div>
+      <ReviewStoreInfoCard store={store} totalReviews={totalReviews} />
+      <ReviewsContainer reviews={reviews} />
+    </div>
+  );
 };
 
 export default ReviewsPage;

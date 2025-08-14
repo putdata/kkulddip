@@ -3,21 +3,91 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { ReviewService } from '@/services/reviewService';
 import type { ReviewResponse } from '@/types/review';
 import { formatDate } from '@/utils/dateFormat';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+// import { toast } from 'sonner';
 
 interface ReviewProps {
   review: ReviewResponse;
 }
 
 const ReviewItem = ({ review }: ReviewProps) => {
+  // 도움돼요 상태 관리
+  const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
+  const [isHelpful, setIsHelpful] = useState(false); // 사용자가 이미 눌렀는지 여부
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 컴포넌트 마운트 시 도움돼요 상태 확인
+  useEffect(() => {
+    const checkHelpfulStatus = async () => {
+      try {
+        const helpful = await ReviewService.checkHelpful(review.reviewId);
+        setIsHelpful(helpful);
+      } catch (error) {
+        console.error('도움돼요 상태 확인 실패:', error);
+      }
+    };
+
+    checkHelpfulStatus();
+  }, [review.reviewId]);
+
+  // TODO: api 연동 필요
+  // const handleHelpfulClick = () => {
+  //   if (isHelpful) {
+  //     setHelpfulCount(prev => prev - 1);
+  //     setIsHelpful(false);
+  //   } else {
+  //     setHelpfulCount(prev => prev + 1);
+  //     setIsHelpful(true);
+  //   }
+  // };
+
+  const handleHelpfulClick = async () => {
+    if (isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (isHelpful) {
+        // 즉시 UI 업데이트
+        setHelpfulCount(prev => prev - 1);
+        setIsHelpful(false);
+
+        // API 호출
+        await ReviewService.removeHelpful(review.reviewId.toString());
+        console.log('도움돼요 제거 성공:', review.reviewId);
+      } else {
+        setHelpfulCount(prev => prev + 1);
+        setIsHelpful(true);
+
+        await ReviewService.addHelpful(review.reviewId.toString());
+        console.log('도움돼요 추가 성공:', review.reviewId);
+      }
+    } catch (error) {
+      if (isHelpful) {
+        setHelpfulCount(prev => prev + 1);
+        setIsHelpful(true);
+      } else {
+        setHelpfulCount(prev => prev - 1);
+        setIsHelpful(false);
+      }
+
+      console.error('도움돼요 처리 실패:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card key={review.reviewId} className="w-full rounded-none bg-white">
       <CardContent className="flex flex-col items-start gap-3 px-5">
         <div className="flex w-full items-start justify-between">
           <div className="inline-flex items-center gap-3">
-            {/* TODO: 유저 프로필 사진 어떻게 할 것 인지 논의 필요... */}
             <Avatar className="h-10 w-10 bg-amber-500">
               <AvatarFallback className="bg-amber-500 text-sm font-bold text-white">
                 {review.userName.charAt(0)}
@@ -68,13 +138,21 @@ const ReviewItem = ({ review }: ReviewProps) => {
         {/* 도움, 사장님 댓글 */}
         <Separator />
         <div className="flex h-5 w-full items-center justify-end gap-2 text-sm text-gray-400">
-          <div className="flex">
-            <ThumbsUpIcon className="h-5" />
-            {/* TODO: 도움 수 임시로 rating 사용 - 변경 필요 */}
-            <span>도움돼요 {review.rating}</span>
-          </div>
+          <button
+            onClick={handleHelpfulClick}
+            className={`flex cursor-pointer items-center gap-1 transition-colors hover:text-amber-500 ${
+              isHelpful ? 'text-amber-500' : 'text-gray-400'
+            }`}
+          >
+            <div className="flex">
+              <ThumbsUpIcon
+                className={`h-5 w-5 ${isHelpful ? 'fill-amber-500' : ''}`}
+              />
+              <span>도움돼요 {helpfulCount}</span>
+            </div>
+          </button>
           {/* TODO: 사장님 댓글 여부 확인 및 동작 추가 필요 */}
-          <div className="flex">
+          <div className="flex items-center gap-1">
             <MessageCircleMore className="h-5" />
             <span>사장님 댓글</span>
           </div>
