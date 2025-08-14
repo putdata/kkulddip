@@ -12,7 +12,7 @@ export const StoreDetailContainer = ({
   ddipBoxes,
 }: StoreDetailHeaderProps) => {
   return (
-    <div className="min-w-sm flex w-full flex-col items-center gap-2">
+    <div className="flex w-full flex-col items-center gap-2">
       <DdipboxContainer store={store} ddipBoxes={ddipBoxes} />
       <StoreDescription store={store} />
     </div>
