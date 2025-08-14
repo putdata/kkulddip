@@ -190,10 +190,10 @@ public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
     }
 
     /**
-     * 가게 ID로 PAYMENT_PENDING 이후 상태의 주문 목록 조회
-     * (PAID, AWAITING_CONFIRMATION, CONFIRMED, PICKED_UP 상태)
+     * 가게 ID로 AWAITING_CONFIRMATION 이후 상태의 주문 목록 조회
+     * (CONFIRMED, PICKED_UP 상태)
      */
-    @Query("SELECT o FROM OrderEntity o WHERE o.storeId = :storeId AND o.orderStatus IN ('PAID', 'AWAITING_CONFIRMATION', 'CONFIRMED', 'PICKED_UP') ORDER BY o.orderDate DESC")
+    @Query("SELECT o FROM OrderEntity o WHERE o.storeId = :storeId AND o.orderStatus IN ('CONFIRMED', 'PICKED_UP') ORDER BY o.orderDate DESC")
     List<OrderEntity> findByStoreIdAfterPaymentPending(@Param("storeId") Long storeId);
 
 }
