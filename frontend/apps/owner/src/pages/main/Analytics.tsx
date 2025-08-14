@@ -3,8 +3,8 @@ import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays } from 'lucide-react';
-import SalesAnalyticsTab from '@/components/pages/analytics/SalesAnalyticsTab';
-import DailyAnalyticsTab from '@/components/pages/analytics/DailyAnalyticsTab';
+import SalesAnalyticsTab from '@/components/pages/analytics/sales/SalesAnalyticsTab';
+import DailyAnalyticsTab from '@/components/pages/analytics/daily/DailyAnalyticsTab';
 
 const Analytics = () => {
   const { storeId } = useStoreSelection();

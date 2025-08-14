@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import AnalyticsSummaryCards from './AnalyticsSummaryCards';
+import AnalyticsSummaryCards from '../common/AnalyticsSummaryCards';
 import TopSellingChart from './TopSellingChart';
 import DiscountRangeChart from './DiscountRangeChart';
 import SalesPredictionChart from './SalesPredictionChart';
