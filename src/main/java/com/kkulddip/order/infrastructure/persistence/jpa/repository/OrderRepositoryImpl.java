@@ -237,4 +237,27 @@ public class OrderRepositoryImpl implements OrderRepository {
             throw OrderException.orderDatabaseError(e);
         }
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> findByStoreIdAfterPaymentPending(StoreId storeId) {
+        log.debug("가게 PAYMENT_PENDING 이후 주문 목록 조회 - storeId: {}", storeId.value());
+        
+        try {
+            List<OrderEntity> orderEntities = orderJpaRepository.findByStoreIdAfterPaymentPending(storeId.value());
+            
+            List<Order> orders = orderEntities.stream()
+                .map(orderEntityMapper::toDomain)
+                .collect(Collectors.toList());
+            
+            log.debug("가게 PAYMENT_PENDING 이후 주문 목록 조회 완료 - storeId: {}, count: {}", 
+                storeId.value(), orders.size());
+            
+            return orders;
+        } catch (Exception e) {
+            log.error("주문 데이터베이스 조회 작업 실패 - storeId: {}, operation: findByStoreIdAfterPaymentPending, details: {}", 
+                storeId.value(), e.getMessage(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
 }

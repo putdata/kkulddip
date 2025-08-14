@@ -68,7 +68,7 @@ public class OwnerOrderFacade {
             // 권한 검증: 사장님이 해당 가게를 소유하고 있는지 확인
             storeAuthService.validateOwnerPermission(ownerId, storeId);
             
-            List<Order> orders = orderService.findByStoreId(storeId);
+            List<Order> orders = orderService.findByStoreIdAfterPaymentPending(storeId);
             
             log.info("가게 주문 내역 조회 완료 - ownerId: {}, storeId: {}, count: {}", 
                 ownerId, storeId.value(), orders.size());
