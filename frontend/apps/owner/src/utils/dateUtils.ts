@@ -39,14 +39,14 @@ export const formatDate = (dateString: string): string => {
 };
 
 /**
- * 현재 시간에 분을 추가한 Date 객체 반환
+ * 한국시간 기준으로 현재 시간에 분을 추가한 Date 객체 반환
  * @param minutes - 추가할 분
- * @returns 새로운 Date 객체
+ * @returns 한국시간 기준 Date 객체
  */
 export const addMinutes = (minutes: number): Date => {
-  const date = new Date();
-  date.setMinutes(date.getMinutes() + minutes);
-  return date;
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + minutes);
+  return now;
 };
 
 /**
@@ -67,7 +67,7 @@ export const getTimeOptions = (
   // 현재 시간부터 30분 단위로 옵션 생성
   const currentMinutes = now.getMinutes();
   const startMinutes = currentMinutes < 30 ? 30 : 0;
-  
+
   for (let hour = start; hour <= Math.min(end, 23); hour++) {
     const minuteStart = hour === start ? startMinutes : 0;
     for (let minute = minuteStart; minute < 60; minute += 30) {
@@ -75,20 +75,16 @@ export const getTimeOptions = (
       if (hour === start && minute < currentMinutes) {
         continue;
       }
-      
-      const date = new Date();
-      date.setHours(hour);
-      date.setMinutes(minute);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
-      
-      const value = date.toISOString();
-      const label = date.toLocaleTimeString('ko-KR', {
+
+      const value = createKoreanTime(hour, minute);
+      // value와 동일한 시간으로 label 생성
+      const labelDate = new Date(value);
+      const label = labelDate.toLocaleTimeString('ko-KR', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,
       });
-      
+
       options.push({ value, label });
     }
   }
@@ -108,4 +104,45 @@ export const formatTimeKorean = (dateString: string): string => {
     minute: 'numeric',
     hour12: true,
   });
+};
+
+/**
+ * 한국시간 기준으로 현재 시간 생성
+ * @returns 한국시간 기준 Date 객체
+ */
+export const getKoreanTime = (): Date => {
+  // 한국시간대로 설정된 Date 객체 생성
+  const now = new Date();
+  const koreaTime = new Date(
+    now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+  );
+  return koreaTime;
+};
+
+/**
+ * 한국시간 기준으로 시간 생성
+ * @param hour - 시간 (0-23)
+ * @param minute - 분 (0-59)
+ * @returns 한국시간 기준 ISO 문자열
+ */
+export const createKoreanTime = (hour: number, minute: number): string => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const date = today.getDate();
+
+  // 한국시간 그대로 ISO 형식 문자열 생성 (UTC 변환 없이)
+  const isoString =
+    year +
+    '-' +
+    String(month + 1).padStart(2, '0') +
+    '-' +
+    String(date).padStart(2, '0') +
+    'T' +
+    String(hour).padStart(2, '0') +
+    ':' +
+    String(minute).padStart(2, '0') +
+    ':00.000';
+
+  return isoString;
 };

@@ -4,7 +4,11 @@ import { ddipboxService } from '@/services/ddipboxService';
 import { ddipboxQueryKeys } from './ddipboxQueryKeys';
 
 /**
- * 특정 가게의 딥박스 목록을 조회하는 쿼리 훅
+ * 특정 매장의 띱박스 목록을 조회하는 쿼리 훅
+ * 
+ * @param storeId - 조회할 매장 ID
+ * @param params - 페이지네이션 파라미터 (cursor, limit)
+ * @returns 띱박스 목록 쿼리 객체
  */
 export const useDdipboxList = (
   storeId: number,

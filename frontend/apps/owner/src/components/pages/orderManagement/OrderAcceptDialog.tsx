@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Clock, Check, Keyboard } from 'lucide-react';
 import type { Order } from '@/types/order';
-import { useConfirmOrder } from '@/queries/order';
-import { getTimeOptions, formatTimeKorean, addMinutes } from '@/utils/dateUtils';
+import { formatTimeKorean } from '@/utils/dateUtils';
+import { useOrderAcceptDialog } from '@/hooks/useOrderAcceptDialog';
 import {
   Dialog,
   DialogContent,
@@ -38,58 +37,18 @@ const OrderAcceptDialog = ({
   open,
   onOpenChange,
 }: OrderAcceptDialogProps) => {
-  // 기본값: 현재 시간 + 30분
-  const defaultTime = addMinutes(30);
-  const [pickupTime, setPickupTime] = useState(defaultTime.toISOString());
-  const [manualHour, setManualHour] = useState(
-    defaultTime.getHours().toString().padStart(2, '0'),
-  );
-  const [manualMinute, setManualMinute] = useState(
-    defaultTime.getMinutes().toString().padStart(2, '0'),
-  );
-
-  const confirmOrderMutation = useConfirmOrder({
-    orderId: order.orderId,
-    storeId,
-  });
-
-  const handleConfirm = () => {
-    confirmOrderMutation.mutate(
-      {
-        action: 'CONFIRM',
-        pickupTime,
-      },
-      {
-        onSuccess: () => {
-          onOpenChange(false);
-          const newDefaultTime = addMinutes(30);
-          setPickupTime(newDefaultTime.toISOString());
-          setManualHour(newDefaultTime.getHours().toString().padStart(2, '0'));
-          setManualMinute(newDefaultTime.getMinutes().toString().padStart(2, '0'));
-        },
-      },
-    );
-  };
-
-  const handleManualTimeChange = (hour: string, minute: string) => {
-    const h = parseInt(hour, 10);
-    const m = parseInt(minute, 10);
-    
-    if (!isNaN(h) && !isNaN(m) && h >= 0 && h < 24 && m >= 0 && m < 60) {
-      const newDate = new Date();
-      newDate.setHours(h);
-      newDate.setMinutes(m);
-      newDate.setSeconds(0);
-      newDate.setMilliseconds(0);
-      
-      // 현재 시간보다 이후인지 확인
-      if (newDate > new Date()) {
-        setPickupTime(newDate.toISOString());
-      }
-    }
-  };
-
-  const timeOptions = getTimeOptions();
+  const {
+    pickupTime,
+    setPickupTime,
+    manualHour,
+    setManualHour,
+    manualMinute,
+    setManualMinute,
+    handleConfirm,
+    handleManualTimeChange,
+    timeOptions,
+    confirmOrderMutation,
+  } = useOrderAcceptDialog({ order, storeId, onOpenChange });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,7 +73,7 @@ const OrderAcceptDialog = ({
                 직접 입력
               </TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="quick" className="space-y-2">
               <Label htmlFor="pickup-time">픽업 예상 시간</Label>
               <Select value={pickupTime} onValueChange={setPickupTime}>
@@ -138,7 +97,7 @@ const OrderAcceptDialog = ({
                 30분 단위로 빠르게 선택할 수 있습니다
               </p>
             </TabsContent>
-            
+
             <TabsContent value="manual" className="space-y-2">
               <Label>픽업 예상 시간 직접 입력</Label>
               <div className="flex items-center gap-2">

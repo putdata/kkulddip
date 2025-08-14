@@ -28,7 +28,7 @@ const DdipboxManagement = () => {
   } = useDdipboxList(storeId);
 
   const ddipboxes = ddipboxData || [];
-  
+
   const {
     selectedDdipbox,
     showAddDialog,
@@ -58,7 +58,6 @@ const DdipboxManagement = () => {
   if (error) {
     return <DdipboxManagementError error={error} onRetry={refetch} />;
   }
-
 
   return (
     <div className="space-y-6">

@@ -16,8 +16,10 @@ export interface UseUserSelectionOptions {
 }
 
 /**
- * 사용자 메뉴 선택 및 처리를 위한 훅
- * 메뉴 아이템과 로그아웃 기능을 제공합니다
+ * 사용자 메뉴 선택 및 처리를 위한 커스텀 훅
+ * 
+ * @param options - 메뉴 아이템 클릭 핸들러 옵션
+ * @returns 메뉴 아이템 배열과 로그아웃 핸들러
  */
 export const useUserSelection = (options: UseUserSelectionOptions = {}) => {
   const { clearAuth } = useAuthStore();

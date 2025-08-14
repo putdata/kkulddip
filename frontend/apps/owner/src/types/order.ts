@@ -7,6 +7,7 @@ export type OrderStatus =
   | 'PAID'
   | 'AWAITING_CONFIRMATION'
   | 'CONFIRMED'
+  | 'PICKED_UP'
   | 'CANCELLED'
   | 'FAILED';
 
@@ -31,11 +32,13 @@ export interface OrderItem {
 export interface Order {
   orderId: string;
   customerId: number;
+  customerName?: string;
   storeId: number;
   orderItems: OrderItem[];
   originalPrice: number;
   orderStatus: OrderStatus;
   orderDate: string;
+  pickupTime?: string;
 }
 
 /**
@@ -58,6 +61,20 @@ export interface ConfirmOrderResponse {
 }
 
 /**
+ * 주문 픽업 완료 응답
+ */
+export interface PickupOrderResponse {
+  orderId: string;
+  orderStatus: string;
+  pickedUpAt: string;
+}
+
+/**
  * 주문 정보
  */
 export type PendingOrdersResponse = Order[];
+
+/**
+ * 가게 주문 내역 조회 응답
+ */
+export type StoreOrderHistoryResponse = Order[];

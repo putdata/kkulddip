@@ -39,6 +39,8 @@ export const API_PATH = {
 
   ORDERS: {
     PENDING: '/v1/orders/pending',
+    STORE_HISTORY: '/v1/orders/store-history',
     CONFIRM: (orderId: string) => `/v1/orders/${orderId}/confirm`,
+    PICKUP: (orderId: string) => `/v1/orders/${orderId}/pickup`,
   },
 } as const;

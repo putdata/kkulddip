@@ -1,4 +1,9 @@
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const DdipboxManagementSkeleton = () => {
@@ -53,7 +58,7 @@ const DdipboxManagementSkeleton = () => {
 
             <CardContent className="space-y-4">
               <Skeleton className="h-4 w-full" />
-              
+
               <div className="space-y-2">
                 <Skeleton className="h-4 w-8" />
                 <div className="flex items-center gap-2">

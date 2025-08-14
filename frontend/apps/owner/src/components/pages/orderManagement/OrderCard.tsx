@@ -19,7 +19,6 @@ interface OrderCardProps {
 }
 
 const OrderCard = ({ order, onAcceptClick, onRejectClick }: OrderCardProps) => {
-
   const totalQuantity = order.orderItems.reduce(
     (sum, item) => sum + item.quantity,
     0,
@@ -92,17 +91,10 @@ const OrderCard = ({ order, onAcceptClick, onRejectClick }: OrderCardProps) => {
           </div>
         </CardContent>
         <CardFooter className="flex gap-2">
-          <Button
-            className="flex-1"
-            variant="outline"
-            onClick={onRejectClick}
-          >
+          <Button className="flex-1" variant="outline" onClick={onRejectClick}>
             주문 거절
           </Button>
-          <Button
-            className="flex-1"
-            onClick={onAcceptClick}
-          >
+          <Button className="flex-1" onClick={onAcceptClick}>
             주문 확정
           </Button>
         </CardFooter>

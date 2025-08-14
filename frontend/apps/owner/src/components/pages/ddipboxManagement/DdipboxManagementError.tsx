@@ -21,9 +21,7 @@ const DdipboxManagementError = ({
         <p className="text-muted-foreground mb-4 text-sm">
           띱박스 정보를 불러오는 중 문제가 발생했습니다.
         </p>
-        <p className="text-muted-foreground mb-4 text-xs">
-          {error.message}
-        </p>
+        <p className="text-muted-foreground mb-4 text-xs">{error.message}</p>
         <Button onClick={onRetry} className="gap-2">
           <RefreshCw className="h-4 w-4" />
           다시 시도

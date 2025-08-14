@@ -107,7 +107,7 @@ const OrderRejectDialog = ({
                     type="button"
                     onClick={() => setSelectedReason(reason.value)}
                     className={cn(
-                      'flex flex-col items-center justify-center gap-1.5 rounded-lg border-2 p-3 transition-all hover:bg-accent',
+                      'hover:bg-accent flex flex-col items-center justify-center gap-1.5 rounded-lg border-2 p-3 transition-all',
                       isSelected
                         ? 'border-primary bg-primary/5 text-primary'
                         : 'border-border bg-background',
@@ -123,8 +123,10 @@ const OrderRejectDialog = ({
 
           {/* 기타 사유 입력 */}
           {selectedReason === 'other' && (
-            <div className="space-y-2 animate-in slide-in-from-top-2">
-              <Label htmlFor="custom-reason">구체적인 사유를 입력해주세요</Label>
+            <div className="animate-in slide-in-from-top-2 space-y-2">
+              <Label htmlFor="custom-reason">
+                구체적인 사유를 입력해주세요
+              </Label>
               <Textarea
                 id="custom-reason"
                 placeholder="예: 특정 메뉴 준비 불가, 오늘 조기 마감 등..."
@@ -140,7 +142,10 @@ const OrderRejectDialog = ({
           )}
 
           {/* 경고 메시지 */}
-          <Alert variant="destructive" className="border-orange-200 bg-orange-50">
+          <Alert
+            variant="destructive"
+            className="border-orange-200 bg-orange-50"
+          >
             <AlertCircle className="h-4 w-4 text-orange-600" />
             <AlertDescription className="text-orange-800">
               주문을 거절하면 고객에게 알림이 전송되며, 이 작업은 취소할 수

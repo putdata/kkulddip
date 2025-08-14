@@ -6,9 +6,9 @@ import { getCurrentPageRoute } from '@/utils/sidebarUtils';
 import type { Store } from '@/types/store';
 
 /**
- * 스토어 선택 및 라우팅을 관리하는 훅
- * URL 파라미터 기반 스토어 선택과 스토어 간 이동 기능을 제공합니다
- * storeId 파라미터 유효성 검증 및 404 리다이렉트 포함
+ * 매장 선택 및 라우팅을 관리하는 커스텀 훅
+ * 
+ * @returns 매장 목록, 선택된 매장, 매장 변경 함수, 현재 매장 ID
  */
 export const useStoreSelection = () => {
   const navigate = useNavigate();

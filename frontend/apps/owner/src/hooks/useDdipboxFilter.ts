@@ -3,13 +3,10 @@ import type { DdipBox } from '@/types/ddipbox';
 import type { DdipboxStatusFilter } from '@/types/ddipboxManagement';
 
 /**
- * 띱박스 검색 및 필터링을 관리하는 훅
+ * 띱박스 검색 및 필터링을 관리하는 커스텀 훅
  *
- * @description
- * 검색어와 상태 필터를 통해 띱박스 목록을 필터링합니다.
- *
- * @param {DdipBox[]} ddipboxes - 전체 띱박스 목록
- * @returns 필터링된 띱박스와 검색/필터 상태
+ * @param ddipboxes - 전체 띱박스 목록
+ * @returns 검색어, 상태 필터, 필터링된 목록 및 설정 함수들
  */
 export const useDdipboxFilter = (ddipboxes: DdipBox[]) => {
   const [searchTerm, setSearchTerm] = useState('');

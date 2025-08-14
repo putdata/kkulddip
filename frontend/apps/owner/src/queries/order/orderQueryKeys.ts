@@ -7,4 +7,7 @@ export const orderQueryKeys = {
   pending: () => [...orderQueryKeys.all, 'pending'] as const,
   pendingByStore: (storeId: number) =>
     [...orderQueryKeys.pending(), storeId] as const,
+  storeHistory: () => [...orderQueryKeys.all, 'storeHistory'] as const,
+  storeHistoryByStore: (storeId: number) =>
+    [...orderQueryKeys.storeHistory(), storeId] as const,
 } as const;
