@@ -39,6 +39,7 @@ class DdipBoxItemDto(BaseModel):
     ddipboxItemName: str
     originalPrice: int
     itemQuantity: int
+    weight: Optional[float] = None
 
 class OrderItemDataDto(BaseModel):
     orderItemId: int

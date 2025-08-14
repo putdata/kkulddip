@@ -21,7 +21,7 @@ public class PythonAnalyticsClient {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${python.analytics.base-url:http://localhost:8001}")
+    @Value("${python.analytics.base-url}")
     private String pythonBaseUrl;
 
     public AnalyticsResponseDto analyzeData(AnalyticsRequestDto request) {
