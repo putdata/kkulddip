@@ -56,7 +56,7 @@ const Welcome = () => {
             : 'bg-transparent py-5'
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <div
               className={`rounded-lg p-2 transition-all duration-300 ${
@@ -83,10 +83,10 @@ const Welcome = () => {
           <div className="flex items-center gap-4">
             <Button
               size="sm"
-              className="hidden bg-gradient-to-r from-amber-500 to-orange-500 font-semibold text-white shadow-md transition-all duration-300 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg sm:inline-flex"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 font-semibold text-white shadow-md transition-all duration-300 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg"
               onClick={() => navigate(ROUTE_PATH.LOGIN)}
             >
-              가게 등록하기
+              지금 시작하기
               <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
 
@@ -132,7 +132,7 @@ const Welcome = () => {
         </div>
 
         <div
-          className={`relative z-10 mx-auto max-w-6xl px-4 text-center transition-all duration-1000 ${
+          className={`relative z-10 mx-auto max-w-6xl px-6 text-center transition-all duration-1000 ${
             heroSection.isVisible
               ? 'translate-y-0 opacity-100'
               : 'translate-y-10 opacity-0'
@@ -189,7 +189,7 @@ const Welcome = () => {
         ref={feature1Section.ref as React.RefObject<HTMLDivElement>}
         className="flex min-h-screen items-center py-20"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div
               className={`transition-all duration-1000 ${
@@ -350,7 +350,7 @@ const Welcome = () => {
         ref={feature2Section.ref as React.RefObject<HTMLDivElement>}
         className="flex min-h-screen items-center bg-gradient-to-br from-green-50 to-emerald-50 py-20"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div
               className={`order-2 transition-all duration-1000 lg:order-1 ${
@@ -470,7 +470,7 @@ const Welcome = () => {
         ref={feature3Section.ref as React.RefObject<HTMLDivElement>}
         className="flex min-h-screen items-center py-20"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div
               className={`transition-all duration-1000 ${
@@ -647,7 +647,7 @@ const Welcome = () => {
         ref={howItWorksSection.ref as React.RefObject<HTMLDivElement>}
         className="bg-gradient-to-br from-amber-50 to-orange-50 py-20"
       >
-        <div className="mx-auto w-full max-w-7xl px-4">
+        <div className="mx-auto w-full max-w-7xl px-6">
           <div
             className={`duration-1500 mb-16 text-center transition-all ${
               howItWorksSection.isVisible
@@ -758,7 +758,7 @@ const Welcome = () => {
         ref={additionalFeaturesSection.ref as React.RefObject<HTMLDivElement>}
         className="bg-gradient-to-br from-slate-50 to-gray-100 py-20"
       >
-        <div className="mx-auto max-w-6xl px-4">
+        <div className="mx-auto max-w-6xl px-6">
           <div
             className={`duration-1500 mb-12 text-center transition-all ${
               additionalFeaturesSection.isVisible
@@ -845,7 +845,7 @@ const Welcome = () => {
         ref={ctaSection.ref as React.RefObject<HTMLDivElement>}
         className="py-20"
       >
-        <div className="mx-auto max-w-4xl px-4 text-center">
+        <div className="mx-auto max-w-4xl px-6 text-center">
           <div
             className={`transition-all duration-1000 ${
               ctaSection.isVisible
@@ -882,7 +882,7 @@ const Welcome = () => {
                   className="bg-white px-10 py-4 text-lg font-bold text-amber-600 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-xl"
                   onClick={() => navigate(ROUTE_PATH.LOGIN)}
                 >
-                  무료로 시작하기
+                  지금 시작하기
                   <Package className="ml-2 h-5 w-5" />
                 </Button>
               </CardContent>
