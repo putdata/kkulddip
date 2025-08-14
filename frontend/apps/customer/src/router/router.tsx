@@ -18,6 +18,8 @@ import ReviewCreate from '@/pages/review/ReviewCreate';
 import AuthCallback from '@/pages/AuthCallback';
 import Notification from '@/pages/Notification';
 import StoreDetail from '@/pages/StoreDetail';
+import Streams from '@/pages/Streams';
+import StreamDetail from '@/pages/StreamDetail';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -77,6 +79,14 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.STORE,
             element: <StoreDetail />,
+          },
+          {
+            path: ROUTE_PATH.STREAMS,
+            element: <Streams />,
+          },
+          {
+            path: ROUTE_PATH.STREAM_DETAIL,
+            element: <StreamDetail />,
           },
         ],
       },

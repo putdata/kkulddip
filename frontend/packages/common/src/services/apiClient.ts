@@ -23,7 +23,7 @@ class ApiClient {
   constructor(baseURL = import.meta.env.VITE_API_BASE_URL) {
     this.instance = axios.create({
       baseURL: `${baseURL}`,
-      timeout: 10000,
+      timeout: 30000, // Increased from 10s to 30s for streaming operations
       headers: {
         'Content-Type': 'application/json',
       },
