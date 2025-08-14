@@ -211,4 +211,53 @@ public class OrderRepositoryImpl implements OrderRepository {
         
         return exists;
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Order> findByOrderIdAndCustomerId(OrderId orderId, CustomerId customerId) {
+        log.debug("주문 조회 시작 - orderId: {}, customerId: {}", 
+            orderId.value(), customerId.value());
+        
+        try {
+            Optional<OrderEntity> orderEntity = orderJpaRepository.findByOrderIdAndCustomerId(
+                orderId.value(), customerId.value());
+            
+            if (orderEntity.isPresent()) {
+                log.debug("주문 조회 성공 - orderId: {}, customerId: {}", 
+                    orderId.value(), customerId.value());
+                return Optional.of(orderEntityMapper.toDomain(orderEntity.get()));
+            } else {
+                log.debug("주문 조회 결과 없음 - orderId: {}, customerId: {}", 
+                    orderId.value(), customerId.value());
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("주문 데이터베이스 조회 작업 실패 - orderId: {}, customerId: {}, operation: findByOrderIdAndCustomerId, details: {}", 
+                orderId.value(), customerId.value(), e.getMessage(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> findByStoreIdAfterPaymentPending(StoreId storeId) {
+        log.debug("가게 PAYMENT_PENDING 이후 주문 목록 조회 - storeId: {}", storeId.value());
+        
+        try {
+            List<OrderEntity> orderEntities = orderJpaRepository.findByStoreIdAfterPaymentPending(storeId.value());
+            
+            List<Order> orders = orderEntities.stream()
+                .map(orderEntityMapper::toDomain)
+                .collect(Collectors.toList());
+            
+            log.debug("가게 PAYMENT_PENDING 이후 주문 목록 조회 완료 - storeId: {}, count: {}", 
+                storeId.value(), orders.size());
+            
+            return orders;
+        } catch (Exception e) {
+            log.error("주문 데이터베이스 조회 작업 실패 - storeId: {}, operation: findByStoreIdAfterPaymentPending, details: {}", 
+                storeId.value(), e.getMessage(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
 }

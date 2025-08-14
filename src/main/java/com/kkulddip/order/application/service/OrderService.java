@@ -194,4 +194,15 @@ public class OrderService {
             throw OrderException.orderUpdateFailed(String.valueOf(order.getOrderId().value()), e);
         }
     }
+    
+    /**
+     * 가게 ID로 PAYMENT_PENDING 이후 상태의 주문 목록 조회
+     * (PAID, AWAITING_CONFIRMATION, CONFIRMED, PICKED_UP 상태)
+     * 
+     * @param storeId 가게 ID
+     * @return 주문 목록
+     */
+    public List<Order> findByStoreIdAfterPaymentPending(StoreId storeId) {
+        return orderRepository.findByStoreIdAfterPaymentPending(storeId);
+    }
 }
