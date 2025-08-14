@@ -58,8 +58,9 @@ class ApiClient {
       },
       error => {
         if (error.response?.status === 401) {
-          console.log('401 에러');
-          // useAuthStore.getState().clearAuth();
+          // 인증 실패 시 토큰 제거만 수행
+          const { clearAuth } = useAuthStore.getState();
+          clearAuth();
         }
 
         if (error.isAxiosError) {
