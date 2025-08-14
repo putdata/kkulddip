@@ -63,7 +63,9 @@ export const DdipboxItem = ({ ddipbox }: RandomItemProps) => {
             {formatPrice(ddipbox.salePrice)}
           </p>
         </div>
-        <Button className="bg-amber-500">{message.RESERVE_BUTTON_TEXT}</Button>
+        <Button className="bg-amber-500 hover:bg-amber-500 data-[state=on]:bg-amber-600">
+          {message.RESERVE_BUTTON_TEXT}
+        </Button>
       </CardFooter>
     </Card>
   );
