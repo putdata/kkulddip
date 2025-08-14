@@ -131,7 +131,7 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
             </Table>
           </div>
         ) : (
-          <div className="text-muted-foreground flex h-full items-center justify-center">
+          <div className="text-muted-foreground flex h-full min-h-32 items-center justify-center">
             베스트셀러 데이터가 없습니다
           </div>
         )}
