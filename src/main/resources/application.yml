@@ -121,7 +121,3 @@ management:
             base-path: /actuator
             exposure:
                 include: health, info
-
-python:
-    analytics:
-        base-url: https://kkulddip-python-ai-298.fly.dev
