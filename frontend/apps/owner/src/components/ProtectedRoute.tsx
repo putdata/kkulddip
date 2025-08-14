@@ -13,9 +13,9 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // 컴포넌트가 마운트될 때 한 번 인증 상태를 체크
     setIsAuthChecked(true);
-    
+
     // authStore 상태 변경을 감지하여 401 에러로 인한 토큰 제거 시 즉시 리다이렉트
-    const unsubscribe = useAuthStore.subscribe((state) => {
+    const unsubscribe = useAuthStore.subscribe(state => {
       // 토큰이 제거되면 리다이렉트 (초기 로딩이 아닌 경우에만)
       if (isAuthChecked && !state.accessToken && accessToken) {
         // 현재 페이지가 로그인 페이지가 아닌 경우에만 리다이렉트
