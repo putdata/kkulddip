@@ -1,6 +1,7 @@
 import FilterBar from '@/components/pages/home/FilterBar';
 import HomeMainContainer from '@/components/pages/home/HomeMainContainer';
 import { useStores } from '@/hooks/useStores';
+import { Loader2 } from 'lucide-react';
 
 const Home = () => {
   const {
@@ -9,9 +10,15 @@ const Home = () => {
     error: storeError,
   } = useStores();
 
-  // 둘 중 하나라도 로딩 중이면 로딩 표시
   if (storeLoading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+          <div className="text-gray-500">주변 가게들을 불러오고 있어요...</div>
+        </div>
+      </div>
+    );
   }
 
   // 에러 처리

@@ -9,6 +9,7 @@ import { useStoreReviews } from '@/hooks/useStoreReviews';
 
 import { useParams } from 'react-router-dom';
 import { useCustomerProfile } from '@/hooks/useProfile';
+import { Loader2 } from 'lucide-react';
 
 const StoreDetail = () => {
   const params = useParams();
@@ -34,7 +35,14 @@ const StoreDetail = () => {
 
   // 둘 중 하나라도 로딩 중이면 로딩 표시
   if (storeLoading || ddipBoxLoading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+          <div className="text-gray-500">가게 정보를 불러오고 있어요...</div>
+        </div>
+      </div>
+    );
   }
 
   // 에러 처리
