@@ -29,7 +29,7 @@ export const useSalesChartData = (
       predictions?.map(prediction => ({
         date: prediction.date,
         revenue: prediction.predictedRevenue,
-        confidence: prediction.confidence * 100,
+        confidence: prediction.confidence,
       })) || [],
     [predictions],
   );
