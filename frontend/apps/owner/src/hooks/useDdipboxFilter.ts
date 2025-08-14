@@ -1,0 +1,35 @@
+import { useState, useMemo } from 'react';
+import type { DdipBox } from '@/types/ddipbox';
+import type { DdipboxStatusFilter } from '@/types/ddipboxManagement';
+
+/**
+ * 띱박스 검색 및 필터링을 관리하는 커스텀 훅
+ *
+ * @param ddipboxes - 전체 띱박스 목록
+ * @returns 검색어, 상태 필터, 필터링된 목록 및 설정 함수들
+ */
+export const useDdipboxFilter = (ddipboxes: DdipBox[]) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<DdipboxStatusFilter>('all');
+
+  const filteredDdipboxes = useMemo(() => {
+    return ddipboxes.filter((ddipbox: DdipBox) => {
+      const matchesSearch =
+        ddipbox.ddipboxName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ddipbox.category.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && ddipbox.isActive) ||
+        (statusFilter === 'inactive' && !ddipbox.isActive);
+      return matchesSearch && matchesStatus;
+    });
+  }, [ddipboxes, searchTerm, statusFilter]);
+
+  return {
+    searchTerm,
+    statusFilter,
+    filteredDdipboxes,
+    setSearchTerm,
+    setStatusFilter,
+  };
+};
