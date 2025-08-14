@@ -26,6 +26,7 @@ public final class SecurityPaths {
      */
     public static final String[] PUBLIC_GET_PATHS = {
         "/v1/events/**",
-        "/v1/stores/**"
+        "/v1/stores/**",
+        "/v1/stores"
     };
 }

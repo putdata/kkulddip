@@ -22,6 +22,11 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
     @Query("""
         SELECT s FROM Store s 
         WHERE s.isActive = true 
+        AND EXISTS (
+            SELECT 1 FROM DdipBox d 
+            WHERE d.store.storeId = s.storeId 
+            AND d.isActive = true
+        )
         AND (:cursor IS NULL OR s.storeId > :cursor)
         ORDER BY s.storeId ASC
         """)
@@ -36,6 +41,11 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
     @Query("""
         SELECT s FROM Store s 
         WHERE s.isActive = true 
+        AND EXISTS (
+            SELECT 1 FROM DdipBox d 
+            WHERE d.store.storeId = s.storeId 
+            AND d.isActive = true
+        )
         AND (
             :cursorDate IS NULL OR 
             s.createdAt < :cursorDate OR 
@@ -55,6 +65,11 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
     @Query("""
         SELECT s FROM Store s 
         WHERE s.isActive = true 
+        AND EXISTS (
+            SELECT 1 FROM DdipBox d 
+            WHERE d.store.storeId = s.storeId 
+            AND d.isActive = true
+        )
         AND (
             :cursorRating IS NULL OR 
             s.ratingAverage < :cursorRating OR 
@@ -82,6 +97,11 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
         WHERE s.is_active = true 
         AND s.latitude IS NOT NULL 
         AND s.longitude IS NOT NULL
+        AND EXISTS (
+            SELECT 1 FROM ddip_box d 
+            WHERE d.store_id = s.store_id 
+            AND d.is_active = true
+        )
         AND (
             :cursorDistance IS NULL OR 
             (6371 * acos(cos(radians(:userLat)) 
@@ -113,6 +133,11 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
     @Query("""
         SELECT s FROM Store s 
         WHERE s.isActive = true 
+        AND EXISTS (
+            SELECT 1 FROM DdipBox d 
+            WHERE d.store.storeId = s.storeId 
+            AND d.isActive = true
+        )
         AND (s.storeName LIKE %:keyword% OR s.description LIKE %:keyword%)
         AND (:cursor IS NULL OR s.storeId > :cursor)
         ORDER BY s.storeId ASC
@@ -146,7 +171,15 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
     /**
      * 활성화된 가게 수 조회 (전체)
      */
-    @Query("SELECT COUNT(s) FROM Store s WHERE s.isActive = true")
+    @Query("""
+        SELECT COUNT(s) FROM Store s 
+        WHERE s.isActive = true 
+        AND EXISTS (
+            SELECT 1 FROM DdipBox d 
+            WHERE d.store.storeId = s.storeId 
+            AND d.isActive = true
+        )
+        """)
     long countActiveStores();
 
     /**
@@ -155,6 +188,11 @@ public interface CursorStoreRepository extends JpaRepository<Store, Long> {
     @Query("""
         SELECT COUNT(s) FROM Store s 
         WHERE s.isActive = true 
+        AND EXISTS (
+            SELECT 1 FROM DdipBox d 
+            WHERE d.store.storeId = s.storeId 
+            AND d.isActive = true
+        )
         AND (s.storeName LIKE %:keyword% OR s.description LIKE %:keyword%)
         """)
     long countBySearchKeyword(@Param("keyword") String keyword);
