@@ -16,8 +16,9 @@ interface UseOrderAcceptDialogProps {
 /**
  * OrderAcceptDialog 비즈니스 로직을 관리하는 커스텀 훅
  *
- * @param order - 확정할 주문 정보
- * @param storeId - 매장 ID
+ * @description
+ * 주문 확정 다이얼로그의 상태와 로직을 관리합니다.
+ * 픽업 시간 설정 및 주문 확정 처리를 담당합니다.
  * @param onOpenChange - 다이얼로그 열림/닫힘 상태 변경 콜백
  * @returns 픽업 시간 선택, 주문 확정 관련 상태와 핸들러들
  */

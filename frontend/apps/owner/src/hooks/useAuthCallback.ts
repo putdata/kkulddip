@@ -6,6 +6,10 @@ import { ROUTE_PATH } from '@/router/route-path';
 
 /**
  * OAuth 콜백 처리를 위한 훅
+ * 
+ * @description
+ * Google OAuth 인증 완료 후 콜백 URL을 처리합니다.
+ * 인증 코드를 액세스 토큰으로 교환하고 사용자 정보를 저장합니다.
  */
 export const useAuthCallback = () => {
   const navigate = useNavigate();
@@ -15,7 +19,6 @@ export const useAuthCallback = () => {
 
   /**
    * OAuth 콜백 URL 처리 및 토큰 교환
-   * URL 파라미터에서 인증 코드를 추출하여 액세스 토큰으로 교환합니다
    */
   const processCallback = async () => {
     const urlParams = new URLSearchParams(location.search);
