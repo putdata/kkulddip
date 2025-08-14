@@ -111,3 +111,7 @@ firebase:
 management:
     server:
         port: 8080
+
+python:
+    analytics:
+        base-url: http://mock-server:8001  # 테스트용 Mock 서버
