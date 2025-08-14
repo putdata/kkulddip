@@ -14,12 +14,15 @@ export const useProfitAnalytics = (profitAnalysis?: ProfitMarginAnalysis) => {
   /*
    * 차트 색상 배열 (높은 수익 -> 손실 순서)
    */
-  const COLORS = useMemo(() => [
-    '#10b981', // emerald-500 - 높은 수익
-    '#3b82f6', // blue-500 - 보통 수익
-    '#f59e0b', // amber-500 - 낮은 수익
-    '#ef4444', // red-500 - 손실
-  ], []);
+  const COLORS = useMemo(
+    () => [
+      '#10b981', // emerald-500 - 높은 수익
+      '#3b82f6', // blue-500 - 보통 수익
+      '#f59e0b', // amber-500 - 낮은 수익
+      '#ef4444', // red-500 - 손실
+    ],
+    [],
+  );
 
   /*
    * 수익률 구간별 도넛 차트용 데이터
@@ -28,7 +31,7 @@ export const useProfitAnalytics = (profitAnalysis?: ProfitMarginAnalysis) => {
     if (!profitAnalysis) {
       return [];
     }
-    
+
     return profitAnalysis.profitByMarginRanges.map((range, index) => ({
       name: range.marginRange,
       value: range.salesAmount,
@@ -44,7 +47,7 @@ export const useProfitAnalytics = (profitAnalysis?: ProfitMarginAnalysis) => {
     if (!profitAnalysis) {
       return null;
     }
-    
+
     const percentage = profitAnalysis.profitMarginPercentage;
     if (percentage >= 30) {
       return {
@@ -59,10 +62,10 @@ export const useProfitAnalytics = (profitAnalysis?: ProfitMarginAnalysis) => {
         text: '양호',
       };
     } else if (percentage >= 10) {
-      return { 
-        status: 'fair', 
-        color: 'outline', 
-        text: '보통' 
+      return {
+        status: 'fair',
+        color: 'outline',
+        text: '보통',
       };
     } else {
       return {

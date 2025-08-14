@@ -13,7 +13,7 @@ export const useDdipboxFilter = (ddipboxes: DdipBox[]) => {
    * 검색어 상태
    */
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   /**
    * 상태 필터 (전체/활성/비활성)
    */

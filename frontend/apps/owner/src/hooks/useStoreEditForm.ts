@@ -10,7 +10,7 @@ interface UseStoreEditFormOptions {
 
 /**
  * 매장 정보 수정 폼 관리 Hook
- * 
+ *
  * @description
  * 매장 정보 수정 다이얼로그의 폼 데이터와 제출 로직을 관리합니다.
  */

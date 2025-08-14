@@ -29,7 +29,7 @@ interface UseStreamFlowManagerProps {
 
 /**
  * 스트림 플로우를 관리하는 커스텀 훅
- * 
+ *
  * @description
  * OpenVidu와 백엔드 API를 연동하여 스트림 생성부터 종료까지의 전체 플로우를 관리합니다.
  */

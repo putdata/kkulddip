@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import type { 
-  InventoryPrediction, 
-  InventoryStatus, 
-  HighInventoryDdipBox 
+import type {
+  InventoryPrediction,
+  InventoryStatus,
+  HighInventoryDdipBox,
 } from '@/types/analytics';
 
 /**
@@ -46,12 +46,20 @@ export const useInventoryAnalytics = (
     const avgRatio =
       predictionChartData.reduce((sum, item) => sum + item.inventoryRatio, 0) /
       predictionChartData.length;
-    
+
     if (avgRatio < 20) {
-      return { level: 'high' as const, color: 'destructive' as const, text: '높음' };
+      return {
+        level: 'high' as const,
+        color: 'destructive' as const,
+        text: '높음',
+      };
     }
     if (avgRatio < 50) {
-      return { level: 'medium' as const, color: 'default' as const, text: '보통' };
+      return {
+        level: 'medium' as const,
+        color: 'default' as const,
+        text: '보통',
+      };
     }
     return { level: 'low' as const, color: 'secondary' as const, text: '낮음' };
   }, [predictionChartData]);
@@ -63,7 +71,10 @@ export const useInventoryAnalytics = (
     if (predictionChartData.length === 0) {
       return 0;
     }
-    return predictionChartData.reduce((sum, item) => sum + item.inventoryRatio, 0) / predictionChartData.length;
+    return (
+      predictionChartData.reduce((sum, item) => sum + item.inventoryRatio, 0) /
+      predictionChartData.length
+    );
   }, [predictionChartData]);
 
   /*
@@ -73,9 +84,10 @@ export const useInventoryAnalytics = (
     if (!inventoryStatus) {
       return [];
     }
-    
-    const soldQuantity = inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
-    
+
+    const soldQuantity =
+      inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
+
     return [
       {
         name: '판매완료',
@@ -97,7 +109,7 @@ export const useInventoryAnalytics = (
     if (!inventoryStatus) {
       return null;
     }
-    
+
     const percentage = inventoryStatus.remainingPercentage;
     if (percentage >= 70) {
       return {
@@ -160,7 +172,7 @@ export const useInventoryAnalytics = (
     if (!highInventoryItems) {
       return [];
     }
-    
+
     return [...highInventoryItems].sort((a, b) => {
       const ratioA = a.remainingCount / a.dailyCount;
       const ratioB = b.remainingCount / b.dailyCount;

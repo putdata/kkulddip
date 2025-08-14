@@ -12,22 +12,22 @@ export const useDdipboxDialog = () => {
    * 선택된 띱박스 정보
    */
   const [selectedDdipbox, setSelectedDdipbox] = useState<DdipBox | null>(null);
-  
+
   /**
    * 띱박스 추가 다이얼로그 표시 여부
    */
   const [showAddDialog, setShowAddDialog] = useState(false);
-  
+
   /**
    * 띱박스 편집 다이얼로그 표시 여부
    */
   const [showEditDialog, setShowEditDialog] = useState(false);
-  
+
   /**
    * 띱박스 삭제 다이얼로그 표시 여부
    */
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
   /**
    * 띱박스 수량 변경 다이얼로그 표시 여부
    */

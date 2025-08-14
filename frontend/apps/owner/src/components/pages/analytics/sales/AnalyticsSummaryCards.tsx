@@ -13,10 +13,7 @@ const AnalyticsSummaryCards = ({
   totalOrders,
   totalWeight,
 }: AnalyticsSummaryCardsProps) => {
-  const { averageOrderValue } = useDailyAnalytics(
-    totalRevenue,
-    totalOrders,
-  );
+  const { averageOrderValue } = useDailyAnalytics(totalRevenue, totalOrders);
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -66,9 +63,7 @@ const AnalyticsSummaryCards = ({
           <div className="text-2xl font-bold">
             {totalWeight !== null ? `${totalWeight}kg` : '0kg'}
           </div>
-          <p className="text-muted-foreground text-xs">
-            판매된 총 상품 중량
-          </p>
+          <p className="text-muted-foreground text-xs">판매된 총 상품 중량</p>
         </CardContent>
       </Card>
     </div>

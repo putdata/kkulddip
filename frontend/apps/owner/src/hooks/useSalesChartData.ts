@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import type { 
-  SalesPrediction, 
-  TopSellingItem, 
-  TopSellingProduct 
+import type {
+  SalesPrediction,
+  TopSellingItem,
+  TopSellingProduct,
 } from '@/types/analytics';
 
 /**
@@ -55,7 +55,10 @@ export const useSalesChartData = (
     if (!predictions || predictions.length === 0) {
       return 0;
     }
-    return predictions.reduce((sum, p) => sum + p.predictedRevenue, 0) / predictions.length;
+    return (
+      predictions.reduce((sum, p) => sum + p.predictedRevenue, 0) /
+      predictions.length
+    );
   }, [predictions]);
 
   /*

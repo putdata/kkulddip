@@ -3,7 +3,7 @@ import { useNotificationStore } from 'common';
 
 /**
  * 푸시 알림 관리 Hook
- * 
+ *
  * @description
  * Firebase Cloud Messaging을 사용하여 푸시 알림을 관리합니다.
  * 알림 권한 요청과 FCM 토큰 발급 기능을 제공합니다.
