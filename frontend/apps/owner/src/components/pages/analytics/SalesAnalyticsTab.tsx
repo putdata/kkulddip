@@ -1,5 +1,11 @@
 import { useSalesAnalytics } from '@/queries/analytics';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import AnalyticsSummaryCards from './AnalyticsSummaryCards';
 import TopSellingChart from './TopSellingChart';
@@ -47,7 +53,7 @@ const SalesAnalyticsTab = ({ storeId }: SalesAnalyticsTabProps) => {
   return (
     <div className="space-y-6">
       {/* 매출 요약 카드들 */}
-      <AnalyticsSummaryCards 
+      <AnalyticsSummaryCards
         totalRevenue={salesData.totalRevenue}
         totalOrders={salesData.totalOrders}
         totalWeight={salesData.totalWeight}
@@ -56,7 +62,7 @@ const SalesAnalyticsTab = ({ storeId }: SalesAnalyticsTabProps) => {
       {/* 차트 그리드 */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* 인기 상품 차트 */}
-        <TopSellingChart 
+        <TopSellingChart
           items={salesData.topSellingItems}
           products={salesData.topSellingProducts}
         />

@@ -5,7 +5,7 @@ import type { SettlementSummaryResponse } from '@/types/settlement';
 
 /**
  * 전체 가게 정산 요약을 조회하는 쿼리 훅
- * 
+ *
  * @param year - 조회할 년도
  * @param month - 조회할 월
  * @returns 정산 요약 쿼리 객체

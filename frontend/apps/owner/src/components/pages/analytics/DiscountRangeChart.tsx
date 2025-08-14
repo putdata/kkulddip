@@ -1,5 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import type { TopDiscountRange } from '@/types/analytics';
 
@@ -16,7 +30,11 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
   }));
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload, label }: {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
     active?: boolean;
     payload?: Array<{ payload: { count: number; percentage: number } }>;
     label?: string;
@@ -27,7 +45,7 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
         return null;
       }
       return (
-        <div className="rounded-lg border bg-background p-3 shadow-md">
+        <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{label}</p>
           <p className="text-sm text-blue-600">
             판매 건수: {data.count}건 ({data.percentage.toFixed(1)}%)
@@ -52,10 +70,13 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
             {/* 차트 */}
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="range" 
+                  <XAxis
+                    dataKey="range"
                     fontSize={12}
                     angle={-45}
                     textAnchor="end"
@@ -63,11 +84,7 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
                   />
                   <YAxis fontSize={12} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="count" 
-                    fill="#3b82f6" 
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -77,9 +94,9 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
               <h4 className="text-sm font-medium">주요 할인 구간</h4>
               <div className="flex flex-wrap gap-2">
                 {chartData.slice(0, 3).map((item, index) => (
-                  <Badge 
-                    key={item.range} 
-                    variant={index === 0 ? "default" : "secondary"}
+                  <Badge
+                    key={item.range}
+                    variant={index === 0 ? 'default' : 'secondary'}
                     className="text-xs"
                   >
                     {item.range}: {item.count}건
@@ -89,7 +106,7 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
             </div>
           </>
         ) : (
-          <div className="flex h-80 items-center justify-center text-muted-foreground">
+          <div className="text-muted-foreground flex h-80 items-center justify-center">
             할인별 판매 데이터가 없습니다
           </div>
         )}

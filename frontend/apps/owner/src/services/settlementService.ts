@@ -17,10 +17,13 @@ export const settlementService = {
     year: number,
     month: number,
   ): Promise<SettlementSummaryResponse> => {
-    return apiClient.get<SettlementSummaryResponse>(API_PATH.SETTLEMENT.SUMMARY, {
-      year,
-      month,
-    });
+    return apiClient.get<SettlementSummaryResponse>(
+      API_PATH.SETTLEMENT.SUMMARY,
+      {
+        year,
+        month,
+      },
+    );
   },
 
   /**

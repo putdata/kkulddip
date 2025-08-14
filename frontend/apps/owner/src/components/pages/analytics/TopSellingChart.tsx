@@ -1,6 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from 'recharts';
 import type { TopSellingItem, TopSellingProduct } from '@/types/analytics';
 
 interface TopSellingChartProps {
@@ -37,9 +50,14 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
   const productsData = formatProductsForChart(products);
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload }: {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
     active?: boolean;
-    payload?: Array<{ payload: { name: string; value: number; percentage: number } }>;
+    payload?: Array<{
+      payload: { name: string; value: number; percentage: number };
+    }>;
   }) => {
     if (active && payload && payload.length) {
       const data = payload[0]?.payload;
@@ -47,7 +65,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
         return null;
       }
       return (
-        <div className="rounded-lg border bg-background p-3 shadow-md">
+        <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-blue-600">
             판매량: {data.value}개 ({data.percentage.toFixed(1)}%)
@@ -101,7 +119,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="flex h-80 items-center justify-center text-muted-foreground">
+              <div className="text-muted-foreground flex h-80 items-center justify-center">
                 상품별 판매 데이터가 없습니다
               </div>
             )}
@@ -135,7 +153,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="flex h-80 items-center justify-center text-muted-foreground">
+              <div className="text-muted-foreground flex h-80 items-center justify-center">
                 제품별 판매 데이터가 없습니다
               </div>
             )}

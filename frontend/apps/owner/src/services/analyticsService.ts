@@ -25,7 +25,10 @@ export const analyticsService = {
       params.endDate = endDate;
     }
 
-    return apiClient.get<SalesAnalyticsResponse>(API_PATH.ANALYTICS.SALES, params);
+    return apiClient.get<SalesAnalyticsResponse>(
+      API_PATH.ANALYTICS.SALES,
+      params,
+    );
   },
 
   /**
@@ -40,6 +43,9 @@ export const analyticsService = {
       params.targetDate = targetDate;
     }
 
-    return apiClient.get<DailyAnalyticsResponse>(API_PATH.ANALYTICS.DAILY, params);
+    return apiClient.get<DailyAnalyticsResponse>(
+      API_PATH.ANALYTICS.DAILY,
+      params,
+    );
   },
 };

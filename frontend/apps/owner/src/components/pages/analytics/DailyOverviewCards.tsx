@@ -8,7 +8,10 @@ interface DailyOverviewCardsProps {
   salesOverview: SalesOverview;
 }
 
-const DailyOverviewCards = ({ analysisDate, salesOverview }: DailyOverviewCardsProps) => {
+const DailyOverviewCards = ({
+  analysisDate,
+  salesOverview,
+}: DailyOverviewCardsProps) => {
   const formattedDate = new Date(analysisDate).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
@@ -29,16 +32,16 @@ const DailyOverviewCards = ({ analysisDate, salesOverview }: DailyOverviewCardsP
         {/* 일일 총 매출 */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm font-medium">
               일일 총 매출
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               ₩{salesOverview.totalSales.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               분석일 기준 총 매출액
             </p>
           </CardContent>
@@ -47,34 +50,32 @@ const DailyOverviewCards = ({ analysisDate, salesOverview }: DailyOverviewCardsP
         {/* 총 주문 수 */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm font-medium">
               총 주문 수
             </CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            <ShoppingCart className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {salesOverview.totalOrderCount.toLocaleString()}건
             </div>
-            <p className="text-xs text-muted-foreground">
-              완료된 주문 건수
-            </p>
+            <p className="text-muted-foreground text-xs">완료된 주문 건수</p>
           </CardContent>
         </Card>
 
         {/* 평균 주문 금액 */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm font-medium">
               평균 주문 금액
             </CardTitle>
-            <Calculator className="h-4 w-4 text-muted-foreground" />
+            <Calculator className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               ₩{salesOverview.averageOrderAmount.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               주문당 평균 결제 금액
             </p>
           </CardContent>

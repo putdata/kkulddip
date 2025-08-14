@@ -5,7 +5,7 @@ import type { MonthlySettlementResponse } from '@/types/settlement';
 
 /**
  * 특정 가게의 월별 정산 리스트를 조회하는 쿼리 훅
- * 
+ *
  * @param storeId - 조회할 매장 ID
  * @param startYear - 시작 년도
  * @param startMonth - 시작 월

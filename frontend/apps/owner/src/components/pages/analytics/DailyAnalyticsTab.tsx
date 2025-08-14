@@ -1,5 +1,11 @@
 import { useDailyAnalytics } from '@/queries/analytics';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import DailyOverviewCards from './DailyOverviewCards';
 import BestSellerTable from './BestSellerTable';
@@ -47,7 +53,7 @@ const DailyAnalyticsTab = ({ storeId }: DailyAnalyticsTabProps) => {
   return (
     <div className="space-y-6">
       {/* 일별 개요 카드들 */}
-      <DailyOverviewCards 
+      <DailyOverviewCards
         analysisDate={dailyData.analysisDate}
         salesOverview={dailyData.salesOverview}
       />
@@ -66,7 +72,9 @@ const DailyAnalyticsTab = ({ storeId }: DailyAnalyticsTabProps) => {
       {/* 재고 과다 알림과 수익률 분석 */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* 재고 과다 상품 알림 */}
-        <HighInventoryAlert highInventoryItems={dailyData.highInventoryDdipBoxes} />
+        <HighInventoryAlert
+          highInventoryItems={dailyData.highInventoryDdipBoxes}
+        />
 
         {/* 수익률 분석 */}
         <ProfitMarginChart profitAnalysis={dailyData.profitMarginAnalysis} />

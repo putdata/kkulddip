@@ -1,5 +1,20 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp } from 'lucide-react';
 import type { SalesPrediction } from '@/types/analytics';
@@ -32,14 +47,27 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
   };
 
   // 평균 예측 매출
-  const avgPredictedRevenue = predictions.length > 0 
-    ? predictions.reduce((sum, p) => sum + p.predictedRevenue, 0) / predictions.length
-    : 0;
+  const avgPredictedRevenue =
+    predictions.length > 0
+      ? predictions.reduce((sum, p) => sum + p.predictedRevenue, 0) /
+        predictions.length
+      : 0;
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload, label }: {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
     active?: boolean;
-    payload?: Array<{ payload: { date: string; revenue: number; confidence: number; fullDate: string } }>;
+    payload?: Array<{
+      payload: {
+        date: string;
+        revenue: number;
+        confidence: number;
+        fullDate: string;
+      };
+    }>;
     label?: string;
   }) => {
     if (active && payload && payload.length) {
@@ -48,12 +76,12 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
         return null;
       }
       return (
-        <div className="rounded-lg border bg-background p-3 shadow-md">
+        <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{label}</p>
           <p className="text-sm text-blue-600">
             예상 매출: ₩{data.revenue.toLocaleString()}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             신뢰도: {data.confidence.toFixed(1)}%
           </p>
         </div>
@@ -79,29 +107,29 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
             {/* 차트 */}
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis dataKey="date" fontSize={12} />
+                  <YAxis
                     fontSize={12}
-                  />
-                  <YAxis 
-                    fontSize={12}
-                    tickFormatter={(value) => `₩${(value / 1000).toFixed(0)}K`}
+                    tickFormatter={value => `₩${(value / 1000).toFixed(0)}K`}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  
+
                   {/* 평균선 */}
-                  <ReferenceLine 
-                    y={avgPredictedRevenue} 
-                    stroke="#94a3b8" 
+                  <ReferenceLine
+                    y={avgPredictedRevenue}
+                    stroke="#94a3b8"
                     strokeDasharray="5 5"
                     label="평균"
                   />
-                  
-                  <Line 
-                    type="monotone" 
-                    dataKey="revenue" 
+
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
                     stroke="#3b82f6"
                     strokeWidth={2}
                     dot={{ r: 4 }}
@@ -119,17 +147,17 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
                   ₩{Math.round(avgPredictedRevenue).toLocaleString()}
                 </span>
               </div>
-              
+
               {/* 신뢰도 표시 */}
               <div className="space-y-2">
                 <span className="text-sm font-medium">신뢰도 수준</span>
                 <div className="flex flex-wrap gap-2">
                   {chartData.slice(0, 3).map((item, index) => (
-                    <Badge 
+                    <Badge
                       key={index}
-                      style={{ 
+                      style={{
                         backgroundColor: getConfidenceColor(item.confidence),
-                        color: 'white'
+                        color: 'white',
                       }}
                       className="text-xs"
                     >
@@ -141,7 +169,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
             </div>
           </>
         ) : (
-          <div className="flex h-80 items-center justify-center text-muted-foreground">
+          <div className="text-muted-foreground flex h-80 items-center justify-center">
             매출 예측 데이터가 없습니다
           </div>
         )}

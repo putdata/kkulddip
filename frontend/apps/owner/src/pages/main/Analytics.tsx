@@ -16,7 +16,9 @@ const Analytics = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">분석</h1>
-          <p className="text-muted-foreground">매장 운영 데이터를 분석하고 인사이트를 얻어보세요</p>
+          <p className="text-muted-foreground">
+            매장 운영 데이터를 분석하고 인사이트를 얻어보세요
+          </p>
         </div>
         <Badge variant="secondary" className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4" />

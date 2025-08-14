@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Package, TrendingDown } from 'lucide-react';
@@ -8,17 +14,34 @@ interface HighInventoryAlertProps {
   highInventoryItems: HighInventoryDdipBox[];
 }
 
-const HighInventoryAlert = ({ highInventoryItems }: HighInventoryAlertProps) => {
+const HighInventoryAlert = ({
+  highInventoryItems,
+}: HighInventoryAlertProps) => {
   // 재고 위험도 계산
   const getInventoryRisk = (item: HighInventoryDdipBox) => {
     const remainingRatio = item.remainingCount / item.dailyCount;
-    
+
     if (remainingRatio >= 0.8) {
-      return { level: 'high', color: 'destructive', text: '긴급', percentage: remainingRatio * 100 };
+      return {
+        level: 'high',
+        color: 'destructive',
+        text: '긴급',
+        percentage: remainingRatio * 100,
+      };
     } else if (remainingRatio >= 0.6) {
-      return { level: 'medium', color: 'default', text: '주의', percentage: remainingRatio * 100 };
+      return {
+        level: 'medium',
+        color: 'default',
+        text: '주의',
+        percentage: remainingRatio * 100,
+      };
     } else {
-      return { level: 'low', color: 'secondary', text: '보통', percentage: remainingRatio * 100 };
+      return {
+        level: 'low',
+        color: 'secondary',
+        text: '보통',
+        percentage: remainingRatio * 100,
+      };
     }
   };
 
@@ -34,31 +57,31 @@ const HighInventoryAlert = ({ highInventoryItems }: HighInventoryAlertProps) => 
     if (highInventoryItems.length === 0) {
       return null;
     }
-    
-    const highRiskCount = highInventoryItems.filter(item => 
-      getInventoryRisk(item).level === 'high'
+
+    const highRiskCount = highInventoryItems.filter(
+      item => getInventoryRisk(item).level === 'high',
     ).length;
-    
+
     if (highRiskCount > 0) {
       return {
         level: 'high',
         color: 'destructive',
         message: `${highRiskCount}개 상품이 재고 과다 상태입니다`,
-        icon: AlertTriangle
+        icon: AlertTriangle,
       };
     } else if (highInventoryItems.length > 3) {
       return {
         level: 'medium',
         color: 'default',
         message: '재고 관리가 필요한 상품들이 있습니다',
-        icon: Package
+        icon: Package,
       };
     } else {
       return {
         level: 'low',
         color: 'secondary',
         message: '재고 상태가 양호합니다',
-        icon: Package
+        icon: Package,
       };
     }
   };
@@ -81,41 +104,53 @@ const HighInventoryAlert = ({ highInventoryItems }: HighInventoryAlertProps) => 
           <div className="space-y-4">
             {/* 전체 알림 상태 */}
             {overallAlert && (
-              <Alert className={overallAlert.level === 'high' ? 'border-destructive' : ''}>
+              <Alert
+                className={
+                  overallAlert.level === 'high' ? 'border-destructive' : ''
+                }
+              >
                 <overallAlert.icon className="h-4 w-4" />
-                <AlertDescription>
-                  {overallAlert.message}
-                </AlertDescription>
+                <AlertDescription>{overallAlert.message}</AlertDescription>
               </Alert>
             )}
 
             {/* 재고 과다 상품 목록 */}
             <div className="space-y-3">
-              {sortedItems.slice(0, 5).map((item) => {
+              {sortedItems.slice(0, 5).map(item => {
                 const risk = getInventoryRisk(item);
-                
+
                 return (
-                  <div 
-                    key={item.ddipBoxId} 
-                    className="flex items-center justify-between p-3 rounded-lg border"
+                  <div
+                    key={item.ddipBoxId}
+                    className="flex items-center justify-between rounded-lg border p-3"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="mb-1 flex items-center gap-2">
                         <span className="font-medium">{item.ddipBoxName}</span>
-                        <Badge variant={risk.color as "default" | "destructive" | "outline" | "secondary"} className="text-xs">
+                        <Badge
+                          variant={
+                            risk.color as
+                              | 'default'
+                              | 'destructive'
+                              | 'outline'
+                              | 'secondary'
+                          }
+                          className="text-xs"
+                        >
                           {risk.text}
                         </Badge>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        잔여: {item.remainingCount}개 / 일일: {item.dailyCount}개
+                      <div className="text-muted-foreground text-sm">
+                        잔여: {item.remainingCount}개 / 일일: {item.dailyCount}
+                        개
                       </div>
                     </div>
-                    
+
                     <div className="text-right">
                       <div className="font-bold text-orange-600">
                         {risk.percentage.toFixed(1)}%
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         재고율
                       </div>
                     </div>
@@ -125,12 +160,12 @@ const HighInventoryAlert = ({ highInventoryItems }: HighInventoryAlertProps) => 
             </div>
 
             {/* 추천 액션 */}
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="bg-muted/50 mt-4 rounded-lg p-3">
+              <div className="mb-2 flex items-center gap-2">
                 <TrendingDown className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-sm">권장 조치</span>
+                <span className="text-sm font-medium">권장 조치</span>
               </div>
-              <ul className="text-sm text-muted-foreground space-y-1">
+              <ul className="text-muted-foreground space-y-1 text-sm">
                 <li>• 재고 과다 상품에 할인 이벤트 적용</li>
                 <li>• 번들 상품으로 판매 촉진</li>
                 <li>• 다음 발주 시 수량 조정</li>
@@ -147,8 +182,8 @@ const HighInventoryAlert = ({ highInventoryItems }: HighInventoryAlertProps) => 
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-            <Package className="h-8 w-8 mb-2" />
+          <div className="text-muted-foreground flex h-32 flex-col items-center justify-center">
+            <Package className="mb-2 h-8 w-8" />
             <p className="text-sm">재고 과다 상품이 없습니다</p>
             <p className="text-xs">재고 관리가 잘 되고 있습니다!</p>
           </div>

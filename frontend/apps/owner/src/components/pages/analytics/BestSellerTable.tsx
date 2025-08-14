@@ -1,12 +1,18 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { Trophy, TrendingUp } from 'lucide-react';
 import type { TopSellingDdipBox } from '@/types/analytics';
@@ -19,15 +25,15 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
   // 순위별 뱃지 색상
   const getRankBadge = (index: number) => {
     if (index === 0) {
-      return { variant: "default" as const, icon: "🥇" };
+      return { variant: 'default' as const, icon: '🥇' };
     }
     if (index === 1) {
-      return { variant: "secondary" as const, icon: "🥈" };
+      return { variant: 'secondary' as const, icon: '🥈' };
     }
     if (index === 2) {
-      return { variant: "outline" as const, icon: "🥉" };
+      return { variant: 'outline' as const, icon: '🥉' };
     }
-    return { variant: "outline" as const, icon: `${index + 1}위` };
+    return { variant: 'outline' as const, icon: `${index + 1}위` };
   };
 
   return (
@@ -57,9 +63,10 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
               <TableBody>
                 {ddipBoxes.map((ddipBox, index) => {
                   const rankInfo = getRankBadge(index);
-                  const salesPerItem = ddipBox.quantitySold > 0 
-                    ? ddipBox.totalSalesAmount / ddipBox.quantitySold 
-                    : 0;
+                  const salesPerItem =
+                    ddipBox.quantitySold > 0
+                      ? ddipBox.totalSalesAmount / ddipBox.quantitySold
+                      : 0;
 
                   return (
                     <TableRow key={ddipBox.ddipBoxId}>
@@ -73,8 +80,10 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
                       {/* 상품명 */}
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium">{ddipBox.ddipBoxName}</span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="font-medium">
+                            {ddipBox.ddipBoxName}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
                             ID: {ddipBox.ddipBoxId}
                           </span>
                         </div>
@@ -86,7 +95,7 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
                           <span className="font-medium text-blue-600">
                             {ddipBox.quantitySold}개
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-muted-foreground text-xs">
                             개당 ₩{Math.round(salesPerItem).toLocaleString()}
                           </span>
                         </div>
@@ -102,12 +111,17 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
                       {/* 성과 표시 */}
                       <TableCell className="text-center">
                         {index < 3 ? (
-                          <Badge variant="secondary" className="flex items-center gap-1">
+                          <Badge
+                            variant="secondary"
+                            className="flex items-center gap-1"
+                          >
                             <TrendingUp className="h-3 w-3" />
                             인기
                           </Badge>
                         ) : (
-                          <span className="text-muted-foreground text-sm">-</span>
+                          <span className="text-muted-foreground text-sm">
+                            -
+                          </span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -117,7 +131,7 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
             </Table>
           </div>
         ) : (
-          <div className="flex h-32 items-center justify-center text-muted-foreground">
+          <div className="text-muted-foreground flex h-32 items-center justify-center">
             베스트셀러 데이터가 없습니다
           </div>
         )}
