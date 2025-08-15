@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  # 앱 지표: Nginx 내부 엔드포인트(현재 활성 버전으로 프록시)
+  - job_name: 'kkulddip-app'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:18080']
+        labels:
+          app: 'kkulddip'

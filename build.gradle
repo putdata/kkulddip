@@ -76,6 +76,9 @@ dependencies {
 	// Firebase FCM
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+	// Prometheus
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

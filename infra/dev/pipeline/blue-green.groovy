@@ -68,8 +68,24 @@ pipeline {
                             echo "✅ .env file created successfully"
                         '''
                     }
+
+                    // 2단계: Firebase 서비스 계정 주입 (Secret file → 워크스페이스 파일로)
+                    withCredentials([file(credentialsId: 'firebase-sa-json-file', variable: 'FIREBASE_SA_FILE')]) {
+                        sh '''
+                            mkdir -p secrets
+                            install -m 600 "$FIREBASE_SA_FILE" "secrets/firebase.json"
+
+                            # (중요) .env에 "호스트 경로"와 "컨테이너 경로" 모두 기록
+                            touch .docker.env
+                            printf 'export HOST_FIREBASE_CREDENTIALS_PATH=%s\n' "$(pwd)/secrets/firebase.json" > .docker.env
+                            chmod 600 .docker.env
+
+                            echo "" >> .env
+                            echo "FIREBASE_CREDENTIALS_PATH=/run/secrets/firebase.json" >> .env
+                        '''
+                    }
                     
-                    // 2단계: .env 파일을 사용하여 배포 실행
+                    // 3단계: .env 파일을 사용하여 배포 실행
                     sh '''
                         echo "🚀 Starting deployment with .env file..."
                         
@@ -83,6 +99,10 @@ pipeline {
                             echo "❌ .env file not found!"
                             exit 1
                         fi
+
+                        set -a
+                        . ./.docker.env
+                        set +a
                         
                         # 배포 스크립트에 실행 권한 부여
                         chmod +x script/deploy.sh
