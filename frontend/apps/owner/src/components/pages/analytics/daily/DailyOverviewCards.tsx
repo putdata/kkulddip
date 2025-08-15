@@ -1,28 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { DollarSign, ShoppingCart, Calculator } from 'lucide-react';
 import type { SalesOverview } from '@/types/analytics';
 
 interface DailyOverviewCardsProps {
-  analysisDate: string;
   salesOverview: SalesOverview;
 }
 
 const DailyOverviewCards = ({
-  analysisDate,
   salesOverview,
 }: DailyOverviewCardsProps) => {
   return (
-    <>
-      {/* 날짜 표시 */}
-      <div className="mb-4">
-        <Badge variant="outline" className="text-sm">
-          {analysisDate} 기준 분석
-        </Badge>
-      </div>
-
-      {/* 개요 카드들 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* 일일 총 매출 */}
         <Card className="border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -80,8 +68,7 @@ const DailyOverviewCards = ({
             </p>
           </CardContent>
         </Card>
-      </div>
-    </>
+    </div>
   );
 };
 
