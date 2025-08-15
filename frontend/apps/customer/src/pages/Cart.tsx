@@ -1,6 +1,4 @@
 // pages/Cart.tsx
-import { useState } from 'react';
-import { dummyCartProduct, dummyStoreInfo } from '@/dummies/CartDummy';
 import { CART_CONSTANTS } from '@/constants/cart';
 import { type CartData } from '@/types/orderflow';
 
@@ -12,30 +10,42 @@ import PriceSummary from '@/components/pages/cart/PriceSummary/PriceSummary';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 
+import { useCartStore } from '@/store/useCartStore';
+
 interface CartProps {
   onNext: (cartData: CartData) => void;
   onBack: () => void;
-  initialQuantity?: number;
 }
 
-const Cart = ({ onNext, onBack, initialQuantity = 1 }: CartProps) => {
-  const [quantity, setQuantity] = useState(initialQuantity);
+const Cart = ({ onNext, onBack }: CartProps) => {
+  const { items, storeInfo, updateQuantity } = useCartStore(); // Zustand에서 가져오기
 
-  const updateQuantity = (change: number) => {
-    setQuantity(prev => Math.max(CART_CONSTANTS.MIN_QUANTITY, prev + change));
-  };
+  if (!items.length || !storeInfo) {
+    return <div>장바구니가 비어있습니다</div>;
+  }
 
   const handleNext = () => {
-    const total = dummyCartProduct.price * quantity;
+    const total = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
     const cartData: CartData = {
-      quantity,
       total,
-      productId: dummyCartProduct.id,
+      orderItems: items.map(item => ({
+        productId: item.ddipboxId,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        // TODO: discountInfos 내용 확인 필요
+        discountInfos: [], // 일단 빈 배열
+      })),
     };
     onNext(cartData);
   };
 
-  const total = dummyCartProduct.price * quantity;
+  const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   const bottomButton = (
     <button
@@ -56,31 +66,35 @@ const Cart = ({ onNext, onBack, initialQuantity = 1 }: CartProps) => {
       {/* 매장 정보 카드 */}
       <Card className="px-3">
         <StoreInfo
-          Store={dummyStoreInfo}
+          Store={storeInfo}
           pickupTimePrefix={CART_CONSTANTS.PICKUP_TIME_PREFIX}
         />
 
         <Separator />
 
         {/* 상품 정보 카드 */}
-        <Card className="px-3">
-          <ProductCard product={dummyCartProduct} />
-          <div className="mt-4 border-t border-gray-100 pt-4">
+        {items.map((item, index) => (
+          <Card key={item.ddipboxId}>
+            <ProductCard product={item} />
             <QuantitySelector
-              quantity={quantity}
-              onQuantityChange={updateQuantity}
-              initialQuantity={initialQuantity}
+              quantity={item.quantity}
+              onQuantityChange={change => {
+                const newQuantity = Math.max(1, item.quantity + change);
+                updateQuantity(item.ddipboxId, newQuantity);
+              }}
+              initialQuantity={1}
               label={CART_CONSTANTS.QUANTITY_LABEL}
             />
-          </div>
-        </Card>
+            {index < items.length - 1 && <Separator />}
+          </Card>
+        ))}
 
         <Separator />
 
         {/* 가격 요약 카드 */}
         <PriceSummary
-          productName={dummyCartProduct.name}
-          quantity={quantity}
+          productName="장바구니 합계"
+          quantity={items.reduce((sum, item) => sum + item.quantity, 0)}
           total={total}
           totalLabel={CART_CONSTANTS.TOTAL_AMOUNT_LABEL}
         />

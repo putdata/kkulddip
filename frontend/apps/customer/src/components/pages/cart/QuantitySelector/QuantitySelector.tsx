@@ -10,7 +10,7 @@ export interface QuantitySelectorProps {
 const QuantitySelector = ({
   quantity,
   onQuantityChange,
-  initialQuantity,
+  initialQuantity = 1,
   label,
 }: QuantitySelectorProps) => {
   return (
