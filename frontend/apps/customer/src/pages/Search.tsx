@@ -6,9 +6,7 @@ const Search = () => {
         <h3 className="mb-2 text-lg font-semibold text-gray-800">
           아직 오픈되지 않은 기능이에요
         </h3>
-        <p className="text-sm text-gray-500">
-          다음에 만나요!
-        </p>
+        <p className="text-sm text-gray-500">다음에 만나요!</p>
       </div>
     </div>
   );

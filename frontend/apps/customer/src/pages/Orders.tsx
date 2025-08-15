@@ -24,9 +24,7 @@ const Orders = () => {
           <h3 className="mb-2 text-lg font-semibold text-gray-800">
             아직 주문 내역이 없어요
           </h3>
-          <p className="text-sm text-gray-500">
-            맛있는 음식을 주문해보세요!
-          </p>
+          <p className="text-sm text-gray-500">맛있는 음식을 주문해보세요!</p>
         </div>
       </div>
     );

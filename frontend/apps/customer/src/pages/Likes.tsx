@@ -7,7 +7,11 @@ import { useState } from 'react';
 
 const Likes = () => {
   const { data: profile } = useCustomerProfile();
-  const { data: stores, isLoading, isFetching } = useLikes(profile?.customerId || 0);
+  const {
+    data: stores,
+    isLoading,
+    isFetching,
+  } = useLikes(profile?.customerId || 0);
   const deleteFavoriteMutation = useDeleteFavorite();
   const [deletedStores, setDeletedStores] = useState<Set<string | number>>(
     new Set(),
