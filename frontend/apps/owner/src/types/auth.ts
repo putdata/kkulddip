@@ -3,7 +3,7 @@ export interface GoogleAuthResponse {
   refreshToken: string;
   expiresIn: number;
   user: {
-    id: number;
+    userId: number;
     email: string;
     name: string;
     role: string;
