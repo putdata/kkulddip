@@ -15,7 +15,6 @@ export const useLikes = (customerId: number) => {
       });
       return data.content;
     },
-    enabled:
-      location.isLoaded && Boolean(location.coordinate) && !location.error,
+    enabled: Boolean(customerId) && location.isLoaded,
   });
 };

@@ -85,7 +85,9 @@ const LikeFoodCard = ({
           </h3>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>⭐ {item.storeInfo.ratingAverage.toFixed(1)}</span>
-            <span>📍 {item.distance.toFixed(2)} km</span>
+            {item.distance !== undefined && item.distance !== null && (
+              <span>📍 {item.distance.toFixed(2)} km</span>
+            )}
           </div>
         </div>
 
