@@ -9,6 +9,7 @@ import { useCreateReviewMutation } from '@/services/reviewService';
 import type { ReviewCreateRequest } from '@/types/review';
 import { useParams } from 'react-router-dom';
 import { useStoreDetail } from '@/hooks/useStoreDetail';
+import { useCustomerProfile } from '@/hooks/useProfile';
 
 interface ReviewFormState {
   rating: number;
@@ -20,6 +21,10 @@ interface ReviewFormState {
 const ReviewCreate = () => {
   const params = useParams();
   const storeId = params.storeId!;
+
+  // customerId 받기
+  const { data: profile } = useCustomerProfile();
+  const customerId = profile?.customerId;
 
   const {
     data: store,
@@ -79,8 +84,7 @@ const ReviewCreate = () => {
 
     const reviewData: ReviewCreateRequest = {
       storeId: storeId,
-      // TODO: 실제 로그인한 사용자 ID로 변경 필요
-      customerId: 6,
+      customerId: customerId!,
       content: trimmedContent,
       // TODO: 실제 주문 ID로 변경 필요 (주문 연동 시)
       orderId: 119,

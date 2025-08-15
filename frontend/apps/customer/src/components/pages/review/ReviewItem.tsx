@@ -3,83 +3,47 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ReviewService } from '@/services/reviewService';
+import {
+  useAddHelpfulMutation,
+  useRemoveHelpfulMutation,
+} from '@/services/reviewService';
 import type { ReviewResponse } from '@/types/review';
 import { formatDate } from '@/utils/dateFormat';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-// import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface ReviewProps {
   review: ReviewResponse;
 }
 
 const ReviewItem = ({ review }: ReviewProps) => {
-  // 도움돼요 상태 관리
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
-  const [isHelpful, setIsHelpful] = useState(false); // 사용자가 이미 눌렀는지 여부
-  const [isLoading, setIsLoading] = useState(false);
+  const [isHelpful, setIsHelpful] = useState(review.isHelpful);
 
-  // 컴포넌트 마운트 시 도움돼요 상태 확인
-  useEffect(() => {
-    const checkHelpfulStatus = async () => {
-      try {
-        const helpful = await ReviewService.checkHelpful(review.reviewId);
-        setIsHelpful(helpful);
-      } catch (error) {
-        console.error('도움돼요 상태 확인 실패:', error);
-      }
-    };
+  // 사장님 댓글 유무 확인
+  // let isReply = false;
+  // if (review.reply != null) {
+  //   isReply = true;
+  // }
 
-    checkHelpfulStatus();
-  }, [review.reviewId]);
+  const addHelpfulMutation = useAddHelpfulMutation(review.reviewId.toString());
 
-  // TODO: api 연동 필요
-  // const handleHelpfulClick = () => {
-  //   if (isHelpful) {
-  //     setHelpfulCount(prev => prev - 1);
-  //     setIsHelpful(false);
-  //   } else {
-  //     setHelpfulCount(prev => prev + 1);
-  //     setIsHelpful(true);
-  //   }
-  // };
+  const removeHelpfulMutation = useRemoveHelpfulMutation(
+    review.reviewId.toString(),
+  );
 
   const handleHelpfulClick = async () => {
-    if (isLoading) {
-      return;
-    }
+    // if (addHelpfulMutation.isLoading || removeHelpfulMutation.isLoading) {return};
 
-    setIsLoading(true);
-
-    try {
-      if (isHelpful) {
-        // 즉시 UI 업데이트
-        setHelpfulCount(prev => prev - 1);
-        setIsHelpful(false);
-
-        // API 호출
-        await ReviewService.removeHelpful(review.reviewId.toString());
-        console.log('도움돼요 제거 성공:', review.reviewId);
-      } else {
-        setHelpfulCount(prev => prev + 1);
-        setIsHelpful(true);
-
-        await ReviewService.addHelpful(review.reviewId.toString());
-        console.log('도움돼요 추가 성공:', review.reviewId);
-      }
-    } catch (error) {
-      if (isHelpful) {
-        setHelpfulCount(prev => prev + 1);
-        setIsHelpful(true);
-      } else {
-        setHelpfulCount(prev => prev - 1);
-        setIsHelpful(false);
-      }
-
-      console.error('도움돼요 처리 실패:', error);
-    } finally {
-      setIsLoading(false);
+    if (isHelpful) {
+      // 즉시 UI 업데이트
+      setHelpfulCount(prev => prev - 1);
+      setIsHelpful(false);
+      removeHelpfulMutation.mutate(); // API 호출
+    } else {
+      setHelpfulCount(prev => prev + 1);
+      setIsHelpful(true);
+      addHelpfulMutation.mutate(); // API 호출
     }
   };
 
@@ -129,7 +93,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
                 key={index}
                 className="flex h-20 w-20 items-center justify-center overflow-hidden rounded bg-gray-100"
               >
-                <img src={review.profileImage} alt="" />
+                <img src={image.imageUrl} alt={image.originalName} />
               </div>
             ))}
           </div>
@@ -152,11 +116,20 @@ const ReviewItem = ({ review }: ReviewProps) => {
             </div>
           </button>
           {/* TODO: 사장님 댓글 여부 확인 및 동작 추가 필요 */}
-          <div className="flex items-center gap-1">
-            <MessageCircleMore className="h-5" />
-            <span>사장님 댓글</span>
+          <div className="gap flex items-center">
+            <MessageCircleMore className={'h-5'} />
+            <span className={'text-gray-400'}>사장님 댓글</span>
           </div>
         </div>
+        {review.reply && (
+          <div className="border-1 flex w-full flex-col rounded-lg p-2 text-xs">
+            <div className="flex justify-between text-gray-400">
+              <div>사장님의 답글: </div>
+              <div>{formatDate(review.reply.createdAt)}</div>
+            </div>
+            <div className="p-2">{review.reply.content}</div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

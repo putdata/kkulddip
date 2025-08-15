@@ -13,14 +13,18 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { STORE_DETAIL_MESSAGES } from '@/constants/storeDetail';
+import { ROUTE_PATH } from '@/router';
 import type { DdipBox } from '@/types/store';
 import { formatPrice } from '@/utils/priceFormat';
+import { useNavigate } from 'react-router-dom';
 
 interface RandomItemProps {
   ddipbox: DdipBox;
 }
 
 export const DdipboxItem = ({ ddipbox }: RandomItemProps) => {
+  const navigate = useNavigate();
+
   const message = STORE_DETAIL_MESSAGES;
 
   return (
@@ -63,7 +67,12 @@ export const DdipboxItem = ({ ddipbox }: RandomItemProps) => {
             {formatPrice(ddipbox.salePrice)}
           </p>
         </div>
-        <Button className="bg-amber-500">{message.RESERVE_BUTTON_TEXT}</Button>
+        <Button
+          className="bg-amber-500 hover:bg-amber-500 data-[state=on]:bg-amber-600"
+          onClick={() => navigate(ROUTE_PATH.PAY)}
+        >
+          {message.RESERVE_BUTTON_TEXT}
+        </Button>
       </CardFooter>
     </Card>
   );

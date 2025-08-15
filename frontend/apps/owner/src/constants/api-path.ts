@@ -43,4 +43,16 @@ export const API_PATH = {
     CONFIRM: (orderId: string) => `/v1/orders/${orderId}/confirm`,
     PICKUP: (orderId: string) => `/v1/orders/${orderId}/pickup`,
   },
+
+  SETTLEMENT: {
+    SUMMARY: '/v1/owners/settlement/summary',
+    STORE: (storeId: number) => `/v1/owners/stores/${storeId}/settlement`,
+    MONTHLY: (storeId: number) =>
+      `/v1/owners/stores/${storeId}/settlement/monthly`,
+  },
+
+  ANALYTICS: {
+    SALES: '/api/analytics/sales-analytics',
+    DAILY: '/api/analytics/daily-analytics',
+  },
 } as const;

@@ -16,14 +16,17 @@ interface UseDdipboxFormOptions {
 /**
  * 띱박스 폼 관리를 위한 커스텀 훅
  *
- * AddDdipboxDialog와 EditDdipboxDialog에서 공통으로 사용되는
- * 폼 상태 관리, 입력 처리, 유효성 검증 로직을 통합 관리합니다.
+ * @description
+ * 띱박스 생성/편집 폼의 상태 관리, 입력 처리, 유효성 검증을 담당합니다.
  */
 export const useDdipboxForm = ({
   initialData,
   mode,
   originalDdipbox,
 }: UseDdipboxFormOptions) => {
+  /**
+   * 초기 폼 데이터 생성
+   */
   const getInitialFormData = useCallback((): DdipboxFormData => {
     if (mode === 'create') {
       return {
@@ -50,6 +53,9 @@ export const useDdipboxForm = ({
     }
   }, [mode, initialData, originalDdipbox]);
 
+  /**
+   * 폼 데이터 상태
+   */
   const [formData, setFormData] = useState<DdipboxFormData>(getInitialFormData);
 
   /**
