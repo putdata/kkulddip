@@ -77,42 +77,41 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
       <CardContent>
         <div className="space-y-4">
           {/* 전체 수익 요약 */}
-          <div className="bg-muted/50 grid grid-cols-2 gap-4 rounded-lg p-4">
+          <div className="bg-muted/30 grid grid-cols-2 gap-4 rounded-lg p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 ₩{profitAnalysis.totalProfit.toLocaleString()}
               </div>
-              <div className="text-muted-foreground text-xs">총 수익</div>
+              <div className="text-muted-foreground text-xs font-medium">
+                총 수익
+              </div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1">
                 {profitStatus?.status === 'poor' ? (
-                  <TrendingUp className="h-5 w-5" />
+                  <TrendingUp className="h-4 w-4 text-red-500" />
                 ) : profitStatus?.status === 'fair' ? (
-                  <Percent className="h-5 w-5" />
+                  <Percent className="h-4 w-4 text-amber-500" />
                 ) : (
-                  <TrendingUp className="h-5 w-5" />
+                  <TrendingUp className="h-4 w-4 text-green-500" />
                 )}
                 <span className="text-2xl font-bold">
                   {profitAnalysis.profitMarginPercentage.toFixed(2)}%
                 </span>
               </div>
-              <div className="text-muted-foreground text-xs">수익률</div>
+              <div className="text-muted-foreground text-xs font-medium">
+                수익률
+              </div>
             </div>
           </div>
 
           {/* 수익률 상태 */}
           {profitStatus && (
-            <div className="flex items-center justify-between">
+            <div className="bg-muted/20 flex items-center justify-between rounded-lg p-3">
               <span className="text-sm font-medium">수익률 평가</span>
               <Badge
-                variant={
-                  profitStatus.color as
-                    | 'default'
-                    | 'destructive'
-                    | 'outline'
-                    | 'secondary'
-                }
+                variant="outline"
+                className={`${profitStatus.status === 'excellent' ? 'border-green-200 bg-green-50 text-green-700' : profitStatus.status === 'good' ? 'border-blue-200 bg-blue-50 text-blue-700' : profitStatus.status === 'fair' ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-red-200 bg-red-50 text-red-700'}`}
               >
                 {profitStatus.text}
               </Badge>
@@ -153,23 +152,23 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
 
           {/* 구간별 상세 정보 */}
           {chartData.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">구간별 매출 현황</h4>
-              <div className="space-y-2">
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold">구간별 매출 현황</h4>
+              <div className="bg-muted/20 space-y-3 rounded-lg p-3">
                 {chartData.map((item, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between text-sm"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <div
                         className="h-3 w-3 rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
-                      <span>{item.name}</span>
+                      <span className="font-medium">{item.name}</span>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">
+                      <div className="font-semibold">
                         ₩{item.value.toLocaleString()}
                       </div>
                       <div className="text-muted-foreground text-xs">
@@ -183,19 +182,19 @@ const ProfitMarginChart = ({ profitAnalysis }: ProfitMarginChartProps) => {
           )}
 
           {/* 매출 vs 비용 비교 */}
-          <div className="border-t pt-2">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">총 매출</span>
-                <span className="font-medium">
+          <div className="border-muted border-t pt-4">
+            <div className="bg-muted/20 grid grid-cols-2 gap-4 rounded-lg p-3">
+              <div className="text-center">
+                <div className="text-muted-foreground">총 매출</div>
+                <div className="font-semibold text-blue-600">
                   ₩{profitAnalysis.totalRevenue.toLocaleString()}
-                </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">총 비용</span>
-                <span className="font-medium">
+              <div className="text-center">
+                <div className="text-muted-foreground">총 비용</div>
+                <div className="font-semibold text-red-600">
                   ₩{profitAnalysis.totalCost.toLocaleString()}
-                </span>
+                </div>
               </div>
             </div>
           </div>

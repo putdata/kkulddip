@@ -232,7 +232,7 @@ const StreamingLive = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={handleGoBack}>
             <ArrowLeft className="h-4 w-4" />

@@ -15,7 +15,6 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
-import { Badge } from '@/components/ui/badge';
 import { TrendingUp } from 'lucide-react';
 import type { SalesPrediction } from '@/types/analytics';
 import { useSalesChartData } from '@/hooks/useSalesChartData';
@@ -56,7 +55,7 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
         <div className="bg-background rounded-lg border p-3 shadow-md">
           <p className="font-medium">{label}</p>
           <p className="text-sm text-blue-600">
-            예상 매출: ₩{data.revenue.toLocaleString()}
+            예상 매출: ₩{Number(data.revenue.toFixed(0)).toLocaleString()}
           </p>
           <p className="text-muted-foreground text-sm">
             신뢰도: {data.confidence.toFixed(2)}%
@@ -117,29 +116,43 @@ const SalesPredictionChart = ({ predictions }: SalesPredictionChartProps) => {
             </div>
 
             {/* 예측 요약 */}
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="mt-4 space-y-4">
+              <div className="bg-muted/30 flex items-center justify-between rounded-lg p-3">
                 <span className="text-sm font-medium">평균 예상 매출</span>
                 <span className="text-lg font-bold text-blue-600">
-                  ₩{avgPredictedRevenue.toFixed(0)}
+                  ₩{Number(avgPredictedRevenue.toFixed(0)).toLocaleString()}
                 </span>
               </div>
 
               {/* 신뢰도 표시 */}
-              <div className="space-y-2">
-                <span className="text-sm font-medium">신뢰도 수준</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-3">
+                <span className="text-sm font-semibold">신뢰도 수준</span>
+                <div className="bg-muted/20 space-y-2 rounded-lg p-3">
                   {chartData.slice(0, 3).map((item, index) => (
-                    <Badge
+                    <div
                       key={index}
-                      style={{
-                        backgroundColor: getConfidenceColor(item.confidence),
-                        color: 'white',
-                      }}
-                      className="text-xs"
+                      className="flex items-center justify-between"
                     >
-                      {item.date}: {item.confidence.toFixed(2)}%
-                    </Badge>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-3 w-3 rounded-full"
+                          style={{
+                            backgroundColor: getConfidenceColor(
+                              item.confidence,
+                            ),
+                          }}
+                        />
+                        <span className="text-sm font-medium">{item.date}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold">
+                          ₩{Number(item.revenue.toFixed(0)).toLocaleString()}
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          {item.confidence.toFixed(2)}% 신뢰도
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

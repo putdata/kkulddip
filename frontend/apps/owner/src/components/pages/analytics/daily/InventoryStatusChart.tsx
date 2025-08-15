@@ -6,8 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Badge } from '@/components/ui/badge';
-import { Package, AlertCircle, CheckCircle } from 'lucide-react';
+import { Package } from 'lucide-react';
 import type { InventoryStatus } from '@/types/analytics';
 import { useInventoryAnalytics } from '@/hooks/useInventoryAnalytics';
 
@@ -18,8 +17,10 @@ interface InventoryStatusChartProps {
 const InventoryStatusChart = ({
   inventoryStatus,
 }: InventoryStatusChartProps) => {
-  const { statusChartData: chartData, inventoryStatusInfo: statusInfo } =
-    useInventoryAnalytics(undefined, inventoryStatus);
+  const { statusChartData: chartData } = useInventoryAnalytics(
+    undefined,
+    inventoryStatus,
+  );
 
   const soldQuantity =
     inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
@@ -98,62 +99,32 @@ const InventoryStatusChart = ({
         </div>
 
         {/* 재고 상태 정보 */}
-        <div className="mt-4 space-y-3">
-          {/* 상태 배지 */}
-          {statusInfo && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {statusInfo.status === 'good' ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <AlertCircle className="h-4 w-4" />
-                )}
-                <span className="text-sm font-medium">재고 상태</span>
-              </div>
-              <Badge
-                variant={
-                  statusInfo.color as
-                    | 'default'
-                    | 'destructive'
-                    | 'outline'
-                    | 'secondary'
-                }
-              >
-                {statusInfo.text}
-              </Badge>
-            </div>
-          )}
-
-          {/* 상태 설명 */}
-          {statusInfo && (
-            <p className="text-muted-foreground text-xs">
-              {statusInfo.description}
-            </p>
-          )}
-
+        <div className="mt-4 space-y-4">
           {/* 수량 요약 */}
-          <div className="grid grid-cols-2 gap-4 border-t pt-2">
+          <div className="bg-muted/20 grid grid-cols-2 gap-4 rounded-lg p-4">
             <div className="text-center">
-              <div className="text-lg font-bold text-green-600">
-                {soldQuantity}개
+              <div className="text-2xl font-bold text-green-600">
+                {soldQuantity}
               </div>
-              <div className="text-muted-foreground text-xs">판매완료</div>
+              <div className="text-muted-foreground text-xs font-medium">
+                판매완료 (개)
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-blue-600">
-                {inventoryStatus.totalRemainingCount}개
+              <div className="text-2xl font-bold text-blue-600">
+                {inventoryStatus.totalRemainingCount}
               </div>
-              <div className="text-muted-foreground text-xs">남은재고</div>
+              <div className="text-muted-foreground text-xs font-medium">
+                남은재고 (개)
+              </div>
             </div>
           </div>
 
           {/* 전체 재고 */}
-          <div className="border-t pt-2 text-center">
-            <div className="text-muted-foreground text-sm">
-              일일 총 재고:
-              <span className="font-medium">
-                {inventoryStatus.totalDailyCount}개
-              </span>
+          <div className="border-muted border-t pt-3 text-center">
+            <div className="text-muted-foreground text-sm">일일 총 재고</div>
+            <div className="text-foreground font-semibold">
+              {inventoryStatus.totalDailyCount}개
             </div>
           </div>
         </div>

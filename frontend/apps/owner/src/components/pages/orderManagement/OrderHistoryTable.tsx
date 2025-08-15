@@ -29,7 +29,9 @@ const OrderHistoryTable = ({
     handlePickupClick,
     getOrderItemsText,
     getTotalQuantity,
-  } = useOrderHistoryTable(onPickupClick);
+  } = useOrderHistoryTable({
+    onPickupClick,
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {

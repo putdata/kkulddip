@@ -35,6 +35,15 @@ export interface StoreSettlementResponse {
   orderCountGrowthRate: number;
 }
 
+export interface MonthlySettlement {
+  year: number;
+  month: number;
+  totalSalesAmount: number;
+  totalCommissionAmount: number;
+  commissionRate: number;
+  settlementAmount: number;
+}
+
 export interface MonthlySettlementData {
   period: string;
   totalRevenue: number;

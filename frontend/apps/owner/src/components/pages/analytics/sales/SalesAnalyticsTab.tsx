@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useSalesAnalytics } from '@/queries/analytics';
 import {
   Card,
@@ -5,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { DateRangePicker } from '@/components/pages/analytics/sales/DateRangePicker';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 import AnalyticsSummaryCards from './AnalyticsSummaryCards';
 import TopSellingChart from './TopSellingChart';
 import DiscountRangeChart from './DiscountRangeChart';
@@ -17,7 +21,27 @@ interface SalesAnalyticsTabProps {
 }
 
 const SalesAnalyticsTab = ({ storeId }: SalesAnalyticsTabProps) => {
-  const { data: salesData, isLoading, error } = useSalesAnalytics(storeId);
+  const defaultEndDate = new Date();
+  const defaultStartDate = new Date();
+  defaultStartDate.setMonth(defaultStartDate.getMonth() - 3);
+
+  const [queryDate, setQueryDate] = useState<DateRange | undefined>({
+    from: defaultStartDate,
+    to: defaultEndDate,
+  });
+
+  const startDate = queryDate?.from
+    ? format(queryDate.from, 'yyyy-MM-dd')
+    : undefined;
+  const endDate = queryDate?.to
+    ? format(queryDate.to, 'yyyy-MM-dd')
+    : undefined;
+
+  const {
+    data: salesData,
+    isLoading,
+    error,
+  } = useSalesAnalytics(storeId, startDate, endDate);
 
   if (isLoading) {
     return <SalesAnalyticsTabSkeleton />;
@@ -51,6 +75,21 @@ const SalesAnalyticsTab = ({ storeId }: SalesAnalyticsTabProps) => {
 
   return (
     <div className="space-y-6">
+      {/* 날짜 범위 선택 */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">매출 분석</h3>
+        <DateRangePicker
+          defaultValue={queryDate}
+          displayValue={queryDate}
+          onClose={selectedRange => {
+            if (selectedRange?.from && selectedRange?.to) {
+              setQueryDate(selectedRange);
+            }
+          }}
+          disabled={date => date > new Date() || date < new Date('2024-01-01')}
+        />
+      </div>
+
       {/* 매출 요약 카드들 */}
       <AnalyticsSummaryCards
         totalRevenue={salesData.totalRevenue}
