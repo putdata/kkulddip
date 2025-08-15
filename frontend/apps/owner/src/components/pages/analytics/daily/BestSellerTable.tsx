@@ -110,19 +110,21 @@ const BestSellerTable = ({ ddipBoxes }: BestSellerTableProps) => {
 
                       {/* 성과 표시 */}
                       <TableCell className="text-center">
-                        {index < 3 ? (
-                          <Badge
-                            variant="secondary"
-                            className="flex items-center gap-1"
-                          >
-                            <TrendingUp className="h-3 w-3" />
-                            인기
-                          </Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">
-                            -
-                          </span>
-                        )}
+                        <div className="flex justify-center">
+                          {index < 3 ? (
+                            <Badge
+                              variant="secondary"
+                              className="flex items-center gap-1"
+                            >
+                              <TrendingUp className="h-3 w-3" />
+                              인기
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">
+                              -
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
