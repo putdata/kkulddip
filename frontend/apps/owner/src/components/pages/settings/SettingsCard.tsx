@@ -1,6 +1,5 @@
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -24,30 +23,30 @@ const SettingsCard = ({
 }: SettingsCardProps) => {
   return (
     <Card
-      className={`group transition-all ${
-        isActive
-          ? 'cursor-pointer hover:shadow-md'
-          : 'cursor-not-allowed opacity-60'
+      className={`group cursor-pointer transition-all hover:shadow-md ${
+        isActive ? 'border-blue-200 bg-blue-50' : 'hover:border-gray-300'
       }`}
-      onClick={isActive ? onClick : undefined}
+      onClick={onClick}
     >
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <div
             className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-              isActive ? 'bg-blue-100 group-hover:bg-blue-200' : 'bg-gray-100'
+              isActive ? 'bg-blue-200' : 'bg-gray-100 group-hover:bg-gray-200'
             }`}
           >
             <Icon
               className={`h-5 w-5 ${
-                isActive ? 'text-blue-600' : 'text-gray-400'
+                isActive ? 'text-blue-700' : 'text-gray-600'
               }`}
             />
           </div>
           <div>
             <CardTitle
               className={`text-base ${
-                isActive ? 'text-gray-900' : 'text-gray-500'
+                isActive
+                  ? 'text-blue-900'
+                  : 'text-gray-700 group-hover:text-gray-900'
               }`}
             >
               {title}
@@ -56,11 +55,6 @@ const SettingsCard = ({
           </div>
         </div>
       </CardHeader>
-      {!isActive && (
-        <CardContent className="pt-0">
-          <span className="text-xs text-gray-400">준비 중</span>
-        </CardContent>
-      )}
     </Card>
   );
 };
