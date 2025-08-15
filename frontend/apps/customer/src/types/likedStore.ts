@@ -54,8 +54,8 @@ export interface StoreApiResponse {
   body: StoreResponseBody;
 }
 
-// 좋아요 삭제 요청 파라미터
-export interface DeleteLikeParams {
+// 좋아요 추가, 삭제, 체크 요청
+export interface LikeParams {
   customerId: number;
   storeId: number;
 }
@@ -64,4 +64,24 @@ export interface DeleteLikeParams {
 export interface DeleteLikeResponse {
   success: boolean;
   message?: string;
+}
+
+// 좋아요 응답
+export interface AddLikeResponse {
+  success: boolean;
+  status: number;
+  body: {
+    favoriteId: number;
+    customerId: number;
+    storeId: number;
+    storeName: string;
+    addedAt: string;
+  };
+}
+
+// 찜 상태 확인 응답
+export interface CheckLikeResponse {
+  success: boolean;
+  status: number;
+  body: boolean;
 }
