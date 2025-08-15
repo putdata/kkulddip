@@ -1,4 +1,8 @@
 import { apiClient } from 'common';
+import type {
+  NotificationListResponse,
+  SubscriberType,
+} from '@/types/notification';
 
 interface NotificationRequest {
   title: string;
@@ -24,6 +28,25 @@ export const registerFCMToken = async (fcmToken: string): Promise<void> => {
 
   await apiClient.post('/v1/fcm-tokens', tokenData);
   console.log('FCM Token registered with server');
+};
+
+/**
+ * 알림 목록 조회
+ */
+export const getNotifications = async (
+  subscriberId: number,
+  subscriberType: SubscriberType,
+  page = 0,
+  size = 50,
+): Promise<NotificationListResponse> => {
+  const params = {
+    subscriberId,
+    subscriberType,
+    page,
+    size,
+  };
+
+  return apiClient.get<NotificationListResponse>('/v1/notifications', params);
 };
 
 export const sendTestNotification = async (

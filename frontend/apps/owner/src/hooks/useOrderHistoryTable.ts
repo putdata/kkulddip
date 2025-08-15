@@ -5,11 +5,21 @@ import type { Order } from '@/types/order';
  * OrderHistoryTable 비즈니스 로직을 관리하는 커스텀 훅
  *
  * @param onPickupClick - 픽업 완료 버튼 클릭 시 호출할 콜백 함수
+ * @param onPickupSuccess - 픽업 완료 성공 시 호출할 콜백 함수
+ * @param onPickupError - 픽업 완료 실패 시 호출할 콜백 함수
  * @returns 주문 상태 관리, 주문 정보 포맷팅 관련 상태와 핸들러들
  */
-export const useOrderHistoryTable = (
-  onPickupClick?: (order: Order) => void,
-) => {
+interface UseOrderHistoryTableProps {
+  onPickupClick?: (order: Order) => void;
+  onPickupSuccess?: (orderId: string) => void;
+  onPickupError?: (orderId: string) => void;
+}
+
+export const useOrderHistoryTable = ({
+  onPickupClick,
+  onPickupSuccess,
+  onPickupError,
+}: UseOrderHistoryTableProps = {}) => {
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
 
@@ -23,16 +33,25 @@ export const useOrderHistoryTable = (
 
     // 실제 API 호출은 부모 컴포넌트에서 처리
     onPickupClick(order);
+  };
 
-    // 2초 후 완료 상태로 변경 (API 응답 시간 예상)
-    setTimeout(() => {
-      setProcessingIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(order.orderId);
-        return newSet;
-      });
-      setCompletedIds(prev => new Set(prev).add(order.orderId));
-    }, 2000);
+  const handlePickupSuccess = (orderId: string) => {
+    setProcessingIds(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(orderId);
+      return newSet;
+    });
+    setCompletedIds(prev => new Set(prev).add(orderId));
+    onPickupSuccess?.(orderId);
+  };
+
+  const handlePickupError = (orderId: string) => {
+    setProcessingIds(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(orderId);
+      return newSet;
+    });
+    onPickupError?.(orderId);
   };
 
   const getOrderItemsText = (orderItems: Order['orderItems']) => {
@@ -60,6 +79,8 @@ export const useOrderHistoryTable = (
     processingIds,
     completedIds,
     handlePickupClick,
+    handlePickupSuccess,
+    handlePickupError,
     getOrderItemsText,
     getTotalQuantity,
   };

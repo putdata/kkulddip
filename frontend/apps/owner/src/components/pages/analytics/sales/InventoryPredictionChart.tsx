@@ -14,8 +14,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from 'recharts';
-import { Badge } from '@/components/ui/badge';
-import { Package, AlertTriangle } from 'lucide-react';
+import { Package } from 'lucide-react';
 import type { InventoryPrediction } from '@/types/analytics';
 import { useInventoryAnalytics } from '@/hooks/useInventoryAnalytics';
 
@@ -26,11 +25,8 @@ interface InventoryPredictionChartProps {
 const InventoryPredictionChart = ({
   predictions,
 }: InventoryPredictionChartProps) => {
-  const {
-    predictionChartData: chartData,
-    inventoryRiskLevel: riskLevel,
-    avgInventoryRatio,
-  } = useInventoryAnalytics(predictions);
+  const { predictionChartData: chartData, avgInventoryRatio } =
+    useInventoryAnalytics(predictions);
 
   // 커스텀 툴팁
   const CustomTooltip = ({
@@ -124,31 +120,10 @@ const InventoryPredictionChart = ({
               </ResponsiveContainer>
             </div>
 
-            {/* 재고 위험도와 요약 */}
+            {/* 예측 요약 */}
             <div className="mt-4 space-y-3">
-              {/* 재고 위험도 */}
-              {riskLevel && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="text-muted-foreground h-4 w-4" />
-                    <span className="text-sm font-medium">재고 위험도</span>
-                  </div>
-                  <Badge
-                    variant={
-                      riskLevel.color as
-                        | 'default'
-                        | 'destructive'
-                        | 'outline'
-                        | 'secondary'
-                    }
-                  >
-                    {riskLevel.text}
-                  </Badge>
-                </div>
-              )}
-
               {/* 평균 재고율 */}
-              <div className="flex items-center justify-between">
+              <div className="bg-muted/20 flex items-center justify-between rounded-lg p-3">
                 <span className="text-sm font-medium">평균 재고율</span>
                 <span className="text-lg font-bold text-green-600">
                   {avgInventoryRatio.toFixed(2)}%
@@ -156,13 +131,27 @@ const InventoryPredictionChart = ({
               </div>
 
               {/* 일별 예측 요약 */}
-              <div className="space-y-2">
-                <span className="text-sm font-medium">주요 예측</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-3">
+                <span className="text-sm font-semibold">주요 예측</span>
+                <div className="bg-muted/20 space-y-2 rounded-lg p-3">
                   {chartData.slice(0, 3).map((item, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {item.date}: {item.dailyQuantity}개 판매 예상
-                    </Badge>
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full bg-blue-500" />
+                        <span className="text-sm font-medium">{item.date}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold">
+                          {item.dailyQuantity}개
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          {item.confidence}% 신뢰도
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

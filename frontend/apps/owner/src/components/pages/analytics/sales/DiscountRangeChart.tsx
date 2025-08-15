@@ -14,7 +14,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Badge } from '@/components/ui/badge';
 import type { TopDiscountRange } from '@/types/analytics';
 
 interface DiscountRangeChartProps {
@@ -90,17 +89,37 @@ const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
             </div>
 
             {/* 상위 할인 구간 요약 */}
-            <div className="mt-4 space-y-2">
-              <h4 className="text-sm font-medium">주요 할인 구간</h4>
-              <div className="flex flex-wrap gap-2">
+            <div className="mt-4 space-y-3">
+              <h4 className="text-sm font-semibold">주요 할인 구간</h4>
+              <div className="bg-muted/20 space-y-2 rounded-lg p-3">
                 {chartData.slice(0, 3).map((item, index) => (
-                  <Badge
+                  <div
                     key={item.range}
-                    variant={index === 0 ? 'default' : 'secondary'}
-                    className="text-xs"
+                    className="flex items-center justify-between"
                   >
-                    {item.range}: {item.count}건
-                  </Badge>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{
+                          backgroundColor:
+                            index === 0
+                              ? '#3b82f6'
+                              : index === 1
+                                ? '#10b981'
+                                : '#f59e0b',
+                        }}
+                      />
+                      <span className="text-sm font-medium">{item.range}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold">
+                        {item.count}건
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        {item.percentage.toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

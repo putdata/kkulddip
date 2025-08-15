@@ -1,6 +1,8 @@
 import {
   BarChart3,
+  Bell,
   ChefHat,
+  CreditCard,
   Home,
   Settings,
   ShoppingBag,
@@ -51,6 +53,20 @@ export const sidebarItems: SidebarItem[] = [
     label: '분석',
     icon: BarChart3,
     tooltip: '분석',
+  },
+  {
+    key: 'settlement',
+    path: ROUTE_PATH.STORE.SETTLEMENT,
+    label: '정산',
+    icon: CreditCard,
+    tooltip: '정산',
+  },
+  {
+    key: 'notifications',
+    path: ROUTE_PATH.STORE.NOTIFICATIONS,
+    label: '알림',
+    icon: Bell,
+    tooltip: '알림',
   },
   {
     key: 'settings',
