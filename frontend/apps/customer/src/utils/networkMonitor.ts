@@ -53,12 +53,18 @@ export class NetworkMonitor {
   private setupEventListeners() {
     // 온라인/오프라인 상태 변경
     window.addEventListener('online', this.handleOnlineStatusChange.bind(this));
-    window.addEventListener('offline', this.handleOnlineStatusChange.bind(this));
+    window.addEventListener(
+      'offline',
+      this.handleOnlineStatusChange.bind(this),
+    );
 
     // 네트워크 정보 변경 (지원하는 브라우저에서만)
     if ('connection' in navigator) {
-      const connection = (navigator as unknown).connection;
-      connection?.addEventListener('change', this.handleNetworkChange.bind(this));
+      const connection = (navigator as any).connection;
+      connection?.addEventListener(
+        'change',
+        this.handleNetworkChange.bind(this),
+      );
     }
   }
 
@@ -94,9 +100,10 @@ export class NetworkMonitor {
    * 네트워크 연결 정보 수집
    */
   private getNetworkConnection(): Partial<NetworkStatus> {
-    const connection = (navigator as unknown).connection || 
-                      (navigator as unknown).mozConnection || 
-                      (navigator as unknown).webkitConnection;
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
 
     if (!connection) {
       return {};
@@ -136,7 +143,10 @@ export class NetworkMonitor {
 
     if (effectiveType === '4g' && (rtt ?? 0) < 100 && (downlink ?? 0) > 2) {
       return 'excellent';
-    } else if (effectiveType === '3g' || ((rtt ?? 0) < 300 && (downlink ?? 0) > 1)) {
+    } else if (
+      effectiveType === '3g' ||
+      ((rtt ?? 0) < 300 && (downlink ?? 0) > 1)
+    ) {
       return 'good';
     } else if (effectiveType === '2g' || (rtt ?? 0) > 300) {
       return 'fair';
@@ -152,21 +162,30 @@ export class NetworkMonitor {
    */
   isWebSocketSuitable(): boolean {
     const quality = this.getQualityAssessment();
-    return this.currentStatus.online && 
-           quality !== 'poor' && 
-           quality !== 'unknown';
+    return (
+      this.currentStatus.online && quality !== 'poor' && quality !== 'unknown'
+    );
   }
 
   /**
    * 리소스 정리
    */
   destroy() {
-    window.removeEventListener('online', this.handleOnlineStatusChange.bind(this));
-    window.removeEventListener('offline', this.handleOnlineStatusChange.bind(this));
-    
+    window.removeEventListener(
+      'online',
+      this.handleOnlineStatusChange.bind(this),
+    );
+    window.removeEventListener(
+      'offline',
+      this.handleOnlineStatusChange.bind(this),
+    );
+
     if ('connection' in navigator) {
-      const connection = (navigator as unknown).connection;
-      connection?.removeEventListener('change', this.handleNetworkChange.bind(this));
+      const connection = (navigator as any).connection;
+      connection?.removeEventListener(
+        'change',
+        this.handleNetworkChange.bind(this),
+      );
     }
 
     this.listeners = [];

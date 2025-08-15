@@ -4,7 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertCircle, Loader2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { StreamPlayer, StreamInfo } from '@/components/pages/streams/StreamPlayer';
+import {
+  StreamPlayer,
+  StreamInfo,
+} from '@/components/pages/streams/StreamPlayer';
 import { StreamService } from '@/services/streamService';
 import { toast } from 'sonner';
 
@@ -20,7 +23,9 @@ const StreamDetail = () => {
   const location = useLocation();
   const locationState = location.state as LocationState | null;
 
-  const [token, setToken] = useState<string | null>(locationState?.token || null);
+  const [token, setToken] = useState<string | null>(
+    locationState?.token || null,
+  );
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [isPreValidated] = useState(locationState?.preValidated || false);
@@ -39,7 +44,7 @@ const StreamDetail = () => {
     enabled: Boolean(numericStreamId),
     retry: 3,
     retryDelay: 1000,
-    refetchInterval: (query) => {
+    refetchInterval: query => {
       const data = query.state.data;
       // 스트림이 LIVE 상태이고 토큰이 없으면 5초마다 상태 확인
       if (data?.status === 'LIVE' && !token) {
@@ -58,12 +63,16 @@ const StreamDetail = () => {
   // 스트림 참가 (토큰 획득)
   const joinStream = useCallback(async () => {
     if (!numericStreamId) {
-      console.error('[StreamDetail] joinStream 호출되었지만 numericStreamId가 없음');
+      console.error(
+        '[StreamDetail] joinStream 호출되었지만 numericStreamId가 없음',
+      );
       return;
     }
 
     if (isJoining) {
-      console.warn('[StreamDetail] 이미 스트림 참가 요청 진행 중 - 중복 요청 차단');
+      console.warn(
+        '[StreamDetail] 이미 스트림 참가 요청 진행 중 - 중복 요청 차단',
+      );
       return;
     }
 
@@ -132,6 +141,7 @@ const StreamDetail = () => {
     isPreValidated,
     joinError,
     isJoining,
+    stream,
     joinStream,
   ]);
 
@@ -155,19 +165,19 @@ const StreamDetail = () => {
   // 스트림 ID가 유효하지 않은 경우
   if (!numericStreamId) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center space-y-4">
-            <AlertCircle className="w-12 h-12 mx-auto text-red-400" />
+      <div className="flex h-full flex-col">
+        <div className="flex flex-1 items-center justify-center p-4">
+          <div className="space-y-4 text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="mb-2 text-lg font-medium text-gray-900">
                 잘못된 스트림 ID
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="mb-4 text-sm text-gray-500">
                 유효하지 않은 스트림 주소입니다.
               </p>
               <Button onClick={handleBack}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 돌아가기
               </Button>
             </div>
@@ -180,11 +190,13 @@ const StreamDetail = () => {
   // 스트림 정보 로딩 중
   if (isStreamLoading) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center space-y-4">
-            <Loader2 className="w-8 h-8 mx-auto animate-spin text-blue-500" />
-            <p className="text-sm text-gray-500">스트림 정보를 불러오는 중...</p>
+      <div className="flex h-full flex-col">
+        <div className="flex flex-1 items-center justify-center p-4">
+          <div className="space-y-4 text-center">
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-500" />
+            <p className="text-sm text-gray-500">
+              스트림 정보를 불러오는 중...
+            </p>
           </div>
         </div>
       </div>
@@ -194,24 +206,24 @@ const StreamDetail = () => {
   // 스트림 정보 로드 에러
   if (streamError || !stream) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center space-y-4">
-            <AlertCircle className="w-12 h-12 mx-auto text-red-400" />
+      <div className="flex h-full flex-col">
+        <div className="flex flex-1 items-center justify-center p-4">
+          <div className="space-y-4 text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="mb-2 text-lg font-medium text-gray-900">
                 스트림을 찾을 수 없습니다
               </h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="mb-4 text-sm text-gray-500">
                 요청하신 스트림이 존재하지 않거나 삭제되었습니다.
               </p>
               <div className="space-x-2">
                 <Button onClick={handleRetryStream} variant="outline">
-                  <RotateCcw className="w-4 h-4 mr-2" />
+                  <RotateCcw className="mr-2 h-4 w-4" />
                   다시 시도
                 </Button>
                 <Button onClick={handleBack}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="mr-2 h-4 w-4" />
                   돌아가기
                 </Button>
               </div>
@@ -223,10 +235,10 @@ const StreamDetail = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* 메인 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
-        <div className="p-4 space-y-4">
+        <div className="space-y-4 p-4">
           {/* 참가 에러 알림 */}
           {joinError && (
             <Alert variant="destructive">
@@ -242,7 +254,7 @@ const StreamDetail = () => {
                 >
                   {isJoining ? (
                     <>
-                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
                       재시도 중...
                     </>
                   ) : (
@@ -261,13 +273,11 @@ const StreamDetail = () => {
               preValidated={isPreValidated}
             />
           ) : (
-            <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Loader2 className="w-6 h-6 mx-auto animate-spin text-gray-400" />
+            <div className="flex aspect-video items-center justify-center rounded-lg bg-gray-100">
+              <div className="space-y-2 text-center">
+                <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-400" />
                 <p className="text-sm text-gray-500">
-                  {isJoining
-                    ? '스트림 참가 중...'
-                    : '스트림 연결 준비 중...'}
+                  {isJoining ? '스트림 참가 중...' : '스트림 연결 준비 중...'}
                 </p>
               </div>
             </div>

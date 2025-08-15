@@ -12,11 +12,13 @@ const StreamInfo = ({ stream }: StreamInfoProps) => {
     if (!startedAt) {
       return '시작 시간 정보 없음';
     }
-    
+
     const startTime = new Date(startedAt);
     const now = new Date();
-    const diffMinutes = Math.floor((now.getTime() - startTime.getTime()) / (1000 * 60));
-    
+    const diffMinutes = Math.floor(
+      (now.getTime() - startTime.getTime()) / (1000 * 60),
+    );
+
     if (diffMinutes < 1) {
       return '방금 시작됨';
     } else if (diffMinutes < 60) {
@@ -39,13 +41,13 @@ const StreamInfo = ({ stream }: StreamInfoProps) => {
     switch (status) {
       case 'LIVE':
         return (
-          <Badge className="bg-red-500 hover:bg-red-600 text-white animate-pulse">
+          <Badge className="animate-pulse bg-red-500 text-white hover:bg-red-600">
             🔴 라이브
           </Badge>
         );
       case 'READY':
         return (
-          <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">
+          <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
             ⏸️ 준비 중
           </Badge>
         );
@@ -62,18 +64,18 @@ const StreamInfo = ({ stream }: StreamInfoProps) => {
 
   return (
     <Card>
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="space-y-4 p-4">
         {/* 스트림 제목 및 상태 */}
         <div className="space-y-2">
           <div className="flex items-start justify-between">
-            <h1 className="text-xl font-bold leading-tight pr-2">
+            <h1 className="pr-2 text-xl font-bold leading-tight">
               {stream.title}
             </h1>
             {getStatusBadge(stream.status)}
           </div>
-          
+
           {stream.description && (
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm leading-relaxed text-gray-600">
               {stream.description}
             </p>
           )}
@@ -81,7 +83,7 @@ const StreamInfo = ({ stream }: StreamInfoProps) => {
 
         {/* 가게 정보 */}
         <div className="flex items-center space-x-2 text-sm">
-          <MapPin className="w-4 h-4 text-gray-500" />
+          <MapPin className="h-4 w-4 text-gray-500" />
           <span className="font-medium text-gray-900">{stream.storeName}</span>
         </div>
 
@@ -89,19 +91,18 @@ const StreamInfo = ({ stream }: StreamInfoProps) => {
         <div className="flex items-center space-x-6 text-sm">
           {/* 시청자 수 */}
           <div className="flex items-center space-x-1 text-gray-600">
-            <Users className="w-4 h-4" />
+            <Users className="h-4 w-4" />
             <span>{formatViewerCount(stream.viewerCount)} 시청 중</span>
           </div>
 
           {/* 시작 시간 */}
           {stream.startedAt && (
             <div className="flex items-center space-x-1 text-gray-600">
-              <Clock className="w-4 h-4" />
+              <Clock className="h-4 w-4" />
               <span>{formatStartTime(stream.startedAt)}</span>
             </div>
           )}
         </div>
-
       </CardContent>
     </Card>
   );

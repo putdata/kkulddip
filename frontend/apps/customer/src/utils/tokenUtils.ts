@@ -15,13 +15,13 @@ export const isUrlFormatToken = (token: string): boolean => {
 export const extractTokenFromUrl = (urlToken: string): string => {
   try {
     const url = new URL(urlToken);
-    
+
     // OpenVidu 토큰 ID 추출 (token 파라미터에서)
     const tokenParam = url.searchParams.get('token');
     if (!tokenParam) {
       throw new Error('URL에서 OpenVidu 토큰을 찾을 수 없습니다');
     }
-    
+
     return tokenParam;
   } catch (error) {
     console.error('토큰 URL 파싱 실패:', error);
@@ -37,7 +37,7 @@ export const normalizeOpenViduToken = (token: string): string => {
     // OpenVidu는 전체 WebSocket URL을 토큰으로 사용
     console.log('[tokenUtils] OpenVidu WebSocket URL 토큰 사용:', {
       tokenUrl: token,
-      tokenType: 'OpenVidu WebSocket URL Token'
+      tokenType: 'OpenVidu WebSocket URL Token',
     });
     return token; // 전체 URL 그대로 반환
   }

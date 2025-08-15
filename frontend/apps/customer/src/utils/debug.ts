@@ -35,7 +35,10 @@ export const debugInfo = {
   checkNetwork: () => {
     const networkInfo = {
       online: navigator.onLine,
-      connection: (navigator as unknown).connection || (navigator as unknown).mozConnection || (navigator as unknown).webkitConnection,
+      connection:
+        (navigator as any).connection ||
+        (navigator as any).mozConnection ||
+        (navigator as any).webkitConnection,
       serviceWorker: 'serviceWorker' in navigator,
       localStorage: typeof Storage !== 'undefined',
       sessionStorage: typeof sessionStorage !== 'undefined',
@@ -101,7 +104,7 @@ export const debugInfo = {
    */
   fullDiagnostic: () => {
     console.group('🚨 전체 시스템 진단');
-    
+
     const results = {
       environment: debugInfo.checkEnvironment(),
       network: debugInfo.checkNetwork(),
@@ -123,7 +126,9 @@ export const debugInfo = {
     if (perfEntries.length > 0) {
       const navTiming = perfEntries[0] as PerformanceNavigationTiming;
       const loadInfo = {
-        domContentLoaded: navTiming.domContentLoadedEventEnd - navTiming.domContentLoadedEventStart,
+        domContentLoaded:
+          navTiming.domContentLoadedEventEnd -
+          navTiming.domContentLoadedEventStart,
         loadComplete: navTiming.loadEventEnd - navTiming.loadEventStart,
         domInteractive: navTiming.domInteractive - navTiming.fetchStart,
         responseTime: navTiming.responseEnd - navTiming.requestStart,
@@ -160,14 +165,21 @@ export const useDebugLifecycle = (componentName: string) => {
 /**
  * 에러 캐치 및 로깅
  */
-export const logError = (context: string, error: unknown, additionalInfo?: object) => {
+export const logError = (
+  context: string,
+  error: unknown,
+  additionalInfo?: object,
+) => {
   const errorInfo = {
     context,
-    error: error instanceof Error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    } : error,
+    error:
+      error instanceof Error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : error,
     additionalInfo,
     timestamp: new Date().toISOString(),
     userAgent: navigator.userAgent,

@@ -12,10 +12,15 @@ export const StreamService = {
    */
   getLiveStreams: async () => {
     try {
-      const response = await apiClient.get<StreamListItem[]>(API_PATH.STREAMS_LIVE);
+      const response = await apiClient.get<StreamListItem[]>(
+        API_PATH.STREAMS_LIVE,
+      );
       return response;
     } catch (error) {
-      console.error('라이브 스트림 목록 요청 실패:', error instanceof Error ? error.message : '알 수 없는 에러');
+      console.error(
+        '라이브 스트림 목록 요청 실패:',
+        error instanceof Error ? error.message : '알 수 없는 에러',
+      );
       throw error;
     }
   },
@@ -39,7 +44,7 @@ export const StreamService = {
         {},
       );
       const endTime = performance.now();
-      
+
       console.log('✅ [StreamService] Spring Boot 서버 응답 성공');
       console.log('📥 [StreamService] 응답 정보:', {
         streamId,
@@ -49,17 +54,23 @@ export const StreamService = {
         sessionId: response.sessionId,
         tokenType: typeof response.token,
         tokenLength: response.token?.length || 0,
-        isWebSocketUrl: response.token?.startsWith('wss://') || response.token?.startsWith('ws://'),
+        isWebSocketUrl:
+          response.token?.startsWith('wss://') ||
+          response.token?.startsWith('ws://'),
         tokenPreview: response.token?.substring(0, 100) + '...',
         timestamp: new Date().toISOString(),
       });
-      
+
       return response;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 에러';
-      const httpStatus = (error as { response?: { status?: number, data?: unknown } })?.response?.status;
-      const responseData = (error as { response?: { data?: unknown } })?.response?.data;
-      
+      const errorMessage =
+        error instanceof Error ? error.message : '알 수 없는 에러';
+      const httpStatus = (
+        error as { response?: { status?: number; data?: unknown } }
+      )?.response?.status;
+      const responseData = (error as { response?: { data?: unknown } })
+        ?.response?.data;
+
       console.error('❌ [StreamService] Spring Boot 서버 요청 실패');
       console.error('📥 [StreamService] 에러 정보:', {
         streamId,
@@ -73,7 +84,9 @@ export const StreamService = {
       if (httpStatus === 400) {
         throw new Error('스트림이 진행 중이 아닙니다. 다시 시도해주세요.');
       } else if (httpStatus === 404) {
-        throw new Error('스트림을 찾을 수 없습니다. 스트림이 종료되었을 수 있습니다.');
+        throw new Error(
+          '스트림을 찾을 수 없습니다. 스트림이 종료되었을 수 있습니다.',
+        );
       } else if (httpStatus === 401) {
         throw new Error('인증이 필요합니다. 로그인 후 다시 시도해주세요.');
       } else if (httpStatus === 403) {
@@ -91,10 +104,15 @@ export const StreamService = {
    */
   getStreamDetail: async (streamId: number) => {
     try {
-      const response = await apiClient.get<StreamDetail>(API_PATH.STREAMS_DETAIL(streamId));
+      const response = await apiClient.get<StreamDetail>(
+        API_PATH.STREAMS_DETAIL(streamId),
+      );
       return response;
     } catch (error) {
-      console.error('스트림 상세 정보 요청 실패:', error instanceof Error ? error.message : '알 수 없는 에러');
+      console.error(
+        '스트림 상세 정보 요청 실패:',
+        error instanceof Error ? error.message : '알 수 없는 에러',
+      );
       throw error;
     }
   },

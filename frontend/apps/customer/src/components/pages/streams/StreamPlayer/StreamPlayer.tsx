@@ -32,18 +32,20 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
 
   useEffect(() => {
     strictModeCounterRef.current++;
-    
+
     // React StrictMode에서 이중 실행 방지
     if (strictModeCounterRef.current > 1) {
-      console.log(`🔄 [StreamPlayer] React StrictMode 이중 실행 감지 (${strictModeCounterRef.current}번째) - 스킵`);
+      console.log(
+        `🔄 [StreamPlayer] React StrictMode 이중 실행 감지 (${strictModeCounterRef.current}번째) - 스킵`,
+      );
       return;
     }
-    
+
     // 강력한 중복 방지 로직
-    const shouldConnect = 
+    const shouldConnect =
       mountedRef.current &&
-      token && 
-      stream.status === 'LIVE' && 
+      token &&
+      stream.status === 'LIVE' &&
       !hasConnected &&
       !connectionAttemptedRef.current &&
       currentTokenRef.current !== token;
@@ -52,7 +54,7 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
       connectionAttemptedRef.current = true;
       currentTokenRef.current = token;
       setHasConnected(true);
-      
+
       connectToStream(token, videoElementId);
     }
   }, [token, stream.status, hasConnected, videoElementId, connectToStream]);
@@ -69,14 +71,13 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     mountedRef.current = true;
-    
+
     return () => {
       mountedRef.current = false;
       connectionAttemptedRef.current = false;
       currentTokenRef.current = null;
     };
   }, []);
-
 
   const formatViewerCount = (count: number) => {
     if (count >= 1000) {
@@ -87,10 +88,10 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
 
   if (stream.status !== 'LIVE') {
     return (
-      <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+      <div className="flex aspect-video items-center justify-center rounded-lg bg-gray-900">
         <div className="text-center text-white">
-          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium mb-2">스트림이 종료되었습니다</h3>
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+          <h3 className="mb-2 text-lg font-medium">스트림이 종료되었습니다</h3>
           <p className="text-sm text-gray-400">
             이 방송은 현재 진행되지 않습니다.
           </p>
@@ -103,32 +104,32 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
     <div className="space-y-4">
       {/* 비디오 플레이어 영역 */}
       <div className="relative">
-        <div 
+        <div
           id={videoElementId}
-          className="aspect-video bg-gray-900 rounded-lg overflow-hidden"
+          className="aspect-video overflow-hidden rounded-lg bg-gray-900"
           style={{
             position: 'relative',
             width: '100%',
             height: '100%',
-            minHeight: '200px'
+            minHeight: '200px',
           }}
         >
           {isConnecting && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
               <div className="text-center text-white">
-                <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin" />
+                <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin" />
                 <p className="text-sm">스트림에 연결 중...</p>
               </div>
             </div>
           )}
-          
+
           {isError && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-              <div className="text-center text-white space-y-4">
-                <AlertCircle className="w-12 h-12 mx-auto text-red-400" />
+              <div className="space-y-4 text-center text-white">
+                <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
                 <div>
-                  <h3 className="text-lg font-medium mb-2">연결 실패</h3>
-                  <p className="text-sm text-gray-400 mb-4">
+                  <h3 className="mb-2 text-lg font-medium">연결 실패</h3>
+                  <p className="mb-4 text-sm text-gray-400">
                     {error?.message || '스트림 연결에 실패했습니다.'}
                   </p>
                   <p className="text-xs text-gray-500">
@@ -138,12 +139,12 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
               </div>
             </div>
           )}
-          
+
           {isEnded && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
               <div className="text-center text-white">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-medium mb-2">방송 종료</h3>
+                <AlertCircle className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                <h3 className="mb-2 text-lg font-medium">방송 종료</h3>
                 <p className="text-sm text-gray-400">
                   스트리머가 방송을 종료했습니다.
                 </p>
@@ -154,12 +155,15 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
 
         {/* 라이브 배지 및 시청자 수 */}
         {isConnected && (
-          <div className="absolute top-4 left-4 flex items-center space-x-2">
-            <Badge className="bg-red-500 hover:bg-red-600 text-white">
+          <div className="absolute left-4 top-4 flex items-center space-x-2">
+            <Badge className="bg-red-500 text-white hover:bg-red-600">
               🔴 LIVE
             </Badge>
-            <Badge variant="secondary" className="bg-black/70 text-white border-none">
-              <Users className="w-3 h-3 mr-1" />
+            <Badge
+              variant="secondary"
+              className="border-none bg-black/70 text-white"
+            >
+              <Users className="mr-1 h-3 w-3" />
               {formatViewerCount(stream.viewerCount)}
             </Badge>
           </div>
@@ -172,13 +176,12 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {error.message}
-            <span className="block mt-2 text-sm">
+            <span className="mt-2 block text-sm">
               페이지를 새로고침해 주세요.
             </span>
           </AlertDescription>
         </Alert>
       )}
-
     </div>
   );
 };

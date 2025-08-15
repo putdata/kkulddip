@@ -33,7 +33,12 @@ export interface StreamDetail {
   endedAt: string | null;
 }
 
-export type StreamPlayerStatus = 'idle' | 'connecting' | 'connected' | 'error' | 'ended';
+export type StreamPlayerStatus =
+  | 'idle'
+  | 'connecting'
+  | 'connected'
+  | 'error'
+  | 'ended';
 
 export interface StreamPlayerError {
   code: string;

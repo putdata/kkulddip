@@ -1,7 +1,7 @@
 /**
  * @deprecated This file contains development-only diagnostic utilities
  * TODO: DELETE THIS ENTIRE FILE - Used only for debugging OpenVidu connections
- * 
+ *
  * OpenVidu 연결 진단 유틸리티
  */
 
@@ -14,7 +14,9 @@ export const openviduDiagnostic = {
       RTCPeerConnection: Boolean(window.RTCPeerConnection),
       getUserMedia: Boolean(navigator.mediaDevices?.getUserMedia),
       WebSocket: Boolean(window.WebSocket),
-      WebRTC: Boolean(window.RTCPeerConnection && navigator.mediaDevices?.getUserMedia),
+      WebRTC: Boolean(
+        window.RTCPeerConnection && navigator.mediaDevices?.getUserMedia,
+      ),
       browser: navigator.userAgent,
       timestamp: new Date().toISOString(),
     };
@@ -43,7 +45,9 @@ export const openviduDiagnostic = {
     try {
       // HTTP 연결 테스트
       const httpStartTime = Date.now();
-      const response = await fetch(serverUrl.replace('wss://', 'https://').replace(':8443', ''));
+      const response = await fetch(
+        serverUrl.replace('wss://', 'https://').replace(':8443', ''),
+      );
       results.httpTest = response.ok;
       const httpEndTime = Date.now();
       console.log(`HTTP 응답시간: ${httpEndTime - httpStartTime}ms`);
@@ -55,8 +59,8 @@ export const openviduDiagnostic = {
       // WebSocket 연결 테스트
       const wsStartTime = Date.now();
       const testWs = new WebSocket(serverUrl?.split('?')[0] || '');
-      
-      const wsPromise = new Promise<boolean>((resolve) => {
+
+      const wsPromise = new Promise<boolean>(resolve => {
         const timeout = setTimeout(() => {
           testWs.close();
           resolve(false);
@@ -141,9 +145,9 @@ export const openviduDiagnostic = {
 
     try {
       // 카메라 권한 확인
-      const videoStream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: false 
+      const videoStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
       });
       permissions.camera = true;
       videoStream.getTracks().forEach(track => track.stop());
@@ -153,9 +157,9 @@ export const openviduDiagnostic = {
 
     try {
       // 마이크 권한 확인
-      const audioStream = await navigator.mediaDevices.getUserMedia({ 
-        video: false, 
-        audio: true 
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true,
       });
       permissions.microphone = true;
       audioStream.getTracks().forEach(track => track.stop());
@@ -187,10 +191,14 @@ export const openviduDiagnostic = {
     const results = {
       webrtc: openviduDiagnostic.checkWebRTCSupport(),
       media: await openviduDiagnostic.checkMediaPermissions(),
-      network: serverUrl ? await openviduDiagnostic.testNetworkConnection(serverUrl) : null,
-      server: serverUrl ? await openviduDiagnostic.checkOpenViduServerStatus(
-        serverUrl.replace('wss://', 'https://').split('?')[0] || ''
-      ) : null,
+      network: serverUrl
+        ? await openviduDiagnostic.testNetworkConnection(serverUrl)
+        : null,
+      server: serverUrl
+        ? await openviduDiagnostic.checkOpenViduServerStatus(
+            serverUrl.replace('wss://', 'https://').split('?')[0] || '',
+          )
+        : null,
       timestamp: new Date().toISOString(),
     };
 
