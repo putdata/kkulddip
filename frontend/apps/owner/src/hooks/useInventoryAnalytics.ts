@@ -36,33 +36,6 @@ export const useInventoryAnalytics = (
     [predictions],
   );
 
-  /*
-   * 재고 위험도 계산 및 상태 정보
-   */
-  const inventoryRiskLevel = useMemo(() => {
-    if (predictionChartData.length === 0) {
-      return null;
-    }
-    const avgRatio =
-      predictionChartData.reduce((sum, item) => sum + item.inventoryRatio, 0) /
-      predictionChartData.length;
-
-    if (avgRatio < 20) {
-      return {
-        level: 'high' as const,
-        color: 'destructive' as const,
-        text: '높음',
-      };
-    }
-    if (avgRatio < 50) {
-      return {
-        level: 'medium' as const,
-        color: 'default' as const,
-        text: '보통',
-      };
-    }
-    return { level: 'low' as const, color: 'secondary' as const, text: '낮음' };
-  }, [predictionChartData]);
 
   /*
    * 평균 재고율 계산값
@@ -102,38 +75,6 @@ export const useInventoryAnalytics = (
     ];
   }, [inventoryStatus]);
 
-  /*
-   * 재고 상태 평가 정보
-   */
-  const inventoryStatusInfo = useMemo(() => {
-    if (!inventoryStatus) {
-      return null;
-    }
-
-    const percentage = inventoryStatus.remainingPercentage;
-    if (percentage >= 70) {
-      return {
-        status: 'good',
-        color: 'secondary',
-        text: '양호',
-        description: '재고가 충분합니다',
-      };
-    } else if (percentage >= 30) {
-      return {
-        status: 'warning',
-        color: 'default',
-        text: '주의',
-        description: '재고 보충을 고려해보세요',
-      };
-    } else {
-      return {
-        status: 'critical',
-        color: 'destructive',
-        text: '부족',
-        description: '재고 보충이 필요합니다',
-      };
-    }
-  }, [inventoryStatus]);
 
   /*
    * 재고 과다 상품별 위험도 계산 함수
@@ -215,10 +156,8 @@ export const useInventoryAnalytics = (
 
   return {
     predictionChartData,
-    inventoryRiskLevel,
     avgInventoryRatio,
     statusChartData,
-    inventoryStatusInfo,
     getHighInventoryRisk,
     sortedHighInventoryItems,
     overallAlertLevel,

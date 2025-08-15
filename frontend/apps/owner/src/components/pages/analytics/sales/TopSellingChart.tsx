@@ -70,7 +70,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
           가장 많이 팔린 상품들의 판매량과 비중을 확인해보세요
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col">
+      <CardContent className="flex h-full flex-col">
         <Tabs defaultValue="items" className="flex w-full flex-1 flex-col">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="items">상품별</TabsTrigger>
@@ -114,7 +114,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
           {/* 제품별 차트 */}
           <TabsContent value="products" className="mt-6 flex-1">
             {productsData.length > 0 ? (
-              <div className="h-80">
+              <div className="h-80 min-h-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
