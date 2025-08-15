@@ -42,12 +42,12 @@ const OrderFlowLayout = ({
       </div>
 
       {/* 전체 카드 */}
-      <div className="flex-1 overflow-hidden rounded-[2.5rem] bg-amber-50 pt-8 shadow-lg">
+      <div className="rounded-4xl flex-1 overflow-hidden pt-8">
         {/* 진행 상태 표시 */}
         <ProgressSteps currentStep={currentStep} />
 
         {/* 메인 콘텐츠 스크롤 영역 */}
-        <div className="rounded-t-4xl flex-1 overflow-y-auto bg-amber-100 p-6">
+        <div className="rounded-4xl flex-1 overflow-y-auto p-6">
           <div className="space-y-3">{children}</div>
         </div>
       </div>
