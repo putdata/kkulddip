@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertCircle, Loader2, RotateCcw } from 'lucide-react';
@@ -19,7 +19,7 @@ const StreamDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LocationState | null;
-  
+
   const [token, setToken] = useState<string | null>(locationState?.token || null);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
@@ -39,7 +39,8 @@ const StreamDetail = () => {
     enabled: Boolean(numericStreamId),
     retry: 3,
     retryDelay: 1000,
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
+      const data = query.state.data;
       // 스트림이 LIVE 상태이고 토큰이 없으면 5초마다 상태 확인
       if (data?.status === 'LIVE' && !token) {
         return 5000;
@@ -54,9 +55,8 @@ const StreamDetail = () => {
     refetchIntervalInBackground: false,
   });
 
-
   // 스트림 참가 (토큰 획득)
-  const joinStream = async () => {
+  const joinStream = useCallback(async () => {
     if (!numericStreamId) {
       console.error('[StreamDetail] joinStream 호출되었지만 numericStreamId가 없음');
       return;
@@ -67,18 +67,15 @@ const StreamDetail = () => {
       return;
     }
 
-
     try {
       setIsJoining(true);
       setJoinError(null);
       const response = await StreamService.joinStream(numericStreamId);
       
-      
-      
       setToken(response.token);
     } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : '스트림 참가에 실패했습니다.';
       
       console.error('스트림 참가 실패:', errorMessage);
@@ -101,7 +98,7 @@ const StreamDetail = () => {
     } finally {
       setIsJoining(false); // 요청 완료 후 상태 초기화
     }
-  };
+  }, [numericStreamId, isJoining, token, refetchStream]);
 
   // 사전 검증된 토큰이 없는 경우에만 자동 참가 시도
   useEffect(() => {
@@ -118,37 +115,29 @@ const StreamDetail = () => {
         setJoinError('스트림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
       }
     }
-  }, [stream?.status, token, isPreValidated]);
+  }, [stream?.status, token, isPreValidated, joinError, isJoining, stream?.sessionId, joinStream]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
 
-  const handleRetryJoin = () => {
+  const handleRetryJoin = useCallback(() => {
     if (isJoining) {
       return;
     }
     
     setJoinError(null);
     joinStream();
-  };
+  }, [isJoining, joinStream]);
 
-  const handleRetryStream = () => {
+  const handleRetryStream = useCallback(() => {
     refetchStream();
-  };
+  }, [refetchStream]);
 
   // 스트림 ID가 유효하지 않은 경우
   if (!numericStreamId) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b bg-white">
-          <Button variant="ghost" size="icon" onClick={handleBack}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-bold">스트림</h1>
-          <div className="w-10" />
-        </div>
-
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-4">
             <AlertCircle className="w-12 h-12 mx-auto text-red-400" />
@@ -174,14 +163,6 @@ const StreamDetail = () => {
   if (isStreamLoading) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b bg-white">
-          <Button variant="ghost" size="icon" onClick={handleBack}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-bold">스트림</h1>
-          <div className="w-10" />
-        </div>
-
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-4">
             <Loader2 className="w-8 h-8 mx-auto animate-spin text-blue-500" />
@@ -196,14 +177,6 @@ const StreamDetail = () => {
   if (streamError || !stream) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b bg-white">
-          <Button variant="ghost" size="icon" onClick={handleBack}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-bold">스트림</h1>
-          <div className="w-10" />
-        </div>
-
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-4">
             <AlertCircle className="w-12 h-12 mx-auto text-red-400" />
@@ -233,15 +206,6 @@ const StreamDetail = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <Button variant="ghost" size="icon" onClick={handleBack}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-lg font-bold truncate px-2">{stream.title}</h1>
-        <div className="w-10" />
-      </div>
-
       {/* 메인 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-4">

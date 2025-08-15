@@ -54,7 +54,7 @@ export const openviduDiagnostic = {
     try {
       // WebSocket 연결 테스트
       const wsStartTime = Date.now();
-      const testWs = new WebSocket(serverUrl.split('?')[0]);
+      const testWs = new WebSocket(serverUrl?.split('?')[0] || '');
       
       const wsPromise = new Promise<boolean>((resolve) => {
         const timeout = setTimeout(() => {
@@ -165,7 +165,7 @@ export const openviduDiagnostic = {
 
     try {
       // 화면 공유 권한 확인 (선택사항)
-      if (navigator.mediaDevices.getDisplayMedia) {
+      if (navigator.mediaDevices?.getDisplayMedia) {
         permissions.screen = true;
       }
     } catch (error) {
@@ -189,7 +189,7 @@ export const openviduDiagnostic = {
       media: await openviduDiagnostic.checkMediaPermissions(),
       network: serverUrl ? await openviduDiagnostic.testNetworkConnection(serverUrl) : null,
       server: serverUrl ? await openviduDiagnostic.checkOpenViduServerStatus(
-        serverUrl.replace('wss://', 'https://').split('?')[0]
+        serverUrl.replace('wss://', 'https://').split('?')[0] || ''
       ) : null,
       timestamp: new Date().toISOString(),
     };

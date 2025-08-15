@@ -334,7 +334,7 @@ export const useStreamViewer = ({
         const cleanupFunctions: (() => void)[] = [];
         
         // ICE 연결 상태 변경 이벤트 리스너 설정 함수
-        const setupIceConnectionTracking = (stream: { connection?: { connection?: RTCPeerConnection } }) => {
+        const setupIceConnectionTracking = (stream: any) => {
           if (stream && stream.connection && stream.connection.connection) {
             const rtcPeerConnection = stream.connection.connection;
             
@@ -529,7 +529,7 @@ export const useStreamViewer = ({
                 if (videoElements.length === 0) {
                   console.warn('⚠️ [useStreamViewer] 비디오 엘리먼트가 생성되지 않음 - 강제 생성 시도');
                   // OpenVidu가 비디오 엘리먼트를 생성하도록 재시도
-                  subscriber.createVideoElement(videoElementId, 'APPEND');
+                  (subscriber as any).createVideoElement(videoElementId, 'APPEND');
                 }
               }
             }, 1000); // 1초 후 확인
@@ -537,7 +537,7 @@ export const useStreamViewer = ({
             console.log('✅ [useStreamViewer] OpenVidu 구독자 생성 완료');
             
             // ICE 연결 상태 추적 시작
-            setupIceConnectionTracking(subscriber.stream);
+            setupIceConnectionTracking(subscriber.stream as any);
             
             // streamPlaying 이벤트 대기 (네트워크 품질에 따른 적응적 타임아웃)
             let playingTimeout: NodeJS.Timeout;
@@ -560,7 +560,7 @@ export const useStreamViewer = ({
               // RTCPeerConnection에서 직접 ICE 연결 상태 확인
               let currentIceState = 'new';
               try {
-                const rtcConnection = (subscriber as { stream?: { connection?: { connection?: RTCPeerConnection } } })?.stream?.connection?.connection;
+                const rtcConnection = (subscriber as any)?.stream?.connection?.connection;
                 if (rtcConnection) {
                   currentIceState = rtcConnection.iceConnectionState;
                   iceConnectionState = currentIceState; // 변수 업데이트
@@ -608,7 +608,7 @@ export const useStreamViewer = ({
                       // RTCPeerConnection 접근 시도 (OpenVidu 내부 구조)
                       try {
                         // OpenVidu subscriber의 stream manager에서 RTCPeerConnection 찾기
-                        const streamManager = subscriber as { stream?: { webRtcPeer?: { pc?: RTCPeerConnection }, connection?: { connection?: RTCPeerConnection }, getRTCPeerConnection?: () => RTCPeerConnection } };
+                        const streamManager = subscriber as any;
                         let rtcConnection: RTCPeerConnection | null = null;
                         
                         // 여러 경로로 RTCPeerConnection 접근 시도
