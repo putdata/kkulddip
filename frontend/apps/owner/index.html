@@ -2,9 +2,140 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>꿀띱 사장님</title>
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128.png" />
+    <link rel="icon" type="image/png" sizes="196x196" href="/favicon-196x196.png" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+    
+    <!-- Windows Metro Tiles -->
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
+    <meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />
+    <meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />
+    <meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />
+    
+    <!-- iOS Web App -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="꿀띱 사장님" />
+    
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" href="/apple-splash-2048x2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/apple-splash-1668x2224.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/apple-splash-1536x2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/apple-splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/apple-splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/apple-splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    
+    <!-- Theme and Colors -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="msapplication-navbutton-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Viewport and PWA -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!-- manifest는 VitePWA 플러그인이 자동으로 주입합니다 -->
+    
+    <!-- SEO Meta Tags -->
+    <title>꿀띱 사장님 - 스마트 매장 관리 시스템</title>
+    <meta name="description" content="꿀띱 사장님 전용 관리 시스템으로 매장 운영을 쉽고 효율적으로 관리하세요. 실시간 주문 관리, 매출 분석, 고객 관리까지 한 번에!" />
+    <meta name="keywords" content="꿀띱, 사장님, 관리시스템, 매장운영, PWA, 주문관리, 매출분석, 고객관리, 스마트 매장" />
+    <meta name="author" content="꿀띱" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="ko-KR" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Open Graph (Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="꿀띱 사장님 - 스마트 매장 관리 시스템" />
+    <meta property="og:description" content="매장 운영을 쉽고 효율적으로! 실시간 주문 관리, 매출 분석, 고객 관리까지 한 번에 관리하는 스마트 시스템" />
+    <meta property="og:image" content="/Kkulddip_og_1200x630.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="꿀띱 사장님 - 스마트 매장 관리 시스템 로고와 앱 인터페이스" />
+    <meta property="og:url" content="https://owner.kkulddip.store" />
+    <meta property="og:site_name" content="꿀띱 사장님" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="꿀띱 사장님 - 스마트 매장 관리 시스템" />
+    <meta name="twitter:description" content="매장 운영을 쉽고 효율적으로! 실시간 주문 관리, 매출 분석, 고객 관리까지 한 번에" />
+    <meta name="twitter:image" content="/Kkulddip_og_1200x630.png" />
+    <meta name="twitter:image:alt" content="꿀띱 사장님 - 스마트 매장 관리 시스템" />
+    <meta name="twitter:site" content="@kkulddip" />
+    <meta name="twitter:creator" content="@kkulddip" />
+    
+    <!-- Additional SEO -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="꿀띱 사장님" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://owner.kkulddip.store" />
+    
+    <!-- DNS Prefetch for Performance -->
+    <link rel="dns-prefetch" href="//api.kkulddip.store" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//www.gstatic.com" />
+    
+    <!-- Preconnect for Critical Resources -->
+    <link rel="preconnect" href="https://api.kkulddip.store" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "꿀띱 사장님",
+      "alternateName": "꿀띱",
+      "description": "꿀띱 사장님 전용 관리 시스템으로 매장 운영을 쉽고 효율적으로 관리하세요. 실시간 주문 관리, 매출 분석, 고객 관리까지 한 번에!",
+      "url": "https://owner.kkulddip.store",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "softwareVersion": "1.0",
+      "author": {
+        "@type": "Organization",
+        "name": "꿀띱",
+        "url": "https://kkulddip.store"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "KRW"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      },
+      "featureList": [
+        "실시간 주문 관리",
+        "매출 분석 및 통계",
+        "고객 관리 시스템",
+        "푸시 알림 서비스",
+        "오프라인 지원",
+        "모바일 최적화"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

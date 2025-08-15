@@ -55,4 +55,14 @@ export const API_PATH = {
     SALES: '/api/analytics/sales-analytics',
     DAILY: '/api/analytics/daily-analytics',
   },
+
+  FCM_TOKENS: {
+    REGISTER: '/v1/fcm-tokens',
+    DEACTIVATE: (userId: number) => `/v1/fcm-tokens/users/${userId}/deactivate`,
+  },
+
+  NOTIFICATIONS: {
+    SEND: '/v1/notifications',
+    LIST: '/v1/notifications',
+  },
 } as const;
