@@ -3,37 +3,28 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ReviewService } from '@/services/reviewService';
+import {
+  useAddHelpfulMutation,
+  useRemoveHelpfulMutation,
+} from '@/services/reviewService';
 import type { ReviewResponse } from '@/types/review';
 import { formatDate } from '@/utils/dateFormat';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query'; // ✅ react-query 훅 추가
 
 interface ReviewProps {
   review: ReviewResponse;
 }
 
 const ReviewItem = ({ review }: ReviewProps) => {
-  // ✅ 초기 상태를 props 값 기반으로 설정
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
   const [isHelpful, setIsHelpful] = useState(review.isHelpful);
-  const queryClient = useQueryClient();
 
-  const addHelpfulMutation = useMutation({
-    mutationFn: () => ReviewService.addHelpful(review.reviewId.toString()),
-    onSuccess: () => {
-      // 요청 성공 시, 최신 리뷰 목록 다시 불러오기
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
-    },
-  });
+  const addHelpfulMutation = useAddHelpfulMutation(review.reviewId.toString());
 
-  const removeHelpfulMutation = useMutation({
-    mutationFn: () => ReviewService.removeHelpful(review.reviewId.toString()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
-    },
-  });
+  const removeHelpfulMutation = useRemoveHelpfulMutation(
+    review.reviewId.toString(),
+  );
 
   const handleHelpfulClick = async () => {
     // if (addHelpfulMutation.isLoading || removeHelpfulMutation.isLoading) {return};
@@ -96,7 +87,6 @@ const ReviewItem = ({ review }: ReviewProps) => {
                 key={index}
                 className="flex h-20 w-20 items-center justify-center overflow-hidden rounded bg-gray-100"
               >
-                {/* ✅ 프로필 이미지 대신 리뷰 이미지 사용 */}
                 <img src={image.imageUrl} alt={image.originalName} />
               </div>
             ))}
