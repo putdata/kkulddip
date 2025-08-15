@@ -60,6 +60,7 @@ export class NetworkMonitor {
 
     // 네트워크 정보 변경 (지원하는 브라우저에서만)
     if ('connection' in navigator) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const connection = (navigator as any).connection;
       connection?.addEventListener(
         'change',
@@ -101,8 +102,11 @@ export class NetworkMonitor {
    */
   private getNetworkConnection(): Partial<NetworkStatus> {
     const connection =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (navigator as any).connection ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (navigator as any).mozConnection ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (navigator as any).webkitConnection;
 
     if (!connection) {
@@ -181,6 +185,7 @@ export class NetworkMonitor {
     );
 
     if ('connection' in navigator) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const connection = (navigator as any).connection;
       connection?.removeEventListener(
         'change',

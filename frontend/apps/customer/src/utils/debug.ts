@@ -36,8 +36,11 @@ export const debugInfo = {
     const networkInfo = {
       online: navigator.onLine,
       connection:
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (navigator as any).connection ||
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (navigator as any).mozConnection ||
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (navigator as any).webkitConnection,
       serviceWorker: 'serviceWorker' in navigator,
       localStorage: typeof Storage !== 'undefined',

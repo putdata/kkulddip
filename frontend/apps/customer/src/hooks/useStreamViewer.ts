@@ -363,7 +363,14 @@ export const useStreamViewer = ({
 
         // ICE 연결 상태 변경 이벤트 리스너 설정 함수
         const setupIceConnectionTracking = (stream: unknown) => {
-          if (stream && (stream as any).connection && (stream as any).connection.connection) {
+          if (
+            stream &&
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (stream as any).connection &&
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (stream as any).connection.connection
+          ) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const rtcPeerConnection = (stream as any).connection.connection;
 
             // ICE 연결 상태 추적
@@ -640,6 +647,7 @@ export const useStreamViewer = ({
                       '⚠️ [useStreamViewer] 비디오 엘리먼트가 생성되지 않음 - 강제 생성 시도',
                     );
                     // OpenVidu가 비디오 엘리먼트를 생성하도록 재시도
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (subscriber as any).createVideoElement(
                       videoElementId,
                       'APPEND',
@@ -676,8 +684,9 @@ export const useStreamViewer = ({
                 // RTCPeerConnection에서 직접 ICE 연결 상태 확인
                 let currentIceState = 'new';
                 try {
-                  const rtcConnection = (subscriber as any)?.stream
-                    ?.connection?.connection;
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const rtcConnection = (subscriber as any)?.stream?.connection
+                    ?.connection;
                   if (rtcConnection) {
                     currentIceState = rtcConnection.iceConnectionState;
                     iceConnectionState = currentIceState; // 변수 업데이트
@@ -749,18 +758,28 @@ export const useStreamViewer = ({
                           let rtcConnection: RTCPeerConnection | null = null;
 
                           // 여러 경로로 RTCPeerConnection 접근 시도
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           if ((streamManager as any)?.stream?.webRtcPeer?.pc) {
-                            rtcConnection = (streamManager as any).stream.webRtcPeer.pc;
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            rtcConnection = (streamManager as any).stream
+                              .webRtcPeer.pc;
                           } else if (
-                            (streamManager as any)?.stream?.connection?.connection
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            (streamManager as any)?.stream?.connection
+                              ?.connection
                           ) {
-                            rtcConnection =
-                              (streamManager as any).stream.connection.connection;
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            rtcConnection = (streamManager as any).stream
+                              .connection.connection;
                           } else if (
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             (streamManager as any)?.stream?.getRTCPeerConnection
                           ) {
                             rtcConnection =
-                              (streamManager as any).stream.getRTCPeerConnection();
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              (
+                                streamManager as any
+                              ).stream.getRTCPeerConnection();
                           }
 
                           if (rtcConnection) {
