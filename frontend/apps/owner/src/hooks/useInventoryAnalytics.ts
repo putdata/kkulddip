@@ -31,7 +31,7 @@ export const useInventoryAnalytics = (
         dailyQuantity: prediction.predictedDailyQuantity,
         remainingQuantity: prediction.predictedRemainingQuantity,
         inventoryRatio: prediction.inventoryRatio,
-        confidence: prediction.confidence * 100,
+        confidence: prediction.confidence,
       })) || [],
     [predictions],
   );
