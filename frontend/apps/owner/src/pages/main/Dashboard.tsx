@@ -13,7 +13,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4">
         <div>
           <h1 className="text-2xl font-bold">대시보드</h1>
           <p className="text-muted-foreground">

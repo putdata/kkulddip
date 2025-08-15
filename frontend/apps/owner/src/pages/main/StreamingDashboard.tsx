@@ -78,7 +78,7 @@ const StreamingDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4">
         <h1 className="text-2xl font-bold">라이브 대시보드</h1>
       </div>
 

@@ -13,7 +13,7 @@ const Analytics = () => {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4">
         <div>
           <h1 className="text-3xl font-bold">분석</h1>
           <p className="text-muted-foreground">
