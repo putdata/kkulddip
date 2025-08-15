@@ -18,15 +18,47 @@ const DdipboxStatusSection = ({ storeId }: DdipboxStatusSectionProps) => {
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5 text-blue-500" />
             띱박스 현황
+            <div className="ml-auto h-5 w-16 animate-pulse rounded bg-gray-200"></div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="animate-pulse">
-                <div className="h-16 rounded-lg bg-gray-200"></div>
+          {/* 요약 통계 skeleton */}
+          <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="rounded-lg bg-gray-50 p-3">
+                <div className="mb-2 h-6 w-8 animate-pulse rounded bg-gray-200"></div>
+                <div className="h-4 w-12 animate-pulse rounded bg-gray-200"></div>
               </div>
             ))}
+          </div>
+
+          {/* 활성 띱박스 skeleton */}
+          <div>
+            <div className="mb-4 flex items-center gap-2">
+              <div className="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
+              <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
+              <div className="ml-auto h-5 w-8 animate-pulse rounded bg-gray-200"></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="rounded-lg border bg-gray-50 p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="mb-1 h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                      <div className="h-3 w-32 animate-pulse rounded bg-gray-200"></div>
+                    </div>
+                    <div className="h-5 w-10 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <div className="h-3 w-12 animate-pulse rounded bg-gray-200"></div>
+                      <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                    </div>
+                    <div className="h-2 w-full animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -56,15 +88,14 @@ const DdipboxStatusSection = ({ storeId }: DdipboxStatusSectionProps) => {
 
   const ddipboxes = ddipboxData || [];
   const activeDdipboxes = ddipboxes.filter(box => box.isActive);
-  const lowStockDdipboxes = ddipboxes.filter(
-    box => box.remainingQuantity <= Math.floor(box.dailyQuantity * 0.2),
-  );
 
   const totalRemaining = ddipboxes.reduce(
     (sum, box) => sum + box.remainingQuantity,
     0,
   );
   const totalDaily = ddipboxes.reduce((sum, box) => sum + box.dailyQuantity, 0);
+  const totalActive = activeDdipboxes.length;
+  const totalDdipboxes = ddipboxes.length;
 
   return (
     <Card>
@@ -78,61 +109,46 @@ const DdipboxStatusSection = ({ storeId }: DdipboxStatusSectionProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {/* 요약 통계 */}
-        <div className="mb-4 grid grid-cols-2 gap-4">
+        {/* 요약 통계 - 4컬럼 가로 배치 */}
+        <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <div className="rounded-lg bg-blue-50 p-3 text-center">
             <div className="text-lg font-semibold text-blue-600">
+              {totalActive}개
+            </div>
+            <div className="text-muted-foreground text-sm">운영 중</div>
+          </div>
+          <div className="rounded-lg bg-green-50 p-3 text-center">
+            <div className="text-lg font-semibold text-green-600">
               {totalRemaining}개
             </div>
             <div className="text-muted-foreground text-sm">남은 재고</div>
           </div>
-          <div className="rounded-lg bg-green-50 p-3 text-center">
-            <div className="text-lg font-semibold text-green-600">
+          <div className="rounded-lg bg-orange-50 p-3 text-center">
+            <div className="text-lg font-semibold text-orange-600">
               {totalDaily}개
             </div>
-            <div className="text-muted-foreground text-sm">일일 등록량</div>
+            <div className="text-muted-foreground text-sm">일일 등록</div>
+          </div>
+          <div className="rounded-lg bg-purple-50 p-3 text-center">
+            <div className="text-lg font-semibold text-purple-600">
+              {totalDdipboxes}개
+            </div>
+            <div className="text-muted-foreground text-sm">전체 띱박스</div>
           </div>
         </div>
 
-        {/* 낮은 재고 알림 */}
-        {lowStockDdipboxes.length > 0 && (
-          <div className="mb-4">
-            <div className="mb-2 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-medium">낮은 재고 알림</span>
-            </div>
-            <div className="space-y-2">
-              {lowStockDdipboxes.slice(0, 3).map(ddipbox => (
-                <div
-                  key={ddipbox.ddipboxId}
-                  className="flex items-center justify-between rounded border bg-orange-50 p-2"
-                >
-                  <div>
-                    <div className="text-sm font-medium">
-                      {ddipbox.ddipboxName}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      남은 재고: {ddipbox.remainingQuantity}개
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="text-orange-600">
-                    부족
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 최근 활성 띱박스 */}
+        {/* 활성 띱박스 - 그리드 레이아웃 */}
         {activeDdipboxes.length > 0 ? (
           <div>
-            <div className="mb-2 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
               <span className="text-sm font-medium">활성 띱박스</span>
+              <Badge variant="secondary" className="ml-auto">
+                {activeDdipboxes.length}개
+              </Badge>
             </div>
-            <div className="space-y-2">
-              {activeDdipboxes.slice(0, 4).map(ddipbox => {
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {activeDdipboxes.slice(0, 6).map(ddipbox => {
                 const stockPercentage =
                   (ddipbox.remainingQuantity / ddipbox.dailyQuantity) * 100;
                 const stockStatus =
@@ -145,7 +161,7 @@ const DdipboxStatusSection = ({ storeId }: DdipboxStatusSectionProps) => {
                 return (
                   <div
                     key={ddipbox.ddipboxId}
-                    className="rounded-lg border bg-gray-50 p-3"
+                    className="rounded-lg border bg-gray-50 p-4 transition-shadow hover:shadow-md"
                   >
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex-1">
@@ -198,6 +214,13 @@ const DdipboxStatusSection = ({ storeId }: DdipboxStatusSectionProps) => {
                 );
               })}
             </div>
+            {activeDdipboxes.length > 6 && (
+              <div className="mt-4 text-center">
+                <Badge variant="outline" className="text-sm">
+                  +{activeDdipboxes.length - 6}개 더 있음
+                </Badge>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-center py-8">

@@ -20,8 +20,14 @@ export const usePickupOrder = (storeId?: number) => {
 
       // 캐시 무효화하여 서버에서 최신 데이터 가져오기
       if (storeId) {
+        // 주문 내역 갱신
         queryClient.invalidateQueries({
           queryKey: orderQueryKeys.storeHistoryByStore(storeId),
+        });
+
+        // 대기 중인 주문 목록도 갱신 (픽업 완료 후 확정된 주문이 사라져야 함)
+        queryClient.invalidateQueries({
+          queryKey: orderQueryKeys.pendingByStore(storeId),
         });
       }
     },

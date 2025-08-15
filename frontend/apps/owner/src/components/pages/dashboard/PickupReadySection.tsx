@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,39 +9,46 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Clock, AlertCircle, Check, X } from 'lucide-react';
-import { usePendingOrders } from '@/queries/order';
-import OrderAcceptDialog from '@/components/pages/orderManagement/OrderAcceptDialog';
-import OrderRejectDialog from '@/components/pages/orderManagement/OrderRejectDialog';
+import { CheckCircle, Clock, Package, Loader2 } from 'lucide-react';
+import { useStoreOrderHistory } from '@/queries/order';
+import { usePickupOrder } from '@/queries/order/usePickupOrder';
+import { useOrderHistoryTable } from '@/hooks/useOrderHistoryTable';
 import type { Order } from '@/types/order';
 
-interface PendingOrdersSectionProps {
+interface PickupReadySectionProps {
   storeId: number;
 }
 
-const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
-  const { data: ordersData, isLoading, error } = usePendingOrders(storeId);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showAcceptDialog, setShowAcceptDialog] = useState(false);
-  const [showRejectDialog, setShowRejectDialog] = useState(false);
+const PickupReadySection = ({ storeId }: PickupReadySectionProps) => {
+  const { data: ordersData, isLoading, error } = useStoreOrderHistory(storeId);
+  const pickupOrderMutation = usePickupOrder(storeId);
 
-  const handleAcceptOrder = (order: Order) => {
-    setSelectedOrder(order);
-    setShowAcceptDialog(true);
-  };
+  // Filter only CONFIRMED orders ready for pickup
+  const confirmedOrders =
+    ordersData?.filter(order => order.orderStatus === 'CONFIRMED') || [];
 
-  const handleRejectOrder = (order: Order) => {
-    setSelectedOrder(order);
-    setShowRejectDialog(true);
-  };
+  const {
+    processingIds,
+    completedIds,
+    handlePickupClick,
+    handlePickupSuccess,
+    handlePickupError,
+  } = useOrderHistoryTable({
+    onPickupClick: (order: Order) => {
+      pickupOrderMutation.mutate(order.orderId, {
+        onSuccess: () => handlePickupSuccess(order.orderId),
+        onError: () => handlePickupError(order.orderId),
+      });
+    },
+  });
 
   if (isLoading) {
     return (
       <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-orange-500" />
-            대기 중인 주문
+            <Package className="h-5 w-5 text-blue-500" />
+            픽업 대기
             <div className="ml-auto h-5 w-8 animate-pulse rounded bg-gray-200"></div>
           </CardTitle>
         </CardHeader>
@@ -54,7 +60,7 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
                   <TableHead>주문번호</TableHead>
                   <TableHead className="text-center">상품수</TableHead>
                   <TableHead className="text-right">금액</TableHead>
-                  <TableHead className="text-center">시간</TableHead>
+                  <TableHead className="text-center">픽업시간</TableHead>
                   <TableHead className="text-center">액션</TableHead>
                 </TableRow>
               </TableHeader>
@@ -71,13 +77,10 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
                       <div className="ml-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="mx-auto h-4 w-10 animate-pulse rounded bg-gray-200"></div>
+                      <div className="mx-auto h-4 w-12 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex gap-1">
-                        <div className="h-7 w-7 animate-pulse rounded bg-gray-200"></div>
-                        <div className="h-7 w-7 animate-pulse rounded bg-gray-200"></div>
-                      </div>
+                      <div className="h-7 w-16 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -94,14 +97,14 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-orange-500" />
-            대기 중인 주문
+            <Package className="h-5 w-5 text-blue-500" />
+            픽업 대기
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <div className="text-muted-foreground text-center">
-              <AlertCircle className="mx-auto mb-2 h-8 w-8 text-red-500" />
+              <Package className="mx-auto mb-2 h-8 w-8 text-red-500" />
               <p>주문 데이터를 불러올 수 없습니다</p>
             </div>
           </div>
@@ -110,21 +113,19 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
     );
   }
 
-  const pendingOrders = ordersData || [];
-
   return (
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-orange-500" />
-          대기 중인 주문
+          <Package className="h-5 w-5 text-blue-500" />
+          픽업 대기
           <Badge variant="secondary" className="ml-auto">
-            {pendingOrders.length}건
+            {confirmedOrders.length}건
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="h-full p-0">
-        {pendingOrders.length > 0 ? (
+        {confirmedOrders.length > 0 ? (
           <div className="overflow-hidden">
             <Table>
               <TableHeader>
@@ -132,12 +133,12 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
                   <TableHead>주문번호</TableHead>
                   <TableHead className="text-center">상품수</TableHead>
                   <TableHead className="text-right">금액</TableHead>
-                  <TableHead className="text-center">시간</TableHead>
+                  <TableHead className="text-center">픽업시간</TableHead>
                   <TableHead className="text-center">액션</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pendingOrders.slice(0, 5).map((order: Order) => (
+                {confirmedOrders.slice(0, 5).map((order: Order) => (
                   <TableRow key={order.orderId}>
                     <TableCell className="font-medium">
                       {order.orderId.slice(-6)}
@@ -149,38 +150,54 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
                       ₩{order.originalPrice?.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-center text-sm">
-                      {new Date(order.orderDate).toLocaleTimeString('ko-KR', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {order.pickupTime ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(order.pickupTime).toLocaleTimeString(
+                            'ko-KR',
+                            {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            },
+                          )}
+                        </div>
+                      ) : (
+                        '-'
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          onClick={() => handleAcceptOrder(order)}
-                          className="h-7 px-2 text-xs"
-                        >
-                          <Check className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleRejectOrder(order)}
-                          className="h-7 px-2 text-xs"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => handlePickupClick(order)}
+                        disabled={
+                          processingIds.has(order.orderId) ||
+                          pickupOrderMutation.isPending
+                        }
+                        className="h-7 px-3 text-xs"
+                      >
+                        {processingIds.has(order.orderId) ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : completedIds.has(order.orderId) ? (
+                          <>
+                            <CheckCircle className="mr-1 h-3 w-3 text-green-600" />
+                            완료
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="mr-1 h-3 w-3" />
+                            완료
+                          </>
+                        )}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            {pendingOrders.length > 5 && (
+            {confirmedOrders.length > 5 && (
               <div className="border-t p-2 text-center">
                 <Badge variant="outline">
-                  +{pendingOrders.length - 5}개 더 있음
+                  +{confirmedOrders.length - 5}개 더 있음
                 </Badge>
               </div>
             )}
@@ -188,32 +205,14 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
         ) : (
           <div className="flex h-full items-center justify-center py-8">
             <div className="text-muted-foreground text-center">
-              <Clock className="mx-auto mb-2 h-8 w-8" />
-              <p>대기 중인 주문이 없습니다</p>
+              <Package className="mx-auto mb-2 h-8 w-8" />
+              <p>픽업 대기 중인 주문이 없습니다</p>
             </div>
           </div>
         )}
       </CardContent>
-
-      {/* Order Action Dialogs */}
-      {selectedOrder && (
-        <>
-          <OrderAcceptDialog
-            order={selectedOrder}
-            storeId={storeId}
-            open={showAcceptDialog}
-            onOpenChange={setShowAcceptDialog}
-          />
-          <OrderRejectDialog
-            order={selectedOrder}
-            storeId={storeId}
-            open={showRejectDialog}
-            onOpenChange={setShowRejectDialog}
-          />
-        </>
-      )}
     </Card>
   );
 };
 
-export default PendingOrdersSection;
+export default PickupReadySection;
