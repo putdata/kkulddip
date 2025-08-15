@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore, useUserStore } from 'common';
+import { useAuthStore, useUserStore, useRedirectStore } from 'common';
 import { toast } from 'sonner';
 import { AuthService } from '@/services/authService';
 import { ROUTE_PATH } from '@/router/route-path';
@@ -16,6 +16,7 @@ export const useAuthCallback = () => {
   const location = useLocation();
   const setAccessToken = useAuthStore(state => state.setAccessToken);
   const setUser = useUserStore(state => state.setUser);
+  const { getAndClearRedirectUrl } = useRedirectStore();
 
   /**
    * OAuth 콜백 URL 처리 및 토큰 교환
@@ -46,7 +47,12 @@ export const useAuthCallback = () => {
     });
     toast.success('로그인 성공!');
 
-    navigate(ROUTE_PATH.INDEX, { replace: true });
+    const redirectUrl = getAndClearRedirectUrl();
+    if (redirectUrl) {
+      navigate(redirectUrl, { replace: true });
+    } else {
+      navigate(ROUTE_PATH.INDEX, { replace: true });
+    }
   };
 
   return { processCallback };

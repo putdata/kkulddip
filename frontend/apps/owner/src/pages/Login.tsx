@@ -3,7 +3,7 @@ import GoogleLoginButton from '@/components/GoogleLoginButton';
 
 const Login = () => {
   return (
-    <div className="flex min-h-full items-center justify-center bg-gray-50 p-4">
+    <div className="flex h-full items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Owner 로그인</CardTitle>
