@@ -126,7 +126,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         boolean isPublicPath = Arrays.stream(PUBLIC_PATHS)
             .anyMatch(pattern -> pathMatcher.match(pattern, path));
-        boolean isPublicGetPath = HTTPRequest.Method.GET.equals(method) && Arrays.stream(PUBLIC_GET_PATHS)
+        boolean isPublicGetPath = "GET".equals(method) && Arrays.stream(PUBLIC_GET_PATHS)
             .anyMatch(pattern -> pathMatcher.match(pattern, path));
             
         return isPublicPath || isPublicGetPath;
