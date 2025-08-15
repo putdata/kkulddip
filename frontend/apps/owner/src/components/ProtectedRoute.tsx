@@ -1,11 +1,12 @@
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from 'common';
+import { useAuthStore, useRedirectStore } from 'common';
 import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { ROUTE_PATH } from '@/router/route-path';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuthStore();
+  const { setRedirectUrl } = useRedirectStore();
   const navigate = useNavigate();
   const location = useLocation();
   const prevTokenRef = useRef<string | null>(accessToken);
@@ -20,6 +21,8 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
       if (prevTokenRef.current && !state.accessToken) {
         // 현재 페이지가 로그인 페이지가 아닌 경우에만 리다이렉트
         if (location.pathname !== ROUTE_PATH.LOGIN) {
+          // 현재 경로를 저장하고 로그인 페이지로 이동
+          setRedirectUrl(location.pathname + location.search);
           navigate(ROUTE_PATH.LOGIN, { replace: true });
         }
         prevTokenRef.current = null;
@@ -27,10 +30,17 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [accessToken, navigate, location.pathname]);
+  }, [
+    accessToken,
+    navigate,
+    location.pathname,
+    location.search,
+    setRedirectUrl,
+  ]);
 
   // 초기 인증 상태 체크
   if (!accessToken) {
+    setRedirectUrl(location.pathname + location.search);
     return <Navigate to={ROUTE_PATH.LOGIN} replace />;
   }
 
