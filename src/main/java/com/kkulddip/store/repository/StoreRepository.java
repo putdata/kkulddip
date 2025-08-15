@@ -3,6 +3,7 @@ package com.kkulddip.store.repository;
 import com.kkulddip.store.entity.DdipBox;
 import com.kkulddip.store.entity.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -115,4 +116,14 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         AND s.isActive = true
         """)
     Long countActiveByOwnerId(@Param("ownerId") Long ownerId);
+
+    // 리뷰 개수 증가 (1씩 증가)
+    @Modifying
+    @Query("UPDATE Store s SET s.reviewCount = s.reviewCount + 1 WHERE s.storeId = :storeId")
+    void incrementReviewCount(@Param("storeId") Long storeId);
+
+    // 리뷰 개수 감소 (1씩 감소)
+    @Modifying
+    @Query("UPDATE Store s SET s.reviewCount = s.reviewCount - 1 WHERE s.storeId = :storeId")
+    void decrementReviewCount(@Param("storeId") Long storeId);
 }
