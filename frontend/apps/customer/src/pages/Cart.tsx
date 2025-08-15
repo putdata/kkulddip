@@ -9,6 +9,8 @@ import StoreInfo from '@/components/pages/cart/StoreInfo/StoreInfo';
 import ProductCard from '@/components/pages/cart/ProductCard/ProductCard';
 import QuantitySelector from '@/components/pages/cart/QuantitySelector/QuantitySelector';
 import PriceSummary from '@/components/pages/cart/PriceSummary/PriceSummary';
+import { Separator } from '@/components/ui/separator';
+import { Card } from '@/components/ui/card';
 
 interface CartProps {
   onNext: (cartData: CartData) => void;
@@ -52,35 +54,37 @@ const Cart = ({ onNext, onBack, initialQuantity = 1 }: CartProps) => {
       bottomButton={bottomButton}
     >
       {/* 매장 정보 카드 */}
-      <div className="rounded-2xl bg-white p-4 shadow-sm">
+      <Card className="px-3">
         <StoreInfo
           Store={dummyStoreInfo}
           pickupTimePrefix={CART_CONSTANTS.PICKUP_TIME_PREFIX}
         />
-      </div>
 
-      {/* 상품 정보 카드 */}
-      <div className="rounded-2xl bg-white p-4 shadow-sm">
-        <ProductCard product={dummyCartProduct} />
-        <div className="mt-4 border-t border-gray-100 pt-4">
-          <QuantitySelector
-            quantity={quantity}
-            onQuantityChange={updateQuantity}
-            initialQuantity={initialQuantity}
-            label={CART_CONSTANTS.QUANTITY_LABEL}
-          />
-        </div>
-      </div>
+        <Separator />
 
-      {/* 가격 요약 카드 */}
-      <div className="rounded-2xl bg-white p-4 shadow-sm">
+        {/* 상품 정보 카드 */}
+        <Card className="px-3">
+          <ProductCard product={dummyCartProduct} />
+          <div className="mt-4 border-t border-gray-100 pt-4">
+            <QuantitySelector
+              quantity={quantity}
+              onQuantityChange={updateQuantity}
+              initialQuantity={initialQuantity}
+              label={CART_CONSTANTS.QUANTITY_LABEL}
+            />
+          </div>
+        </Card>
+
+        <Separator />
+
+        {/* 가격 요약 카드 */}
         <PriceSummary
           productName={dummyCartProduct.name}
           quantity={quantity}
           total={total}
           totalLabel={CART_CONSTANTS.TOTAL_AMOUNT_LABEL}
         />
-      </div>
+      </Card>
     </OrderFlowLayout>
   );
 };
