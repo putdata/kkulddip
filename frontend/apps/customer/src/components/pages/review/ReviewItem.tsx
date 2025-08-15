@@ -20,6 +20,12 @@ const ReviewItem = ({ review }: ReviewProps) => {
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
   const [isHelpful, setIsHelpful] = useState(review.isHelpful);
 
+  // 사장님 댓글 유무 확인
+  // let isReply = false;
+  // if (review.reply != null) {
+  //   isReply = true;
+  // }
+
   const addHelpfulMutation = useAddHelpfulMutation(review.reviewId.toString());
 
   const removeHelpfulMutation = useRemoveHelpfulMutation(
@@ -111,10 +117,19 @@ const ReviewItem = ({ review }: ReviewProps) => {
           </button>
           {/* TODO: 사장님 댓글 여부 확인 및 동작 추가 필요 */}
           <div className="gap flex items-center">
-            <MessageCircleMore className="h-5" />
-            <span>사장님 댓글</span>
+            <MessageCircleMore className={'h-5'} />
+            <span className={'text-gray-400'}>사장님 댓글</span>
           </div>
         </div>
+        {review.reply && (
+          <div className="border-1 flex w-full flex-col rounded-lg p-2 text-xs">
+            <div className="flex justify-between text-gray-400">
+              <div>사장님의 답글: </div>
+              <div>{formatDate(review.reply.createdAt)}</div>
+            </div>
+            <div className="p-2">{review.reply.content}</div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
