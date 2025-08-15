@@ -1,5 +1,6 @@
 package com.kkulddip.order.domain.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,4 +105,25 @@ public interface OrderRepository {
      * @return 주문 목록
      */
     List<Order> findByStoreIdAfterPaymentPending(StoreId storeId);
+    
+    /**
+     * 가게 ID와 주문 상태 목록, 주문 날짜로 주문 목록 조회
+     * 
+     * @param storeId 가게 ID
+     * @param orderStatuses 주문 상태 목록
+     * @param orderDate 주문 날짜
+     * @return 주문 목록
+     */
+    List<Order> findByStoreIdAndOrderStatusInAndOrderDate(StoreId storeId, List<OrderStatus> orderStatuses, LocalDate orderDate);
+    
+    /**
+     * 가게 ID와 주문 상태 목록, 날짜 범위로 주문 목록 조회
+     * 
+     * @param storeId 가게 ID
+     * @param orderStatuses 주문 상태 목록
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @return 주문 목록
+     */
+    List<Order> findByStoreIdAndOrderStatusInAndOrderDateBetween(StoreId storeId, List<OrderStatus> orderStatuses, LocalDate startDate, LocalDate endDate);
 }

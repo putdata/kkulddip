@@ -1,5 +1,6 @@
 package com.kkulddip.order.infrastructure.persistence.jpa.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -195,5 +196,26 @@ public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
      */
     @Query("SELECT o FROM OrderEntity o WHERE o.storeId = :storeId AND o.orderStatus IN ('CONFIRMED', 'PICKED_UP') ORDER BY o.orderDate DESC")
     List<OrderEntity> findByStoreIdAfterPaymentPending(@Param("storeId") Long storeId);
+
+    /**
+     * 가게 ID와 주문 상태 목록, 주문 날짜로 주문 목록 조회
+     */
+    @Query("SELECT o FROM OrderEntity o WHERE o.storeId = :storeId AND o.orderStatus IN :orderStatuses AND DATE(o.orderDate) = :orderDate ORDER BY o.orderDate DESC")
+    List<OrderEntity> findByStoreIdAndOrderStatusInAndOrderDate(
+        @Param("storeId") Long storeId, 
+        @Param("orderStatuses") List<OrderStatus> orderStatuses, 
+        @Param("orderDate") LocalDate orderDate
+    );
+
+    /**
+     * 가게 ID와 주문 상태 목록, 날짜 범위로 주문 목록 조회
+     */
+    @Query("SELECT o FROM OrderEntity o WHERE o.storeId = :storeId AND o.orderStatus IN :orderStatuses AND DATE(o.orderDate) BETWEEN :startDate AND :endDate ORDER BY o.orderDate DESC")
+    List<OrderEntity> findByStoreIdAndOrderStatusInAndOrderDateBetween(
+        @Param("storeId") Long storeId, 
+        @Param("orderStatuses") List<OrderStatus> orderStatuses, 
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
 
 }
