@@ -7,79 +7,46 @@ import { ReviewService } from '@/services/reviewService';
 import type { ReviewResponse } from '@/types/review';
 import { formatDate } from '@/utils/dateFormat';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-// import { toast } from 'sonner';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query'; // ✅ react-query 훅 추가
 
 interface ReviewProps {
   review: ReviewResponse;
 }
 
 const ReviewItem = ({ review }: ReviewProps) => {
-  // 도움돼요 상태 관리
+  // ✅ 초기 상태를 props 값 기반으로 설정
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
-  const [isHelpful, setIsHelpful] = useState(false); // 사용자가 이미 눌렀는지 여부
-  const [isLoading, setIsLoading] = useState(false);
+  const [isHelpful, setIsHelpful] = useState(review.isHelpful);
+  const queryClient = useQueryClient();
 
-  // 컴포넌트 마운트 시 도움돼요 상태 확인
-  useEffect(() => {
-    const checkHelpfulStatus = async () => {
-      try {
-        const helpful = await ReviewService.checkHelpful(review.reviewId);
-        setIsHelpful(helpful);
-      } catch (error) {
-        console.error('도움돼요 상태 확인 실패:', error);
-      }
-    };
+  const addHelpfulMutation = useMutation({
+    mutationFn: () => ReviewService.addHelpful(review.reviewId.toString()),
+    onSuccess: () => {
+      // 요청 성공 시, 최신 리뷰 목록 다시 불러오기
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
 
-    checkHelpfulStatus();
-  }, [review.reviewId]);
-
-  // TODO: api 연동 필요
-  // const handleHelpfulClick = () => {
-  //   if (isHelpful) {
-  //     setHelpfulCount(prev => prev - 1);
-  //     setIsHelpful(false);
-  //   } else {
-  //     setHelpfulCount(prev => prev + 1);
-  //     setIsHelpful(true);
-  //   }
-  // };
+  const removeHelpfulMutation = useMutation({
+    mutationFn: () => ReviewService.removeHelpful(review.reviewId.toString()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
 
   const handleHelpfulClick = async () => {
-    if (isLoading) {
-      return;
-    }
+    // if (addHelpfulMutation.isLoading || removeHelpfulMutation.isLoading) {return};
 
-    setIsLoading(true);
-
-    try {
-      if (isHelpful) {
-        // 즉시 UI 업데이트
-        setHelpfulCount(prev => prev - 1);
-        setIsHelpful(false);
-
-        // API 호출
-        await ReviewService.removeHelpful(review.reviewId.toString());
-        console.log('도움돼요 제거 성공:', review.reviewId);
-      } else {
-        setHelpfulCount(prev => prev + 1);
-        setIsHelpful(true);
-
-        await ReviewService.addHelpful(review.reviewId.toString());
-        console.log('도움돼요 추가 성공:', review.reviewId);
-      }
-    } catch (error) {
-      if (isHelpful) {
-        setHelpfulCount(prev => prev + 1);
-        setIsHelpful(true);
-      } else {
-        setHelpfulCount(prev => prev - 1);
-        setIsHelpful(false);
-      }
-
-      console.error('도움돼요 처리 실패:', error);
-    } finally {
-      setIsLoading(false);
+    if (isHelpful) {
+      // 즉시 UI 업데이트
+      setHelpfulCount(prev => prev - 1);
+      setIsHelpful(false);
+      removeHelpfulMutation.mutate(); // API 호출
+    } else {
+      setHelpfulCount(prev => prev + 1);
+      setIsHelpful(true);
+      addHelpfulMutation.mutate(); // API 호출
     }
   };
 
@@ -129,7 +96,8 @@ const ReviewItem = ({ review }: ReviewProps) => {
                 key={index}
                 className="flex h-20 w-20 items-center justify-center overflow-hidden rounded bg-gray-100"
               >
-                <img src={review.profileImage} alt="" />
+                {/* ✅ 프로필 이미지 대신 리뷰 이미지 사용 */}
+                <img src={image.imageUrl} alt={image.originalName} />
               </div>
             ))}
           </div>
@@ -152,7 +120,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
             </div>
           </button>
           {/* TODO: 사장님 댓글 여부 확인 및 동작 추가 필요 */}
-          <div className="flex items-center gap-1">
+          <div className="gap flex items-center">
             <MessageCircleMore className="h-5" />
             <span>사장님 댓글</span>
           </div>

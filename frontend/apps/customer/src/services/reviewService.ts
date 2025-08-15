@@ -60,9 +60,7 @@ export class ReviewService {
       console.log(`${key} =>`, value);
     });
 
-    // TODO: storeID 변경 필요
     return apiClient.post(API_PATH.STORE_REVIEWS(data.storeId), formData);
-    // return apiClient.post(API_PATH.STORE_REVIEWS('1'), formData);
   }
 
   /**
