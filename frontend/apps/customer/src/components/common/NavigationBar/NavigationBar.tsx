@@ -35,12 +35,10 @@ const NavigationBar = () => {
       </div>
       <div className="flex items-center justify-between">
         <SearchBar />
-        {/* TODO: 일단은 마이페이지로 이동, STREAMS 로 이동 필요 */}
-        {/* <Button variant="destructive" onClick={() => navigate(ROUTE_PATH.STERAMS)}> */}
         <Button
           variant="destructive"
           className="rounded-xl"
-          onClick={() => navigate(ROUTE_PATH.MY)}
+          onClick={() => navigate(ROUTE_PATH.STREAMS)}
         >
           LIVE
         </Button>
