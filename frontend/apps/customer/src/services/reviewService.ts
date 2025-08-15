@@ -60,9 +60,7 @@ export class ReviewService {
       console.log(`${key} =>`, value);
     });
 
-    // TODO: storeID 변경 필요
     return apiClient.post(API_PATH.STORE_REVIEWS(data.storeId), formData);
-    // return apiClient.post(API_PATH.STORE_REVIEWS('1'), formData);
   }
 
   /**
@@ -103,6 +101,39 @@ export const useCreateReviewMutation = () => {
     },
     onError: error => {
       console.error('리뷰 등록 실패:', error);
+    },
+  });
+};
+
+/**
+ * 리뷰 Helpful POST 뮤테이션
+ *
+ * @returns 리뷰 Helpful POST 뮤테이션 객체
+ */
+export const useAddHelpfulMutation = (reviewId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => ReviewService.addHelpful(reviewId),
+    onSuccess: () => {
+      // 요청 성공 시, 최신 리뷰 목록 다시 불러오기
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
+};
+
+/**
+ * 리뷰 Helpful DELETE 뮤테이션
+ *
+ * @returns 리뷰 Helpful DELETE 뮤테이션 객체
+ */
+export const useRemoveHelpfulMutation = (reviewId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => ReviewService.removeHelpful(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
     },
   });
 };
