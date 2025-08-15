@@ -36,7 +36,6 @@ export const useInventoryAnalytics = (
     [predictions],
   );
 
-
   /*
    * 평균 재고율 계산값
    */
@@ -74,7 +73,6 @@ export const useInventoryAnalytics = (
       },
     ];
   }, [inventoryStatus]);
-
 
   /*
    * 재고 과다 상품별 위험도 계산 함수

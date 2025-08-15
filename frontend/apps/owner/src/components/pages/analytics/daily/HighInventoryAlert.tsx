@@ -75,7 +75,12 @@ const HighInventoryAlert = ({
                         </Badge>
                       </div>
                       <div className="text-muted-foreground text-sm">
-                        잔여: <span className="font-medium">{item.remainingCount}개</span> / 일일: <span className="font-medium">{item.dailyCount}개</span>
+                        잔여:{' '}
+                        <span className="font-medium">
+                          {item.remainingCount}개
+                        </span>{' '}
+                        / 일일:{' '}
+                        <span className="font-medium">{item.dailyCount}개</span>
                       </div>
                     </div>
 
@@ -100,16 +105,22 @@ const HighInventoryAlert = ({
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
-                  <div className="bg-blue-100 mt-1 h-1.5 w-1.5 rounded-full"></div>
-                  <span className="text-muted-foreground">재고 과다 상품에 할인 이벤트 적용</span>
+                  <div className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-100"></div>
+                  <span className="text-muted-foreground">
+                    재고 과다 상품에 할인 이벤트 적용
+                  </span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <div className="bg-blue-100 mt-1 h-1.5 w-1.5 rounded-full"></div>
-                  <span className="text-muted-foreground">번들 상품으로 판매 촉진</span>
+                  <div className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-100"></div>
+                  <span className="text-muted-foreground">
+                    번들 상품으로 판매 촉진
+                  </span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <div className="bg-blue-100 mt-1 h-1.5 w-1.5 rounded-full"></div>
-                  <span className="text-muted-foreground">다음 발주 시 수량 조정</span>
+                  <div className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-100"></div>
+                  <span className="text-muted-foreground">
+                    다음 발주 시 수량 조정
+                  </span>
                 </div>
               </div>
             </div>
@@ -117,7 +128,10 @@ const HighInventoryAlert = ({
             {/* 추가 상품이 있는 경우 */}
             {highInventoryItems.length > 5 && (
               <div className="text-center">
-                <Badge variant="outline" className="border-muted-foreground/30 bg-muted/20 text-xs text-muted-foreground">
+                <Badge
+                  variant="outline"
+                  className="border-muted-foreground/30 bg-muted/20 text-muted-foreground text-xs"
+                >
                   +{highInventoryItems.length - 5}개 상품 더 있음
                 </Badge>
               </div>

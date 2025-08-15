@@ -34,7 +34,7 @@ const DateRangePicker = ({
   return (
     <div className={cn('grid gap-2', className)}>
       <Popover
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           // popover가 닫힐 때 날짜 범위가 완전히 선택되어 있으면 조회
           if (!open && date?.from && date?.to && onClose) {
             onClose(date);
@@ -66,7 +66,7 @@ const DateRangePicker = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div onClick={(e) => e.stopPropagation()}>
+          <div onClick={e => e.stopPropagation()}>
             <Calendar
               mode="range"
               defaultMonth={date?.from}

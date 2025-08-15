@@ -29,9 +29,17 @@ interface DailyAnalyticsTabProps {
 }
 
 const DailyAnalyticsTab = ({ storeId }: DailyAnalyticsTabProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const targetDate = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined;
-  const { data: dailyData, isLoading, error } = useDailyAnalytics(storeId, targetDate);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date(),
+  );
+  const targetDate = selectedDate
+    ? format(selectedDate, 'yyyy-MM-dd')
+    : undefined;
+  const {
+    data: dailyData,
+    isLoading,
+    error,
+  } = useDailyAnalytics(storeId, targetDate);
 
   if (isLoading) {
     return <DailyAnalyticsTabSkeleton />;
@@ -90,7 +98,7 @@ const DailyAnalyticsTab = ({ storeId }: DailyAnalyticsTabProps) => {
               mode="single"
               selected={selectedDate}
               onSelect={setSelectedDate}
-              disabled={(date) =>
+              disabled={date =>
                 date > new Date() || date < new Date('2024-01-01')
               }
               initialFocus
@@ -101,9 +109,7 @@ const DailyAnalyticsTab = ({ storeId }: DailyAnalyticsTabProps) => {
       </div>
 
       {/* 일별 개요 카드들 */}
-      <DailyOverviewCards
-        salesOverview={dailyData.salesOverview}
-      />
+      <DailyOverviewCards salesOverview={dailyData.salesOverview} />
 
       {/* 베스트셀러와 재고 현황 */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

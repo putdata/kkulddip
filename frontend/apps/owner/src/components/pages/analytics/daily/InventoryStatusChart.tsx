@@ -17,8 +17,10 @@ interface InventoryStatusChartProps {
 const InventoryStatusChart = ({
   inventoryStatus,
 }: InventoryStatusChartProps) => {
-  const { statusChartData: chartData } =
-    useInventoryAnalytics(undefined, inventoryStatus);
+  const { statusChartData: chartData } = useInventoryAnalytics(
+    undefined,
+    inventoryStatus,
+  );
 
   const soldQuantity =
     inventoryStatus.totalDailyCount - inventoryStatus.totalRemainingCount;
@@ -98,29 +100,30 @@ const InventoryStatusChart = ({
 
         {/* 재고 상태 정보 */}
         <div className="mt-4 space-y-4">
-
           {/* 수량 요약 */}
           <div className="bg-muted/20 grid grid-cols-2 gap-4 rounded-lg p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 {soldQuantity}
               </div>
-              <div className="text-muted-foreground text-xs font-medium">판매완료 (개)</div>
+              <div className="text-muted-foreground text-xs font-medium">
+                판매완료 (개)
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
                 {inventoryStatus.totalRemainingCount}
               </div>
-              <div className="text-muted-foreground text-xs font-medium">남은재고 (개)</div>
+              <div className="text-muted-foreground text-xs font-medium">
+                남은재고 (개)
+              </div>
             </div>
           </div>
 
           {/* 전체 재고 */}
-          <div className="border-t border-muted pt-3 text-center">
-            <div className="text-muted-foreground text-sm">
-              일일 총 재고
-            </div>
-            <div className="font-semibold text-foreground">
+          <div className="border-muted border-t pt-3 text-center">
+            <div className="text-muted-foreground text-sm">일일 총 재고</div>
+            <div className="text-foreground font-semibold">
               {inventoryStatus.totalDailyCount}개
             </div>
           </div>

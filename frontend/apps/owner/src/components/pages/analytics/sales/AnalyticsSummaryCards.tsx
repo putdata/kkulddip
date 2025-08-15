@@ -23,7 +23,7 @@ const AnalyticsSummaryCards = ({
           <CardTitle className="text-muted-foreground text-sm font-medium">
             총 매출
           </CardTitle>
-          <div className="bg-green-100 rounded-full p-2">
+          <div className="rounded-full bg-green-100 p-2">
             <DollarSign className="h-4 w-4 text-green-600" />
           </div>
         </CardHeader>
@@ -41,7 +41,7 @@ const AnalyticsSummaryCards = ({
           <CardTitle className="text-muted-foreground text-sm font-medium">
             총 주문 수
           </CardTitle>
-          <div className="bg-blue-100 rounded-full p-2">
+          <div className="rounded-full bg-blue-100 p-2">
             <ShoppingCart className="h-4 w-4 text-blue-600" />
           </div>
         </CardHeader>
@@ -61,7 +61,7 @@ const AnalyticsSummaryCards = ({
           <CardTitle className="text-muted-foreground text-sm font-medium">
             {totalWeight !== null ? '총 판매 중량' : '분석 지표'}
           </CardTitle>
-          <div className="bg-amber-100 rounded-full p-2">
+          <div className="rounded-full bg-amber-100 p-2">
             <Weight className="h-4 w-4 text-amber-600" />
           </div>
         </CardHeader>
