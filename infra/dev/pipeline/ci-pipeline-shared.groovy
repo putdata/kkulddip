@@ -99,6 +99,13 @@ EOF
                 '''
             }
         }
+        
+        stage('Test Results') {
+            steps {
+                echo "📊 Publishing test results"
+                junit 'build/test-results/test/*.xml'
+            }
+        }
     }
     
     post {

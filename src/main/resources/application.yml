@@ -15,6 +15,13 @@ spring:
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
 
+        hikari:
+            maximum-pool-size: 30
+            minimum-idle: 10
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-timeout: 3000 
+
     jpa:
         hibernate:
             ddl-auto: update
@@ -120,7 +127,7 @@ management:
         web:
             base-path: /actuator
             exposure:
-                include: health, info
+                include: health, info, prometheus
 
 python:
     analytics:

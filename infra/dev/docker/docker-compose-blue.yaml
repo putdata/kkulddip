@@ -10,6 +10,8 @@ services:
       - ../.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ${HOST_FIREBASE_CREDENTIALS_PATH}:/run/secrets/firebase.json:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
