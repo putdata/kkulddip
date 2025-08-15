@@ -17,20 +17,33 @@ export const useStoreSelection = () => {
   const { data: storeListData } = useMyStores();
 
   /**
-   * storeId 파라미터 유효성 검증
-   */
-  useEffect(() => {
-    if (storeId === null || isNaN(storeId) || storeId <= 0) {
-      navigate('/404', { replace: true });
-    }
-  }, [storeId, navigate]);
-
-  /**
    * 사용 가능한 스토어 목록
    */
   const stores = useMemo(() => {
     return storeListData?.stores || [];
   }, [storeListData?.stores]);
+
+  /**
+   * storeId 파라미터 유효성 검증 및 자동 리다이렉트
+   */
+  useEffect(() => {
+    if (storeId === null || isNaN(storeId) || storeId <= 0) {
+      navigate('/not-found', { replace: true });
+      return;
+    }
+
+    // 스토어 목록이 로드되었고, 현재 storeId가 내 가게가 아닌 경우
+    if (stores.length > 0 && !stores.find(s => s.storeId === storeId)) {
+      const firstStore = stores[0];
+      if (firstStore) {
+        const currentRoutePath = getCurrentPageRoute(location.pathname);
+        const newPath = generatePath(currentRoutePath, {
+          storeId: firstStore.storeId.toString(),
+        });
+        navigate(newPath, { replace: true });
+      }
+    }
+  }, [storeId, stores, navigate, location.pathname]);
 
   /**
    * 현재 선택된 스토어

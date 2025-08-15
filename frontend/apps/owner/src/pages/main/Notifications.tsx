@@ -4,14 +4,13 @@ import {
   NotificationTableSkeleton,
 } from '@/components/pages/notification';
 import { Bell } from 'lucide-react';
+import { useUserStore } from 'common';
 
 const Notifications = () => {
-  // TODO: 사장용 전체 알림 API 연결 필요
-  // 현재는 임시로 첫 번째 매장 데이터 사용 (Owner ID 필요)
-  const defaultOwnerId = 1;
+  const { user } = useUserStore();
 
   const { data: notifications = [], isLoading } = useNotifications(
-    defaultOwnerId,
+    user?.userId || 0,
     'OWNER',
   );
 
