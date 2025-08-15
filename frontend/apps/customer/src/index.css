@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Cafe24 Ssurround';
+  src:
+    url('/fonts/Cafe24Ssurround-v2.0') format('woff'),
+    url('/fonts/Cafe24Ssurround-v2.0.ttf') format('truetype');
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
