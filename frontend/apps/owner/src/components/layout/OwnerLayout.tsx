@@ -12,7 +12,7 @@ const OwnerLayout = () => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="max-w-full overflow-hidden">
         <MobileHeader onSettingsClick={() => setIsSettingsOpen(true)} />
         <SimpleBar className="h-dvh" autoHide={true}>
           <main className="flex flex-1 flex-col gap-4 p-4 pt-16 md:pt-4">
