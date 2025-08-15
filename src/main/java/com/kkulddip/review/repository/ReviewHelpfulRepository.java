@@ -10,4 +10,8 @@ public interface ReviewHelpfulRepository extends JpaRepository<ReviewHelpful, Lo
     Optional<ReviewHelpful> findByReviewReviewIdAndCustomerId(Long reviewId, Long currentUserId);
 
     boolean existsByReviewReviewIdAndCustomerId(Long reviewId, Long currentUserId);
+
+    void deleteByReviewReviewId(Long reviewId);
+
+    boolean existsByReviewReviewId(Long reviewId);
 }

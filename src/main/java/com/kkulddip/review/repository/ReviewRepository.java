@@ -176,4 +176,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT rr.review.reviewId FROM ReviewReply rr WHERE rr.ownerId = :ownerId")
     List<Long> findReviewIdsByOwnerId(@Param("ownerId") Long ownerId);
+
+    Long countByStoreId(Long storeId);
+
+    Long countByCustomerId(Long currentUserId);
+
+    Long countByCustomerIdAndStoreId(Long currentUserId, Long storeId);
 }
