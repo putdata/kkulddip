@@ -64,7 +64,7 @@ export interface FinalPriceProps {
 export interface OrderData {
   customerId: number;
   storeId: number;
-  orderItems: Array<{
+  orderItems: {
     productId: number;
     quantity: number;
     unitPrice: number;
@@ -72,7 +72,7 @@ export interface OrderData {
       discountCode: number;
       discountAmount: number;
     }[];
-  }>;
+  }[];
 }
 
 /**
@@ -80,12 +80,16 @@ export interface OrderData {
  */
 export interface OrderResponse {
   success: boolean;
+  status: number;
   body: {
-    orderId: number;
+    orderId: string;
     customerId: number;
+    storeId: number;
+    originalPrice: number;
     finalPrice: number;
+    orderStatus: string;
+    orderDate: string;
   };
-  message: string;
 }
 
 /**

@@ -50,6 +50,8 @@ const StoreDetail = () => {
     return <div>에러가 발생했습니다.</div>;
   }
 
+  // -----여기서부터 모든 store 정보 받은 상태 -----
+
   const reviewTotalCount = store.reviewCount;
 
   return (

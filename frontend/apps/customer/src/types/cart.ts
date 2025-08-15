@@ -1,12 +1,15 @@
 /**
  * 상품 정보 인터페이스
  */
-export interface Product {
-  id: number;
+export interface CartItem {
+  ddipboxId: number;
   name: string;
   price: number;
   description: string;
-  image: string;
+  quantity: number;
+  // DdipBox에서 추가로 필요한 정보들
+  discountRate: number;
+  storeId: number;
 }
 
 /**
@@ -20,7 +23,20 @@ export interface CartPageProps {
  * 매장 정보 인터페이스
  */
 export interface StoreInfo {
+  storeId: number;
   name: string;
   pickupTime: string;
-  pickupType: string;
+  address: string;
 }
+
+/**
+ * 장바구니 추가 결과 타입
+ */
+export type AddToCartResult =
+  | { success: true; message: string; action: 'added' | 'updated' }
+  | {
+      success: false;
+      message: string;
+      requiresConfirmation: boolean;
+      conflictStoreInfo?: StoreInfo;
+    };

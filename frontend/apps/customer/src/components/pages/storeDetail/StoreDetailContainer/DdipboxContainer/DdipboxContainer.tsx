@@ -18,7 +18,7 @@ export const DdipboxContainer = ({
         <div className="flex w-full flex-col gap-2 p-2">
           {ddipBoxes.map(ddipBox => (
             <div key={ddipBox.ddipboxId}>
-              <DdipboxItem ddipbox={ddipBox} />
+              <DdipboxItem store={store} ddipbox={ddipBox} />
             </div>
           ))}
         </div>

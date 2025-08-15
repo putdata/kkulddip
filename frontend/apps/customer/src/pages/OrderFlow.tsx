@@ -53,11 +53,7 @@ const OrderFunnelContainer = () => {
   return (
     <Funnel>
       <Step name="cart">
-        <Cart
-          onNext={handleNextToPayment}
-          onBack={handleBackToHome}
-          initialQuantity={orderData.quantity}
-        />
+        <Cart onNext={handleNextToPayment} onBack={handleBackToHome} />
       </Step>
 
       <Step name="payment">
