@@ -5,9 +5,14 @@ import { Store as StoreIcon, Bell, Shield } from 'lucide-react';
 const Settings = () => {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="mb-2 text-2xl font-bold">설정</h1>
-        <p className="text-gray-600">가게 운영과 관련된 설정을 관리하세요.</p>
+      {/* 헤더 */}
+      <div className="flex items-center justify-between px-4">
+        <div>
+          <h1 className="text-2xl font-bold">설정</h1>
+          <p className="text-muted-foreground">
+            가게 운영과 관련된 설정을 관리하세요
+          </p>
+        </div>
       </div>
 
       {/* 설정 카테고리 그리드 */}

@@ -15,7 +15,7 @@ const Analytics = () => {
       {/* 헤더 */}
       <div className="flex items-center justify-between px-4">
         <div>
-          <h1 className="text-3xl font-bold">분석</h1>
+          <h1 className="text-2xl font-bold">분석</h1>
           <p className="text-muted-foreground">
             매장 운영 데이터를 분석하고 인사이트를 얻어보세요
           </p>

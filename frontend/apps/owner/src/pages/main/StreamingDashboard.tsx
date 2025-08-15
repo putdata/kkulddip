@@ -49,8 +49,13 @@ const StreamingDashboard = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="mb-6 text-2xl font-bold">라이브 대시보드</h1>
+        <div className="flex items-center justify-between px-4">
+          <div>
+            <h1 className="text-2xl font-bold">라이브 대시보드</h1>
+            <p className="text-muted-foreground">
+              실시간 방송을 관리하고 스트림 현황을 확인하세요
+            </p>
+          </div>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
           <Skeleton className="h-[200px]" />
@@ -63,8 +68,13 @@ const StreamingDashboard = () => {
   if (error) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="mb-6 text-2xl font-bold">라이브 대시보드</h1>
+        <div className="flex items-center justify-between px-4">
+          <div>
+            <h1 className="text-2xl font-bold">라이브 대시보드</h1>
+            <p className="text-muted-foreground">
+              실시간 방송을 관리하고 스트림 현황을 확인하세요
+            </p>
+          </div>
         </div>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -79,7 +89,12 @@ const StreamingDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between px-4">
-        <h1 className="text-2xl font-bold">라이브 대시보드</h1>
+        <div>
+          <h1 className="text-2xl font-bold">라이브 대시보드</h1>
+          <p className="text-muted-foreground">
+            실시간 방송을 관리하고 스트림 현황을 확인하세요
+          </p>
+        </div>
       </div>
 
       {activeStream && (
