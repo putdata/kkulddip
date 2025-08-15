@@ -54,7 +54,7 @@ const Likes = () => {
 
   if (isLoading || isFetching) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
           <div className="text-gray-500">가게 정보를 가져오고 있어요...</div>
@@ -65,7 +65,7 @@ const Likes = () => {
 
   if (isSuccess && (!filteredStores || filteredStores.length === 0)) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 px-4">
+      <div className="flex flex-1 flex-col items-center justify-center space-y-4 px-4">
         <div className="text-4xl">💔</div>
         <div className="text-center">
           <h3 className="mb-2 text-lg font-semibold text-gray-800">
@@ -81,7 +81,7 @@ const Likes = () => {
 
   return (
     <div>
-      <div className="space-y-2 px-2 pb-16 pt-16">
+      <div className="space-y-2 px-2">
         {filteredStores?.map(item => (
           <LikeFoodCard
             key={item.id}
