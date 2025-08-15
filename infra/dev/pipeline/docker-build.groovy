@@ -58,7 +58,16 @@ pipeline {
                 sh '''
                     # Dockerfile 생성
                     cat > Dockerfile << 'EOF'
-FROM openjdk:21-jdk
+FROM openjdk:21-jdk-slim
+
+# 타임존 환경변수 설정
+ENV TZ=Asia/Seoul
+
+# 타임존 데이터 설치 및 적용
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
 
 # 작업 디렉토리 설정
 WORKDIR /app

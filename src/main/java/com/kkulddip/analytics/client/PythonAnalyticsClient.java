@@ -38,11 +38,7 @@ public class PythonAnalyticsClient {
             // 요청 데이터를 JSON으로 변환하여 콘솔에 출력
             try {
                 String requestJson = objectMapper.writeValueAsString(request);
-                log.info("Request data being sent to Python API:");
-                log.info("{}", requestJson);
-                System.out.println("=== FastAPI 요청 데이터 ===");
-                System.out.println(requestJson);
-                System.out.println("========================");
+                log.debug("Request data being sent to Python API: {}", requestJson);
             } catch (Exception e) {
                 log.warn("Failed to serialize request data for logging: {}", e.getMessage());
             }
