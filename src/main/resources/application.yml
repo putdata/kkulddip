@@ -131,4 +131,4 @@ management:
 
 python:
     analytics:
-        base-url: https://kkulddip-python-ai-298.fly.dev
+        base-url: ${AI_API_ADDRESS:}
