@@ -57,7 +57,7 @@ export class NetworkMonitor {
 
     // 네트워크 정보 변경 (지원하는 브라우저에서만)
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as unknown).connection;
       connection?.addEventListener('change', this.handleNetworkChange.bind(this));
     }
   }
@@ -94,9 +94,9 @@ export class NetworkMonitor {
    * 네트워크 연결 정보 수집
    */
   private getNetworkConnection(): Partial<NetworkStatus> {
-    const connection = (navigator as any).connection || 
-                      (navigator as any).mozConnection || 
-                      (navigator as any).webkitConnection;
+    const connection = (navigator as unknown).connection || 
+                      (navigator as unknown).mozConnection || 
+                      (navigator as unknown).webkitConnection;
 
     if (!connection) {
       return {};
@@ -165,7 +165,7 @@ export class NetworkMonitor {
     window.removeEventListener('offline', this.handleOnlineStatusChange.bind(this));
     
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as unknown).connection;
       connection?.removeEventListener('change', this.handleNetworkChange.bind(this));
     }
 

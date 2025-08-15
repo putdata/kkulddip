@@ -35,7 +35,7 @@ export const debugInfo = {
   checkNetwork: () => {
     const networkInfo = {
       online: navigator.onLine,
-      connection: (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection,
+      connection: (navigator as unknown).connection || (navigator as unknown).mozConnection || (navigator as unknown).webkitConnection,
       serviceWorker: 'serviceWorker' in navigator,
       localStorage: typeof Storage !== 'undefined',
       sessionStorage: typeof sessionStorage !== 'undefined',

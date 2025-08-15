@@ -71,25 +71,27 @@ const StreamDetail = () => {
       setIsJoining(true);
       setJoinError(null);
       const response = await StreamService.joinStream(numericStreamId);
-      
+
       setToken(response.token);
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : '스트림 참가에 실패했습니다.';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : '스트림 참가에 실패했습니다.';
+
       console.error('스트림 참가 실패:', errorMessage);
-      
+
       // 자동 재시도 대상 에러 처리
-      if (errorMessage.includes('진행 중이 아닙니다') || errorMessage.includes('사장님이 아직 방송을')) {
+      if (
+        errorMessage.includes('진행 중이 아닙니다') ||
+        errorMessage.includes('사장님이 아직 방송을')
+      ) {
         refetchStream();
-        
+
         setTimeout(() => {
           if (!token && !isJoining) {
             setJoinError(null);
           }
         }, 3000);
-        
+
         setJoinError(`${errorMessage} (3초 후 자동 재시도)`);
       } else {
         setJoinError(errorMessage);
@@ -106,16 +108,32 @@ const StreamDetail = () => {
     if (isPreValidated && token) {
       return;
     }
-    
+
     // 기존 로직: 스트림이 LIVE이고 토큰이 없을 때 자동 참가
-    if (stream && stream.status === 'LIVE' && !token && !joinError && !isJoining) {
+    if (
+      stream &&
+      stream.status === 'LIVE' &&
+      !token &&
+      !joinError &&
+      !isJoining
+    ) {
       if (stream.sessionId) {
         joinStream();
       } else {
-        setJoinError('스트림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        setJoinError(
+          '스트림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.',
+        );
       }
     }
-  }, [stream?.status, token, isPreValidated, joinError, isJoining, stream?.sessionId, joinStream]);
+  }, [
+    stream?.status,
+    stream?.sessionId,
+    token,
+    isPreValidated,
+    joinError,
+    isJoining,
+    joinStream,
+  ]);
 
   const handleBack = useCallback(() => {
     navigate(-1);
@@ -125,7 +143,7 @@ const StreamDetail = () => {
     if (isJoining) {
       return;
     }
-    
+
     setJoinError(null);
     joinStream();
   }, [isJoining, joinStream]);
@@ -215,8 +233,8 @@ const StreamDetail = () => {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
                 <span>{joinError}</span>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={handleRetryJoin}
                   disabled={isJoining}
@@ -237,9 +255,9 @@ const StreamDetail = () => {
 
           {/* 스트림 플레이어 */}
           {token && !joinError ? (
-            <StreamPlayer 
-              stream={stream} 
-              token={token} 
+            <StreamPlayer
+              stream={stream}
+              token={token}
               preValidated={isPreValidated}
             />
           ) : (
@@ -247,7 +265,9 @@ const StreamDetail = () => {
               <div className="text-center space-y-2">
                 <Loader2 className="w-6 h-6 mx-auto animate-spin text-gray-400" />
                 <p className="text-sm text-gray-500">
-                  {isJoining ? '스트림 참가 중...' : '스트림 연결 준비 중...'}
+                  {isJoining
+                    ? '스트림 참가 중...'
+                    : '스트림 연결 준비 중...'}
                 </p>
               </div>
             </div>

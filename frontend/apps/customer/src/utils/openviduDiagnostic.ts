@@ -11,10 +11,10 @@ export const openviduDiagnostic = {
    */
   checkWebRTCSupport: () => {
     const support = {
-      RTCPeerConnection: !!window.RTCPeerConnection,
-      getUserMedia: !!(navigator.mediaDevices?.getUserMedia),
-      WebSocket: !!window.WebSocket,
-      WebRTC: !!(window.RTCPeerConnection && navigator.mediaDevices?.getUserMedia),
+      RTCPeerConnection: Boolean(window.RTCPeerConnection),
+      getUserMedia: Boolean(navigator.mediaDevices?.getUserMedia),
+      WebSocket: Boolean(window.WebSocket),
+      WebRTC: Boolean(window.RTCPeerConnection && navigator.mediaDevices?.getUserMedia),
       browser: navigator.userAgent,
       timestamp: new Date().toISOString(),
     };
@@ -166,7 +166,7 @@ export const openviduDiagnostic = {
     try {
       // 화면 공유 권한 확인 (선택사항)
       if (navigator.mediaDevices?.getDisplayMedia) {
-        permissions.screen = true;
+        permissions.screen = Boolean(navigator.mediaDevices.getDisplayMedia);
       }
     } catch (error) {
       console.warn('화면 공유 지원 확인 실패:', error);
@@ -208,7 +208,7 @@ export const extractServerUrlFromToken = (token: string): string | null => {
   try {
     // 토큰 형식: "wss://server:port?sessionId=...&token=..."
     const urlMatch = token.match(/^(wss?:\/\/[^?]+)/);
-    return urlMatch ? urlMatch[1] : null;
+    return urlMatch?.[1] ?? null;
   } catch (error) {
     console.error('토큰에서 서버 URL 추출 실패:', error);
     return null;

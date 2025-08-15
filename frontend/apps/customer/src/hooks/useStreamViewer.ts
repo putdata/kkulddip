@@ -334,7 +334,7 @@ export const useStreamViewer = ({
         const cleanupFunctions: (() => void)[] = [];
         
         // ICE 연결 상태 변경 이벤트 리스너 설정 함수
-        const setupIceConnectionTracking = (stream: any) => {
+        const setupIceConnectionTracking = (stream: unknown) => {
           if (stream && stream.connection && stream.connection.connection) {
             const rtcPeerConnection = stream.connection.connection;
             
@@ -362,7 +362,7 @@ export const useStreamViewer = ({
             });
             
             // ICE Candidate 수집 추적
-            rtcPeerConnection.addEventListener('icecandidate', (event) => {
+            rtcPeerConnection.addEventListener('icecandidate', (event: RTCPeerConnectionIceEvent) => {
               if (event.candidate) {
                 console.log('📍 [useStreamViewer] ICE Candidate 수집:', {
                   type: event.candidate.type,
@@ -480,7 +480,9 @@ export const useStreamViewer = ({
                 // 첫 번째 비디오 엘리먼트가 있다면 강제로 재생 시도
                 if (videoElements.length > 0) {
                   const video = videoElements[0];
-                  if (!video) return;
+                  if (!video) {
+                    return;
+                  }
                   
                   // 브라우저 자동재생 정책을 위한 설정
                   video.muted = true; // 자동재생을 위해 음소거 필요
@@ -529,7 +531,7 @@ export const useStreamViewer = ({
                 if (videoElements.length === 0) {
                   console.warn('⚠️ [useStreamViewer] 비디오 엘리먼트가 생성되지 않음 - 강제 생성 시도');
                   // OpenVidu가 비디오 엘리먼트를 생성하도록 재시도
-                  (subscriber as any).createVideoElement(videoElementId, 'APPEND');
+                  (subscriber as unknown).createVideoElement(videoElementId, 'APPEND');
                 }
               }
             }, 1000); // 1초 후 확인
@@ -537,10 +539,10 @@ export const useStreamViewer = ({
             console.log('✅ [useStreamViewer] OpenVidu 구독자 생성 완료');
             
             // ICE 연결 상태 추적 시작
-            setupIceConnectionTracking(subscriber.stream as any);
+            setupIceConnectionTracking(subscriber.stream as unknown);
             
             // streamPlaying 이벤트 대기 (네트워크 품질에 따른 적응적 타임아웃)
-            let playingTimeout: NodeJS.Timeout;
+            let playingTimeout: NodeJS.Timeout | undefined;
             
             // WebRTC ICE 연결을 위한 충분한 타임아웃 설정
             const getTimeoutDuration = () => {
@@ -550,22 +552,24 @@ export const useStreamViewer = ({
             const timeoutDuration = getTimeoutDuration();
             
             const handleStreamPlaying = () => {
-              clearTimeout(playingTimeout);
+              if (playingTimeout) {
+                clearTimeout(playingTimeout);
+              }
               
               // 실제 비디오 엘리먼트와 스트림 상태 확인
-              const videoElement = document.getElementById(videoElementId);
+              const _videoElement = document.getElementById(videoElementId);
               const hasVideoTracks = subscriber.stream.hasVideo;
               const hasAudioTracks = subscriber.stream.hasAudio;
               
               // RTCPeerConnection에서 직접 ICE 연결 상태 확인
               let currentIceState = 'new';
               try {
-                const rtcConnection = (subscriber as any)?.stream?.connection?.connection;
+                const rtcConnection = (subscriber as unknown)?.stream?.connection?.connection;
                 if (rtcConnection) {
                   currentIceState = rtcConnection.iceConnectionState;
                   iceConnectionState = currentIceState; // 변수 업데이트
                 }
-              } catch (_) {
+              } catch {
                 console.warn('⚠️ [useStreamViewer] RTCPeerConnection 접근 실패, 기본값 사용');
               }
               // ICE가 이미 연결된 경우 즉시 성공 처리
@@ -608,7 +612,7 @@ export const useStreamViewer = ({
                       // RTCPeerConnection 접근 시도 (OpenVidu 내부 구조)
                       try {
                         // OpenVidu subscriber의 stream manager에서 RTCPeerConnection 찾기
-                        const streamManager = subscriber as any;
+                        const streamManager = subscriber as unknown;
                         let rtcConnection: RTCPeerConnection | null = null;
                         
                         // 여러 경로로 RTCPeerConnection 접근 시도
@@ -884,6 +888,7 @@ export const useStreamViewer = ({
       waitForWebSocketReady,
       initializeOpenVidu,
       cleanup,
+      testStunTurnConnectivity,
       // 콜백 함수들을 의존성에서 제거 (ref로 관리)
     ],
   );
