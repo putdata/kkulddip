@@ -168,6 +168,14 @@
 }
 
 /* SimpleBar 자동 숨김 커스터마이징 */
+.simplebar-content-wrapper {
+  height: 100%;
+}
+
+.simplebar-content {
+  height: 100%;
+}
+
 .simplebar-track.simplebar-vertical {
   width: 12px;
   right: 0;
