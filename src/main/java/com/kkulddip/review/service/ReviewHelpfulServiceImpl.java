@@ -76,7 +76,6 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
             // 입력값 검증
             validateReviewId(reviewId);
 
-            // 현재 사용자 ID와 요청 userId 일치 확인
             Long currentUserId = Long.parseLong(userInfo.userId());
 
             // 리뷰 존재 확인
@@ -87,6 +86,7 @@ public class ReviewHelpfulServiceImpl implements ReviewHelpfulService {
                 .findByReviewReviewIdAndCustomerId(reviewId, currentUserId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_HELPFUL_NOT_FOUND, "좋아요를 찾을 수 없습니다."));
 
+            System.out.println("why");
             // 좋아요 삭제
             reviewHelpfulRepository.delete(existingHelpful);
             int updated = reviewRepository.decrementHelpfulCount(reviewId);

@@ -22,6 +22,7 @@ import com.kkulddip.review.dto.response.ReviewWithHelpfulStatusResponseDto;
 import com.kkulddip.review.entity.Review;
 import com.kkulddip.review.entity.ReviewReply;
 import com.kkulddip.review.entity.enums.ReviewSortType;
+import com.kkulddip.review.repository.ReviewHelpfulRepository;
 import com.kkulddip.review.repository.ReviewRepository;
 import com.kkulddip.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final CursorUtil cursorUtil;
     private final RedisNotificationUtil redisNotificationUtil;
     private final StoreRepository storeRepository;
+    private final ReviewHelpfulRepository reviewHelpfulRepository;
     private final CustomerRepository customerRepository;
     private final OrderRepository orderRepository;
     private final int size10 = 10;
@@ -89,6 +91,8 @@ public class ReviewServiceImpl implements ReviewService {
 
             List<ReviewImageResponseDto> imageList = reviewImageService.getImageDtoList(reviewWithImages.getImages());
             ReviewReplyResponseDto replyDto = getReplyDto(reviewWithImages.getReply());
+            // 가게 리뷰 수 증가
+            storeRepository.incrementReviewCount(storeId);
 
             // 가게 사장님에게 리뷰 작성 알림 발송
             sendReviewCreatedNotification(storeId, request.customerId());
@@ -175,6 +179,8 @@ public class ReviewServiceImpl implements ReviewService {
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, sortType);
 
+            Long reviewCount = reviewRepository.countByStoreId(storeId);
+
             //리뷰 리스트 받아오기
             List<Review> reviews = fetchReviews(cursorData, sortType, storeId, size10+1, withImage);
 
@@ -192,7 +198,7 @@ public class ReviewServiceImpl implements ReviewService {
             }
 
             log.info("매장 리뷰 목록 조회 완료. storeId: {}, sortType: {}, cursor: {}", storeId, sortType, nextCursor);
-            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo);
+            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo, reviewCount);
 
         } catch (BusinessException e) {
             log.error("매장 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -217,6 +223,8 @@ public class ReviewServiceImpl implements ReviewService {
             // 커서에서 날짜 타입과 숫자 타입 분리하여 값 추출
             CursorUtil.CursorParams params = cursorUtil.extractParams(cursorData);
 
+            Long reviewCount = reviewRepository.countByCustomerId(currentUserId);
+
             List<Review> reviews = reviewRepository
                 .findByCustomerIdOrderByCreatedAtDesc(currentUserId, params.getDateTime(), params.getReviewId(), pageable10);
 
@@ -233,7 +241,7 @@ public class ReviewServiceImpl implements ReviewService {
                 nextCursor = cursorUtil.createCursor(lastReview, ReviewSortType.LATEST);
             }
             log.info("내 리뷰 목록 조회 완료. customerId: {}, cursor: {}", currentUserId, nextCursor);
-            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo);
+            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo, reviewCount);
 
         } catch (BusinessException e) {
             log.error("내 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -261,6 +269,8 @@ public class ReviewServiceImpl implements ReviewService {
             // 커서에서 날짜 타입과 숫자 타입 분리하여 값 추출
             CursorUtil.CursorParams params = cursorUtil.extractParams(cursorData);
 
+            Long reviewCount = reviewRepository.countByCustomerIdAndStoreId(currentUserId, storeId);
+
             List<Review> reviews = reviewRepository
                 .findByCustomerIdAndStoreIdOrderByCreatedAtDesc(currentUserId, storeId, params.getDateTime(), params.getReviewId(), pageable10);
 
@@ -278,7 +288,7 @@ public class ReviewServiceImpl implements ReviewService {
             }
 
             log.info("매장별 내 리뷰 목록 조회 완료. customerId: {}, storeId: {}, cursor: {}", currentUserId, storeId, nextCursor);
-            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo);
+            return createReviewListResponseDto(reviews, nextCursor, hasNext, userInfo, reviewCount);
 
         } catch (BusinessException e) {
             log.error("매장별 내 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -296,6 +306,8 @@ public class ReviewServiceImpl implements ReviewService {
             Long currentOwnerId = Long.parseLong(userInfo.userId());
 
             List<Long> reviewIdsWithMyReplies = reviewRepository.findReviewIdsByOwnerId(currentOwnerId);
+
+            Long reivewCount = Long.valueOf(reviewIdsWithMyReplies.size());
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, ReviewSortType.LATEST);
             // 커서에서 날짜 타입과 숫자 타입 분리하여 값 추출
@@ -311,7 +323,7 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewsWithMyReplies = reviewsWithMyReplies.subList(0, size10);
             }
 
-            return createReviewListResponseDto(reviewsWithMyReplies, cursor, hasNext, userInfo);
+            return createReviewListResponseDto(reviewsWithMyReplies, cursor, hasNext, userInfo, reivewCount);
 
         } catch (BusinessException e) {
             log.error("내 답글 리뷰 목록 조회 실패: {}", e.getMessage(), e);
@@ -348,9 +360,16 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), userInfo);
             }
 
+            // 좋아요 있을 때, 좋아요 삭제
+            if(reviewHelpfulRepository.existsByReviewReviewId(reviewId)){
+                reviewHelpfulRepository.deleteByReviewReviewId(reviewId);
+            }
+
             Long storeId = deletedReview.getStoreId();
             // 리뷰 삭제
             reviewRepository.delete(deletedReview);
+            // 가게 리뷰 수 감소
+            storeRepository.decrementReviewCount(storeId);
 
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, ReviewSortType.LATEST);
@@ -420,9 +439,14 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), userInfo);
             }
 
+            // 좋아요 있을 때, 좋아요 삭제
+            if(reviewHelpfulRepository.existsByReviewReviewId(reviewId)){
+                reviewHelpfulRepository.deleteByReviewReviewId(reviewId);
+            }
             // 리뷰 삭제
             reviewRepository.delete(deletedReview);
-
+            // 가게 리뷰 수 감소
+            storeRepository.decrementReviewCount(deletedReview.getStoreId());
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, sortType);
             // 커서에서 날짜 타입과 숫자 타입 분리하여 값 추출
@@ -485,8 +509,14 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewReplyService.deleteReviewReply(deletedReview.getReply().getReplyId(), userInfo);
             }
 
+            // 좋아요 있을 때, 좋아요 삭제
+            if(reviewHelpfulRepository.existsByReviewReviewId(reviewId)){
+                reviewHelpfulRepository.deleteByReviewReviewId(reviewId);
+            }
             // 리뷰 삭제
             reviewRepository.delete(deletedReview);
+            // 가게 리뷰 수 감소
+            storeRepository.decrementReviewCount(deletedReview.getStoreId());
 
             // Base64 디코딩 및 파싱
             CursorUtil.CursorData cursorData = cursorUtil.parseCursor(cursor, sortType);
@@ -724,6 +754,7 @@ public class ReviewServiceImpl implements ReviewService {
             .createdAt(review.getCreatedAt())
             .updatedAt(review.getUpdatedAt())
             .images(imageList)
+            .helpfulCount(review.getHelpfulCount())
             .reply(replyDto)
             .isHelpful(isHelpful)
             .build();
@@ -753,13 +784,14 @@ public class ReviewServiceImpl implements ReviewService {
         List<Review> reviews,
         String cursor,
         boolean hasNext,
-        JwtUserInfo userInfo
-    ) {
+        JwtUserInfo userInfo,
+        Long reviewCount) {
 
         return ReviewListResponseDto.builder()
             .reviewList(createReviewWithHelpfulStatusResponseDtoList(reviews, userInfo))
             .cursor(cursor)
             .hasNext(hasNext)
+            .reviewCount(reviewCount)
             .build();
 
     }
