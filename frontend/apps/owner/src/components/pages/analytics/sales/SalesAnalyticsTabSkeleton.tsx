@@ -5,6 +5,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 const SalesAnalyticsTabSkeleton = () => {
   return (
     <div className="space-y-6">
+      {/* 날짜 범위 선택 스켈레톤 */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-7 w-20" />
+        <Skeleton className="h-10 w-[300px]" />
+      </div>
+
       {/* 요약 카드 스켈레톤 */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {[1, 2, 3].map(i => (

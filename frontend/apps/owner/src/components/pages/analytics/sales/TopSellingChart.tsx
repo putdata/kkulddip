@@ -80,7 +80,7 @@ const TopSellingChart = ({ items, products }: TopSellingChartProps) => {
           {/* 상품별 차트 */}
           <TabsContent value="items" className="mt-6 flex-1">
             {itemsData.length > 0 ? (
-              <div className="h-80">
+              <div className="h-80 min-h-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
