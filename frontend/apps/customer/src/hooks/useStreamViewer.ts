@@ -775,10 +775,11 @@ export const useStreamViewer = ({
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             (streamManager as any)?.stream?.getRTCPeerConnection
                           ) {
-                            rtcConnection = (
+                            rtcConnection =
                               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                              streamManager as any
-                            ).stream.getRTCPeerConnection();
+                              (
+                                streamManager as any
+                              ).stream.getRTCPeerConnection();
                           }
 
                           if (rtcConnection) {
