@@ -1,5 +1,6 @@
 package com.kkulddip.order.infrastructure.persistence.jpa.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -257,6 +258,56 @@ public class OrderRepositoryImpl implements OrderRepository {
         } catch (Exception e) {
             log.error("주문 데이터베이스 조회 작업 실패 - storeId: {}, operation: findByStoreIdAfterPaymentPending, details: {}", 
                 storeId.value(), e.getMessage(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> findByStoreIdAndOrderStatusInAndOrderDate(StoreId storeId, List<OrderStatus> orderStatuses, LocalDate orderDate) {
+        log.debug("가게 주문 목록 조회 (상태별, 날짜별) - storeId: {}, statuses: {}, date: {}", 
+            storeId.value(), orderStatuses, orderDate);
+        
+        try {
+            List<OrderEntity> orderEntities = orderJpaRepository.findByStoreIdAndOrderStatusInAndOrderDate(
+                storeId.value(), orderStatuses, orderDate);
+            
+            List<Order> orders = orderEntities.stream()
+                .map(orderEntityMapper::toDomain)
+                .collect(Collectors.toList());
+            
+            log.debug("가게 주문 목록 조회 완료 (상태별, 날짜별) - storeId: {}, statuses: {}, date: {}, count: {}", 
+                storeId.value(), orderStatuses, orderDate, orders.size());
+            
+            return orders;
+        } catch (Exception e) {
+            log.error("주문 데이터베이스 조회 작업 실패 - storeId: {}, statuses: {}, date: {}, operation: findByStoreIdAndOrderStatusInAndOrderDate, details: {}", 
+                storeId.value(), orderStatuses, orderDate, e.getMessage(), e);
+            throw OrderException.orderDatabaseError(e);
+        }
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> findByStoreIdAndOrderStatusInAndOrderDateBetween(StoreId storeId, List<OrderStatus> orderStatuses, LocalDate startDate, LocalDate endDate) {
+        log.debug("가게 주문 목록 조회 (상태별, 날짜 범위별) - storeId: {}, statuses: {}, startDate: {}, endDate: {}", 
+            storeId.value(), orderStatuses, startDate, endDate);
+        
+        try {
+            List<OrderEntity> orderEntities = orderJpaRepository.findByStoreIdAndOrderStatusInAndOrderDateBetween(
+                storeId.value(), orderStatuses, startDate, endDate);
+            
+            List<Order> orders = orderEntities.stream()
+                .map(orderEntityMapper::toDomain)
+                .collect(Collectors.toList());
+            
+            log.debug("가게 주문 목록 조회 완료 (상태별, 날짜 범위별) - storeId: {}, statuses: {}, startDate: {}, endDate: {}, count: {}", 
+                storeId.value(), orderStatuses, startDate, endDate, orders.size());
+            
+            return orders;
+        } catch (Exception e) {
+            log.error("주문 데이터베이스 조회 작업 실패 - storeId: {}, statuses: {}, startDate: {}, endDate: {}, operation: findByStoreIdAndOrderStatusInAndOrderDateBetween, details: {}", 
+                storeId.value(), orderStatuses, startDate, endDate, e.getMessage(), e);
             throw OrderException.orderDatabaseError(e);
         }
     }

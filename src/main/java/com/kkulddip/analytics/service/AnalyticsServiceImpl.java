@@ -23,6 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final DdipBoxRepository ddipBoxRepository;
     private final DdipBoxItemRepository ddipBoxItemRepository;
     private final PythonAnalyticsClient pythonAnalyticsClient;
+    
+    // Java 21 Virtual Thread Executor for parallel processing
+    private final Executor virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     // ================== 기본 메서드 =================
     
@@ -46,6 +52,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
      */
     @Override
     public AnalyticsResponseDto generateSalesAnalytics(Long storeId, LocalDate startDate, LocalDate endDate) {
+        long startTime = System.currentTimeMillis();
 
         // endDate가 없으면 오늘 날짜로
         if (endDate == null) {
@@ -59,117 +66,178 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         log.info("Generating analytics for store: {}, period: {} to {}", storeId, startDate, endDate);
 
-        // 1. Domain Repository를 통한 성공한 주문 조회
-        List<Order> successfulOrders = getSuccessfulOrders(storeId, startDate, endDate);
-        
-        log.info("Found {} successful orders for store {}", successfulOrders.size(), storeId);
+        try {
+            // 병렬 처리: 주문 데이터와 재고 데이터를 동시에 조회 및 처리
+            final LocalDate finalStartDate = startDate;
+            final LocalDate finalEndDate = endDate;
+            
+            CompletableFuture<List<AnalyticsOrderDataDto>> orderDataFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long orderStartTime = System.currentTimeMillis();
+                    List<Order> successfulOrders = getSuccessfulOrders(storeId, finalStartDate, finalEndDate);
+                    log.debug("Orders fetched in {}ms, count: {}", 
+                        System.currentTimeMillis() - orderStartTime, successfulOrders.size());
+                    
+                    long conversionStartTime = System.currentTimeMillis();
+                    List<AnalyticsOrderDataDto> orderData = convertToOrderDataDto(successfulOrders);
+                    log.debug("Order data converted in {}ms", 
+                        System.currentTimeMillis() - conversionStartTime);
+                    
+                    return orderData;
+                }, virtualExecutor);
 
-        // 2. Domain Aggregate를 DTO로 변환
-        List<AnalyticsOrderDataDto> orderData = convertToOrderDataDto(successfulOrders);
+            CompletableFuture<List<DailyInventoryDataDto>> inventoryDataFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long inventoryStartTime = System.currentTimeMillis();
+                    List<DailyInventoryDataDto> inventoryData = collectDailyInventoryData(storeId, finalStartDate, finalEndDate);
+                    log.debug("Inventory data collected in {}ms", 
+                        System.currentTimeMillis() - inventoryStartTime);
+                    return inventoryData;
+                }, virtualExecutor);
 
-        // 3. 날짜별 재고 데이터 수집
-        List<DailyInventoryDataDto> inventoryData = collectDailyInventoryData(storeId, startDate, endDate);
+            // 두 작업의 완료를 기다림
+            CompletableFuture<Void> allDataFuture = CompletableFuture.allOf(orderDataFuture, inventoryDataFuture);
+            allDataFuture.join(); // 모든 작업 완료까지 대기
 
-        // 4. Python API 요청 데이터 생성
-        AnalyticsRequestDto request = AnalyticsRequestDto.builder()
-            .storeId(storeId)
-            .startDate(startDate)
-            .endDate(endDate)
-            .orders(orderData)
-            .dailyInventoryData(inventoryData)
-            .build();
+            List<AnalyticsOrderDataDto> orderData = orderDataFuture.join();
+            List<DailyInventoryDataDto> inventoryData = inventoryDataFuture.join();
+            
+            log.info("Data collection completed in {}ms - Orders: {}, Inventory days: {}", 
+                System.currentTimeMillis() - startTime, orderData.size(), inventoryData.size());
 
-        // 5. Python FastAPI 호출
-        AnalyticsResponseDto response = pythonAnalyticsClient.analyzeData(request);
+            // 4. Python API 요청 데이터 생성
+            AnalyticsRequestDto request = AnalyticsRequestDto.builder()
+                .storeId(storeId)
+                .startDate(finalStartDate)
+                .endDate(finalEndDate)
+                .orders(orderData)
+                .dailyInventoryData(inventoryData)
+                .build();
 
-        log.info("Analytics generated successfully for store: {}", storeId);
-        return response;
+            // 5. Python FastAPI 호출
+            long apiStartTime = System.currentTimeMillis();
+            AnalyticsResponseDto response = pythonAnalyticsClient.analyzeData(request);
+            log.debug("Python API call completed in {}ms", System.currentTimeMillis() - apiStartTime);
+
+            long totalTime = System.currentTimeMillis() - startTime;
+            log.info("Analytics generated successfully for store: {} in {}ms", storeId, totalTime);
+            return response;
+            
+        } catch (Exception e) {
+            log.error("Error generating analytics for store: {}", storeId, e);
+            throw new RuntimeException("Analytics generation failed", e);
+        }
     }
 
     @Override
     public DailyAnalyticsResponseDto generateDailyAnalytics(Long storeId, LocalDate targetDate) {
+        long startTime = System.currentTimeMillis();
+        
         if (targetDate == null) {
             targetDate = LocalDate.now();
         }
 
         log.info("Generating daily analytics for store: {}, date: {}", storeId, targetDate);
 
-        StoreId storeIdVo = StoreId.of(storeId);
+        try {
+            StoreId storeIdVo = StoreId.of(storeId);
+            final LocalDate finalTargetDate = targetDate;
 
-        // 1. 당일 CONFIRMED 주문 조회
-        List<Order> dailyOrders = getDailyConfirmedOrders(storeIdVo, targetDate);
+            // 1. 당일 CONFIRMED 주문 조회 (필수 기반 데이터)
+            long ordersStartTime = System.currentTimeMillis();
+            List<Order> dailyOrders = getDailyConfirmedOrders(storeIdVo, finalTargetDate);
+            log.debug("Daily orders fetched in {}ms, count: {}", 
+                System.currentTimeMillis() - ordersStartTime, dailyOrders.size());
 
-        // 2. 매출 개요 계산
-        DailySalesOverviewDto salesOverview = calculateDailySalesOverview(dailyOrders);
+            // 2. 병렬 처리: 주문 기반 계산들과 재고 기반 계산들을 동시 실행
+            CompletableFuture<DailySalesOverviewDto> salesOverviewFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long calcStartTime = System.currentTimeMillis();
+                    DailySalesOverviewDto result = calculateDailySalesOverview(dailyOrders);
+                    log.debug("Sales overview calculated in {}ms", System.currentTimeMillis() - calcStartTime);
+                    return result;
+                }, virtualExecutor);
 
-        // 3. 인기 띱박스 TOP 5 계산
-        List<TopSellingDdipBoxDto> topSellingDdipBoxes = calculateTopSellingDdipBoxes(dailyOrders);
+            CompletableFuture<List<TopSellingDdipBoxDto>> topSellingFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long calcStartTime = System.currentTimeMillis();
+                    List<TopSellingDdipBoxDto> result = calculateTopSellingDdipBoxes(dailyOrders);
+                    log.debug("Top selling boxes calculated in {}ms", System.currentTimeMillis() - calcStartTime);
+                    return result;
+                }, virtualExecutor);
 
-        // 4. 전체 재고 현황 계산
-        DailyInventoryStatusDto inventoryStatus = calculateInventoryStatus(storeId);
+            CompletableFuture<ProfitMarginAnalysisDto> profitAnalysisFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long calcStartTime = System.currentTimeMillis();
+                    ProfitMarginAnalysisDto result = calculateProfitMarginAnalysis(dailyOrders);
+                    log.debug("Profit analysis calculated in {}ms", System.currentTimeMillis() - calcStartTime);
+                    return result;
+                }, virtualExecutor);
 
-        // 5. 재고 많이 남은 띱박스 TOP 5
-        List<HighInventoryDdipBoxDto> highInventoryDdipBoxes = calculateHighInventoryDdipBoxes(storeId);
+            CompletableFuture<DailyInventoryStatusDto> inventoryStatusFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long calcStartTime = System.currentTimeMillis();
+                    DailyInventoryStatusDto result = calculateInventoryStatus(storeId);
+                    log.debug("Inventory status calculated in {}ms", System.currentTimeMillis() - calcStartTime);
+                    return result;
+                }, virtualExecutor);
 
-        // 6. 수익성 분석
-        ProfitMarginAnalysisDto profitMarginAnalysis = calculateProfitMarginAnalysis(dailyOrders);
+            CompletableFuture<List<HighInventoryDdipBoxDto>> highInventoryFuture = 
+                CompletableFuture.supplyAsync(() -> {
+                    long calcStartTime = System.currentTimeMillis();
+                    List<HighInventoryDdipBoxDto> result = calculateHighInventoryDdipBoxes(storeId);
+                    log.debug("High inventory boxes calculated in {}ms", System.currentTimeMillis() - calcStartTime);
+                    return result;
+                }, virtualExecutor);
 
-        return DailyAnalyticsResponseDto.builder()
-            .analysisDate(targetDate)
-            .storeId(storeId)
-            .salesOverview(salesOverview)
-            .topSellingDdipBoxes(topSellingDdipBoxes)
-            .inventoryStatus(inventoryStatus)
-            .highInventoryDdipBoxes(highInventoryDdipBoxes)
-            .profitMarginAnalysis(profitMarginAnalysis)
-            .build();
+            // 모든 병렬 작업의 완료를 기다림
+            CompletableFuture<Void> allCalculationsFuture = CompletableFuture.allOf(
+                salesOverviewFuture, topSellingFuture, profitAnalysisFuture, 
+                inventoryStatusFuture, highInventoryFuture
+            );
+            allCalculationsFuture.join();
+
+            // 결과 수집
+            DailySalesOverviewDto salesOverview = salesOverviewFuture.join();
+            List<TopSellingDdipBoxDto> topSellingDdipBoxes = topSellingFuture.join();
+            ProfitMarginAnalysisDto profitMarginAnalysis = profitAnalysisFuture.join();
+            DailyInventoryStatusDto inventoryStatus = inventoryStatusFuture.join();
+            List<HighInventoryDdipBoxDto> highInventoryDdipBoxes = highInventoryFuture.join();
+
+            long totalTime = System.currentTimeMillis() - startTime;
+            log.info("Daily analytics generated successfully for store: {} in {}ms", storeId, totalTime);
+
+            return DailyAnalyticsResponseDto.builder()
+                .analysisDate(finalTargetDate)
+                .storeId(storeId)
+                .salesOverview(salesOverview)
+                .topSellingDdipBoxes(topSellingDdipBoxes)
+                .inventoryStatus(inventoryStatus)
+                .highInventoryDdipBoxes(highInventoryDdipBoxes)
+                .profitMarginAnalysis(profitMarginAnalysis)
+                .build();
+                
+        } catch (Exception e) {
+            log.error("Error generating daily analytics for store: {}", storeId, e);
+            throw new RuntimeException("Daily analytics generation failed", e);
+        }
     }
 
     // ================== 유틸리티 메서드 ==================
     
     /**
-     * Domain Repository를 통해 성공한 주문들을 조회
-     * 기존 Repository 메서드를 활용하여 비즈니스 로직 구현
+     * Domain Repository를 통해 성공한 주문들을 조회 (최적화됨)
+     * 데이터베이스 레벨에서 날짜 범위와 상태를 필터링하여 성능 향상
      */
     private List<Order> getSuccessfulOrders(Long storeId, LocalDate startDate, LocalDate endDate) {
-        StoreId storeIdVo = StoreId.of(storeId);
-
-        log.info("Searching for CONFIRMED orders for store: {}", storeId);
-
-        // CONFIRMED, PICKED_UP 상태의 주문들만 조회
-        List<Order> confirmedOrders = orderRepository.findByStoreIdAfterPaymentPending(storeIdVo);
-
-        log.info("Found {} CONFIRMED orders for store {}", confirmedOrders.size(), storeId);
-
-        // 모든 상태의 주문도 확인해보기
-        List<Order> allOrders = orderRepository.findByStoreId(storeIdVo);
-        log.info("Total orders for store {}: {}", storeId, allOrders.size());
-
-        // 각 상태별 주문 수 확인 (추후 수정 필요)
-        allOrders.stream()
-            .collect(Collectors.groupingBy(Order::getOrderStatus, Collectors.counting()))
-            .forEach((status, count) -> {
-                log.info("Order status {}: {} orders", status, count);
-            });
-
-
-        // 날짜 필터링
-        List<Order> filteredOrders = confirmedOrders.stream()
-            .filter(order -> isWithinDateRange(order, startDate, endDate))
-            .collect(Collectors.toList());
-
-        log.info("After date filtering ({} to {}): {} orders", startDate, endDate, filteredOrders.size());
-
-        return filteredOrders;
+        return orderRepository.findByStoreIdAndOrderStatusInAndOrderDateBetween(
+            StoreId.of(storeId),
+            List.of(OrderStatus.CONFIRMED, OrderStatus.PICKED_UP),
+            startDate,
+            endDate
+        );
     }
 
-    /**
-     * 주문이 지정된 날짜 범위 내에 있는지 확인
-     */
-    private boolean isWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
-        LocalDate orderDate = order.getOrderDate().toLocalDate();
-        return !orderDate.isBefore(startDate) && !orderDate.isAfter(endDate);
-    }
 
 
 
@@ -207,11 +275,11 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     private List<Order> getDailyConfirmedOrders(StoreId storeId, LocalDate targetDate) {
-        List<Order> confirmedOrders = orderRepository.findByStoreIdAfterPaymentPending(storeId);
-
-        return confirmedOrders.stream()
-            .filter(order -> order.getOrderDate().toLocalDate().equals(targetDate))
-            .collect(Collectors.toList());
+        return orderRepository.findByStoreIdAndOrderStatusInAndOrderDate(
+            storeId, 
+            List.of(OrderStatus.CONFIRMED, OrderStatus.PICKED_UP), 
+            targetDate
+        );
     }
 
     /**
@@ -236,48 +304,66 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     /**
-     * 인기 띱박스 TOP 5를 계산 (매출액 기준 정렬) - 성능 최적화
+     * 인기 띱박스 TOP 5를 계산 (매출액 기준 정렬) - 가상 스레드 + 병렬 스트림 최적화
      * @param orders 분석할 주문 목록
      * @return 매출액 순으로 정렬된 상위 5개 띱박스 목록
      */
     private List<TopSellingDdipBoxDto> calculateTopSellingDdipBoxes(List<Order> orders) {
-        Map<Long, TopSellingDdipBoxData> ddipBoxSalesMap = new HashMap<>();
+        if (orders.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        // 1. 매출 데이터 집계
-        for (Order order : orders) {
-            for (OrderItem orderItem : order.getOrderItems()) {
-                Long ddipBoxId = orderItem.getProductId().value();
-                int quantity = orderItem.getQuantity();
-                long salesAmount = orderItem.calcDiscountPrice().amount().longValue();
-
-                ddipBoxSalesMap.merge(ddipBoxId, 
-                    new TopSellingDdipBoxData(ddipBoxId, quantity, salesAmount),
+        long startTime = System.currentTimeMillis();
+        
+        // 1. 병렬 스트림으로 매출 데이터 집계 (대량 주문 처리 시 효율적)
+        Map<Long, TopSellingDdipBoxData> ddipBoxSalesMap = orders.parallelStream()
+            .flatMap(order -> order.getOrderItems().stream())
+            .collect(Collectors.groupingByConcurrent(
+                orderItem -> orderItem.getProductId().value(),
+                Collectors.reducing(
+                    new TopSellingDdipBoxData(0L, 0, 0L),
+                    orderItem -> new TopSellingDdipBoxData(
+                        orderItem.getProductId().value(),
+                        orderItem.getQuantity(),
+                        orderItem.calcDiscountPrice().amount().longValue()
+                    ),
                     (existing, newData) -> new TopSellingDdipBoxData(
-                        ddipBoxId,
+                        newData.ddipBoxId,
                         existing.quantitySold + newData.quantitySold,
                         existing.totalSalesAmount + newData.totalSalesAmount
                     )
-                );
+                )
+            ));
+
+        // 2. TOP 5 선별 (병렬 스트림 활용)
+        CompletableFuture<List<TopSellingDdipBoxData>> top5DataFuture = 
+            CompletableFuture.supplyAsync(() -> {
+                return ddipBoxSalesMap.values().parallelStream()
+                    .sorted((a, b) -> Long.compare(b.totalSalesAmount, a.totalSalesAmount))
+                    .limit(5)
+                    .collect(Collectors.toList());
+            }, virtualExecutor);
+
+        // 3. 상품명 배치 로딩을 병렬로 준비
+        CompletableFuture<Map<Long, String>> nameMapFuture = top5DataFuture.thenApplyAsync(top5Data -> {
+            Set<Long> top5Ids = top5Data.stream()
+                .map(data -> data.ddipBoxId)
+                .collect(Collectors.toSet());
+            
+            if (top5Ids.isEmpty()) {
+                return Collections.emptyMap();
             }
-        }
+            
+            return ddipBoxRepository.findAllById(top5Ids)
+                .stream()
+                .collect(Collectors.toMap(DdipBox::getDdipboxId, DdipBox::getDdipboxName));
+        }, virtualExecutor);
 
-        // 2. TOP 5 선별
-        List<TopSellingDdipBoxData> top5Data = ddipBoxSalesMap.values().stream()
-            .sorted((a, b) -> Long.compare(b.totalSalesAmount, a.totalSalesAmount))
-            .limit(5)
-            .collect(Collectors.toList());
+        // 4. 두 작업 완료 대기 및 DTO 변환
+        List<TopSellingDdipBoxData> top5Data = top5DataFuture.join();
+        Map<Long, String> nameMap = nameMapFuture.join();
 
-        // 3. 상품명 배치 로딩
-        Set<Long> top5Ids = top5Data.stream()
-            .map(data -> data.ddipBoxId)
-            .collect(Collectors.toSet());
-        
-        Map<Long, String> nameMap = ddipBoxRepository.findAllById(top5Ids)
-            .stream()
-            .collect(Collectors.toMap(DdipBox::getDdipboxId, DdipBox::getDdipboxName));
-
-        // 4. DTO 변환
-        return top5Data.stream()
+        List<TopSellingDdipBoxDto> result = top5Data.stream()
             .map(data -> new TopSellingDdipBoxDto(
                 data.ddipBoxId,
                 nameMap.getOrDefault(data.ddipBoxId, "띱박스"),
@@ -285,6 +371,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 data.totalSalesAmount
             ))
             .collect(Collectors.toList());
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        log.debug("Top selling boxes calculation completed in {}ms, result count: {}", 
+            totalTime, result.size());
+
+        return result;
     }
 
     /**
@@ -329,54 +421,94 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     /**
-     * 수익성 분석을 수행하여 총 수익률과 범위별 수익 분석 결과를 계산
+     * 수익성 분석을 수행하여 총 수익률과 범위별 수익 분석 결과를 계산 (가상 스레드 + 병렬 스트림 최적화)
      * @param orders 분석할 주문 목록
      * @return 총 매출, 총 원가, 총 이익, 수익률, 범위별 수익 분석을 포함한 수익성 분석 결과
      */
     private ProfitMarginAnalysisDto calculateProfitMarginAnalysis(List<Order> orders) {
-        // 1. 모든 DdipBox ID 수집
-        Set<Long> ddipBoxIds = orders.stream()
+        if (orders.isEmpty()) {
+            return new ProfitMarginAnalysisDto(0L, 0L, 0L, 0.0, Collections.emptyList());
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        // 1. 병렬 스트림으로 DdipBox ID 수집
+        Set<Long> ddipBoxIds = orders.parallelStream()
             .flatMap(order -> order.getOrderItems().stream())
             .map(item -> item.getProductId().value())
             .collect(Collectors.toSet());
 
-        // 2. 한 번에 모든 DdipBox 조회
-        Map<Long, DdipBox> ddipBoxMap = ddipBoxRepository.findAllById(ddipBoxIds)
-            .stream()
-            .collect(Collectors.toMap(DdipBox::getDdipboxId, Function.identity()));
+        // 2. 가상 스레드로 DdipBox 배치 로딩
+        CompletableFuture<Map<Long, DdipBox>> ddipBoxMapFuture = 
+            CompletableFuture.supplyAsync(() -> {
+                long dbStartTime = System.currentTimeMillis();
+                Map<Long, DdipBox> result = ddipBoxRepository.findAllById(ddipBoxIds)
+                    .stream()
+                    .collect(Collectors.toMap(DdipBox::getDdipboxId, Function.identity()));
+                log.debug("DdipBox loading for profit analysis completed in {}ms", 
+                    System.currentTimeMillis() - dbStartTime);
+                return result;
+            }, virtualExecutor);
 
-        long totalRevenue = 0L;
-        long totalCost = 0L;
-        Map<String, ProfitRangeData> profitRanges = new HashMap<>();
+        Map<Long, DdipBox> ddipBoxMap = ddipBoxMapFuture.join();
 
-        for (Order order : orders) {
-            for (OrderItem orderItem : order.getOrderItems()) {
+        // 3. 병렬 스트림으로 수익성 데이터 계산
+        List<OrderItemProfitData> profitDataList = orders.parallelStream()
+            .flatMap(order -> order.getOrderItems().stream())
+            .map(orderItem -> {
                 Long ddipBoxId = orderItem.getProductId().value();
-                DdipBox ddipBox = ddipBoxMap.get(ddipBoxId); // 메모리에서 조회
-
+                DdipBox ddipBox = ddipBoxMap.get(ddipBoxId);
+                
                 if (ddipBox != null) {
                     long salesPrice = orderItem.calcDiscountPrice().amount().longValue();
                     long costPrice = ddipBox.getOriginalPrice().longValue() * orderItem.getQuantity();
                     long profit = salesPrice - costPrice;
                     double profitMargin = salesPrice > 0 ? (double) profit / salesPrice * 100 : 0;
-
-                    totalRevenue += salesPrice;
-                    totalCost += costPrice;
-
-                    String marginRange = categorizeMargin(profitMargin);
-                    profitRanges.merge(marginRange,
-                        new ProfitRangeData(salesPrice, 1),
-                        (existing, newData) -> new ProfitRangeData(
-                            existing.salesAmount + newData.salesAmount,
-                            existing.productCount + newData.productCount
-                        )
-                    );
+                    
+                    return new OrderItemProfitData(salesPrice, costPrice, profitMargin);
                 } else {
-                    // DdipBox를 찾을 수 없는 경우 로깅
                     log.warn("DdipBox not found for ID: {}", ddipBoxId);
+                    return null;
                 }
-            }
-        }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        // 4. 가상 스레드로 총 수치 계산과 범위별 분석을 병렬 처리
+        CompletableFuture<Long> totalRevenueFuture = 
+            CompletableFuture.supplyAsync(() -> 
+                profitDataList.parallelStream().mapToLong(data -> data.salesPrice).sum(), 
+                virtualExecutor);
+
+        CompletableFuture<Long> totalCostFuture = 
+            CompletableFuture.supplyAsync(() -> 
+                profitDataList.parallelStream().mapToLong(data -> data.costPrice).sum(), 
+                virtualExecutor);
+
+        CompletableFuture<Map<String, ProfitRangeData>> profitRangesFuture = 
+            CompletableFuture.supplyAsync(() -> 
+                profitDataList.parallelStream()
+                    .collect(Collectors.groupingByConcurrent(
+                        data -> categorizeMargin(data.profitMargin),
+                        Collectors.reducing(
+                            new ProfitRangeData(0L, 0),
+                            data -> new ProfitRangeData(data.salesPrice, 1),
+                            (existing, newData) -> new ProfitRangeData(
+                                existing.salesAmount + newData.salesAmount,
+                                existing.productCount + newData.productCount
+                            )
+                        )
+                    )), 
+                virtualExecutor);
+
+        // 5. 모든 계산 완료 대기
+        CompletableFuture<Void> allCalculationsFuture = CompletableFuture.allOf(
+            totalRevenueFuture, totalCostFuture, profitRangesFuture);
+        allCalculationsFuture.join();
+
+        long totalRevenue = totalRevenueFuture.join();
+        long totalCost = totalCostFuture.join();
+        Map<String, ProfitRangeData> profitRanges = profitRangesFuture.join();
 
         long totalProfit = totalRevenue - totalCost;
         double profitMarginPercentage = totalRevenue > 0 ? (double) totalProfit / totalRevenue * 100 : 0;
@@ -388,6 +520,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 entry.getValue().productCount
             ))
             .collect(Collectors.toList());
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        log.debug("Profit margin analysis completed in {}ms, processed {} items", 
+            totalTime, profitDataList.size());
 
         return new ProfitMarginAnalysisDto(
             totalRevenue,
@@ -439,32 +575,87 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
     }
 
+    /**
+     * 주문 항목별 수익성 데이터를 위한 임시 데이터 클래스
+     */
+    private static class OrderItemProfitData {
+        final long salesPrice;
+        final long costPrice;
+        final double profitMargin;
+
+        OrderItemProfitData(long salesPrice, long costPrice, double profitMargin) {
+            this.salesPrice = salesPrice;
+            this.costPrice = costPrice;
+            this.profitMargin = profitMargin;
+        }
+    }
+
     // ================== dto 생성 메서드 ==================
     
     /**
-     * Domain Aggregate 리스트를 DTO 리스트로 변환 (배치 로딩으로 성능 최적화)
+     * Domain Aggregate 리스트를 DTO 리스트로 변환 (가상 스레드 + 병렬 스트림으로 최적화)
      */
     private List<AnalyticsOrderDataDto> convertToOrderDataDto(List<Order> orders) {
+        if (orders.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        long startTime = System.currentTimeMillis();
+        
         // 1. 모든 ProductId(DdipBoxId) 수집
         Set<Long> allProductIds = orders.stream()
             .flatMap(order -> order.getOrderItems().stream())
             .map(item -> item.getProductId().value())
             .collect(Collectors.toSet());
 
-        // 2. 한 번에 모든 DdipBox 정보 조회 (배치 로딩)
-        Map<Long, DdipBox> ddipBoxMap = ddipBoxRepository.findAllById(allProductIds)
-            .stream()
-            .collect(Collectors.toMap(DdipBox::getDdipboxId, Function.identity()));
+        log.debug("ProductIds collected: {} items", allProductIds.size());
 
-        // 3. 한 번에 모든 DdipBoxItem 정보 조회 (배치 로딩)
-        Map<Long, List<DdipBoxItem>> ddipBoxItemsMap = ddipBoxItemRepository.findByDdipBoxIdIn(allProductIds)
-            .stream()
-            .collect(Collectors.groupingBy(item -> item.getDdipBox().getDdipboxId()));
+        // 2. 배치 로딩을 가상 스레드로 병렬 실행
+        CompletableFuture<Map<Long, DdipBox>> ddipBoxMapFuture = 
+            CompletableFuture.supplyAsync(() -> {
+                long dbStartTime = System.currentTimeMillis();
+                Map<Long, DdipBox> result = ddipBoxRepository.findAllById(allProductIds)
+                    .stream()
+                    .collect(Collectors.toMap(DdipBox::getDdipboxId, Function.identity()));
+                log.debug("DdipBox batch loading completed in {}ms, count: {}", 
+                    System.currentTimeMillis() - dbStartTime, result.size());
+                return result;
+            }, virtualExecutor);
 
-        // 4. 메모리에서 조회하여 변환
-        return orders.stream()
+        CompletableFuture<Map<Long, List<DdipBoxItem>>> ddipBoxItemsMapFuture = 
+            CompletableFuture.supplyAsync(() -> {
+                long dbStartTime = System.currentTimeMillis();
+                Map<Long, List<DdipBoxItem>> result = ddipBoxItemRepository.findByDdipBoxIdIn(allProductIds)
+                    .stream()
+                    .collect(Collectors.groupingBy(item -> item.getDdipBox().getDdipboxId()));
+                log.debug("DdipBoxItem batch loading completed in {}ms, groups: {}", 
+                    System.currentTimeMillis() - dbStartTime, result.size());
+                return result;
+            }, virtualExecutor);
+
+        // 3. 두 배치 로딩 완료 대기
+        CompletableFuture<Void> batchLoadingFuture = CompletableFuture.allOf(ddipBoxMapFuture, ddipBoxItemsMapFuture);
+        batchLoadingFuture.join();
+
+        Map<Long, DdipBox> ddipBoxMap = ddipBoxMapFuture.join();
+        Map<Long, List<DdipBoxItem>> ddipBoxItemsMap = ddipBoxItemsMapFuture.join();
+
+        long batchLoadTime = System.currentTimeMillis() - startTime;
+        log.debug("Batch loading completed in {}ms", batchLoadTime);
+
+        // 4. 병렬 스트림으로 DTO 변환 (대량 데이터 처리 시 효율적)
+        long conversionStartTime = System.currentTimeMillis();
+        List<AnalyticsOrderDataDto> result = orders.parallelStream()
             .map(order -> convertSingleOrderToDto(order, ddipBoxMap, ddipBoxItemsMap))
             .collect(Collectors.toList());
+
+        long conversionTime = System.currentTimeMillis() - conversionStartTime;
+        long totalTime = System.currentTimeMillis() - startTime;
+        
+        log.debug("DTO conversion completed - Orders: {}, Conversion: {}ms, Total: {}ms", 
+            result.size(), conversionTime, totalTime);
+
+        return result;
     }
 
     /**
