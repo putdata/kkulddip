@@ -1,5 +1,5 @@
 import { useAuthStore, useUserStore } from 'common';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { User, CreditCard, Bell, Settings } from 'lucide-react';
 import { ROUTE_PATH } from '@/router/route-path';
 
@@ -25,6 +25,7 @@ export const useUserSelection = (options: UseUserSelectionOptions = {}) => {
   const { clearAuth } = useAuthStore();
   const { clearUser } = useUserStore();
   const navigate = useNavigate();
+  const { storeId } = useParams<{ storeId: string }>();
 
   /**
    * 설정 처리
@@ -44,7 +45,9 @@ export const useUserSelection = (options: UseUserSelectionOptions = {}) => {
     if (options.onBilling) {
       options.onBilling();
     } else {
-      console.log('정산 페이지로 이동');
+      navigate(
+        ROUTE_PATH.STORE.OWNER_SETTLEMENT.replace(':storeId', storeId || '1'),
+      );
     }
   };
 
@@ -55,7 +58,12 @@ export const useUserSelection = (options: UseUserSelectionOptions = {}) => {
     if (options.onNotifications) {
       options.onNotifications();
     } else {
-      console.log('알림 페이지로 이동');
+      navigate(
+        ROUTE_PATH.STORE.OWNER_NOTIFICATIONS.replace(
+          ':storeId',
+          storeId || '1',
+        ),
+      );
     }
   };
 
