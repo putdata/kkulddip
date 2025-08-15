@@ -10,8 +10,13 @@ const NavigationBar = () => {
     <nav className="h-min-25 fixed left-0 right-0 top-0 z-50 flex flex-col bg-white px-4 pb-2 pt-3 shadow-md">
       <div className="flex justify-between">
         <div className="flex items-center space-x-2">
-          <img src="/logo.png" alt="logo" className="h-6 w-6" />
-          <span className="text-lg font-semibold text-amber-600">꿀띱</span>
+          <img src="/logo_orange.png" alt="logo" className="h-10 w-10" />
+          <span
+            className="text-lg font-semibold text-amber-600"
+            style={{ fontFamily: 'Cafe24 Ssurround, sans-serif' }}
+          >
+            꿀띱
+          </span>
         </div>
 
         <div className="flex items-center space-x-4">
