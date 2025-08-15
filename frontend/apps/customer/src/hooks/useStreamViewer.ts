@@ -237,8 +237,12 @@ export const useStreamViewer = ({
       
       console.log(`📊 [useStreamViewer] 네트워크 품질 측정: ${latency.toFixed(2)}ms`);
       
-      if (latency < 100) return 'good';
-      if (latency < 300) return 'medium';
+      if (latency < 100) {
+        return 'good';
+      }
+      if (latency < 300) {
+        return 'medium';
+      }
       return 'poor';
     } catch (error) {
       console.warn('📊 [useStreamViewer] 네트워크 품질 측정 실패, 기본값 사용:', error);
@@ -327,9 +331,10 @@ export const useStreamViewer = ({
         let iceConnectionState = 'new';
         iceConnectionStateChangeCountRef.current = 0; // ref 초기화
         const maxIceConnectionChanges = 10; // ICE 상태 변경 횟수 제한
+        const cleanupFunctions: (() => void)[] = [];
         
         // ICE 연결 상태 변경 이벤트 리스너 설정 함수
-        const setupIceConnectionTracking = (stream: any) => {
+        const setupIceConnectionTracking = (stream: { connection?: { connection?: RTCPeerConnection } }) => {
           if (stream && stream.connection && stream.connection.connection) {
             const rtcPeerConnection = stream.connection.connection;
             
@@ -475,6 +480,7 @@ export const useStreamViewer = ({
                 // 첫 번째 비디오 엘리먼트가 있다면 강제로 재생 시도
                 if (videoElements.length > 0) {
                   const video = videoElements[0];
+                  if (!video) return;
                   
                   // 브라우저 자동재생 정책을 위한 설정
                   video.muted = true; // 자동재생을 위해 음소거 필요
@@ -495,7 +501,6 @@ export const useStreamViewer = ({
                   video.style.setProperty('left', '0', 'important');
                   video.style.setProperty('border', 'none', 'important');
                   video.style.setProperty('outline', 'none', 'important');
-                  
                   
                   // 비디오 메타데이터 로드 이벤트 리스너
                   video.addEventListener('loadedmetadata', () => {
@@ -555,16 +560,14 @@ export const useStreamViewer = ({
               // RTCPeerConnection에서 직접 ICE 연결 상태 확인
               let currentIceState = 'new';
               try {
-                const rtcConnection = (subscriber as any)?.stream?.connection?.connection;
+                const rtcConnection = (subscriber as { stream?: { connection?: { connection?: RTCPeerConnection } } })?.stream?.connection?.connection;
                 if (rtcConnection) {
                   currentIceState = rtcConnection.iceConnectionState;
                   iceConnectionState = currentIceState; // 변수 업데이트
                 }
-              } catch (e) {
+              } catch (_) {
                 console.warn('⚠️ [useStreamViewer] RTCPeerConnection 접근 실패, 기본값 사용');
               }
-              
-              
               // ICE가 이미 연결된 경우 즉시 성공 처리
               if (currentIceState === 'connected' || currentIceState === 'completed') {
                 console.log('⚡ [useStreamViewer] ICE 연결 이미 완료 - 즉시 성공 처리');
@@ -605,8 +608,8 @@ export const useStreamViewer = ({
                       // RTCPeerConnection 접근 시도 (OpenVidu 내부 구조)
                       try {
                         // OpenVidu subscriber의 stream manager에서 RTCPeerConnection 찾기
-                        const streamManager = subscriber as any;
-                        let rtcConnection = null;
+                        const streamManager = subscriber as { stream?: { webRtcPeer?: { pc?: RTCPeerConnection }, connection?: { connection?: RTCPeerConnection }, getRTCPeerConnection?: () => RTCPeerConnection } };
+                        let rtcConnection: RTCPeerConnection | null = null;
                         
                         // 여러 경로로 RTCPeerConnection 접근 시도
                         if (streamManager?.stream?.webRtcPeer?.pc) {

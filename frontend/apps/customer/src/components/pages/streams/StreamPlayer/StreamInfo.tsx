@@ -9,7 +9,9 @@ interface StreamInfoProps {
 
 const StreamInfo = ({ stream }: StreamInfoProps) => {
   const formatStartTime = (startedAt: string | null) => {
-    if (!startedAt) return '시작 시간 정보 없음';
+    if (!startedAt) {
+      return '시작 시간 정보 없음';
+    }
     
     const startTime = new Date(startedAt);
     const now = new Date();
@@ -100,27 +102,6 @@ const StreamInfo = ({ stream }: StreamInfoProps) => {
           )}
         </div>
 
-        {/* 개발 환경에서만 디버그 정보 표시 */}
-        {import.meta.env.DEV && (
-          <div className="pt-4 border-t border-gray-200">
-            <details className="text-xs text-gray-500">
-              <summary className="cursor-pointer font-medium">디버그 정보</summary>
-              <div className="mt-2 space-y-1 font-mono">
-                <div>Stream ID: {stream.id}</div>
-                <div>Session ID: {stream.sessionId || 'N/A'}</div>
-                <div>Store ID: {stream.storeId}</div>
-                <div>Status: {stream.status}</div>
-                <div>Created: {new Date(stream.createdAt).toLocaleString()}</div>
-                {stream.startedAt && (
-                  <div>Started: {new Date(stream.startedAt).toLocaleString()}</div>
-                )}
-                {stream.endedAt && (
-                  <div>Ended: {new Date(stream.endedAt).toLocaleString()}</div>
-                )}
-              </div>
-            </details>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

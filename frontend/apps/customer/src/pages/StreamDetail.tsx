@@ -36,7 +36,7 @@ const StreamDetail = () => {
   } = useQuery({
     queryKey: ['stream', numericStreamId],
     queryFn: () => StreamService.getStreamDetail(numericStreamId!),
-    enabled: !!numericStreamId,
+    enabled: Boolean(numericStreamId),
     retry: 3,
     retryDelay: 1000,
     refetchInterval: (data) => {

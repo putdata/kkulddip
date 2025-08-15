@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { Loader2, AlertCircle, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useStreamViewer } from '@/hooks/useStreamViewer';
@@ -12,7 +11,7 @@ interface StreamPlayerProps {
   preValidated?: boolean;
 }
 
-const StreamPlayer = ({ stream, token, preValidated = false }: StreamPlayerProps) => {
+const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
   const [hasConnected, setHasConnected] = useState(false);
   const connectionAttemptedRef = useRef(false);
   const currentTokenRef = useRef<string | null>(null);
@@ -20,7 +19,6 @@ const StreamPlayer = ({ stream, token, preValidated = false }: StreamPlayerProps
   const strictModeCounterRef = useRef(0);
 
   const {
-    connectionStatus,
     error,
     isConnected,
     isConnecting,
@@ -31,7 +29,6 @@ const StreamPlayer = ({ stream, token, preValidated = false }: StreamPlayerProps
   } = useStreamViewer();
 
   const videoElementId = `stream-video-${stream.id}`;
-
 
   useEffect(() => {
     strictModeCounterRef.current++;
@@ -58,7 +55,7 @@ const StreamPlayer = ({ stream, token, preValidated = false }: StreamPlayerProps
       
       connectToStream(token, videoElementId);
     }
-  }, [token, stream.status, hasConnected, videoElementId]);
+  }, [token, stream.status, hasConnected, videoElementId, connectToStream]);
 
   // 컴포넌트 언마운트 시에만 정리하는 별도 useEffect
   useEffect(() => {
@@ -67,7 +64,7 @@ const StreamPlayer = ({ stream, token, preValidated = false }: StreamPlayerProps
         disconnectFromStream(false);
       }
     };
-  }, []); // 빈 의존성 배열로 언마운트 시에만 실행
+  }, [disconnectFromStream]); // disconnectFromStream 의존성 추가
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {

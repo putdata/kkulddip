@@ -57,8 +57,8 @@ export const StreamService = {
       return response;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 에러';
-      const httpStatus = (error as { response?: { status?: number, data?: any } })?.response?.status;
-      const responseData = (error as { response?: { data?: any } })?.response?.data;
+      const httpStatus = (error as { response?: { status?: number, data?: unknown } })?.response?.status;
+      const responseData = (error as { response?: { data?: unknown } })?.response?.data;
       
       console.error('❌ [StreamService] Spring Boot 서버 요청 실패');
       console.error('📥 [StreamService] 에러 정보:', {

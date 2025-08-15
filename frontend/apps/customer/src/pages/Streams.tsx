@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { RefreshCw, Wifi, WifiOff, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -16,9 +16,7 @@ const Streams = () => {
   const [connectingStreamId, setConnectingStreamId] = useState<number | null>(null);
   
   const {
-    connectionState,
     error: connectionError,
-    streamData,
     connectToStream,
     resetConnection,
     isConnecting,
