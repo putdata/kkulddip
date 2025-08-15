@@ -10,7 +10,7 @@ const MyPage = () => {
 
   if (isLoading || !profile) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
           <div className="text-gray-500">프로필을 불러오고 있어요...</div>
