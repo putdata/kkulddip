@@ -11,25 +11,11 @@ export const StreamService = {
    * 라이브 스트림 목록 조회
    */
   getLiveStreams: async () => {
-    // TODO: Remove debug logs
-    // console.log('[StreamService] 라이브 스트림 목록 요청 시작');
-    // console.log('[StreamService] API 경로:', API_PATH.STREAMS_LIVE);
-    
     try {
-      const startTime = Date.now();
       const response = await apiClient.get<StreamListItem[]>(API_PATH.STREAMS_LIVE);
-      const endTime = Date.now();
-      
-      // TODO: Remove debug log (keep basic success info)
-      // console.log('[StreamService] 라이브 스트림 목록 요청 성공:', {
-      //   responseTime: `${endTime - startTime}ms`,
-      //   dataLength: response?.length || 0
-      // });
-      
       return response;
     } catch (error) {
-      // TODO: Keep error logging but reduce verbosity
-      console.error('[StreamService] 라이브 스트림 목록 요청 실패:', error instanceof Error ? error.message : '알 수 없는 에러');
+      console.error('라이브 스트림 목록 요청 실패:', error instanceof Error ? error.message : '알 수 없는 에러');
       throw error;
     }
   },
@@ -38,54 +24,61 @@ export const StreamService = {
    * 스트림 참가 (시청자용 토큰 획득)
    */
   joinStream: async (streamId: number) => {
-    // TODO: Remove debug logs
-    // console.log('[StreamService] 스트림 참가 요청 시작:', { streamId });
-    // console.log('[StreamService] API 경로:', API_PATH.STREAMS_JOIN(streamId));
-    
+    console.log('🔴 [StreamService] Spring Boot 서버에 토큰 요청 시작');
+    console.log('📤 [StreamService] 요청 정보:', {
+      streamId,
+      url: API_PATH.STREAMS_JOIN(streamId),
+      method: 'POST',
+      timestamp: new Date().toISOString(),
+    });
+
     try {
-      const startTime = Date.now();
-      // Customer API 다시 사용 (OpenVidu URL 형식이 정상임을 확인)
+      const startTime = performance.now();
       const response = await apiClient.post<JoinStreamResponse>(
         API_PATH.STREAMS_JOIN(streamId),
         {},
       );
-      const endTime = Date.now();
+      const endTime = performance.now();
       
-      // Spring Server 응답 로그 출력
-      console.log('[StreamService] Spring Server 응답:', {
+      console.log('✅ [StreamService] Spring Boot 서버 응답 성공');
+      console.log('📥 [StreamService] 응답 정보:', {
         streamId,
-        responseTime: `${endTime - startTime}ms`,
-        response: response,
+        responseTime: `${(endTime - startTime).toFixed(2)}ms`,
+        response,
         token: response.token,
         sessionId: response.sessionId,
         tokenType: typeof response.token,
         tokenLength: response.token?.length || 0,
-        isTokenUrl: response.token?.startsWith('wss://') || response.token?.startsWith('ws://'),
-        timestamp: new Date().toISOString()
+        isWebSocketUrl: response.token?.startsWith('wss://') || response.token?.startsWith('ws://'),
+        tokenPreview: response.token?.substring(0, 100) + '...',
+        timestamp: new Date().toISOString(),
       });
       
       return response;
-    } catch (error: any) {
-      // TODO: Keep error logging but reduce verbosity
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 에러';
-      const httpStatus = error?.response?.status;
+      const httpStatus = (error as { response?: { status?: number, data?: any } })?.response?.status;
+      const responseData = (error as { response?: { data?: any } })?.response?.data;
       
-      console.error('[StreamService] 스트림 참가 요청 실패:', {
+      console.error('❌ [StreamService] Spring Boot 서버 요청 실패');
+      console.error('📥 [StreamService] 에러 정보:', {
         streamId,
         errorMessage,
-        httpStatus
+        httpStatus,
+        responseData,
+        timestamp: new Date().toISOString(),
       });
 
       // HTTP 상태 코드별 사용자 친화적 에러 메시지
-      if (error?.response?.status === 400) {
+      if (httpStatus === 400) {
         throw new Error('스트림이 진행 중이 아닙니다. 다시 시도해주세요.');
-      } else if (error?.response?.status === 404) {
+      } else if (httpStatus === 404) {
         throw new Error('스트림을 찾을 수 없습니다. 스트림이 종료되었을 수 있습니다.');
-      } else if (error?.response?.status === 401) {
+      } else if (httpStatus === 401) {
         throw new Error('인증이 필요합니다. 로그인 후 다시 시도해주세요.');
-      } else if (error?.response?.status === 403) {
+      } else if (httpStatus === 403) {
         throw new Error('스트림에 참가할 권한이 없습니다.');
-      } else if (error?.response?.status >= 500) {
+      } else if (httpStatus && httpStatus >= 500) {
         throw new Error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }
 
@@ -97,26 +90,11 @@ export const StreamService = {
    * 스트림 상세 정보 조회
    */
   getStreamDetail: async (streamId: number) => {
-    // TODO: Remove debug logs
-    // console.log('[StreamService] 스트림 상세 정보 요청 시작:', { streamId });
-    // console.log('[StreamService] API 경로:', API_PATH.STREAMS_DETAIL(streamId));
-    
     try {
-      const startTime = Date.now();
       const response = await apiClient.get<StreamDetail>(API_PATH.STREAMS_DETAIL(streamId));
-      const endTime = Date.now();
-      
-      // TODO: Remove debug log (keep basic success info)
-      // console.log('[StreamService] 스트림 상세 정보 요청 성공:', {
-      //   streamId,
-      //   responseTime: `${endTime - startTime}ms`,
-      //   streamStatus: response.status
-      // });
-      
       return response;
     } catch (error) {
-      // TODO: Keep error logging but reduce verbosity
-      console.error('[StreamService] 스트림 상세 정보 요청 실패:', error instanceof Error ? error.message : '알 수 없는 에러');
+      console.error('스트림 상세 정보 요청 실패:', error instanceof Error ? error.message : '알 수 없는 에러');
       throw error;
     }
   },

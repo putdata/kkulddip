@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, AlertCircle, Loader2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,14 +7,23 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { StreamPlayer, StreamInfo } from '@/components/pages/streams/StreamPlayer';
 import { StreamService } from '@/services/streamService';
 import { toast } from 'sonner';
-import { openviduDiagnostic, extractServerUrlFromToken } from '@/utils/openviduDiagnostic';
+
+interface LocationState {
+  token?: string;
+  sessionId?: string;
+  preValidated?: boolean;
+}
 
 const StreamDetail = () => {
   const { streamId } = useParams<{ streamId: string }>();
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(null);
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
+  
+  const [token, setToken] = useState<string | null>(locationState?.token || null);
   const [joinError, setJoinError] = useState<string | null>(null);
-  const [isJoining, setIsJoining] = useState(false); // 중복 요청 방지용
+  const [isJoining, setIsJoining] = useState(false);
+  const [isPreValidated] = useState(locationState?.preValidated || false);
 
   const numericStreamId = streamId ? parseInt(streamId, 10) : null;
 
@@ -45,18 +54,6 @@ const StreamDetail = () => {
     refetchIntervalInBackground: false,
   });
 
-  // TODO: Remove debug log
-  // console.log('[StreamDetail] 컴포넌트 렌더링 시작:', {
-  //   streamId,
-  //   numericStreamId,
-  //   hasToken: !!token,
-  //   joinError,
-  //   pathname: window.location.pathname,
-  //   streamStatus: stream?.status,
-  //   streamTitle: stream?.title,
-  //   isJoining,
-  //   timestamp: new Date().toISOString()
-  // });
 
   // 스트림 참가 (토큰 획득)
   const joinStream = async () => {
@@ -70,29 +67,13 @@ const StreamDetail = () => {
       return;
     }
 
-    // TODO: Remove debug log
-    // console.log('[StreamDetail] joinStream 시작:', { numericStreamId });
 
     try {
       setIsJoining(true);
       setJoinError(null);
       const response = await StreamService.joinStream(numericStreamId);
       
-      // TODO: Remove debug log (keep basic success info for now)
-      // console.log('[StreamDetail] joinStream 성공:', {
-      //   hasToken: !!response.token,
-      //   sessionId: response.sessionId,
-      //   tokenLength: response.token?.length || 0,
-      //   fullResponse: response
-      // });
       
-      // TODO: Remove OpenVidu diagnostic (development only)
-      // if (import.meta.env.DEV) {
-      //   const serverUrl = extractServerUrlFromToken(response.token);
-      //   if (serverUrl) {
-      //     openviduDiagnostic.fullDiagnostic(response.token);
-      //   }
-      // }
       
       setToken(response.token);
     } catch (error) {
@@ -100,24 +81,15 @@ const StreamDetail = () => {
         ? error.message 
         : '스트림 참가에 실패했습니다.';
       
-      // TODO: Keep error logging but reduce verbosity
-      console.error('[StreamDetail] joinStream 실패:', errorMessage);
+      console.error('스트림 참가 실패:', errorMessage);
       
-      // 400 에러 (스트림 진행 중 아님) 또는 401 에러 (방송 미시작)인 경우 자동 재시도
+      // 자동 재시도 대상 에러 처리
       if (errorMessage.includes('진행 중이 아닙니다') || errorMessage.includes('사장님이 아직 방송을')) {
-        // TODO: Remove debug log
-        // console.log('[StreamDetail] 400 에러 감지 - 스트림 상태 새로고침 후 재시도 예약');
-        
-        // 스트림 상태 즉시 새로고침
         refetchStream();
         
-        // 3초 후 자동 재시도
         setTimeout(() => {
-          // TODO: Remove debug log
-          // console.log('[StreamDetail] 400 에러 후 자동 재시도 시작');
-          if (!token && !isJoining) { // 아직 토큰이 없고 진행 중이 아니면
-            setJoinError(null); // 에러 초기화
-            // 다음 useEffect 트리거를 위해 상태는 그대로 둠
+          if (!token && !isJoining) {
+            setJoinError(null);
           }
         }, 3000);
         
@@ -131,34 +103,22 @@ const StreamDetail = () => {
     }
   };
 
-  // 스트림 정보 로드 완료 후 자동으로 참가 시도 (중복 요청 방지)
+  // 사전 검증된 토큰이 없는 경우에만 자동 참가 시도
   useEffect(() => {
-    // TODO: Remove debug log
-    // console.log('[StreamDetail] useEffect 트리거 - 스트림 참가 조건 검사:', {
-    //   hasStream: !!stream,
-    //   streamStatus: stream?.status,
-    //   hasToken: !!token,
-    //   hasJoinError: !!joinError,
-    //   isJoining,
-    //   shouldJoin: stream && stream.status === 'LIVE' && !token && !joinError && !isJoining
-    // });
-
+    // 사전 검증된 토큰이 있으면 자동 참가 시도 스킵
+    if (isPreValidated && token) {
+      return;
+    }
+    
+    // 기존 로직: 스트림이 LIVE이고 토큰이 없을 때 자동 참가
     if (stream && stream.status === 'LIVE' && !token && !joinError && !isJoining) {
-      // TODO: Remove debug log
-      // console.log('[StreamDetail] 자동 스트림 참가 조건 충족 - joinStream 호출');
-      
-      // 추가 안전장치: 스트림 상태 재확인
       if (stream.sessionId) {
-        // TODO: Remove debug log
-        // console.log('[StreamDetail] 스트림 sessionId 존재 - 참가 가능:', stream.sessionId);
         joinStream();
       } else {
-        // TODO: Remove debug log
-        // console.warn('[StreamDetail] 스트림 sessionId 없음 - 실제로 LIVE 상태가 아닐 수 있음');
         setJoinError('스트림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
       }
     }
-  }, [stream?.status, token]); // 의존성 최소화로 중복 요청 방지
+  }, [stream?.status, token, isPreValidated]);
 
   const handleBack = () => {
     navigate(-1);
@@ -166,13 +126,9 @@ const StreamDetail = () => {
 
   const handleRetryJoin = () => {
     if (isJoining) {
-      // TODO: Remove debug log
-      // console.warn('[StreamDetail] 재시도 버튼 클릭했지만 이미 요청 진행 중');
       return;
     }
     
-    // TODO: Remove debug log
-    // console.log('[StreamDetail] 수동 재시도 시작');
     setJoinError(null);
     joinStream();
   };
@@ -317,7 +273,11 @@ const StreamDetail = () => {
 
           {/* 스트림 플레이어 */}
           {token && !joinError ? (
-            <StreamPlayer stream={stream} token={token} />
+            <StreamPlayer 
+              stream={stream} 
+              token={token} 
+              preValidated={isPreValidated}
+            />
           ) : (
             <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
               <div className="text-center space-y-2">

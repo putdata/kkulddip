@@ -9,12 +9,15 @@ import type { StreamDetail } from '@/types/stream';
 interface StreamPlayerProps {
   stream: StreamDetail;
   token: string;
+  preValidated?: boolean;
 }
 
-const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
+const StreamPlayer = ({ stream, token, preValidated = false }: StreamPlayerProps) => {
   const [hasConnected, setHasConnected] = useState(false);
   const connectionAttemptedRef = useRef(false);
   const currentTokenRef = useRef<string | null>(null);
+  const mountedRef = useRef(true);
+  const strictModeCounterRef = useRef(0);
 
   const {
     connectionStatus,
@@ -25,34 +28,23 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
     isEnded,
     connectToStream,
     disconnectFromStream,
-  } = useStreamViewer({
-    onStreamConnected: () => {
-      console.log('스트림에 연결되었습니다.');
-    },
-    onStreamEnded: () => {
-      console.log('스트림이 종료되었습니다.');
-    },
-    onError: (error) => {
-      console.error('스트림 에러:', error);
-    },
-  });
+  } = useStreamViewer();
 
   const videoElementId = `stream-video-${stream.id}`;
 
-  // 네트워크 상태 모니터링 (자동 재연결 제거)
-  // useEffect(() => {
-  //   const handleNetworkChange = (status: NetworkStatus) => {
-  //     setNetworkStatus(status);
-  //   };
-  //   networkMonitor.addListener(handleNetworkChange);
-  //   return () => {
-  //     networkMonitor.removeListener(handleNetworkChange);
-  //   };
-  // }, []);
 
   useEffect(() => {
+    strictModeCounterRef.current++;
+    
+    // React StrictMode에서 이중 실행 방지
+    if (strictModeCounterRef.current > 1) {
+      console.log(`🔄 [StreamPlayer] React StrictMode 이중 실행 감지 (${strictModeCounterRef.current}번째) - 스킵`);
+      return;
+    }
+    
     // 강력한 중복 방지 로직
     const shouldConnect = 
+      mountedRef.current &&
       token && 
       stream.status === 'LIVE' && 
       !hasConnected &&
@@ -64,33 +56,30 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
       currentTokenRef.current = token;
       setHasConnected(true);
       
-      console.log('[StreamPlayer] 단일 연결 시도 (중복 방지 적용):', { 
-        token: token.substring(0, 50) + '...',
-        streamStatus: stream.status,
-        hasConnected,
-        attempted: connectionAttemptedRef.current
-      });
-      
       connectToStream(token, videoElementId);
     }
+  }, [token, stream.status, hasConnected, videoElementId]);
 
-    return () => {
-      disconnectFromStream(false);
-    };
-  }, [token, stream.status, hasConnected]); // 함수 의존성 제거하여 중복 실행 방지
-
-  // 컴포넌트 언마운트 시 연결 상태 초기화
+  // 컴포넌트 언마운트 시에만 정리하는 별도 useEffect
   useEffect(() => {
     return () => {
+      if (mountedRef.current) {
+        disconnectFromStream(false);
+      }
+    };
+  }, []); // 빈 의존성 배열로 언마운트 시에만 실행
+
+  // 컴포넌트 언마운트 시 정리
+  useEffect(() => {
+    mountedRef.current = true;
+    
+    return () => {
+      mountedRef.current = false;
       connectionAttemptedRef.current = false;
       currentTokenRef.current = null;
     };
   }, []);
 
-  // 재시도 로직 제거됨
-  // const handleRetry = () => {
-  //   // 재시도 없음 - 사용자가 수동으로 페이지 새로고침 필요
-  // };
 
   const formatViewerCount = (count: number) => {
     if (count >= 1000) {
@@ -120,6 +109,12 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
         <div 
           id={videoElementId}
           className="aspect-video bg-gray-900 rounded-lg overflow-hidden"
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            minHeight: '200px'
+          }}
         >
           {isConnecting && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
@@ -187,7 +182,6 @@ const StreamPlayer = ({ stream, token }: StreamPlayerProps) => {
         </Alert>
       )}
 
-      {/* 디버그 정보 제거됨 */}
     </div>
   );
 };

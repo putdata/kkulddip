@@ -1,14 +1,16 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Clock } from 'lucide-react';
+import { Users, Clock, Loader2 } from 'lucide-react';
 import type { StreamListItem } from '@/types/stream';
 
 interface StreamCardProps {
   stream: StreamListItem;
   onClick: () => void;
+  disabled?: boolean;
+  isConnecting?: boolean;
 }
 
-const StreamCard = ({ stream, onClick }: StreamCardProps) => {
+const StreamCard = ({ stream, onClick, disabled = false, isConnecting = false }: StreamCardProps) => {
   const formatViewerCount = (count: number) => {
     if (count >= 1000) {
       return `${(count / 1000).toFixed(1)}k`;
@@ -31,8 +33,14 @@ const StreamCard = ({ stream, onClick }: StreamCardProps) => {
 
   return (
     <Card 
-      className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105"
-      onClick={onClick}
+      className={`transition-all duration-200 ${
+        disabled 
+          ? 'opacity-60 cursor-not-allowed' 
+          : 'cursor-pointer hover:shadow-lg hover:scale-105'
+      } ${
+        isConnecting ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+      }`}
+      onClick={disabled ? undefined : onClick}
     >
       <div className="relative">
         {/* 썸네일 영역 */}
@@ -53,11 +61,18 @@ const StreamCard = ({ stream, onClick }: StreamCardProps) => {
           )}
         </div>
         
-        {/* LIVE 배지 */}
+        {/* LIVE 배지 / 연결 중 표시 */}
         <div className="absolute top-2 left-2">
-          <Badge className="bg-red-500 hover:bg-red-600 text-white font-medium">
-            🔴 LIVE
-          </Badge>
+          {isConnecting ? (
+            <Badge className="bg-blue-500 text-white font-medium">
+              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              연결 중...
+            </Badge>
+          ) : (
+            <Badge className="bg-red-500 hover:bg-red-600 text-white font-medium">
+              🔴 LIVE
+            </Badge>
+          )}
         </div>
         
         {/* 시청자 수 */}
