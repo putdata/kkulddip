@@ -10,6 +10,8 @@ import com.kkulddip.notification.domain.model.enums.NotificationType;
 import com.kkulddip.order.domain.repository.OrderRepository;
 import com.kkulddip.order.domain.model.vo.OrderId;
 import com.kkulddip.order.domain.model.vo.CustomerId;
+import com.kkulddip.order.domain.model.aggregate.Order;
+import com.kkulddip.order.domain.model.enums.OrderStatus;
 import com.kkulddip.review.common.CursorUtil;
 import com.kkulddip.review.dto.request.ReviewCreateRequestDto;
 import com.kkulddip.review.dto.request.ReviewUpdateRequestDto;
@@ -74,8 +76,8 @@ public class ReviewServiceImpl implements ReviewService {
             // 중복 리뷰 검증 (같은 주문에 대한 리뷰)
             validateDuplicateReview(request.customerId(), request.orderId());
 
-            // 주문 소유권 검증
-            validateOrderOwnership(request.orderId(), Long.parseLong(userInfo.userId()));
+            // 주문 소유권 및 상태 검증 (CONFIRMED 또는 PICKED_UP만 리뷰 작성 가능)
+            validateOrderForReview(request.orderId(), Long.parseLong(userInfo.userId()));
 
             Review review = createReviewEntity(storeId, request);
             Review savedReview = reviewRepository.save(review);
@@ -594,7 +596,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private void validateOrderOwnership(Long orderId, Long customerId) {
+    private void validateOrderForReview(Long orderId, Long customerId) {
         if (orderId == null) {
             throw new BusinessException(ErrorCode.INVALID_REQUEST, "주문 ID는 필수입니다.");
         }
@@ -602,14 +604,22 @@ public class ReviewServiceImpl implements ReviewService {
         OrderId orderIdVO = OrderId.of(orderId);
         CustomerId customerIdVO = CustomerId.of(customerId);
         
-        boolean orderExists = orderRepository.findByOrderIdAndCustomerId(orderIdVO, customerIdVO).isPresent();
+        Order order = orderRepository.findByOrderIdAndCustomerId(orderIdVO, customerIdVO)
+            .orElseThrow(() -> {
+                log.warn("주문 검증 실패 - 주문을 찾을 수 없음. orderId: {}, customerId: {}", orderId, customerId);
+                return new BusinessException(ErrorCode.ORDER_NOT_FOUND, "해당 주문을 찾을 수 없거나 접근 권한이 없습니다.");
+            });
         
-        if (!orderExists) {
-            log.warn("주문 소유권 검증 실패 - orderId: {}, customerId: {}", orderId, customerId);
-            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "해당 주문을 찾을 수 없거나 접근 권한이 없습니다.");
+        OrderStatus orderStatus = order.getOrderStatus();
+        if (orderStatus != OrderStatus.CONFIRMED && orderStatus != OrderStatus.PICKED_UP) {
+            log.warn("주문 상태 검증 실패 - 잘못된 상태. orderId: {}, customerId: {}, orderStatus: {}", 
+                orderId, customerId, orderStatus);
+            throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS_FOR_REVIEW, 
+                "리뷰는 주문 확정 또는 픽업 완료된 주문에 대해서만 작성할 수 있습니다.");
         }
         
-        log.debug("주문 소유권 검증 성공 - orderId: {}, customerId: {}", orderId, customerId);
+        log.debug("주문 소유권 및 상태 검증 성공 - orderId: {}, customerId: {}, orderStatus: {}", 
+            orderId, customerId, orderStatus);
     }
 
     private void validateReviewWriter(Review review, JwtUserInfo userInfo) {
