@@ -66,7 +66,7 @@ export const getTimeOptions = (): Array<{ value: string; label: string }> => {
     const minutes = currentTime.getMinutes() < 30 ? 30 : 0;
     let hour =
       minutes === 0 ? currentTime.getHours() + 1 : currentTime.getHours();
-    let targetDate = new Date(currentTime);
+    const targetDate = new Date(currentTime);
 
     // 시간이 24시를 넘으면 다음날로 설정
     if (hour >= 24) {
@@ -186,7 +186,6 @@ export const createKoreanTimeWithDate = (
   const month = targetDate.getMonth();
   const date = targetDate.getDate();
 
-  // 한국시간 그대로 ISO 형식 문자열 생성 (UTC 변환 없이)
   const isoString =
     year +
     '-' +
