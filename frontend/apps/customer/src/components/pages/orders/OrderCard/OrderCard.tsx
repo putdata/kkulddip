@@ -6,7 +6,14 @@ import { type OrderCardProps } from '@/types/orderFood';
 import { ROUTE_PATH } from '@/router/route-path';
 
 const OrderCard = ({ item }: OrderCardProps) => {
-  const { orderDate, storeName, orderItems, originalPrice, finalPrice } = item;
+  const {
+    orderDate,
+    storeName,
+    orderItems,
+    originalPrice,
+    finalPrice,
+    orderStatus,
+  } = item;
 
   const navigate = useNavigate();
 
@@ -81,9 +88,21 @@ const OrderCard = ({ item }: OrderCardProps) => {
           </div>
         </div>
 
-        <button className="border-1 mt-2 w-full rounded-lg border-gray-400 bg-white py-2 text-xs font-semibold text-gray-700 transition-colors active:bg-gray-100">
-          이 띱박스 또 담기
-        </button>
+        {(orderStatus === 'CONFIRMED' || orderStatus === 'PICKED_UP') && (
+          <button
+            className="border-1 mt-2 w-full rounded-lg border-gray-400 bg-white py-2 text-xs font-semibold text-gray-700 transition-colors active:bg-gray-100"
+            onClick={() =>
+              navigate(
+                ROUTE_PATH.REVIEW_CREATE.replace(
+                  ':storeId',
+                  String(item.storeId),
+                ),
+              )
+            }
+          >
+            리뷰 작성하기
+          </button>
+        )}
       </div>
     </div>
   );
