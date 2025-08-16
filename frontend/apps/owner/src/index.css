@@ -217,6 +217,23 @@
   background-color: oklch(0.5 0 0 / 0.9);
 }
 
+/* Toast 아이콘 색상 바리에이션 */
+.toaster [data-sonner-toast][data-type='success'] [data-icon] {
+  color: #10b981;
+}
+
+.toaster [data-sonner-toast][data-type='error'] [data-icon] {
+  color: #ef4444;
+}
+
+.toaster [data-sonner-toast][data-type='warning'] [data-icon] {
+  color: #f59e0b;
+}
+
+.toaster [data-sonner-toast][data-type='info'] [data-icon] {
+  color: #3b82f6;
+}
+
 /* 브라우저 기본 스크롤바 숨김 */
 html {
   scrollbar-width: none;
