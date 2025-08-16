@@ -4,8 +4,10 @@ import { useDeleteFavorite } from '@/hooks/useDeleteFavorite';
 import { useCustomerProfile } from '@/hooks/useProfile';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Likes = () => {
+  const navigate = useNavigate();
   const { data: profile } = useCustomerProfile();
   const {
     data: stores,
@@ -89,7 +91,7 @@ const Likes = () => {
           <LikeFoodCard
             key={item.id}
             item={item}
-            onClick={() => console.log('매장 클릭:', item.id)}
+            onClick={() => navigate(`/stores/${item.id}`)}
             onDelete={handleDelete}
           />
         ))}

@@ -15,7 +15,7 @@ const OrderDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="pb-17 mx-2 space-y-2 pt-14">
+      <div className="mx-2 space-y-2">
         <div className="flex h-40 items-center justify-center">
           <div className="text-gray-500">주문 상세를 불러오는 중...</div>
         </div>
@@ -25,7 +25,7 @@ const OrderDetail = () => {
 
   if (error || !orderDetail) {
     return (
-      <div className="pb-17 mx-2 space-y-2 pt-14">
+      <div className="mx-2 space-y-2">
         <div className="flex h-40 items-center justify-center">
           <div className="text-red-500">
             주문 상세를 불러오는데 실패했습니다
@@ -66,11 +66,11 @@ const OrderDetail = () => {
   };
 
   return (
-    <div className="pb-17 mx-2 space-y-2 pt-14">
-      <div className="mt-3 px-1 text-sm font-semibold">픽업 상태</div>
+    <div className="mx-2 space-y-2">
+      <div className="text-md mt-3 px-1 pt-2 font-semibold">픽업 상태</div>
       <PickUpStatusCard item={statusData} />
 
-      <div className="mt-3 px-1 text-sm font-semibold">결제 정보</div>
+      <div className="text-md mt-3 px-1 pt-4 font-semibold">결제 정보</div>
       <PaymentInfoCard paymentInfo={paymentInfo} />
     </div>
   );
