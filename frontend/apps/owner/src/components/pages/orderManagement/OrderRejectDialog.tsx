@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   X,
   AlertCircle,
@@ -61,6 +62,11 @@ const OrderRejectDialog = ({
         : REJECTION_REASONS.find(r => r.value === selectedReason)?.label || '';
 
     if (!rejectionReason.trim()) {
+      if (selectedReason === 'other') {
+        toast.error('거절 사유를 입력해주세요.');
+      } else {
+        toast.error('거절 사유를 선택해주세요.');
+      }
       return;
     }
 

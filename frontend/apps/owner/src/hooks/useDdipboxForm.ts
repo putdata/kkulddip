@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 import type {
   CreateDdipBoxRequest,
   UpdateDdipBoxRequest,
@@ -87,40 +88,51 @@ export const useDdipboxForm = ({
 
       // 필수 필드 검증
       if (!data.ddipboxName?.trim()) {
+        toast.error('띱박스 이름을 입력해주세요.');
         return false;
       }
       if (!data.category?.trim()) {
+        toast.error('카테고리를 입력해주세요.');
         return false;
       }
       if (data.originalPrice <= 0) {
+        toast.error('정가는 0원보다 커야 합니다.');
         return false;
       }
       if (data.salePrice <= 0) {
+        toast.error('판매가는 0원보다 커야 합니다.');
         return false;
       }
       if (data.dailyQuantity < 1) {
+        toast.error('일일 수량은 1개 이상이어야 합니다.');
         return false;
       }
       if (data.maxPerCustomer < 1) {
+        toast.error('고객당 최대 구매 수량은 1개 이상이어야 합니다.');
         return false;
       }
 
       // 비즈니스 로직 검증
       if (data.salePrice > data.originalPrice) {
+        toast.error('판매가는 정가보다 클 수 없습니다.');
         return false;
       }
       if (data.maxPerCustomer > data.dailyQuantity) {
+        toast.error('고객당 최대 구매 수량은 일일 수량보다 클 수 없습니다.');
         return false;
       }
 
       // 길이 제한 검증
       if (data.ddipboxName.length > 100) {
+        toast.error('띱박스 이름은 100자 이내로 입력해주세요.');
         return false;
       }
       if (data.description && data.description.length > 1000) {
+        toast.error('설명은 1000자 이내로 입력해주세요.');
         return false;
       }
       if (data.category.length > 50) {
+        toast.error('카테고리는 50자 이내로 입력해주세요.');
         return false;
       }
 
@@ -130,21 +142,27 @@ export const useDdipboxForm = ({
 
       // 수정 모드에서는 undefined 값 허용하되, 값이 있으면 유효성 검증
       if (data.ddipboxName !== undefined && !data.ddipboxName.trim()) {
+        toast.error('띱박스 이름을 입력해주세요.');
         return false;
       }
       if (data.category !== undefined && !data.category.trim()) {
+        toast.error('카테고리를 입력해주세요.');
         return false;
       }
       if (data.originalPrice !== undefined && data.originalPrice <= 0) {
+        toast.error('정가는 0원보다 커야 합니다.');
         return false;
       }
       if (data.salePrice !== undefined && data.salePrice <= 0) {
+        toast.error('판매가는 0원보다 커야 합니다.');
         return false;
       }
       if (data.dailyQuantity !== undefined && data.dailyQuantity < 1) {
+        toast.error('일일 수량은 1개 이상이어야 합니다.');
         return false;
       }
       if (data.maxPerCustomer !== undefined && data.maxPerCustomer < 1) {
+        toast.error('고객당 최대 구매 수량은 1개 이상이어야 합니다.');
         return false;
       }
 
@@ -158,20 +176,25 @@ export const useDdipboxForm = ({
         data.maxPerCustomer ?? originalDdipbox?.maxPerCustomer ?? 1;
 
       if (salePrice > originalPrice) {
+        toast.error('판매가는 정가보다 클 수 없습니다.');
         return false;
       }
       if (maxPerCustomer > dailyQuantity) {
+        toast.error('고객당 최대 구매 수량은 일일 수량보다 클 수 없습니다.');
         return false;
       }
 
       // 길이 제한 검증
       if (data.ddipboxName && data.ddipboxName.length > 100) {
+        toast.error('띱박스 이름은 100자 이내로 입력해주세요.');
         return false;
       }
       if (data.description && data.description.length > 1000) {
+        toast.error('설명은 1000자 이내로 입력해주세요.');
         return false;
       }
       if (data.category && data.category.length > 50) {
+        toast.error('카테고리는 50자 이내로 입력해주세요.');
         return false;
       }
 
