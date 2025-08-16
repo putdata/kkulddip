@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { SearchIcon, Loader2 } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { StoreService } from '@/services/storeService';
 import useGeolocation from '@/hooks/useGeolocation';
-import type { Store } from '@/types/store';
+import type { Store, StoreListResponse } from '@/types/store';
 import { Card } from '@/components/ui/card';
 import { priceUtils } from '@/utils/priceFormat';
 import { useNavigate } from 'react-router-dom';
@@ -22,14 +22,17 @@ interface StoreSearchParams {
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchInput, setSearchInput] = useState(searchParams.get('keyword') || '');
-  const [searchKeyword, setSearchKeyword] = useState(searchParams.get('keyword') || '');
+  const [searchInput, setSearchInput] = useState(
+    searchParams.get('keyword') || '',
+  );
+  const [searchKeyword, setSearchKeyword] = useState(
+    searchParams.get('keyword') || '',
+  );
   const location = useGeolocation();
   const latitude = location.coordinate?.latitude;
   const longitude = location.coordinate?.longitude;
   const navigate = useNavigate();
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement>(null);
 
   const {
     data,
@@ -52,28 +55,35 @@ const Search = () => {
       };
       return StoreService.searchStores(searchParams);
     },
-    getNextPageParam: (lastPage) => {
+    getNextPageParam: (lastPage: StoreListResponse) => {
       return lastPage.hasNext ? lastPage.nextCursor : undefined;
     },
-    enabled: !!searchKeyword && searchKeyword.length > 0,
+    initialPageParam: undefined,
+    enabled: Boolean(searchKeyword) && searchKeyword.length > 0,
     staleTime: 5 * 60 * 1000, // 5분
   });
 
   // 무한 스크롤 구현
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (isLoading || isFetchingNextPage) return;
-      if (observerRef.current) observerRef.current.disconnect();
+      if (isLoading || isFetchingNextPage) {
+        return;
+      }
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
 
-      observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetching) {
+      observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetching) {
           fetchNextPage();
         }
       });
 
-      if (node) observerRef.current.observe(node);
+      if (node) {
+        observerRef.current.observe(node);
+      }
     },
-    [isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching]
+    [isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching],
   );
 
   const handleSearch = (e: React.FormEvent) => {
@@ -85,11 +95,12 @@ const Search = () => {
   };
 
   const handleStoreClick = (storeId: number) => {
-    navigate(ROUTE_PATH.STORE_DETAIL(storeId.toString()));
+    navigate(ROUTE_PATH.STORE.replace(':storeId', storeId.toString()));
   };
 
   // 검색 결과 플래튼
-  const stores: Store[] = data?.pages.flatMap((page) => page.content) ?? [];
+  const stores: Store[] =
+    data?.pages.flatMap((page: StoreListResponse) => page.content) ?? [];
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
@@ -103,7 +114,7 @@ const Search = () => {
             type="search"
             placeholder="가게명을 검색하세요"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={e => setSearchInput(e.target.value)}
             className="pl-10 pr-4"
           />
         </form>
@@ -113,29 +124,31 @@ const Search = () => {
       <div className="flex-1 p-4">
         {!searchKeyword ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="text-4xl mb-4">🔍</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            <div className="mb-4 text-4xl">🔍</div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
               가게를 검색해보세요
             </h3>
-            <p className="text-sm text-gray-500">가게명을 입력하여 검색할 수 있어요</p>
+            <p className="text-sm text-gray-500">
+              가게명을 입력하여 검색할 수 있어요
+            </p>
           </div>
         ) : isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-amber-600 mb-4" />
+            <Loader2 className="mb-4 h-8 w-8 animate-spin text-amber-600" />
             <p className="text-gray-500">검색 중...</p>
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="text-4xl mb-4">❌</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            <div className="mb-4 text-4xl">❌</div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
               검색 중 오류가 발생했어요
             </h3>
             <p className="text-sm text-gray-500">다시 시도해주세요</p>
           </div>
         ) : stores.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="text-4xl mb-4">🏪</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            <div className="mb-4 text-4xl">🏪</div>
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
               검색 결과가 없어요
             </h3>
             <p className="text-sm text-gray-500">다른 키워드로 검색해보세요</p>
@@ -151,7 +164,7 @@ const Search = () => {
               {stores.map((store, index) => (
                 <Card
                   key={`${store.storeId}-${index}`}
-                  className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  className="cursor-pointer p-4 transition-shadow hover:shadow-md"
                   onClick={() => handleStoreClick(store.storeId)}
                   ref={index === stores.length - 1 ? lastElementRef : null}
                 >
@@ -161,14 +174,14 @@ const Search = () => {
                       alt={store.storeName}
                       className="h-16 w-16 rounded-lg object-cover"
                     />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 truncate">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate font-semibold text-gray-900">
                         {store.storeName}
                       </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">
+                      <p className="line-clamp-2 text-sm text-gray-600">
                         {store.description}
                       </p>
-                      <div className="flex items-center space-x-2 mt-2">
+                      <div className="mt-2 flex items-center space-x-2">
                         <span className="text-sm text-yellow-600">
                           ⭐ {store.ratingAverage.toFixed(1)}
                         </span>
@@ -179,12 +192,16 @@ const Search = () => {
                           {store.distanceFromUser.toFixed(1)}km
                         </span>
                       </div>
-                      <div className="flex items-center space-x-2 mt-1">
+                      <div className="mt-1 flex items-center space-x-2">
                         <span className="text-sm text-gray-400 line-through">
-                          {priceUtils.formatPrice(store.representativeOriginalPrice)}
+                          {priceUtils.formatPrice(
+                            store.representativeOriginalPrice,
+                          )}
                         </span>
                         <span className="text-sm font-semibold text-amber-600">
-                          {priceUtils.formatPrice(store.representativeSalePrice)}
+                          {priceUtils.formatPrice(
+                            store.representativeSalePrice,
+                          )}
                         </span>
                       </div>
                     </div>
@@ -202,8 +219,10 @@ const Search = () => {
 
             {/* 더 이상 로드할 데이터가 없을 때 */}
             {!hasNextPage && stores.length > 0 && (
-              <div className="text-center py-8">
-                <p className="text-sm text-gray-500">모든 검색 결과를 불러왔어요</p>
+              <div className="py-8 text-center">
+                <p className="text-sm text-gray-500">
+                  모든 검색 결과를 불러왔어요
+                </p>
               </div>
             )}
           </>

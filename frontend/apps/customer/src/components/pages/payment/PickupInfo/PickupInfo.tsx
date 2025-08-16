@@ -6,10 +6,7 @@ interface PickupInfoProps {
   pickupTime: string;
 }
 
-export default function PickupInfo({
-  storeName,
-  address,
-}: PickupInfoProps) {
+export default function PickupInfo({ storeName, address }: PickupInfoProps) {
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium text-gray-900">픽업 정보</p>

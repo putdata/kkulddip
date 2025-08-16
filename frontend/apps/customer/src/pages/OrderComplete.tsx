@@ -18,7 +18,8 @@ const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
   const navigate = useNavigate();
 
   // 백업 데이터가 있으면 백업 데이터 사용, 없으면 현재 장바구니 데이터 사용
-  const actualItems = backupCartItems && backupCartItems.length > 0 ? backupCartItems : items;
+  const actualItems =
+    backupCartItems && backupCartItems.length > 0 ? backupCartItems : items;
   const actualStoreInfo = backupStoreInfo || storeInfo;
 
   const getProductDisplayName = () => {
@@ -113,17 +114,31 @@ const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
         </div>
       </div>
 
-      <div className={`rounded-2xl p-4 shadow-sm ${
-        displayData.orderStatus === 'CONFIRMED' ? 'bg-green-200' : 'bg-amber-200'
-      }`}>
+      <div
+        className={`rounded-2xl p-4 shadow-sm ${
+          displayData.orderStatus === 'CONFIRMED'
+            ? 'bg-green-200'
+            : 'bg-amber-200'
+        }`}
+      >
         <div className="flex items-center justify-center">
-          <Clock className={`mr-2 h-5 w-5 ${
-            displayData.orderStatus === 'CONFIRMED' ? 'text-green-700' : 'text-amber-700'
-          }`} />
-          <span className={`text-sm font-medium ${
-            displayData.orderStatus === 'CONFIRMED' ? 'text-green-800' : 'text-amber-800'
-          }`}>
-            {displayData.orderStatus === 'CONFIRMED' ? '주문 확정 완료' : '주문 확인 중입니다'}
+          <Clock
+            className={`mr-2 h-5 w-5 ${
+              displayData.orderStatus === 'CONFIRMED'
+                ? 'text-green-700'
+                : 'text-amber-700'
+            }`}
+          />
+          <span
+            className={`text-sm font-medium ${
+              displayData.orderStatus === 'CONFIRMED'
+                ? 'text-green-800'
+                : 'text-amber-800'
+            }`}
+          >
+            {displayData.orderStatus === 'CONFIRMED'
+              ? '주문 확정 완료'
+              : '주문 확인 중입니다'}
           </span>
         </div>
       </div>

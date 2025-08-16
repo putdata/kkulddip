@@ -70,7 +70,7 @@ export const useOrderFlowStore = create<OrderFlowState>()(
 
         // 실제 서버 응답 데이터가 있으면 사용, 없으면 더미 데이터 생성
         let completedOrderResponse: OrderResponse;
-        
+
         if (paymentData.orderResponse) {
           // 실제 서버 응답 데이터 사용
           completedOrderResponse = paymentData.orderResponse;

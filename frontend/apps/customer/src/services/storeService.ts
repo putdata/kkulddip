@@ -24,31 +24,35 @@ export class StoreService {
     return apiClient.get(API_PATH.STORE_DDIPBOXES(storeId));
   }
 
-  static async searchStores(params: StoreSearchParams): Promise<StoreListResponse> {
+  static async searchStores(
+    params: StoreSearchParams,
+  ): Promise<StoreListResponse> {
     const searchParams = new URLSearchParams();
-    
+
     searchParams.append('keyword', params.keyword);
-    
+
     if (params.userLatitude !== undefined) {
       searchParams.append('userLatitude', params.userLatitude.toString());
     }
-    
+
     if (params.userLongitude !== undefined) {
       searchParams.append('userLongitude', params.userLongitude.toString());
     }
-    
+
     if (params.sortBy) {
       searchParams.append('sortBy', params.sortBy);
     }
-    
+
     if (params.size) {
       searchParams.append('size', params.size.toString());
     }
-    
+
     if (params.cursor) {
       searchParams.append('cursor', params.cursor);
     }
 
-    return apiClient.get(`${API_PATH.STORES_SEARCH}?${searchParams.toString()}`);
+    return apiClient.get(
+      `${API_PATH.STORES_SEARCH}?${searchParams.toString()}`,
+    );
   }
 }

@@ -10,7 +10,7 @@ interface OrderSummaryProps {
 
 export default function OrderSummary({ orderItems }: OrderSummaryProps) {
   const { items } = useCartStore();
-  
+
   const totalQuantity = orderItems.reduce(
     (sum, item) => sum + item.quantity,
     0,

@@ -26,7 +26,7 @@ const SearchBar = () => {
           placeholder="음식점이나 음식을 검색하세요"
           className="bg-background w-full rounded-lg pl-8"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={e => setSearchInput(e.target.value)}
         />
       </form>
     </div>

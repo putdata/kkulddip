@@ -70,25 +70,20 @@ const PaymentSuccess = () => {
         // 토스페이먼츠 응답을 OrderResponse 형태로 변환
         const cartStore = useCartStore.getState();
         const userStore = useUserStore.getState();
-        
-        // 서버 enum에 맞는 상태 매핑
-        let orderStatus = 'CREATED';
-        if (paymentResponse.status === 'DONE') {
-          orderStatus = 'AWAITING_CONFIRMATION'; // 결제 완료 후 가게 확정 대기 상태
-        } else if (paymentResponse.status === 'READY' || paymentResponse.status === 'IN_PROGRESS') {
-          orderStatus = 'PAYMENT_PENDING';
-        }
-        
+
+        // 서버 enum에 맞는 상태 매핑 (결제 성공시 대기 상태)
+        const orderStatus = 'AWAITING_CONFIRMATION';
+
         const orderResponse: OrderResponse = {
           orderId: paymentOrderId, // paymentOrderId를 orderId로 사용
-          customerId: paymentResponse.customerId || userStore.user?.userId || 0,
+          customerId: userStore.user?.userId || 0,
           storeId: cartStore.storeInfo?.storeId || 0,
-          originalPrice: paymentResponse.amount || parseInt(amount),
-          finalPrice: paymentResponse.amount || parseInt(amount),
+          originalPrice: parseInt(amount),
+          finalPrice: parseInt(amount),
           orderStatus: orderStatus,
-          orderDate: paymentResponse.approvedAt || new Date().toISOString(),
+          orderDate: new Date().toISOString(),
         };
-        
+
         // 주문 완료 처리 - 변환된 주문 응답 데이터 사용
         completeOrder({
           appliedCouponId: undefined,
@@ -129,7 +124,7 @@ const PaymentSuccess = () => {
               // 임시로 주문 완료 상태로 처리
               const cartStore = useCartStore.getState();
               const userStore = useUserStore.getState();
-              
+
               const fallbackOrderResponse: OrderResponse = {
                 orderId: paymentOrderId,
                 customerId: userStore.user?.userId || 0,
@@ -139,7 +134,7 @@ const PaymentSuccess = () => {
                 orderStatus: 'AWAITING_CONFIRMATION', // 결제는 완료되었으므로 가게 확정 대기
                 orderDate: new Date().toISOString(),
               };
-              
+
               completeOrder({
                 appliedCouponId: undefined,
                 discountAmount: 0,
