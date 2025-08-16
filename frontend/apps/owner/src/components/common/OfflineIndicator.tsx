@@ -20,9 +20,9 @@ const OfflineIndicator = () => {
   // 온라인 복구 알림 (잠시만 표시)
   if (showRecoveryAlert) {
     return (
-      <Alert className="fixed left-4 right-4 top-4 z-50 border-green-200 bg-green-50 md:left-auto md:right-4 md:w-96">
+      <Alert className="fixed left-4 right-4 top-safe-or-4 z-50 border-green-200 bg-green-50 shadow-lg md:left-auto md:right-4 md:w-80 lg:w-96">
         <Wifi className="h-4 w-4 text-green-600" />
-        <AlertDescription className="text-green-800">
+        <AlertDescription className="text-sm font-medium text-green-800">
           인터넷 연결이 복구되었습니다.
         </AlertDescription>
       </Alert>
@@ -34,10 +34,10 @@ const OfflineIndicator = () => {
     return (
       <Alert
         variant="destructive"
-        className="fixed left-4 right-4 top-4 z-50 md:left-auto md:right-4 md:w-96"
+        className="fixed left-4 right-4 top-safe-or-4 z-50 shadow-lg md:left-auto md:right-4 md:w-80 lg:w-96"
       >
         <WifiOff className="h-4 w-4" />
-        <AlertDescription>
+        <AlertDescription className="text-sm font-medium">
           인터넷 연결이 끊어졌습니다. 일부 기능이 제한될 수 있습니다.
         </AlertDescription>
       </Alert>
