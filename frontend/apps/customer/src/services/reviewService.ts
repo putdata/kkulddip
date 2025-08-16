@@ -77,8 +77,18 @@ export class ReviewService {
     return apiClient.delete(API_PATH.REVIEW_HELPFUL(reviewId));
   }
 
+  /**
+   * 리뷰에 도움돼요 체크
+   */
   static async checkHelpful(reviewId: number): Promise<boolean> {
     return apiClient.get(`/v1/reviews/${reviewId}/helpful/check`);
+  }
+
+  /**
+   * 내 리뷰 불러오기
+   */
+  static async getMyReviews(): Promise<ReviewListResponse> {
+    return await apiClient.get(API_PATH.MY_REVIEWS);
   }
 }
 

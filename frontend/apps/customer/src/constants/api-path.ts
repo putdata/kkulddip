@@ -18,6 +18,7 @@ export const API_PATH = {
 
   REVIEWS: (storeId: string) => `/v1/review/${storeId}`,
   REVIEW_HELPFUL: (reviewId: string) => `/v1/review/helpful/${reviewId}`,
+  MY_REVIEWS: '/v1/review/myReview',
 
   STREAMS_LIVE: '/v1/streams/live',
   STREAMS_JOIN: (streamId: number) => `/v1/streams/${streamId}/join`,
