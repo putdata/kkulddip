@@ -1,10 +1,110 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer App</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <!-- iOS Web App -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="꿀띱" />
+    
+    <!-- Theme and Colors -->
+    <meta name="theme-color" content="#FF6B35" />
+    <meta name="msapplication-navbutton-color" content="#FF6B35" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Viewport and PWA -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!-- manifest는 VitePWA 플러그인이 자동으로 주입합니다 -->
+    
+    <!-- SEO Meta Tags -->
+    <title>꿀띱 - 남은 음식을 싸게 픽업하세요</title>
+    <meta name="description" content="꿀띱에서 남은 맛있는 음식을 저렴하게 픽업하세요. 환경 보호와 절약을 동시에! 실시간 할인 알림으로 놓치지 마세요." />
+    <meta name="keywords" content="꿀띱, 할인음식, 픽업서비스, 음식절약, 환경보호, 푸드로스, 저렴한음식, 남은음식" />
+    <meta name="author" content="꿀띱" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="ko-KR" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Open Graph (Facebook) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="꿀띱 - 남은 음식을 싸게 픽업하세요" />
+    <meta property="og:description" content="남은 맛있는 음식을 저렴하게 픽업하여 환경도 보호하고 절약도 하세요! 실시간 할인 알림으로 놓치지 마세요." />
+    <meta property="og:image" content="/Kkulddip_og_1200x630.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="꿀띱 - 맛있는 음식 주문 앱 로고와 인터페이스" />
+    <meta property="og:url" content="https://kkulddip.store" />
+    <meta property="og:site_name" content="꿀띱" />
+    <meta property="og:locale" content="ko_KR" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="꿀띱 - 남은 음식을 싸게 픽업하세요" />
+    <meta name="twitter:description" content="남은 맛있는 음식을 저렴하게! 환경 보호와 절약을 동시에 실현하세요" />
+    <meta name="twitter:image" content="/Kkulddip_og_1200x630.png" />
+    <meta name="twitter:image:alt" content="꿀띱 - 맛있는 음식 주문 앱" />
+    <meta name="twitter:site" content="@kkulddip" />
+    <meta name="twitter:creator" content="@kkulddip" />
+    
+    <!-- Additional SEO -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="꿀띱" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://kkulddip.store" />
+    
+    <!-- DNS Prefetch for Performance -->
+    <link rel="dns-prefetch" href="//api.kkulddip.store" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//www.gstatic.com" />
+    
+    <!-- Preconnect for Critical Resources -->
+    <link rel="preconnect" href="https://api.kkulddip.store" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "꿀띱",
+      "alternateName": "꿀띱",
+      "description": "꿀띱에서 남은 맛있는 음식을 저렴하게 픽업하세요. 환경 보호와 절약을 동시에! 실시간 할인 알림까지!",
+      "url": "https://kkulddip.store",
+      "applicationCategory": "FoodApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "softwareVersion": "1.0",
+      "author": {
+        "@type": "Organization",
+        "name": "꿀띱",
+        "url": "https://kkulddip.store"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "KRW"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "500"
+      },
+      "featureList": [
+        "할인된 남은 음식 픽업",
+        "실시간 할인 알림",
+        "환경 보호 기여",
+        "푸시 알림 서비스",
+        "오프라인 지원",
+        "모바일 최적화"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -48,7 +48,7 @@ export const MENU_SECTIONS = [
       {
         id: 'notifications',
         label: '알림 설정',
-        path: '/notifications',
+        path: '/settings/notification',
         icon: <Bell className="h-4 w-4" />,
       },
       {

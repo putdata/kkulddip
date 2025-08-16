@@ -39,6 +39,26 @@ const parseType = (apiType: string): Notification['type'] => {
   }
 };
 
+interface FCMTokenRequest {
+  fcmToken: string;
+  deviceType: 'WEB';
+}
+
+export const registerFCMToken = async (fcmToken: string): Promise<void> => {
+  const tokenData: FCMTokenRequest = {
+    fcmToken,
+    deviceType: 'WEB',
+  };
+
+  await apiClient.post(API_PATH.FCM_TOKENS.REGISTER, tokenData);
+  console.log('FCM Token registered with server');
+};
+
+export const deactivateFCMToken = async (userId: number): Promise<void> => {
+  await apiClient.post(API_PATH.FCM_TOKENS.DEACTIVATE(userId));
+  console.log('FCM Token deactivated for user:', userId);
+};
+
 export const getNotifications = async (
   userId: number,
 ): Promise<Notification[]> => {

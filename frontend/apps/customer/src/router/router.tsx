@@ -19,6 +19,7 @@ import PaymentSuccess from '@/pages/PaymentSuccess';
 import PaymentFail from '@/pages/PaymentFail';
 import AuthCallback from '@/pages/AuthCallback';
 import Notification from '@/pages/Notification';
+import NotificationSettings from '@/pages/NotificationSettings';
 import StoreDetail from '@/pages/StoreDetail';
 import Streams from '@/pages/Streams';
 import StreamDetail from '@/pages/StreamDetail';
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.NOTIFICATION,
             element: <Notification />,
+          },
+          {
+            path: ROUTE_PATH.NOTIFICATION_SETTINGS,
+            element: <NotificationSettings />,
           },
           // {
           //   path: ROUTE_PATH.NOTIFICATIONS,
