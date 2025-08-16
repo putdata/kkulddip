@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BrowserRouter } from 'react-router-dom';
 import OrderCard from './OrderCard';
-
-// Mock 데이터 타입 정의 (OrderFoodItem 타입 사용)
-import { type OrderFoodItem } from '@/types/orderFood';
+import { type OrderCardProps } from '@/types/orderFood';
 
 const meta: Meta<typeof OrderCard> = {
   title: 'Components/OrderCard',
@@ -22,7 +20,7 @@ const meta: Meta<typeof OrderCard> = {
     docs: {
       description: {
         component:
-          '주문 내역을 표시하는 카드 컴포넌트입니다. 주문 정보, 할인 내역, 재주문 기능을 제공합니다.',
+          '주문 내역을 표시하는 카드 컴포넌트입니다. 주문 정보, 할인 내역, 리뷰 작성 버튼 등을 제공합니다.',
       },
     },
   },
@@ -37,10 +35,10 @@ const meta: Meta<typeof OrderCard> = {
 export default meta;
 type Story = StoryObj<typeof OrderCard>;
 
-// 기본 주문 데이터
+// Mock 데이터 생성 함수
 const createMockOrder = (
-  overrides: Partial<OrderFoodItem> = {},
-): OrderFoodItem => ({
+  overrides: Partial<OrderCardProps['item']> = {},
+): OrderCardProps['item'] => ({
   orderDate: '2024-08-12T14:30:00Z',
   storeName: '맥도날드 강남점',
   storeId: 1,
@@ -53,7 +51,7 @@ const createMockOrder = (
       totalPrice: 0,
     },
     {
-      productId: 1,
+      productId: 2,
       productName: '치킨맥너겟 4조각',
       quantity: 2,
       unitPrice: 0,
@@ -63,8 +61,9 @@ const createMockOrder = (
   originalPrice: 15900,
   finalPrice: 12900,
   orderId: 'ORDER123',
-  orderStatus: 'COMPLETED',
+  orderStatus: 'CONFIRMED',
   pickupTime: '2024-08-12T15:00:00Z',
+  hasReview: false,
   ...overrides,
 });
 
@@ -89,7 +88,7 @@ export const LongNames: Story = {
           totalPrice: 0,
         },
         {
-          productId: 1,
+          productId: 2,
           productName: '치킨윙',
           quantity: 5,
           unitPrice: 0,
@@ -106,6 +105,16 @@ export const NoDiscount: Story = {
     item: createMockOrder({
       originalPrice: 12900,
       finalPrice: 12900,
+    }),
+  },
+};
+
+// 리뷰 작성 완료 상태
+export const WithReview: Story = {
+  args: {
+    item: createMockOrder({
+      hasReview: true,
+      orderStatus: 'PICKED_UP',
     }),
   },
 };
