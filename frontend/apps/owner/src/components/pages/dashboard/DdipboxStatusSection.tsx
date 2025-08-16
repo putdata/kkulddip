@@ -197,7 +197,7 @@ const DdipboxStatusSection = ({ storeId }: DdipboxStatusSectionProps) => {
                       </div>
                       <Progress
                         value={stockPercentage}
-                        className="h-2"
+                        size="default"
                         style={
                           {
                             '--progress-background':

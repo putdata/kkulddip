@@ -3,6 +3,26 @@ export const ROUTE_PATH = {
   LOGIN: '/login',
   AUTH_CALLBACK: '/auth-callback',
   WELCOME: '/welcome',
+  ONBOARDING: {
+    STORE: '/onboarding/store',
+    DDIPBOX: '/onboarding/ddipbox',
+    NOTIFICATION: '/onboarding/notification',
+    // Mobile step routes
+    MOBILE: {
+      STORE: {
+        BASIC: '/onboarding/store/basic',
+        LOCATION: '/onboarding/store/location',
+        CONTACT: '/onboarding/store/contact',
+        DESCRIPTION: '/onboarding/store/description',
+      },
+      DDIPBOX: {
+        BASIC: '/onboarding/ddipbox/basic',
+        PRICING: '/onboarding/ddipbox/pricing',
+        QUANTITY: '/onboarding/ddipbox/quantity',
+      },
+      NOTIFICATION: '/onboarding/notification',
+    },
+  },
   STORE: {
     INDEX: '/:storeId',
     DASHBOARD: '/:storeId/dashboard',

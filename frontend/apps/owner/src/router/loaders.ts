@@ -8,7 +8,7 @@ export const indexLoader = async () => {
   const accessToken = useAuthStore.getState().accessToken;
 
   if (accessToken === null) {
-    throw redirect(ROUTE_PATH.LOGIN);
+    throw redirect(ROUTE_PATH.WELCOME);
   }
 
   const storeList = await queryClient
@@ -21,7 +21,7 @@ export const indexLoader = async () => {
     });
 
   if (storeList.stores.length === 0) {
-    throw redirect(ROUTE_PATH.WELCOME);
+    throw redirect(ROUTE_PATH.ONBOARDING.STORE);
   }
 
   const firstStore = storeList.stores[0]!;
