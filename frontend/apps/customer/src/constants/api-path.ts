@@ -22,4 +22,9 @@ export const API_PATH = {
   STREAMS_LIVE: '/v1/streams/live',
   STREAMS_JOIN: (streamId: number) => `/v1/streams/${streamId}/join`,
   STREAMS_DETAIL: (streamId: number) => `/v1/streams/${streamId}`,
+
+  FCM_TOKENS: {
+    REGISTER: '/v1/fcm-tokens',
+    DEACTIVATE: (userId: number) => `/v1/fcm-tokens/users/${userId}/deactivate`,
+  },
 };
