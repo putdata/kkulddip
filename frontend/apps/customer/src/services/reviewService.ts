@@ -7,6 +7,12 @@ import type {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from 'common';
 
+export interface ReviewListParams {
+  size?: number;
+  cursor?: string;
+  sort?: string;
+}
+
 /**
  * 리뷰 관련 API 서비스 클래스
  */
@@ -23,6 +29,34 @@ export class ReviewService {
     },
   ): Promise<ReviewListResponse> {
     return apiClient.get(API_PATH.STORE_REVIEWS(storeId), params);
+  }
+
+  /**
+   * 리뷰 목록 조회 (커서 기반 페이지네이션)
+   */
+  static async getReviewsWithPagination(
+    storeId: string,
+    params: ReviewListParams,
+  ): Promise<ReviewListResponse> {
+    const searchParams = new URLSearchParams();
+
+    if (params.size) {
+      searchParams.append('size', params.size.toString());
+    }
+
+    if (params.cursor) {
+      searchParams.append('cursor', params.cursor);
+    }
+
+    if (params.sort) {
+      searchParams.append('sort', params.sort);
+    }
+
+    const url = searchParams.toString()
+      ? `${API_PATH.STORE_REVIEWS(storeId)}?${searchParams.toString()}`
+      : API_PATH.STORE_REVIEWS(storeId);
+
+    return apiClient.get(url);
   }
 
   /**

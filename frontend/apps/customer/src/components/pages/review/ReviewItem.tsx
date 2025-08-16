@@ -93,7 +93,11 @@ const ReviewItem = ({ review }: ReviewProps) => {
                 key={index}
                 className="flex h-20 w-20 items-center justify-center overflow-hidden rounded bg-gray-100"
               >
-                <img src={image.imageUrl} alt={image.originalName} />
+                <img
+                  className="h-full w-full object-cover"
+                  src={image.imageUrl}
+                  alt={image.originalName}
+                />
               </div>
             ))}
           </div>

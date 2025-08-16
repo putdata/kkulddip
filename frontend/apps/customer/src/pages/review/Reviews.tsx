@@ -2,6 +2,8 @@ import ReviewsContainer from '@/components/pages/review/ReviewsContainer';
 import ReviewStoreInfoCard from '@/components/pages/review/ReviewStoreInfoCard';
 import { useStoreDetail } from '@/hooks/useStoreDetail';
 import { useStoreReviews } from '@/hooks/useStoreReviews';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import type { ReviewResponse, ReviewListResponse } from '@/types/review';
 import { Loader2 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
@@ -16,10 +18,22 @@ const ReviewsPage = () => {
   } = useStoreDetail(storeId);
 
   const {
-    data: reviewResponse,
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
     isLoading: reviewsLoading,
-    error: reviewsError,
+    isError: reviewsError,
   } = useStoreReviews(storeId);
+
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading: reviewsLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    isFetching,
+    fetchNextPage,
+  });
 
   if (storeLoading || reviewsLoading) {
     return (
@@ -42,7 +56,9 @@ const ReviewsPage = () => {
     return <div>가게 정보를 불러올 수 없습니다.</div>;
   }
 
-  const reviews = reviewResponse?.reviewList || []; // 기본값 설정
+  // 리뷰 목록 플래튼
+  const reviews: ReviewResponse[] =
+    data?.pages.flatMap((page: ReviewListResponse) => page.reviewList) ?? [];
 
   const totalReviews = reviews.length;
 
@@ -51,7 +67,12 @@ const ReviewsPage = () => {
   return (
     <div>
       <ReviewStoreInfoCard store={store} totalReviews={totalReviews} />
-      <ReviewsContainer reviews={reviews} />
+      <ReviewsContainer
+        reviews={reviews}
+        lastElementRef={lastElementRef}
+        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={hasNextPage}
+      />
     </div>
   );
 };

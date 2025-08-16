@@ -31,7 +31,15 @@ const StoreDetail = () => {
     error: ddipBoxError,
   } = useStoreDdipBoxes(storeId);
 
-  const { data: reviewResponse } = useStoreReviews(storeId);
+  const { data: reviewInfiniteData } = useStoreReviews(storeId);
+
+  const allReviews =
+    reviewInfiniteData?.pages.flatMap(page => page.reviewList) ?? [];
+  const reviewResponse = {
+    reviewList: allReviews.slice(0, 3),
+    cursor: reviewInfiniteData?.pages[0]?.cursor ?? null,
+    hasNext: reviewInfiniteData?.pages[0]?.hasNext ?? false,
+  };
 
   // 둘 중 하나라도 로딩 중이면 로딩 표시
   if (storeLoading || ddipBoxLoading) {

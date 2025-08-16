@@ -1,28 +1,21 @@
-import { Button } from '@/components/ui/button';
-
-import { useState } from 'react';
 import ReviewItem from './ReviewItem';
 import type { ReviewResponse } from '@/types/review';
+import { Loader2 } from 'lucide-react';
 
 interface ReviewsComponentProps {
   reviews: ReviewResponse[];
+  lastElementRef?: (node: HTMLDivElement | null) => void;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: boolean;
 }
 
-const ReviewsContainer = ({ reviews }: ReviewsComponentProps) => {
-  const [visibleReviewsCount, setVisibleReviewsCount] = useState(5); // 처음에 5개만 보여주기
-  const reviewsPerPage = 5; // 더보기 클릭 시 추가로 보여줄 개수
-  const totalReviews = reviews.length;
-  const remainingReviews = totalReviews - visibleReviewsCount;
-  const displayedReviews = reviews.slice(0, visibleReviewsCount);
-
-  // 핸들러
-  const handleLoadMore = () => {
-    setVisibleReviewsCount(prev =>
-      Math.min(prev + reviewsPerPage, totalReviews),
-    );
-  };
-
-  if (totalReviews === 0) {
+const ReviewsContainer = ({
+  reviews,
+  lastElementRef,
+  isFetchingNextPage,
+  hasNextPage,
+}: ReviewsComponentProps) => {
+  if (reviews.length === 0) {
     return (
       <div className="flex w-full flex-col items-center justify-center space-y-4 bg-gray-100 py-12">
         <div className="text-4xl">📝</div>
@@ -40,21 +33,28 @@ const ReviewsContainer = ({ reviews }: ReviewsComponentProps) => {
 
   return (
     // TODO: [font-family:segoe_ui] 폰트 스타일 전역으로 이동
-    <div className="flex w-full flex-col items-start gap-2 bg-gray-100 [font-family:segoe_ui]">
+    <div className="flex w-full flex-col gap-2 bg-gray-100">
       {/* 리뷰 리스트 렌더링 */}
-      {displayedReviews.map(review => (
-        <ReviewItem review={review} />
+      {reviews.map((review, index) => (
+        <div
+          key={`${review.reviewId}-${index}`}
+          ref={index === reviews.length - 1 ? lastElementRef : null}
+        >
+          <ReviewItem review={review} />
+        </div>
       ))}
-      {/* 더보기 버튼 */}
-      {remainingReviews > 0 && (
-        <div className="flex w-full items-center justify-center pb-2.5">
-          <Button
-            variant="outline"
-            className="h-14 w-2/3 cursor-pointer rounded-xl border border-gray-200 bg-white text-gray-500"
-            onClick={handleLoadMore}
-          >
-            리뷰 더보기 ({remainingReviews}개 남음)
-          </Button>
+
+      {/* 로딩 인디케이터 */}
+      {isFetchingNextPage && (
+        <div className="flex w-full justify-center py-4">
+          <Loader2 className="h-6 w-6 animate-spin text-amber-600" />
+        </div>
+      )}
+
+      {/* 더 이상 로드할 데이터가 없을 때 */}
+      {!hasNextPage && reviews.length > 0 && (
+        <div className="flex w-full justify-center py-8">
+          <p className="text-sm text-gray-500">모든 리뷰를 불러왔어요</p>
         </div>
       )}
     </div>
