@@ -11,6 +11,8 @@ import { Card } from '@/components/ui/card';
 
 import { useCartStore } from '@/store/useCartStore';
 import StoreInfo from '@/components/pages/cart/StoreInfo/StoreInfo';
+import { useNavigate } from 'react-router-dom';
+import { ROUTE_PATH } from '@/router';
 
 interface CartProps {
   onNext: (cartData: CartData) => void;
@@ -19,9 +21,29 @@ interface CartProps {
 
 const Cart = ({ onNext, onBack }: CartProps) => {
   const { items, storeInfo, updateQuantity } = useCartStore(); // Zustand에서 가져오기
+  const navigate = useNavigate();
 
+  // 장바구니가 비어있는 경우
   if (!items.length || !storeInfo) {
-    return <div>장바구니가 비어있습니다</div>;
+    return (
+      <OrderFlowLayout title="장바구니" currentStep="cart" onBack={onBack}>
+        <div className="flex flex-1 flex-col items-center justify-center space-y-4 px-4 py-20">
+          <div className="text-5xl">🛒</div>
+          <div className="text-center">
+            <h3 className="mb-2 text-lg font-semibold text-gray-800">
+              장바구니가 비어있어요
+            </h3>
+            <p className="text-sm text-gray-500">맛있는 띱박스를 담아보세요!</p>
+          </div>
+          <button
+            onClick={() => navigate(ROUTE_PATH.HOME)}
+            className="mt-4 rounded-xl bg-amber-500 px-6 py-3 font-medium text-white transition-colors hover:bg-amber-600"
+          >
+            띱박스 둘러보기
+          </button>
+        </div>
+      </OrderFlowLayout>
+    );
   }
 
   const handleNext = () => {
@@ -50,7 +72,7 @@ const Cart = ({ onNext, onBack }: CartProps) => {
   const bottomButton = (
     <button
       onClick={handleNext}
-      className="fixed bottom-3 w-11/12 rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors"
+      className="w-full rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors"
     >
       다음 단계
     </button>

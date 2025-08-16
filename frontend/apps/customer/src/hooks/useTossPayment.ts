@@ -4,12 +4,14 @@ import { useUserStore } from 'common';
 import { ROUTE_PATH } from '@/router';
 import {
   PaymentService,
+  getPaymentOrderIdWithRetry,
 } from '@/services/paymentService';
 import type {
   OrderData,
   TossPaymentParams,
   TossPaymentRequest,
 } from '@/types/payments';
+import { useCartStore } from '@/store/useCartStore';
 
 interface UseTossPaymentReturn {
   processPayment: (params: TossPaymentParams) => Promise<void>;
@@ -18,6 +20,7 @@ interface UseTossPaymentReturn {
 
 export const useTossPayment = (): UseTossPaymentReturn => {
   const { user } = useUserStore();
+  const { items } = useCartStore();
 
   // 주문 데이터 생성 함수
   const createOrderData = useCallback(
@@ -62,9 +65,8 @@ export const useTossPayment = (): UseTossPaymentReturn => {
       try {
         console.log('=== 토스페이먼츠 위젯 호출 시작 ===');
 
-        const result = await (
-          await tossPayments
-        ).requestPayment('카드', {
+        const tossPaymentsInstance = await tossPayments;
+        const result = await tossPaymentsInstance.requestPayment('카드', {
           amount: paymentData.amount,
           orderId: paymentData.paymentOrderId,
           orderName: paymentData.orderName,
@@ -83,8 +85,12 @@ export const useTossPayment = (): UseTossPaymentReturn => {
         console.error('=== 토스페이먼츠 결제 요청 실패 ===');
         console.error('error 전체:', error);
         console.error('error 타입:', typeof error);
-        console.error('error.message:', error?.message);
-        console.error('error.code:', error?.code);
+        if (error && typeof error === 'object' && 'message' in error) {
+          console.error('error.message:', error.message);
+        }
+        if (error && typeof error === 'object' && 'code' in error) {
+          console.error('error.code:', error.code);
+        }
         console.error('error JSON:', JSON.stringify(error, null, 2));
         throw error;
       }
@@ -100,14 +106,24 @@ export const useTossPayment = (): UseTossPaymentReturn => {
       try {
         // 1단계: 토스페이먼츠 SDK 초기화
         const CLIENT_KEY = import.meta.env.VITE_TOSS_PAYMENTS_CLIENT_KEY;
-        console.log('CLIENT_KEY 확인:', CLIENT_KEY);
+        console.log(
+          'CLIENT_KEY 확인:',
+          CLIENT_KEY ? `${CLIENT_KEY.substring(0, 10)}...` : 'undefined',
+        );
 
-        if (!CLIENT_KEY) {
-          throw new Error('VITE_TOSS_PAYMENTS_CLIENT_KEY가 설정되지 않았습니다.');
+        if (!CLIENT_KEY || typeof CLIENT_KEY !== 'string') {
+          throw new Error(
+            'VITE_TOSS_PAYMENTS_CLIENT_KEY가 설정되지 않았거나 올바르지 않습니다.',
+          );
         }
 
-        if (!CLIENT_KEY.startsWith('test_ck_') && !CLIENT_KEY.startsWith('live_ck_')) {
-          throw new Error('올바르지 않은 CLIENT_KEY 형식입니다.');
+        if (
+          !CLIENT_KEY.startsWith('test_ck_') &&
+          !CLIENT_KEY.startsWith('live_ck_')
+        ) {
+          throw new Error(
+            `올바르지 않은 CLIENT_KEY 형식입니다. 현재: ${CLIENT_KEY.substring(0, 10)}...`,
+          );
         }
 
         console.log('=== SDK 초기화 ===');
@@ -129,16 +145,33 @@ export const useTossPayment = (): UseTossPaymentReturn => {
           throw new Error('결제 금액이 0원 이하입니다.');
         }
 
-        // 3단계: 결제 주문 ID 생성
+        // 3단계: 결제 주문 ID 생성 (Spring Boot 서버 요청)
         console.log('=== 3단계: 결제 주문 ID 생성 ===');
-        const paymentOrderId = orderResult.orderId;
+        const paymentOrderId = await getPaymentOrderIdWithRetry(
+          orderResult.orderId,
+        );
+        console.log('생성된 paymentOrderId:', paymentOrderId);
+
+        // 상품명 생성 (장바구니 아이템 기반)
+        let orderName: string;
+        if (items.length === 0) {
+          orderName = '띱박스';
+        } else if (items.length === 1 && items[0]) {
+          orderName = items[0].name;
+        } else if (items[0]) {
+          // 여러 개인 경우: "첫번째상품 외 N개"
+          orderName = `${items[0].name} 외 ${items.length - 1}개`;
+        } else {
+          orderName = '띱박스';
+        }
+        console.log('주문명:', orderName);
 
         // 4단계: 토스페이먼츠 결제 요청
         console.log('=== 4단계: 토스페이먼츠 결제 요청 ===');
         await requestTossPayment(tossPayments, {
           amount: orderResult.finalPrice,
           paymentOrderId,
-          orderName: `주문 #${orderResult.orderId}`,
+          orderName,
           customerName: params.customerName,
           successUrl: `${baseUrl}/${ROUTE_PATH.PAYMENT_SUCCESS}`,
           failUrl: `${baseUrl}/${ROUTE_PATH.PAYMENT_FAIL}`,
@@ -148,7 +181,7 @@ export const useTossPayment = (): UseTossPaymentReturn => {
         throw error;
       }
     },
-    [createOrderData, requestTossPayment],
+    [createOrderData, requestTossPayment, items],
   );
 
   return {

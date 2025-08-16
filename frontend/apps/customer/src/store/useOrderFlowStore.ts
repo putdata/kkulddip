@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { OrderData, PaymentData } from '@/types/orderflow';
 import type { OrderResponse } from '@/types/payments';
+import { useCartStore } from '@/store/useCartStore';
+import { useUserStore } from 'common';
 
 interface OrderFlowState {
   // 기본 주문 데이터
@@ -44,8 +46,14 @@ export const useOrderFlowStore = create<OrderFlowState>()(
       completeOrder: paymentData => {
         const { orderData } = get();
 
+        // 실제 데이터 가져오기
+        const cartStore = useCartStore.getState();
+        const userStore = useUserStore.getState();
+
         const completedOrderResponse: OrderResponse = {
           orderId: `ORDER-${Date.now()}`,
+          customerId: userStore.user?.userId || 0,
+          storeId: cartStore.storeInfo?.storeId || 0,
           originalPrice: orderData.total,
           finalPrice: paymentData.finalAmount,
           orderStatus: 'COMPLETED',

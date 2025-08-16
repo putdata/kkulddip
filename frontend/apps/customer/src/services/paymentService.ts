@@ -91,14 +91,10 @@ export const getPaymentOrderIdWithRetry = async (
         return result.paymentOrderId;
       }
 
-      console.log('API 응답 실패:', {
-        success: result.success,
-        code: result.code,
-        message: result.message,
-      });
+      console.log('API 응답에 paymentOrderId가 없음');
 
-      // PAYMENT_NOT_FOUND 에러인 경우 재시도
-      if (result.code === 'PAYMENT_NOT_FOUND' && attempt < maxRetries) {
+      // 재시도
+      if (attempt < maxRetries) {
         console.log(
           `결제 주문 ID를 찾을 수 없습니다. ${delay}ms 후 재시도합니다.`,
         );

@@ -107,7 +107,7 @@ export interface PaymentOrderIdResponse {
  */
 export interface PaymentConfirmRequest {
   paymentKey: string;
-  orderId: string;
+  orderId: string; // 실제로는 paymentOrderId 값을 전달
   amount: string;
 }
 
