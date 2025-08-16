@@ -49,8 +49,8 @@ const Home = () => {
       <div className="pt-5">
         <FilterBar />
       </div>
-      <HomeMainContainer 
-        stores={stores} 
+      <HomeMainContainer
+        stores={stores}
         lastElementRef={lastElementRef}
         isFetchingNextPage={isFetchingNextPage}
         hasNextPage={hasNextPage}

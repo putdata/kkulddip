@@ -10,11 +10,11 @@ interface HomeMainProps {
   hasNextPage?: boolean;
 }
 
-const HomeMainContainer = ({ 
-  stores, 
-  lastElementRef, 
-  isFetchingNextPage, 
-  hasNextPage 
+const HomeMainContainer = ({
+  stores,
+  lastElementRef,
+  isFetchingNextPage,
+  hasNextPage,
 }: HomeMainProps) => {
   const navigate = useNavigate();
 
@@ -39,7 +39,7 @@ const HomeMainContainer = ({
           />
         </div>
       ))}
-      
+
       {/* 로딩 인디케이터 */}
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">
@@ -50,9 +50,7 @@ const HomeMainContainer = ({
       {/* 더 이상 로드할 데이터가 없을 때 */}
       {!hasNextPage && stores.length > 0 && (
         <div className="py-8 text-center">
-          <p className="text-sm text-gray-500">
-            모든 가게를 불러왔어요
-          </p>
+          <p className="text-sm text-gray-500">모든 가게를 불러왔어요</p>
         </div>
       )}
     </div>
