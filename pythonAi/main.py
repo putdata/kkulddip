@@ -386,11 +386,11 @@ class AnalyticsProcessor:
             return None
     
     def _predict_inventory_safe(self, inventory_data: Optional[List[DailyInventoryDto]]) -> Optional[List[InventoryPredictionDto]]:
-        """안전한 재고 예측 함수"""
-        
+        """안전한 재고 예측 함수 - 신뢰도 기반 대체 로직 포함"""
+
         if not inventory_data or len(inventory_data) < 2:
             return None
-        
+
         try:
             # 재고 데이터를 DataFrame으로 변환
             df_inventory = pd.DataFrame([
@@ -402,22 +402,37 @@ class AnalyticsProcessor:
             ])
             df_inventory['ds'] = pd.to_datetime(df_inventory['ds'])
             df_inventory = df_inventory.sort_values('ds').reset_index(drop=True)
-            
+
             if PROPHET_AVAILABLE:
-                return self._predict_inventory_with_prophet(df_inventory)
+                # Prophet 예측 시도
+                prophet_result = self._predict_inventory_with_prophet(df_inventory)
+                if prophet_result:
+                    # 평균 신뢰도 계산
+                    avg_confidence = sum(pred.confidence for pred in prophet_result) / len(prophet_result)
+
+                    # 신뢰도가 50% 미만이면 대체 로직 사용
+                    if avg_confidence < 50.0:
+                        self.logger.warning(f"Prophet inventory confidence too low ({avg_confidence:.2f}%), switching to simple method")
+                        return self._predict_inventory_simple(df_inventory)
+
+                    self.logger.info(f"Using Prophet inventory prediction with confidence: {avg_confidence:.2f}%")
+                    return prophet_result
+                else:
+                    # Prophet 실패시 대체 로직
+                    return self._predict_inventory_simple(df_inventory)
             else:
                 return self._predict_inventory_simple(df_inventory)
-                
+
         except Exception as e:
             self.logger.error(f"Inventory prediction error: {str(e)}")
             return None
-    
+
     def _predict_inventory_with_prophet(self, df_inventory: pd.DataFrame) -> List[InventoryPredictionDto]:
         """Prophet을 이용한 재고 예측"""
-        
+
         try:
             results = []
-            
+
             # 1. 일일 총량 예측
             df_daily = df_inventory[['ds', 'daily_quantity']].rename(columns={'daily_quantity': 'y'})
             model_daily = Prophet(
@@ -427,8 +442,8 @@ class AnalyticsProcessor:
                 uncertainty_samples=100
             )
             model_daily.fit(df_daily)
-            
-            # 2. 잔여량 예측  
+
+            # 2. 잔여량 예측
             df_remaining = df_inventory[['ds', 'remaining_quantity']].rename(columns={'remaining_quantity': 'y'})
             model_remaining = Prophet(
                 daily_seasonality=True,
@@ -437,31 +452,31 @@ class AnalyticsProcessor:
                 uncertainty_samples=100
             )
             model_remaining.fit(df_remaining)
-            
+
             # 30일 미래 예측
             future = model_daily.make_future_dataframe(periods=30)
             forecast_daily = model_daily.predict(future)
             forecast_remaining = model_remaining.predict(future)
-            
+
             # 미래 예측 데이터만 추출
             future_daily = forecast_daily.tail(30)
             future_remaining = forecast_remaining.tail(30)
-            
+
             for i in range(30):
                 daily_pred = future_daily.iloc[i]
                 remaining_pred = future_remaining.iloc[i]
-                
+
                 predicted_daily = max(0, float(daily_pred['yhat']))
                 predicted_remaining = max(0, float(remaining_pred['yhat']))
-                
+
                 # 재고 비율 계산 (잔여량/총량)
                 inventory_ratio = (predicted_remaining / predicted_daily * 100) if predicted_daily > 0 else 0
-                
+
                 # 신뢰도 계산
                 daily_uncertainty = abs(daily_pred['yhat_upper'] - daily_pred['yhat_lower'])
                 remaining_uncertainty = abs(remaining_pred['yhat_upper'] - remaining_pred['yhat_lower'])
                 avg_confidence = max(0, min(100, 100 * (1 - (daily_uncertainty + remaining_uncertainty) / 2 / max(predicted_daily + predicted_remaining, 1))))
-                
+
                 results.append(InventoryPredictionDto(
                     date=daily_pred['ds'].date(),
                     predictedDailyQuantity=round(predicted_daily, 2),
@@ -469,50 +484,50 @@ class AnalyticsProcessor:
                     inventoryRatio=round(inventory_ratio, 2),
                     confidence=round(float(avg_confidence), 2)
                 ))
-            
+
             return results
-            
+
         except Exception as e:
             self.logger.error(f"Prophet inventory prediction error: {str(e)}")
             return self._predict_inventory_simple(df_inventory)
-    
+
     def _predict_inventory_simple(self, df_inventory: pd.DataFrame) -> List[InventoryPredictionDto]:
         """간단한 재고 예측 (Prophet 대체)"""
-        
+
         try:
             # 최근 7일 평균 계산
             recent_daily = df_inventory.tail(7)['daily_quantity'].mean()
             recent_remaining = df_inventory.tail(7)['remaining_quantity'].mean()
-            
+
             # 간단한 트렌드 계산
             if len(df_inventory) >= 7:
                 early_daily = df_inventory.head(7)['daily_quantity'].mean()
                 late_daily = df_inventory.tail(7)['daily_quantity'].mean()
                 daily_trend = (late_daily - early_daily) / max(len(df_inventory), 1)
-                
+
                 early_remaining = df_inventory.head(7)['remaining_quantity'].mean()
                 late_remaining = df_inventory.tail(7)['remaining_quantity'].mean()
                 remaining_trend = (late_remaining - early_remaining) / max(len(df_inventory), 1)
             else:
                 daily_trend = 0
                 remaining_trend = 0
-            
+
             # 30일 예측
             results = []
             last_date = df_inventory['ds'].max().date()
-            
+
             for i in range(1, 31):
                 future_date = last_date + timedelta(days=i)
-                
+
                 predicted_daily = max(0, recent_daily + (daily_trend * i))
                 predicted_remaining = max(0, recent_remaining + (remaining_trend * i))
-                
+
                 # 재고 비율
                 inventory_ratio = (predicted_remaining / predicted_daily * 100) if predicted_daily > 0 else 0
-                
+
                 # 단순 신뢰도
                 confidence = min(85, 40 + (len(df_inventory) * 2))
-                
+
                 results.append(InventoryPredictionDto(
                     date=future_date,
                     predictedDailyQuantity=round(predicted_daily, 2),
@@ -520,21 +535,36 @@ class AnalyticsProcessor:
                     inventoryRatio=round(inventory_ratio, 2),
                     confidence=round(float(confidence), 2)
                 ))
-            
+
             return results
-            
+
         except Exception as e:
             self.logger.error(f"Simple inventory prediction error: {str(e)}")
             return None
-    
+
     def _predict_sales_safe(self, df_daily_sales: pd.DataFrame) -> List[SalesPredictionDto]:
-        """안전한 매출 예측 함수"""
-        
+        """안전한 매출 예측 함수 - 신뢰도 기반 대체 로직 포함"""
+
         if df_daily_sales.empty or len(df_daily_sales) < 2:
             return self._simple_prediction_fallback()
-        
+
         if PROPHET_AVAILABLE:
-            return self._predict_with_prophet(df_daily_sales)
+            # Prophet 예측 시도
+            prophet_result = self._predict_with_prophet(df_daily_sales)
+            if prophet_result:
+                # 평균 신뢰도 계산
+                avg_confidence = sum(pred.confidence for pred in prophet_result) / len(prophet_result)
+
+                # 신뢰도가 50% 미만이면 대체 로직 사용
+                if avg_confidence < 50.0:
+                    self.logger.warning(f"Prophet confidence too low ({avg_confidence:.2f}%), switching to simple method")
+                    return self._predict_with_simple_method(df_daily_sales)
+
+                self.logger.info(f"Using Prophet prediction with confidence: {avg_confidence:.2f}%")
+                return prophet_result
+            else:
+                # Prophet 실패시 대체 로직
+                return self._predict_with_simple_method(df_daily_sales)
         else:
             return self._predict_with_simple_method(df_daily_sales)
     
