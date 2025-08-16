@@ -5,7 +5,7 @@ import { ROUTE_PATH } from '@/router/route-path';
 
 const NotFound = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 p-4">
+    <div className="flex h-full items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 p-4">
       <div className="max-w-md space-y-8 text-center">
         {/* 브랜드 곰돌이 일러스트 영역 */}
         <div className="relative">

@@ -27,16 +27,26 @@ export const useOrderAcceptDialog = ({
   storeId,
   onOpenChange,
 }: UseOrderAcceptDialogProps) => {
-  // 기본값: 현재 시간 + 30분
-  const defaultTime = addMinutes(30);
-  const [pickupTime, setPickupTime] = useState(
-    createKoreanTime(defaultTime.getHours(), defaultTime.getMinutes()),
-  );
+  const timeOptions = getTimeOptions();
+
+  // 기본값: 첫 번째 옵션을 사용하거나 현재 시간 + 30분
+  const getDefaultTime = () => {
+    if (timeOptions.length > 0) {
+      return timeOptions[0]!.value;
+    }
+    const defaultTime = addMinutes(30);
+    return createKoreanTime(defaultTime.getHours(), defaultTime.getMinutes());
+  };
+
+  const defaultTimeValue = getDefaultTime();
+  const defaultDate = new Date(defaultTimeValue);
+
+  const [pickupTime, setPickupTime] = useState(defaultTimeValue);
   const [manualHour, setManualHour] = useState(
-    defaultTime.getHours().toString().padStart(2, '0'),
+    defaultDate.getHours().toString().padStart(2, '0'),
   );
   const [manualMinute, setManualMinute] = useState(
-    defaultTime.getMinutes().toString().padStart(2, '0'),
+    defaultDate.getMinutes().toString().padStart(2, '0'),
   );
 
   const confirmOrderMutation = useConfirmOrder({
@@ -60,34 +70,36 @@ export const useOrderAcceptDialog = ({
   };
 
   const resetToDefault = () => {
-    const newDefaultTime = addMinutes(30);
-    setPickupTime(
-      createKoreanTime(newDefaultTime.getHours(), newDefaultTime.getMinutes()),
-    );
-    setManualHour(newDefaultTime.getHours().toString().padStart(2, '0'));
-    setManualMinute(newDefaultTime.getMinutes().toString().padStart(2, '0'));
+    const newTimeOptions = getTimeOptions();
+    const newDefaultTimeValue =
+      newTimeOptions.length > 0
+        ? newTimeOptions[0]!.value
+        : createKoreanTime(
+            addMinutes(30).getHours(),
+            addMinutes(30).getMinutes(),
+          );
+
+    const newDefaultDate = new Date(newDefaultTimeValue);
+    setPickupTime(newDefaultTimeValue);
+    setManualHour(newDefaultDate.getHours().toString().padStart(2, '0'));
+    setManualMinute(newDefaultDate.getMinutes().toString().padStart(2, '0'));
   };
 
   const handleManualTimeChange = (hour: string, minute: string) => {
+    // 빈 값이거나 유효하지 않은 값이면 그냥 반환
+    if (!hour || !minute) {
+      return;
+    }
+
     const h = parseInt(hour, 10);
     const m = parseInt(minute, 10);
 
+    // 유효한 시간 범위인지 확인
     if (!isNaN(h) && !isNaN(m) && h >= 0 && h < 24 && m >= 0 && m < 60) {
-      const now = new Date();
-      const newTime = new Date();
-      newTime.setHours(h);
-      newTime.setMinutes(m);
-      newTime.setSeconds(0);
-      newTime.setMilliseconds(0);
-
-      // 현재 시간보다 이후인지 확인
-      if (newTime > now) {
-        setPickupTime(createKoreanTime(h, m));
-      }
+      // 픽업 시간을 즉시 업데이트 (현재 시간 체크 제거)
+      setPickupTime(createKoreanTime(h, m));
     }
   };
-
-  const timeOptions = getTimeOptions();
 
   return {
     pickupTime,

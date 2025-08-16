@@ -41,7 +41,7 @@ const OnboardingLayout = () => {
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-full bg-gradient-to-br from-amber-50 via-white to-orange-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-md">
         <div className="mx-auto max-w-4xl px-6 py-4">

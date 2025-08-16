@@ -202,7 +202,7 @@ const AdaptiveOnboardingLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-full bg-gradient-to-br from-amber-50 via-white to-orange-50">
       {/* Progress Section */}
       {!isMobile && (
         <div className="bg-gradient-to-b from-white/80 to-white/50 py-8 backdrop-blur-sm">

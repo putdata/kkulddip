@@ -50,34 +50,57 @@ export const addMinutes = (minutes: number): Date => {
 };
 
 /**
- * 30분 단위 시간 옵션 생성
- * @param startHour - 시작 시간 (기본값: 현재 시간)
- * @param endHour - 종료 시간 (기본값: 현재 시간 + 3시간)
+ * 픽업 시간 옵션 생성 (현재 시간 이후 + 오후 8,9,10시)
  * @returns 시간 옵션 배열
  */
-export const getTimeOptions = (
-  startHour?: number,
-  endHour?: number,
-): Array<{ value: string; label: string }> => {
+export const getTimeOptions = (): Array<{ value: string; label: string }> => {
   const now = new Date();
-  const start = startHour ?? now.getHours();
-  const end = endHour ?? now.getHours() + 3;
   const options: Array<{ value: string; label: string }> = [];
 
-  // 현재 시간부터 30분 단위로 옵션 생성
-  const currentMinutes = now.getMinutes();
-  const startMinutes = currentMinutes < 30 ? 30 : 0;
+  // 현재 시간 이후 30분 단위로 추가 (최대 3개까지)
+  let currentTime = addMinutes(30);
+  let count = 0;
 
-  for (let hour = start; hour <= Math.min(end, 23); hour++) {
-    const minuteStart = hour === start ? startMinutes : 0;
-    for (let minute = minuteStart; minute < 60; minute += 30) {
-      // 현재 시간보다 이전 시간은 제외
-      if (hour === start && minute < currentMinutes) {
-        continue;
-      }
+  while (count < 3) {
+    // 30분 단위로 정렬
+    const minutes = currentTime.getMinutes() < 30 ? 30 : 0;
+    let hour =
+      minutes === 0 ? currentTime.getHours() + 1 : currentTime.getHours();
+    let targetDate = new Date(currentTime);
 
-      const value = createKoreanTime(hour, minute);
-      // value와 동일한 시간으로 label 생성
+    // 시간이 24시를 넘으면 다음날로 설정
+    if (hour >= 24) {
+      hour = hour - 24;
+      targetDate.setDate(targetDate.getDate() + 1);
+    }
+
+    const value = createKoreanTimeWithDate(targetDate, hour, minutes);
+    const labelDate = new Date(value);
+    const label = labelDate.toLocaleTimeString('ko-KR', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    options.push({ value, label });
+    count++;
+
+    // 30분 후로 이동
+    currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
+  }
+
+  // 기본 옵션: 오후 8시, 9시, 10시 (현재 시간과 중복되지 않는 경우만)
+  const defaultHours = [20, 21, 22]; // 8PM, 9PM, 10PM
+
+  defaultHours.forEach(hour => {
+    // 이미 추가된 시간인지 확인
+    const existingOption = options.find(option => {
+      const date = new Date(option.value);
+      return date.getHours() === hour && date.getMinutes() === 0;
+    });
+
+    if (!existingOption && hour > now.getHours()) {
+      const value = createKoreanTime(hour, 0);
       const labelDate = new Date(value);
       const label = labelDate.toLocaleTimeString('ko-KR', {
         hour: 'numeric',
@@ -87,7 +110,7 @@ export const getTimeOptions = (
 
       options.push({ value, label });
     }
-  }
+  });
 
   return options;
 };
@@ -130,6 +153,38 @@ export const createKoreanTime = (hour: number, minute: number): string => {
   const year = today.getFullYear();
   const month = today.getMonth();
   const date = today.getDate();
+
+  // 한국시간 그대로 ISO 형식 문자열 생성 (UTC 변환 없이)
+  const isoString =
+    year +
+    '-' +
+    String(month + 1).padStart(2, '0') +
+    '-' +
+    String(date).padStart(2, '0') +
+    'T' +
+    String(hour).padStart(2, '0') +
+    ':' +
+    String(minute).padStart(2, '0') +
+    ':00.000';
+
+  return isoString;
+};
+
+/**
+ * 특정 날짜와 시간으로 한국시간 기준 시간 생성
+ * @param targetDate - 대상 날짜
+ * @param hour - 시간 (0-23)
+ * @param minute - 분 (0-59)
+ * @returns 한국시간 기준 ISO 문자열
+ */
+export const createKoreanTimeWithDate = (
+  targetDate: Date,
+  hour: number,
+  minute: number,
+): string => {
+  const year = targetDate.getFullYear();
+  const month = targetDate.getMonth();
+  const date = targetDate.getDate();
 
   // 한국시간 그대로 ISO 형식 문자열 생성 (UTC 변환 없이)
   const isoString =

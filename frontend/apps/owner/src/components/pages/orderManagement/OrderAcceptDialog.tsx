@@ -109,7 +109,9 @@ const OrderAcceptDialog = ({
                     onChange={e => {
                       const value = e.target.value.slice(0, 2);
                       setManualHour(value);
-                      handleManualTimeChange(value, manualMinute);
+                      if (value && manualMinute) {
+                        handleManualTimeChange(value, manualMinute);
+                      }
                     }}
                     min="0"
                     max="23"
@@ -125,7 +127,9 @@ const OrderAcceptDialog = ({
                     onChange={e => {
                       const value = e.target.value.slice(0, 2);
                       setManualMinute(value);
-                      handleManualTimeChange(manualHour, value);
+                      if (manualHour && value) {
+                        handleManualTimeChange(manualHour, value);
+                      }
                     }}
                     min="0"
                     max="59"
