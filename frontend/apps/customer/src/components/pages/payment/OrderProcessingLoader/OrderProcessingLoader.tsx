@@ -30,6 +30,7 @@ const OrderProcessingLoader = () => {
           // TODO: 실제 사용자 ID 가져와야 함
           customerId: profile!.customerId,
           storeId: storeInfo!.storeId,
+          customerName: profile?.name || `고객 ${profile?.customerId || 6}`, // 추가
         });
       } catch (error) {
         console.error('결제 처리 실패:', error);
