@@ -5,6 +5,7 @@ import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
 import { priceUtils } from '@/utils/priceFormat';
 import type { OrderResponse } from '@/types/payments';
 import { useCartStore } from '@/store/useCartStore';
+import { useOrderFlowStore } from '@/store/useOrderFlowStore';
 
 interface OrderCompleteProps {
   onBack: () => void;
@@ -13,21 +14,33 @@ interface OrderCompleteProps {
 
 const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
   const { storeInfo, items } = useCartStore(); // 가게/상품 정보 가져오기
+  const { backupCartItems, backupStoreInfo } = useOrderFlowStore(); // 백업 데이터
   const navigate = useNavigate();
 
+  // 백업 데이터가 있으면 백업 데이터 사용, 없으면 현재 장바구니 데이터 사용
+  const actualItems =
+    backupCartItems && backupCartItems.length > 0 ? backupCartItems : items;
+  const actualStoreInfo = backupStoreInfo || storeInfo;
+
+  const getProductDisplayName = () => {
+    if (actualItems.length === 1) {
+      return actualItems[0]?.name || '띱박스';
+    }
+    const uniqueNames = [...new Set(actualItems.map(item => item.name))];
+    if (uniqueNames.length === 1) {
+      return uniqueNames[0];
+    }
+    return `띱박스 ${actualItems.length}종류`;
+  };
+
   const displayData = {
-    orderNumber: orderResponse.orderId || 'ORDER-2025-001234',
-    productName:
-      items.length > 1
-        ? `띱박스 ${items.length}개`
-        : items[0]?.name || '띱박스',
-    quantity: items.reduce((sum, item) => sum + item.quantity, 0), // 전체 수량
+    orderNumber: orderResponse.orderId,
+    productName: getProductDisplayName(),
+    quantity: actualItems.reduce((sum, item) => sum + item.quantity, 0),
     totalAmount: orderResponse.finalPrice || 18000,
-    storeName: storeInfo?.name || '가게 정보 없음',
-    storeAddress: storeInfo?.address || '주소 정보 없음',
-    pickupTime: storeInfo?.pickupTime || '픽업 시간 정보 없음',
-    // TODO: 이게 뭔지? 석규님께 확인 필요
-    estimatedTime: '15분', // 기본값 유지
+    storeName: actualStoreInfo?.name || '가게 정보 없음',
+    storeAddress: actualStoreInfo?.address || '주소 정보 없음',
+    orderStatus: orderResponse.orderStatus || 'PENDING',
   };
 
   const bottomButton = (
@@ -98,18 +111,34 @@ const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
             </p>
             <p className="text-xs text-gray-600">{displayData.storeAddress}</p>
           </div>
-          <div className="flex items-center border-t pt-2 text-xs text-gray-600">
-            <Clock className="mr-2 h-4 w-4 text-amber-500" />
-            <span>픽업 시간: {displayData.pickupTime}</span>
-          </div>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-amber-200 p-4 shadow-sm">
+      <div
+        className={`rounded-2xl p-4 shadow-sm ${
+          displayData.orderStatus === 'CONFIRMED'
+            ? 'bg-green-200'
+            : 'bg-amber-200'
+        }`}
+      >
         <div className="flex items-center justify-center">
-          <Clock className="mr-2 h-5 w-5 text-amber-700" />
-          <span className="text-sm font-medium text-amber-800">
-            예상 준비 시간: {displayData.estimatedTime}
+          <Clock
+            className={`mr-2 h-5 w-5 ${
+              displayData.orderStatus === 'CONFIRMED'
+                ? 'text-green-700'
+                : 'text-amber-700'
+            }`}
+          />
+          <span
+            className={`text-sm font-medium ${
+              displayData.orderStatus === 'CONFIRMED'
+                ? 'text-green-800'
+                : 'text-amber-800'
+            }`}
+          >
+            {displayData.orderStatus === 'CONFIRMED'
+              ? '주문 확정 완료'
+              : '주문 확인 중입니다'}
           </span>
         </div>
       </div>

@@ -1,4 +1,5 @@
-// OrderSummary.tsx 수정
+import { useCartStore } from '@/store/useCartStore';
+
 interface OrderSummaryProps {
   orderItems: Array<{
     productId: number;
@@ -8,6 +9,8 @@ interface OrderSummaryProps {
 }
 
 export default function OrderSummary({ orderItems }: OrderSummaryProps) {
+  const { items } = useCartStore();
+
   const totalQuantity = orderItems.reduce(
     (sum, item) => sum + item.quantity,
     0,
@@ -16,10 +19,10 @@ export default function OrderSummary({ orderItems }: OrderSummaryProps) {
   return (
     <div className="space-y-3">
       <p className="text-sm text-gray-900">주문 내역</p>
-      {orderItems.map((item, index) => (
+      {items.map((item, index) => (
         <div key={index} className="rounded-lg bg-gray-50 p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-900">띱박스</span>
+            <span className="text-xs text-gray-900">{item.name}</span>
             <span className="text-xs text-gray-500">×{item.quantity}</span>
           </div>
         </div>

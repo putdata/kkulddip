@@ -15,6 +15,9 @@ export interface PaymentData {
   appliedCouponId?: string;
   discountAmount: number;
   finalAmount: number;
+  orderResponse?: import('@/types/payments').OrderResponse;
+  cartItems?: import('@/types/cart').CartItem[];
+  storeInfo?: import('@/types/cart').StoreInfo;
 }
 
 export interface OrderData {

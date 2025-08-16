@@ -2,6 +2,15 @@ import { apiClient } from 'common';
 import type { DdipBox, StoreDetail, StoreListResponse } from '@/types/store'; // 타입은 나중에 만들어야 함
 import { API_PATH } from '@/constants/api-path';
 
+export interface StoreSearchParams {
+  keyword: string;
+  userLatitude?: number;
+  userLongitude?: number;
+  sortBy?: 'id' | 'created_at' | 'rating' | 'distance';
+  size?: number;
+  cursor?: string;
+}
+
 export class StoreService {
   static async getStoreListResponse(): Promise<StoreListResponse> {
     return apiClient.get(API_PATH.STORES);
@@ -13,5 +22,37 @@ export class StoreService {
 
   static async getDdipBoxes(storeId: string): Promise<DdipBox[]> {
     return apiClient.get(API_PATH.STORE_DDIPBOXES(storeId));
+  }
+
+  static async searchStores(
+    params: StoreSearchParams,
+  ): Promise<StoreListResponse> {
+    const searchParams = new URLSearchParams();
+
+    searchParams.append('keyword', params.keyword);
+
+    if (params.userLatitude !== undefined) {
+      searchParams.append('userLatitude', params.userLatitude.toString());
+    }
+
+    if (params.userLongitude !== undefined) {
+      searchParams.append('userLongitude', params.userLongitude.toString());
+    }
+
+    if (params.sortBy) {
+      searchParams.append('sortBy', params.sortBy);
+    }
+
+    if (params.size) {
+      searchParams.append('size', params.size.toString());
+    }
+
+    if (params.cursor) {
+      searchParams.append('cursor', params.cursor);
+    }
+
+    return apiClient.get(
+      `${API_PATH.STORES_SEARCH}?${searchParams.toString()}`,
+    );
   }
 }

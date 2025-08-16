@@ -4,6 +4,8 @@ import { useOrderFlowStore } from '@/store/useOrderFlowStore';
 import { useCartStore } from '@/store/useCartStore';
 import { PaymentService } from '@/services/paymentService';
 import { ROUTE_PATH } from '@/router';
+import type { OrderResponse } from '@/types/payments';
+import { useUserStore } from 'common';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -51,11 +53,13 @@ const PaymentSuccess = () => {
       try {
         // 토스페이먼츠 결제 승인 API 호출
         console.log('결제 승인 API 호출 시작...');
-        await PaymentService.confirmPayment(
+        const paymentResponse = await PaymentService.confirmPayment(
           paymentKey,
           paymentOrderId,
           parseInt(amount),
         );
+
+        console.log('결제 승인 응답:', paymentResponse);
 
         // 이미 취소된 경우 후속 처리하지 않음
         if (isCancelled) {
@@ -63,11 +67,29 @@ const PaymentSuccess = () => {
           return;
         }
 
-        // 주문 완료 처리
+        // 토스페이먼츠 응답을 OrderResponse 형태로 변환
+        const cartStore = useCartStore.getState();
+        const userStore = useUserStore.getState();
+
+        // 서버 enum에 맞는 상태 매핑 (결제 성공시 대기 상태)
+        const orderStatus = 'AWAITING_CONFIRMATION';
+
+        const orderResponse: OrderResponse = {
+          orderId: paymentOrderId, // paymentOrderId를 orderId로 사용
+          customerId: userStore.user?.userId || 0,
+          storeId: cartStore.storeInfo?.storeId || 0,
+          originalPrice: parseInt(amount),
+          finalPrice: parseInt(amount),
+          orderStatus: orderStatus,
+          orderDate: new Date().toISOString(),
+        };
+
+        // 주문 완료 처리 - 변환된 주문 응답 데이터 사용
         completeOrder({
           appliedCouponId: undefined,
           discountAmount: 0,
           finalAmount: parseInt(amount),
+          orderResponse: orderResponse,
         });
 
         // 장바구니 초기화
@@ -100,10 +122,24 @@ const PaymentSuccess = () => {
                   '문제가 지속되면 고객센터로 문의해 주세요.',
               );
               // 임시로 주문 완료 상태로 처리
+              const cartStore = useCartStore.getState();
+              const userStore = useUserStore.getState();
+
+              const fallbackOrderResponse: OrderResponse = {
+                orderId: paymentOrderId,
+                customerId: userStore.user?.userId || 0,
+                storeId: cartStore.storeInfo?.storeId || 0,
+                originalPrice: parseInt(amount),
+                finalPrice: parseInt(amount),
+                orderStatus: 'AWAITING_CONFIRMATION', // 결제는 완료되었으므로 가게 확정 대기
+                orderDate: new Date().toISOString(),
+              };
+
               completeOrder({
                 appliedCouponId: undefined,
                 discountAmount: 0,
                 finalAmount: parseInt(amount),
+                orderResponse: fallbackOrderResponse,
               });
               // 장바구니 초기화 (서버 오류이지만 결제는 완료된 상황)
               console.log('서버 오류이지만 결제 완료 - 장바구니 초기화');
