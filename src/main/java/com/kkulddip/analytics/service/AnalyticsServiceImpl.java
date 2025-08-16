@@ -291,15 +291,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         while (!currentDate.isAfter(endDate)) {
             Long dailyQty = dailyQuantitySum.get(currentDate);
-            if (dailyQty != null) {
+            if (!inventories.isEmpty() && dailyQty != null) {
                 // 재고 관리 추적 될 때
                 dailyInventoryList.add(DailyInventoryDataDto.builder()
                     .date(currentDate)
                     .totalDailyQuantity(dailyQty)
                     .totalRemainingQuantity(remainingQuantitySum.get(currentDate))
                     .build());
-            } else{
-                // 재고 관리 추적 안 될 때
+            } else if(inventories.isEmpty()){
+                // 재고 관리 아예 추적 안 될 때
                 // 현재 재고량 기준 ±20% 랜덤
                 long randomDailyQty = (long) (totalDailyQuantity * (0.8 + random.nextDouble() * 0.4));
 
