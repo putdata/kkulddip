@@ -76,12 +76,12 @@ export interface OrderData {
 }
 
 /**
- * 주문 생성 응답 데이터
+ * 주문 생성 응답 데이터 (ApiClient에서 body만 추출 후 반환)
  */
 export interface OrderResponse {
   orderId: string;
-  // customerId: number;
-  // storeId: number;
+  customerId: number;
+  storeId: number;
   originalPrice: number;
   finalPrice: number;
   orderStatus: string;
@@ -96,15 +96,10 @@ export interface PaymentOrderIdRequest {
 }
 
 /**
- * 결제 주문 ID 응답 데이터
+ * 결제 주문 ID 응답 데이터 (ApiClient에서 body만 추출 후 반환)
  */
 export interface PaymentOrderIdResponse {
-  success: boolean;
-  body: {
-    paymentOrderId: string;
-  };
-  code: string;
-  message: string;
+  paymentOrderId: string;
 }
 
 /**
@@ -112,7 +107,7 @@ export interface PaymentOrderIdResponse {
  */
 export interface PaymentConfirmRequest {
   paymentKey: string;
-  orderId: string;
+  orderId: string; // 실제로는 paymentOrderId 값을 전달
   amount: string;
 }
 

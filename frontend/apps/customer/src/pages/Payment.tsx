@@ -62,7 +62,7 @@ const Payment = ({ onNext, onBack, orderData }: PaymentProps) => {
     <button
       onClick={handleNext}
       disabled={isProcessing}
-      className="fixed bottom-3 w-11/12 rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+      className="w-full rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
     >
       {isProcessing ? (
         <div className="flex items-center justify-center">

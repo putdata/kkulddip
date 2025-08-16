@@ -5,9 +5,25 @@ const PaymentFail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // 토스페이먼츠 실패 정보 로깅
+  console.log('=== PaymentFail 페이지 진입 ===');
+  console.log('전체 searchParams:', Array.from(searchParams.entries()));
+  console.log('현재 URL:', window.location.href);
+
   const code = searchParams.get('code');
   const message = searchParams.get('message');
   const orderId = searchParams.get('orderId');
+
+  console.log('=== 토스페이먼츠 실패 파라미터 ===');
+  console.log('code:', code);
+  console.log('message:', message);
+  console.log('orderId:', orderId);
+  console.log('추가 파라미터들:');
+  searchParams.forEach((value, key) => {
+    if (!['code', 'message', 'orderId'].includes(key)) {
+      console.log(`${key}:`, value);
+    }
+  });
 
   const handleRetry = () => {
     // 결제 페이지로 다시 이동

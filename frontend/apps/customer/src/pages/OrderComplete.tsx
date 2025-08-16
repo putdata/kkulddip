@@ -31,16 +31,14 @@ const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
   };
 
   const bottomButton = (
-    <div className="fixed bottom-3 w-11/12">
-      <button
-        onClick={() => {
-          navigate(ROUTE_PATH.ORDER);
-        }}
-        className="w-full rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors"
-      >
-        주문내역 보기
-      </button>
-    </div>
+    <button
+      onClick={() => {
+        navigate(ROUTE_PATH.ORDER);
+      }}
+      className="w-full rounded-2xl bg-amber-500 py-4 font-semibold text-white shadow-sm transition-colors"
+    >
+      주문내역 보기
+    </button>
   );
 
   return (
