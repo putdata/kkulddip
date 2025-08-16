@@ -311,6 +311,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                     .totalDailyQuantity(randomDailyQty)
                     .totalRemainingQuantity(randomRemainingQty)
                     .build());
+            } else {
+                // 해당 날짜에 재고 데이터 없는 경우
+                log.debug("Skipping date {} - partial inventory data", currentDate);
             }
             currentDate = currentDate.plusDays(1);
         }
