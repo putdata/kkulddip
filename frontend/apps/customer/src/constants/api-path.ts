@@ -24,4 +24,9 @@ export const API_PATH = {
   STREAMS_DETAIL: (streamId: number) => `/v1/streams/${streamId}`,
 
   STORES_SEARCH: '/v1/stores/search',
+
+  FCM_TOKENS: {
+    REGISTER: '/v1/fcm-tokens',
+    DEACTIVATE: (userId: number) => `/v1/fcm-tokens/users/${userId}/deactivate`,
+  },
 };
