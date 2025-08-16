@@ -39,6 +39,7 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
     name: store.storeName,
     pickupTime: store.operatingHours,
     address: store.storeAddress,
+    storeImageUrl: store.storeProfileImage,
   };
 
   // 장바구니에 추가하기

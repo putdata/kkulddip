@@ -3,7 +3,6 @@ import { CART_CONSTANTS } from '@/constants/cart';
 import { type CartData } from '@/types/orderflow';
 
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
-import StoreInfo from '@/components/pages/cart/StoreInfo/StoreInfo';
 import ProductCard from '@/components/pages/cart/ProductCard/ProductCard';
 import QuantitySelector from '@/components/pages/cart/QuantitySelector/QuantitySelector';
 import PriceSummary from '@/components/pages/cart/PriceSummary/PriceSummary';
@@ -11,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 
 import { useCartStore } from '@/store/useCartStore';
+import StoreInfo from '@/components/pages/cart/StoreInfo/StoreInfo';
 
 interface CartProps {
   onNext: (cartData: CartData) => void;
