@@ -5,7 +5,7 @@
 export const storeQueryKeys = {
   all: ['stores'] as const,
   lists: () => [...storeQueryKeys.all, 'list'] as const,
-  list: () => [...storeQueryKeys.lists()] as const,
+  list: () => [...storeQueryKeys.all, 'list'] as const,
   details: () => [...storeQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...storeQueryKeys.details(), id] as const,
 } as const;

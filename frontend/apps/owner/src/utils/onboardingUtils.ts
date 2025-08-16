@@ -14,8 +14,8 @@ export const handleOnboardingComplete = async (
   navigate: NavigateFunction,
 ): Promise<void> => {
   try {
-    // 스토어 목록 조회
-    const storeList = await queryClient.fetchQuery({
+    // 스토어 목록 조회 - indexLoader와 동일한 쿼리 키 사용
+    const storeList = await queryClient.ensureQueryData({
       queryKey: storeQueryKeys.list(),
       queryFn: storeService.getMyStores,
     });
