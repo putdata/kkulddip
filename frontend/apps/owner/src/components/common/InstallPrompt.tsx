@@ -36,7 +36,7 @@ const InstallPrompt = ({ onDismiss }: InstallPromptProps) => {
   };
 
   return (
-    <Card className="fixed bottom-safe-or-4 left-4 right-4 z-50 border-blue-200 bg-blue-50 shadow-lg md:left-auto md:right-4 md:w-80 lg:w-96">
+    <Card className="bottom-safe-or-4 fixed left-4 right-4 z-50 border-blue-200 bg-blue-50 shadow-lg md:left-auto md:right-4 md:w-80 lg:w-96">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold text-blue-900">
@@ -71,10 +71,12 @@ const InstallPrompt = ({ onDismiss }: InstallPromptProps) => {
         )}
 
         {needsManualInstall && (
-          <Alert className="border-blue-200 bg-blue-25">
+          <Alert className="bg-blue-25 border-blue-200">
             <Smartphone className="h-4 w-4 text-blue-600" />
             <AlertDescription className="text-xs leading-relaxed text-blue-700">
-              <strong className="text-blue-900">Safari에서 설치하는 방법:</strong>
+              <strong className="text-blue-900">
+                Safari에서 설치하는 방법:
+              </strong>
               <br />
               1. 화면 하단의 공유 버튼 탭
               <br />

@@ -7,7 +7,7 @@ import type {
   OpenViduPublisherStatus,
 } from '@/types/stream';
 import { createPublisherConfig } from '@/utils/streamUtils';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/constants/stream';
+import { ERROR_MESSAGES } from '@/constants/stream';
 
 interface UseOpenViduProps {
   onSessionConnected?: () => void;

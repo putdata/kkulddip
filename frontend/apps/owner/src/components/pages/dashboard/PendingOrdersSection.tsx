@@ -139,7 +139,7 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
               <TableBody>
                 {pendingOrders.slice(0, 5).map((order: Order) => (
                   <TableRow key={order.orderId}>
-                    <TableCell className="font-medium text-center">
+                    <TableCell className="text-center font-medium">
                       {order.orderId.slice(-6)}
                     </TableCell>
                     <TableCell className="text-center">

@@ -95,7 +95,7 @@ const StreamingDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-4 w-80" />
                   <Skeleton className="h-10 w-24" />
@@ -113,7 +113,10 @@ const StreamingDashboard = () => {
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-4 opacity-75">
+                  <div
+                    key={i}
+                    className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-4 opacity-75"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="space-y-2">
                         <Skeleton className="h-5 w-28" />
