@@ -73,19 +73,23 @@ const OrderCard = ({ item }: OrderCardProps) => {
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-800">결제금액</span>
             <div className="text-right">
-              <div className="text-xs text-gray-400 line-through">
-                {formatPrice(originalPrice)}
-              </div>
+              {originalPrice !== finalPrice && (
+                <div className="text-xs text-gray-400 line-through">
+                  {formatPrice(originalPrice)}
+                </div>
+              )}
               <div className="text-sm font-bold text-gray-900">
                 {formatPrice(finalPrice)}
               </div>
             </div>
           </div>
-          <div className="text-right">
-            <span className="text-xs font-medium text-blue-600">
-              꿀띱에서만 {formatPrice(discountAmount)} 할인
-            </span>
-          </div>
+          {originalPrice !== finalPrice && (
+            <div className="text-right">
+              <span className="text-xs font-medium text-blue-600">
+                꿀띱에서만 {formatPrice(discountAmount)} 할인
+              </span>
+            </div>
+          )}
         </div>
 
         {(orderStatus === 'CONFIRMED' || orderStatus === 'PICKED_UP') && (

@@ -23,7 +23,7 @@ const PickUpStatusCard = ({ item }: StatusProps) => {
   const statusColor = PICKUP_STATUS_COLORS[status];
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-gray-100 bg-white shadow-md">
+    <div className="w-full rounded-2xl border border-gray-100 bg-white shadow-md">
       <div className="space-y-4 p-4">
         {/* 상태 뱃지 + 주문번호 */}
         <div className="flex items-center justify-center">
