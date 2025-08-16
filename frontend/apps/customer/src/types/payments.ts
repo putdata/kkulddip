@@ -80,8 +80,8 @@ export interface OrderData {
  */
 export interface OrderResponse {
   orderId: string;
-  customerId: number;
-  storeId: number;
+  // customerId: number;
+  // storeId: number;
   originalPrice: number;
   finalPrice: number;
   orderStatus: string;
@@ -152,5 +152,6 @@ export interface TossPaymentParams {
   }[];
   customerId: number;
   storeId: number;
+  customerName: string; // 추가
   baseUrl?: string;
 }

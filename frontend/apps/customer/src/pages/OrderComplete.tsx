@@ -4,24 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
 import { priceUtils } from '@/utils/priceFormat';
 import type { OrderResponse } from '@/types/payments';
+import { useCartStore } from '@/store/useCartStore';
 
 interface OrderCompleteProps {
   onBack: () => void;
-  orderResponse: OrderResponse;
+  orderResponse: OrderResponse; // 서버 응답 (orderId, finalPrice 등)
 }
 
 const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
+  const { storeInfo, items } = useCartStore(); // 가게/상품 정보 가져오기
   const navigate = useNavigate();
 
   const displayData = {
-    orderNumber: orderResponse.body.orderId || 'ORDER-2025-001234',
-    productName: '치킨 버거 세트',
-    quantity: orderResponse.body,
-    totalAmount: orderResponse.body.finalPrice || 18000,
-    storeName: '맥도날드 강남점',
-    storeAddress: '서울시 강남구 테헤란로 123',
-    pickupTime: '오후 2:30 - 2:40',
-    estimatedTime: '15분',
+    orderNumber: orderResponse.orderId || 'ORDER-2025-001234',
+    productName:
+      items.length > 1
+        ? `띱박스 ${items.length}개`
+        : items[0]?.name || '띱박스',
+    quantity: items.reduce((sum, item) => sum + item.quantity, 0), // 전체 수량
+    totalAmount: orderResponse.finalPrice || 18000,
+    storeName: storeInfo?.name || '가게 정보 없음',
+    storeAddress: storeInfo?.address || '주소 정보 없음',
+    pickupTime: storeInfo?.pickupTime || '픽업 시간 정보 없음',
+    // TODO: 이게 뭔지? 석규님께 확인 필요
+    estimatedTime: '15분', // 기본값 유지
   };
 
   const bottomButton = (

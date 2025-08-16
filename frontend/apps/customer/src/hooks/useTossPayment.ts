@@ -3,13 +3,14 @@ import { loadTossPayments } from '@tosspayments/payment-sdk';
 import { ROUTE_PATH } from '@/router';
 import {
   PaymentService,
-  getPaymentOrderIdWithRetry,
+  // getPaymentOrderIdWithRetry,
 } from '@/services/paymentService';
 import type {
   OrderData,
   TossPaymentParams,
   TossPaymentRequest,
 } from '@/types/payments';
+import { useCustomerProfile } from './useProfile';
 
 interface UseTossPaymentReturn {
   processPayment: (params: TossPaymentParams) => Promise<void>;
@@ -18,6 +19,7 @@ interface UseTossPaymentReturn {
 
 export const useTossPayment = (): UseTossPaymentReturn => {
   // 주문 데이터 생성 함수
+  const { data: profile } = useCustomerProfile();
   // 주문 데이터 생성 함수
   const createOrderData = useCallback(
     (params: TossPaymentParams): OrderData => {
@@ -81,18 +83,23 @@ export const useTossPayment = (): UseTossPaymentReturn => {
         if ((orderResult.finalPrice || 0) <= 0) {
           throw new Error('결제 금액이 0원 이하입니다.');
         }
+        console.log('orderResult 전체:', orderResult);
+        console.log('paymentOrderId 있나?:', orderResult.orderId);
+        console.log('profile 전체:', profile);
+        console.log(
+          'profile의 모든 키:',
+          profile ? Object.keys(profile) : 'profile is null',
+        );
 
         // 3단계: 결제 주문 ID 생성
-        const paymentOrderId = await getPaymentOrderIdWithRetry(
-          orderResult.orderId,
-        );
+        const paymentOrderId = orderResult.orderId;
 
         // 4단계: 토스페이먼츠 결제 요청
         await requestTossPayment(tossPayments, {
           amount: orderResult.finalPrice,
           paymentOrderId,
           orderName: `주문 #${orderResult.orderId}`,
-          customerName: `고객 ${orderResult.customerId}`,
+          customerName: params.customerName,
           successUrl: `${baseUrl}/${ROUTE_PATH.PAYMENT_SUCCESS}`,
           failUrl: `${baseUrl}/${ROUTE_PATH.PAYMENT_FAIL}`,
         });

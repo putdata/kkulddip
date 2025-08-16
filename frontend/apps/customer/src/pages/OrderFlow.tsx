@@ -70,7 +70,7 @@ const OrderFunnelContainer = () => {
 
       <Step name="complete">
         <OrderComplete
-          orderData={completedOrderData || orderData}
+          orderResponse={completedOrderData!}
           onBack={handleNewOrder}
         />
       </Step>

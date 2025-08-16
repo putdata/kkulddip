@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { OrderData, PaymentData } from '@/types/orderflow';
+import type { OrderResponse } from '@/types/payments';
 
 interface OrderFlowState {
   // 기본 주문 데이터
   orderData: OrderData;
-  completedOrderData: OrderData | null;
+  completedOrderData: OrderResponse | null;
   isCompleted: boolean;
 
   // 액션들
@@ -16,9 +17,10 @@ interface OrderFlowState {
 }
 
 const initialOrderData: OrderData = {
-  quantity: 1,
   total: 0,
-  productId: 0,
+  orderItems: [], // 빈 배열로 초기화
+  appliedCouponId: undefined,
+  discountAmount: undefined,
   finalAmount: 0,
   orderNumber: '',
   orderDate: new Date(),
@@ -41,21 +43,19 @@ export const useOrderFlowStore = create<OrderFlowState>()(
       // 주문 완료 처리
       completeOrder: paymentData => {
         const { orderData } = get();
-        const orderNumber = `ORDER-${Date.now()}`;
-        const orderDate = new Date();
 
-        const finalOrderData: OrderData = {
-          ...orderData,
-          ...paymentData,
-          orderNumber,
-          orderDate,
+        const completedOrderResponse: OrderResponse = {
+          orderId: `ORDER-${Date.now()}`,
+          originalPrice: orderData.total,
+          finalPrice: paymentData.finalAmount,
+          orderStatus: 'COMPLETED',
+          orderDate: new Date().toISOString(),
         };
 
         set({
-          completedOrderData: finalOrderData,
+          completedOrderData: completedOrderResponse, // OrderResponse 타입으로 저장
           isCompleted: true,
         });
-
         // 뒤로가기 차단
         window.history.replaceState(null, '', window.location.pathname);
       },
