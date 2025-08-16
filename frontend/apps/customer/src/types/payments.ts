@@ -68,7 +68,7 @@ export interface OrderData {
     productId: number;
     quantity: number;
     unitPrice: number;
-    discountInfos: {
+    discountInfos?: {
       discountCode: number;
       discountAmount: number;
     }[];
@@ -79,24 +79,20 @@ export interface OrderData {
  * 주문 생성 응답 데이터
  */
 export interface OrderResponse {
-  success: boolean;
-  status: number;
-  body: {
-    orderId: string;
-    customerId: number;
-    storeId: number;
-    originalPrice: number;
-    finalPrice: number;
-    orderStatus: string;
-    orderDate: string;
-  };
+  orderId: string;
+  customerId: number;
+  storeId: number;
+  originalPrice: number;
+  finalPrice: number;
+  orderStatus: string;
+  orderDate: string;
 }
 
 /**
  * 결제 주문 ID 요청 데이터
  */
 export interface PaymentOrderIdRequest {
-  orderId: number;
+  orderId: string;
 }
 
 /**
@@ -145,9 +141,16 @@ export interface TossPaymentRequest {
  * useTossPayment 훅 매개변수
  */
 export interface TossPaymentParams {
-  productId?: number;
-  quantity: number;
-  customerId?: number;
-  storeId?: number;
+  orderItems: {
+    productId: number;
+    quantity: number;
+    unitPrice: number;
+    discountInfos?: {
+      discountCode: number;
+      discountAmount: number;
+    }[];
+  }[];
+  customerId: number;
+  storeId: number;
   baseUrl?: string;
 }

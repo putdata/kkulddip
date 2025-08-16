@@ -3,31 +3,21 @@ import { ROUTE_PATH } from '@/router';
 import { useNavigate } from 'react-router-dom';
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
 import { priceUtils } from '@/utils/priceFormat';
-
-interface OrderData {
-  quantity: number;
-  total: number;
-  productId?: number;
-  appliedCouponId?: string;
-  discountAmount?: number;
-  finalAmount: number;
-  orderNumber: string;
-  orderDate: Date;
-}
+import type { OrderResponse } from '@/types/payments';
 
 interface OrderCompleteProps {
   onBack: () => void;
-  orderData: OrderData;
+  orderResponse: OrderResponse;
 }
 
-const OrderComplete = ({ onBack, orderData }: OrderCompleteProps) => {
+const OrderComplete = ({ onBack, orderResponse }: OrderCompleteProps) => {
   const navigate = useNavigate();
 
   const displayData = {
-    orderNumber: orderData.orderNumber || 'ORDER-2025-001234',
+    orderNumber: orderResponse.body.orderId || 'ORDER-2025-001234',
     productName: '치킨 버거 세트',
-    quantity: orderData.quantity,
-    totalAmount: orderData.finalAmount || orderData.total || 18000,
+    quantity: orderResponse.body,
+    totalAmount: orderResponse.body.finalPrice || 18000,
     storeName: '맥도날드 강남점',
     storeAddress: '서울시 강남구 테헤란로 123',
     pickupTime: '오후 2:30 - 2:40',
