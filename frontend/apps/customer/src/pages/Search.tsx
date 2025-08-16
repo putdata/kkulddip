@@ -56,7 +56,7 @@ const Search = () => {
       return StoreService.searchStores(searchParams);
     },
     getNextPageParam: (lastPage: StoreListResponse) => {
-      return lastPage.hasNext ? lastPage.nextCursor : undefined;
+      return lastPage.hasNext ? lastPage.cursor : undefined;
     },
     initialPageParam: undefined,
     enabled: Boolean(searchKeyword) && searchKeyword.length > 0,
