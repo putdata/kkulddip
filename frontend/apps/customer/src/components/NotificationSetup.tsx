@@ -38,7 +38,6 @@ const NotificationSetup = () => {
     }
   };
 
-
   return (
     <Card>
       <CardHeader>
@@ -46,7 +45,9 @@ const NotificationSetup = () => {
           <Bell className="h-5 w-5" />
           알림 설정
         </CardTitle>
-        <CardDescription>할인 알림을 받기 위해 알림을 설정하세요.</CardDescription>
+        <CardDescription>
+          할인 알림을 받기 위해 알림을 설정하세요.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <Button
