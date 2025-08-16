@@ -8,7 +8,7 @@ export const indexLoader = async () => {
   const accessToken = useAuthStore.getState().accessToken;
 
   if (accessToken === null) {
-    throw redirect(ROUTE_PATH.LOGIN);
+    throw redirect(ROUTE_PATH.WELCOME);
   }
 
   const storeList = await queryClient
