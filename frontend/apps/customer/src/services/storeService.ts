@@ -12,21 +12,24 @@ export interface StoreSearchParams {
 }
 
 export class StoreService {
-  static async getStoreListResponse(latitude?: number, longitude?: number): Promise<StoreListResponse> {
+  static async getStoreListResponse(
+    latitude?: number,
+    longitude?: number,
+  ): Promise<StoreListResponse> {
     const searchParams = new URLSearchParams();
-    
+
     if (latitude !== undefined) {
       searchParams.append('userLatitude', latitude.toString());
     }
-    
+
     if (longitude !== undefined) {
       searchParams.append('userLongitude', longitude.toString());
     }
-    
-    const url = searchParams.toString() 
+
+    const url = searchParams.toString()
       ? `${API_PATH.STORES}?${searchParams.toString()}`
       : API_PATH.STORES;
-      
+
     return apiClient.get(url);
   }
 
