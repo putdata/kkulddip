@@ -5,7 +5,6 @@ import { useCustomerProfile } from '@/hooks/useProfile';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH } from '@/router/route-path';
 
 const Likes = () => {
   const navigate = useNavigate();
