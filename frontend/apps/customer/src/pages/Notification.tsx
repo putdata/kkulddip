@@ -6,7 +6,7 @@ const Notification = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white pb-14 pt-14">
+      <div className="min-h-dvh bg-white pb-14 pt-14">
         <div className="flex items-center justify-center py-16">
           <div className="text-gray-500">로딩 중...</div>
         </div>
@@ -16,7 +16,7 @@ const Notification = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white pb-14 pt-14">
+      <div className="min-h-dvh bg-white pb-14 pt-14">
         <div className="flex items-center justify-center py-16">
           <div className="text-red-500">
             알림을 불러오는 중 오류가 발생했습니다.
@@ -27,7 +27,7 @@ const Notification = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-14 pt-14">
+    <div className="min-h-dvh bg-white pb-14 pt-14">
       <div className="divide-y divide-gray-100">
         {notifications.length > 0 ? (
           <>

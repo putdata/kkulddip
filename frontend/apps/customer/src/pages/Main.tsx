@@ -10,7 +10,7 @@ export default function Main() {
   const registerMutation = useRegisterMutation();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gray-100 p-6">
       <div className="mb-6 flex space-x-6">
         <a href="https://vite.dev" target="_blank" rel="noreferrer">
           <img src={viteLogo} className="h-16 w-16" alt="Vite logo" />

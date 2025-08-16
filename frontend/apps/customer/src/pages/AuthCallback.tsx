@@ -51,7 +51,7 @@ const AuthCallback = () => {
 
   if (isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
           <p>로그인 처리 중...</p>
@@ -62,7 +62,7 @@ const AuthCallback = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center">
         <div className="text-center">
           <p className="mb-4 text-red-600">로그인 중 오류가 발생했습니다.</p>
           <button

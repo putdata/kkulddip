@@ -173,7 +173,7 @@ const ReviewCreate = () => {
     reviewForm.rating > 0 && reviewForm.reviewText.trim().length > 0;
 
   return (
-    <div className="flex h-screen flex-col items-center gap-5 bg-gray-100 p-5">
+    <div className="flex h-dvh flex-col items-center gap-5 bg-gray-100 p-5">
       {/* 리뷰 작성 페이지 상단 */}
       <ReviewCreateHeader
         store={store}

@@ -18,7 +18,7 @@ const meta = {
   argTypes: {},
   decorators: [
     Story => (
-      <div className="relative min-h-screen bg-gray-50">
+      <div className="relative min-h-dvh bg-gray-50">
         <div className="p-6">
           <h1 className="mb-6 text-2xl font-bold">쇼핑몰 메인 페이지</h1>
           <div className="mb-6 grid grid-cols-2 gap-4">
@@ -67,7 +67,7 @@ export const WithEcommerceContent: Story = {
   args: {},
   decorators: [
     Story => (
-      <div className="relative min-h-screen bg-gray-50">
+      <div className="relative min-h-dvh bg-gray-50">
         <div className="p-4">
           <div className="mb-6 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
             <h1 className="mb-2 text-2xl font-bold">🛍️ 슈퍼 세일</h1>
@@ -124,7 +124,7 @@ export const SearchPage: Story = {
   args: {},
   decorators: [
     Story => (
-      <div className="relative min-h-screen bg-gray-50">
+      <div className="relative min-h-dvh bg-gray-50">
         <div className="p-4">
           <div className="mb-4 rounded-lg bg-white p-4 shadow">
             <input
@@ -174,7 +174,7 @@ export const WishlistPage: Story = {
   args: {},
   decorators: [
     Story => (
-      <div className="relative min-h-screen bg-gray-50">
+      <div className="relative min-h-dvh bg-gray-50">
         <div className="p-4">
           <h1 className="mb-6 text-2xl font-bold">찜한 상품</h1>
 
@@ -210,7 +210,7 @@ export const OrderHistoryPage: Story = {
   args: {},
   decorators: [
     Story => (
-      <div className="relative min-h-screen bg-gray-50">
+      <div className="relative min-h-dvh bg-gray-50">
         <div className="p-4">
           <h1 className="mb-6 text-2xl font-bold">주문내역</h1>
 
@@ -260,7 +260,7 @@ export const MyPage: Story = {
   args: {},
   decorators: [
     Story => (
-      <div className="relative min-h-screen bg-gray-50">
+      <div className="relative min-h-dvh bg-gray-50">
         <div className="p-4">
           <div className="mb-6 rounded-lg bg-white p-6 shadow">
             <div className="mb-4 flex items-center">
@@ -322,7 +322,7 @@ export const MobileView: Story = {
   },
   decorators: [
     Story => (
-      <div className="relative mx-auto min-h-screen max-w-sm bg-gray-50">
+      <div className="relative mx-auto min-h-dvh max-w-sm bg-gray-50">
         <div className="p-4">
           <h1 className="mb-4 text-xl font-bold">모바일 쇼핑몰</h1>
           <div className="grid grid-cols-1 gap-3">
