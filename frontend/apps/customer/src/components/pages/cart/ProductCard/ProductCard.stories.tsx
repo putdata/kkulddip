@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import ProductCard from './ProductCard';
-import type { Product } from '@/types/cart';
+import type { CartItem } from '@/types/cart';
 
 const meta = {
   title: 'components/pages/cart/ProductCard',
@@ -14,13 +14,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultProduct: Product = {
-  id: 1,
+const defaultProduct: CartItem = {
+  ddipboxId: 1,
   name: '[으뜸] 김치삼겹구이',
   price: 29900,
   description: '김치와 삼겹살이 어우러진 최고의 맛',
-  image:
-    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"%3E%3Crect width="48" height="48" fill="%23ff6b35"/%3E%3Cpath d="M12 16h24v16c0 2-2 4-4 4H16c-2 0-4-2-4-4V16z" fill="%23fff"/%3E%3Crect x="16" y="20" width="16" height="2" fill="%23ff6b35"/%3E%3Crect x="16" y="24" width="12" height="2" fill="%23ff6b35"/%3E%3C/svg%3E',
+  quantity: 0,
+  discountRate: 0,
+  storeId: 0,
 };
 
 export const Default: Story = {

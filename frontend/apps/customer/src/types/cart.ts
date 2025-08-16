@@ -27,6 +27,7 @@ export interface StoreInfo {
   name: string;
   pickupTime: string;
   address: string;
+  storeImageUrl: string;
 }
 
 /**
