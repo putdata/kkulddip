@@ -101,7 +101,11 @@ const AddStoreDialog = () => {
       toast.error('사업자등록번호를 입력해주세요.');
       return false;
     }
-    if (!isLocationSelected || formData.latitude === 0 || formData.longitude === 0) {
+    if (
+      !isLocationSelected ||
+      formData.latitude === 0 ||
+      formData.longitude === 0
+    ) {
       toast.error('지도에서 가게 위치를 선택해주세요.');
       return false;
     }
@@ -361,9 +365,10 @@ const AddStoreDialog = () => {
 
                 <div className="space-y-4">
                   <p className="text-muted-foreground text-sm">
-                    지도에서 가게 위치를 클릭하여 선택해주세요. 주소가 자동으로 입력됩니다.
+                    지도에서 가게 위치를 클릭하여 선택해주세요. 주소가 자동으로
+                    입력됩니다.
                   </p>
-                  
+
                   <div className="rounded-lg border">
                     <LocationPicker
                       onLocationSelect={handleLocationSelect}
@@ -372,22 +377,24 @@ const AddStoreDialog = () => {
                     />
                   </div>
 
-                  {isLocationSelected && formData.latitude && formData.longitude && (
-                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-green-50 p-3">
-                      <div>
-                        <span className="text-xs text-green-700">위도</span>
-                        <p className="text-sm font-medium text-green-900">
-                          {formData.latitude.toFixed(6)}
-                        </p>
+                  {isLocationSelected &&
+                    formData.latitude &&
+                    formData.longitude && (
+                      <div className="grid grid-cols-2 gap-4 rounded-lg bg-green-50 p-3">
+                        <div>
+                          <span className="text-xs text-green-700">위도</span>
+                          <p className="text-sm font-medium text-green-900">
+                            {formData.latitude.toFixed(6)}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-green-700">경도</span>
+                          <p className="text-sm font-medium text-green-900">
+                            {formData.longitude.toFixed(6)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-xs text-green-700">경도</span>
-                        <p className="text-sm font-medium text-green-900">
-                          {formData.longitude.toFixed(6)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             </form>
