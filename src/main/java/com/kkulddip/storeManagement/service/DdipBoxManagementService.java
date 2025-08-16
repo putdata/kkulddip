@@ -2,6 +2,8 @@ package com.kkulddip.storeManagement.service;
 
 import com.kkulddip.common.exception.BusinessException;
 import com.kkulddip.common.exception.ErrorCode;
+import com.kkulddip.store.entity.DailyDdipBoxInventory;
+import com.kkulddip.store.repository.DailyDdipBoxInventoryRepository;
 import com.kkulddip.storeManagement.dto.request.CreateDdipBoxRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateDdipBoxRequest;
 import com.kkulddip.storeManagement.dto.request.UpdateDdipBoxQuantityRequest;
@@ -30,6 +32,7 @@ public class DdipBoxManagementService {
 
     private final StoreRepository storeRepository;
     private final DdipBoxRepository ddipBoxRepository;
+    private final DailyDdipBoxInventoryRepository inventoryRepository;
 
     /**
      * 띱박스 생성
@@ -180,6 +183,15 @@ public class DdipBoxManagementService {
             ddipBox.setRemainingQuantity(request.remainingQuantity());
 
         } else if (request.isDailyQuantityReset()) {
+            // 일일 수량 재설정 및 잔여 수량 초기화 전에 재고 기록(매일 장사 시작할 때 초기화 한다고 가정)
+            DailyDdipBoxInventory inventory = DailyDdipBoxInventory.builder()
+                .ddipboxId(ddipboxId)
+                .dailyQuantity(ddipBox.getDailyQuantity())
+                .remainingQuantity(ddipBox.getRemainingQuantity())
+                .build();
+
+            inventoryRepository.save(inventory);
+
             // 일일 수량 재설정 및 잔여 수량 초기화
             ddipBox.setDailyQuantity(request.dailyQuantity());
             ddipBox.setRemainingQuantity(request.dailyQuantity());
