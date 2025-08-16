@@ -46,41 +46,6 @@ setup_environment:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# 환경 변수 설정
-setup_environment:
-  stage: env
-  script:
-    # 공통 환경 변수
-    - |
-      cat > frontend/.env << EOF
-      VITE_API_BASE_URL=${API_SERVER_ADDRESS}
-      VITE_GOOGLE_OAUTH2_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
-      VITE_OAUTH2_SUCCESS_REDIRECT_URL=${OAUTH2_SUCCESS_REDIRECT_URL}
-      VITE_OAUTH2_SUCCESS_REDIRECT_URL_OWNER=${OAUTH2_SUCCESS_REDIRECT_URL_OWNER}
-      EOF
-    
-    # Customer 앱 .env
-    - |
-      cat > frontend/apps/customer/.env << EOF
-      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI}
-      EOF
-    
-    # Owner 앱 .env
-    - |
-      cat > frontend/apps/owner/.env << EOF
-      VITE_OAUTH2_REDIRECT_URI=${GOOGLE_OAUTH2_REDIRECT_URI_OWNER}
-      EOF
-  artifacts:
-    paths:
-      - frontend/.env
-      - frontend/apps/customer/.env
-      - frontend/apps/owner/.env
-    expire_in: 1 hour
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
-
 # 린트 검사 (병렬 실행)
 lint_check:
   stage: test_and_build
