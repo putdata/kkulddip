@@ -57,9 +57,89 @@ const StreamingDashboard = () => {
             </p>
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          <Skeleton className="h-[200px]" />
-          <Skeleton className="h-[200px]" />
+        <div className="space-y-6">
+          {/* 활성 스트림/생성 카드 */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-64" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* StreamStatusCard skeleton */}
+                <div className="rounded-lg border p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-4 w-48" />
+                    </div>
+                    <Skeleton className="h-6 w-16" />
+                  </div>
+                  <div className="mt-3 grid grid-cols-3 gap-4">
+                    <div>
+                      <Skeleton className="mb-1 h-3 w-12" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                    <div>
+                      <Skeleton className="mb-1 h-3 w-16" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                    <div>
+                      <Skeleton className="mb-1 h-3 w-14" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-80" />
+                  <Skeleton className="h-10 w-24" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 최근 종료된 스트림 카드 */}
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-96" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="rounded-lg border-l-4 border-l-gray-300 bg-gray-50 p-4 opacity-75">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <Skeleton className="h-5 w-28" />
+                        <Skeleton className="h-4 w-40" />
+                      </div>
+                      <Skeleton className="h-6 w-12" />
+                    </div>
+                    <div className="mt-3 grid grid-cols-3 gap-4">
+                      <div>
+                        <Skeleton className="mb-1 h-3 w-12" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                      <div>
+                        <Skeleton className="mb-1 h-3 w-16" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                      <div>
+                        <Skeleton className="mb-1 h-3 w-14" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

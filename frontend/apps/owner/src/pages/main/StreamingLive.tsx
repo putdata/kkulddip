@@ -183,9 +183,71 @@ const StreamingLive = () => {
             </div>
           </div>
         </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Skeleton className="h-[400px]" />
-          <Skeleton className="h-[400px]" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            {/* 방송 미리보기 카드 */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+                <Skeleton className="h-4 w-64" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="aspect-video rounded-lg" />
+              </CardContent>
+            </Card>
+
+            {/* 방송 제어 카드 */}
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-4 w-48" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <Skeleton className="h-10 w-32" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            {/* 스트림 상태 카드 */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-6 w-16" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Skeleton className="mb-2 h-4 w-12" />
+                  <Skeleton className="h-6 w-32" />
+                </div>
+                <div>
+                  <Skeleton className="mb-2 h-4 w-16" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+                <div>
+                  <Skeleton className="mb-2 h-4 w-20" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 알림 카드 */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );
