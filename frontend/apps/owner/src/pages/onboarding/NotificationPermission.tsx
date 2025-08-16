@@ -5,7 +5,6 @@ import {
   Bell,
   BellRing,
   ShoppingCart,
-  Package,
   AlertTriangle,
   CheckCircle2,
   Clock,
@@ -14,14 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNotification } from '@/hooks/useNotification';
-import { useUserSelection } from '@/hooks/useUserSelection';
 import OnboardingGuard from '@/components/onboarding/OnboardingGuard';
-import { ROUTE_PATH } from '@/router/route-path';
+import { handleOnboardingComplete } from '@/utils/onboardingUtils';
 
 const NotificationPermission = () => {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { handleLogout, menuItems } = useUserSelection();
   const { requestPermission } = useNotification();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -32,13 +28,6 @@ const NotificationPermission = () => {
       description: '새로운 주문이 들어올 때 즉시 알림을 받으세요',
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
-    },
-    {
-      icon: Package,
-      title: '재고 알림',
-      description: '띱박스 재고가 부족할 때 미리 알림을 받으세요',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
     },
     {
       icon: AlertTriangle,
@@ -52,6 +41,24 @@ const NotificationPermission = () => {
   const handleAllowNotifications = async () => {
     setIsProcessing(true);
     try {
+      // 현재 알림 권한 상태 확인
+      const currentPermission = Notification.permission;
+
+      if (currentPermission === 'granted') {
+        toast.success('알림이 이미 허용되어 있습니다!');
+        handleComplete();
+        return;
+      }
+
+      if (currentPermission === 'denied') {
+        toast.error(
+          '알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해주세요.',
+        );
+        setIsProcessing(false);
+        return;
+      }
+
+      // 권한 요청 (default 상태일 때만)
       const success = await requestPermission();
       if (success) {
         toast.success('알림 권한이 허용되었습니다!');
@@ -71,9 +78,9 @@ const NotificationPermission = () => {
     handleComplete();
   };
 
-  const handleComplete = () => {
-    // 온보딩 완료 후 인덱스로 이동 (indexLoader가 처리)
-    navigate(ROUTE_PATH.INDEX, { replace: true });
+  const handleComplete = async () => {
+    // 온보딩 완료 후 적절한 페이지로 이동
+    await handleOnboardingComplete(navigate);
   };
 
   return (
@@ -96,16 +103,16 @@ const NotificationPermission = () => {
         </div>
 
         {/* Notification Benefits */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-2">
           {notificationTypes.map((type, index) => (
-            <Card key={index} className="border-0 shadow-md">
-              <CardContent className="p-4 text-center">
+            <Card key={index} className="border-0 shadow-sm">
+              <CardContent className="p-3 text-center">
                 <div
-                  className={`mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full ${type.bgColor}`}
+                  className={`mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full ${type.bgColor}`}
                 >
-                  <type.icon className={`h-5 w-5 ${type.color}`} />
+                  <type.icon className={`h-4 w-4 ${type.color}`} />
                 </div>
-                <h3 className="mb-1 text-base font-semibold text-gray-900">
+                <h3 className="mb-1 text-sm font-semibold text-gray-900">
                   {type.title}
                 </h3>
                 <p className="text-xs text-gray-600">{type.description}</p>

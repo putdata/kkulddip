@@ -75,30 +75,6 @@ export const useNotification = () => {
         console.log('Registering existing FCM token to server');
         await registerTokenToServer(fcmToken);
       }
-      // 토큰 유효성 검증 (필요시에만)
-      else if (
-        fcmToken &&
-        isTokenRegistered &&
-        !userDisabled &&
-        Math.random() < 0.1
-      ) {
-        // 10% 확률로만 토큰 유효성 검증 (성능 최적화)
-        try {
-          const messaging = getMessagingInstance();
-          if (messaging) {
-            const currentToken = await getToken(messaging, {
-              vapidKey: VAPID_KEY,
-            });
-            if (currentToken && currentToken !== fcmToken) {
-              console.log('FCM token changed, updating:', currentToken);
-              setFcmToken(currentToken);
-              await registerTokenToServer(currentToken);
-            }
-          }
-        } catch (error) {
-          console.error('Error validating FCM token:', error);
-        }
-      }
     };
 
     initializeNotification();
@@ -109,46 +85,6 @@ export const useNotification = () => {
     setFcmToken,
     registerTokenToServer,
   ]);
-
-  /**
-   * 앱 포커스 시 토큰 갱신 확인 (Firebase v9+ 대응)
-   */
-  useEffect(() => {
-    const checkTokenRefresh = async () => {
-      const messaging = getMessagingInstance();
-      if (!messaging) {
-        return;
-      }
-
-      try {
-        const newToken = await getToken(messaging, { vapidKey: VAPID_KEY });
-        const currentStore = useNotificationStore.getState();
-
-        if (newToken && newToken !== currentStore.fcmToken) {
-          console.log('FCM token updated:', newToken);
-          currentStore.setFcmToken(newToken);
-
-          // 사용자가 알림을 활성화한 상태라면 새 토큰을 서버에 등록
-          if (currentStore.isTokenRegistered && !currentStore.userDisabled) {
-            await registerFCMToken(newToken);
-            console.log('Updated FCM Token registered to server');
-          }
-        }
-      } catch (error) {
-        console.error('Error checking token refresh:', error);
-      }
-    };
-
-    // 앱이 포커스될 때 토큰 확인
-    const handleFocus = () => {
-      checkTokenRefresh();
-    };
-
-    window.addEventListener('focus', handleFocus);
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []); // dependency 없음으로 한 번만 등록
 
   /**
    * 알림 권한 요청 및 FCM 토큰 발급

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   CheckCircle2,
   ArrowLeft,
   Bell,
   ShoppingBag,
-  Package,
   Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import OnboardingGuard from '@/components/onboarding/OnboardingGuard';
-import { ROUTE_PATH } from '@/router/route-path';
+import { useNotification } from '@/hooks/useNotification';
+import { handleOnboardingComplete } from '@/utils/onboardingUtils';
 
 const MobileNotification = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, setCurrentMobileStep, resetForm } =
     useOnboardingStore();
+  const { requestPermission } = useNotification();
   const [isCompleting, setIsCompleting] = useState(false);
 
   const notificationTypes = [
@@ -29,12 +31,6 @@ const MobileNotification = () => {
       description: '새로운 주문이 들어왔을 때 알림을 받습니다',
     },
     {
-      id: 'inventory' as const,
-      icon: Package,
-      title: '재고 알림',
-      description: '띱박스 재고가 부족할 때 알림을 받습니다',
-    },
-    {
       id: 'system' as const,
       icon: Settings,
       title: '시스템 알림',
@@ -43,7 +39,7 @@ const MobileNotification = () => {
   ];
 
   const handleNotificationToggle = (
-    type: 'orders' | 'inventory' | 'system',
+    type: 'orders' | 'system',
     checked: boolean,
   ) => {
     updateFormData({
@@ -57,11 +53,33 @@ const MobileNotification = () => {
   const handleComplete = async () => {
     setIsCompleting(true);
 
-    // 온보딩 완료 처리
-    setTimeout(() => {
+    try {
+      // 알림이 선택되어 있으면 권한 요청
+      if (hasSelectedNotifications) {
+        const currentPermission = Notification.permission;
+
+        if (currentPermission === 'default') {
+          const success = await requestPermission();
+          if (success) {
+            toast.success('알림이 활성화되었습니다!');
+          } else {
+            toast.error('알림 권한을 허용해주세요.');
+          }
+        } else if (currentPermission === 'denied') {
+          toast.warning(
+            '알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해주세요.',
+          );
+        }
+      }
+
+      // 온보딩 완료 처리
       resetForm();
-      navigate(ROUTE_PATH.INDEX);
-    }, 1000);
+      await handleOnboardingComplete(navigate);
+    } catch (error) {
+      console.error('Onboarding completion failed:', error);
+    } finally {
+      setIsCompleting(false);
+    }
   };
 
   const handleBack = () => {
@@ -107,7 +125,7 @@ const MobileNotification = () => {
                 return (
                   <div
                     key={type.id}
-                    className={`rounded-lg border-2 p-4 transition-all duration-200 ${
+                    className={`rounded-lg border-2 p-3 transition-all duration-200 ${
                       isChecked
                         ? 'border-amber-500 bg-amber-50'
                         : 'border-gray-200 bg-white hover:border-gray-300'
@@ -125,12 +143,12 @@ const MobileNotification = () => {
                       <div className="flex-1">
                         <div className="mb-1 flex items-center gap-2">
                           <Icon
-                            className={`h-5 w-5 ${
+                            className={`h-4 w-4 ${
                               isChecked ? 'text-amber-600' : 'text-gray-500'
                             }`}
                           />
                           <h3
-                            className={`font-medium ${
+                            className={`text-sm font-medium ${
                               isChecked ? 'text-amber-900' : 'text-gray-900'
                             }`}
                           >
@@ -138,7 +156,7 @@ const MobileNotification = () => {
                           </h3>
                         </div>
                         <p
-                          className={`text-sm ${
+                          className={`text-xs ${
                             isChecked ? 'text-amber-700' : 'text-gray-600'
                           }`}
                         >
@@ -219,7 +237,7 @@ const MobileNotification = () => {
 
         {/* Progress Info */}
         <div className="text-center">
-          <p className="text-xs text-gray-500">8/8 단계 완료</p>
+          <p className="text-xs text-gray-500">7/7 단계 완료</p>
         </div>
       </div>
     </OnboardingGuard>
