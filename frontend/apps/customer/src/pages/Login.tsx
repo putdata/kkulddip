@@ -5,7 +5,7 @@ import LoginCarousel from '@/components/pages/login/LoginCarousel';
 
 const Login = () => {
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-amber-200">
+    <div className="flex min-h-dvh w-full flex-col items-center justify-center bg-amber-200">
       <div className="flex w-full flex-1 items-center justify-center px-10">
         <div className="w-full max-w-xs">
           <LoginCarousel />

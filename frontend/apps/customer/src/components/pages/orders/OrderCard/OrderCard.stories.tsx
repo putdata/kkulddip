@@ -11,7 +11,7 @@ const meta: Meta<typeof OrderCard> = {
   decorators: [
     Story => (
       <BrowserRouter>
-        <div className="min-h-screen bg-gray-50 p-4">
+        <div className="min-h-dvh bg-gray-50 p-4">
           <Story />
         </div>
       </BrowserRouter>

@@ -135,7 +135,7 @@ const PaymentSuccess = () => {
 
   if (isProcessing) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-gray-50 p-4">
         <div className="rounded-lg bg-white p-8 text-center shadow-lg">
           <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-amber-500 border-t-transparent"></div>
           <h2 className="mb-2 text-xl font-semibold">결제 처리 중...</h2>
@@ -146,7 +146,7 @@ const PaymentSuccess = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gray-50 p-4">
       <div className="rounded-lg bg-white p-8 text-center shadow-lg">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <span className="text-2xl">✅</span>

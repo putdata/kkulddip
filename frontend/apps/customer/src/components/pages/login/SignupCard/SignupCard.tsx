@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 
 export const containerClassName =
-  'w-full h-screen flex items-center justify-center px-4';
+  'w-full h-dvh flex items-center justify-center px-4';
 
 /* TODO: 디자인 확정 필요 */
 

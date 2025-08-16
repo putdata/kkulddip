@@ -35,7 +35,7 @@ const PaymentFail = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
           <span className="text-3xl">❌</span>
