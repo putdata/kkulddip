@@ -96,18 +96,25 @@ const OrderCard = ({ item }: OrderCardProps) => {
 
         {(orderStatus === 'CONFIRMED' || orderStatus === 'PICKED_UP') && (
           <button
-            className="border-1 mt-2 w-full cursor-pointer rounded-lg border-gray-400 bg-white py-2 text-xs font-semibold text-gray-700 transition-colors active:bg-gray-100"
+            className={`mt-2 w-full rounded-lg py-2 text-sm font-semibold transition-colors ${
+              item.hasReview
+                ? 'cursor-not-allowed border border-gray-400 bg-white text-gray-600 hover:bg-white'
+                : 'bg-amber-500 text-white hover:bg-amber-600'
+            }`}
             onClick={() => {
-              setReviewData({
-                storeId: item.storeId,
-                orderId: item.orderId,
-                storeName: item.storeName,
-                orderItems: item.orderItems,
-              });
-              navigate(ROUTE_PATH.REVIEW_CREATE);
+              if (!item.hasReview) {
+                setReviewData({
+                  storeId: item.storeId,
+                  orderId: item.orderId,
+                  storeName: item.storeName,
+                  orderItems: item.orderItems,
+                });
+                navigate('/review/create');
+              }
             }}
+            disabled={item.hasReview}
           >
-            리뷰 작성하기
+            {item.hasReview ? '리뷰 작성 완료!' : '리뷰 작성하기'}
           </button>
         )}
       </div>

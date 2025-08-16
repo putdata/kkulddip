@@ -17,6 +17,7 @@ export interface OrderFoodItem {
   orderStatus: string;
   orderDate: string;
   pickupTime: string;
+  hasReview: boolean; // 추가
 }
 
 /**
