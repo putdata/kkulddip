@@ -11,6 +11,14 @@ export interface StoreSearchParams {
   cursor?: string;
 }
 
+export interface StoreListParams {
+  userLatitude?: number;
+  userLongitude?: number;
+  sortBy?: 'id' | 'created_at' | 'rating' | 'distance';
+  size?: number;
+  cursor?: string;
+}
+
 export class StoreService {
   static async getStoreListResponse(
     latitude?: number,
@@ -24,6 +32,38 @@ export class StoreService {
 
     if (longitude !== undefined) {
       searchParams.append('userLongitude', longitude.toString());
+    }
+
+    const url = searchParams.toString()
+      ? `${API_PATH.STORES}?${searchParams.toString()}`
+      : API_PATH.STORES;
+
+    return apiClient.get(url);
+  }
+
+  static async getStoreListWithPagination(
+    params: StoreListParams,
+  ): Promise<StoreListResponse> {
+    const searchParams = new URLSearchParams();
+
+    if (params.userLatitude !== undefined) {
+      searchParams.append('userLatitude', params.userLatitude.toString());
+    }
+
+    if (params.userLongitude !== undefined) {
+      searchParams.append('userLongitude', params.userLongitude.toString());
+    }
+
+    if (params.sortBy) {
+      searchParams.append('sortBy', params.sortBy);
+    }
+
+    if (params.size) {
+      searchParams.append('size', params.size.toString());
+    }
+
+    if (params.cursor) {
+      searchParams.append('cursor', params.cursor);
     }
 
     const url = searchParams.toString()

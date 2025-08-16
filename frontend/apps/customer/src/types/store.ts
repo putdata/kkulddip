@@ -25,8 +25,14 @@ export type Store = {
 export type StoreListResponse = {
   content: Store[];
   hasNext: boolean;
-  nextCursor: string | null;
+  cursor: string | null;
   actualSize: number;
+  size: number;
+  isFirst: boolean;
+  isLast: boolean;
+  metadata?: {
+    sortBy: string;
+  };
 };
 
 /**
