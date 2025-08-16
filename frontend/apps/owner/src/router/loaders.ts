@@ -21,7 +21,7 @@ export const indexLoader = async () => {
     });
 
   if (storeList.stores.length === 0) {
-    throw redirect(ROUTE_PATH.WELCOME);
+    throw redirect(ROUTE_PATH.ONBOARDING.STORE);
   }
 
   const firstStore = storeList.stores[0]!;

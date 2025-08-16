@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import LocationPicker from '@/components/onboarding/LocationPicker';
 import { useCreateStore } from '@/queries/store';
 import type { CreateStoreRequest } from '@/types/store';
 
@@ -38,6 +39,9 @@ const AddStoreDialog = () => {
     longitude: 0,
   });
 
+  // 실제로 위치가 선택되었는지 확인하는 상태
+  const [isLocationSelected, setIsLocationSelected] = useState(false);
+
   const createStoreMutation = useCreateStore();
 
   const handleInputChange = (
@@ -48,6 +52,22 @@ const AddStoreDialog = () => {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // 위치 정보 업데이트 핸들러
+  const handleLocationSelect = (locationData: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      storeAddress: locationData.address,
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    }));
+    // 실제 위치가 선택되었음을 표시
+    setIsLocationSelected(true);
   };
 
   const resetForm = () => {
@@ -61,6 +81,7 @@ const AddStoreDialog = () => {
       latitude: 0,
       longitude: 0,
     });
+    setIsLocationSelected(false);
   };
 
   const validateForm = (): boolean => {
@@ -80,8 +101,8 @@ const AddStoreDialog = () => {
       toast.error('사업자등록번호를 입력해주세요.');
       return false;
     }
-    if (formData.latitude === 0 || formData.longitude === 0) {
-      toast.error('위치 정보(위도/경도)를 입력해주세요.');
+    if (!isLocationSelected || formData.latitude === 0 || formData.longitude === 0) {
+      toast.error('지도에서 가게 위치를 선택해주세요.');
       return false;
     }
     if (formData.latitude < -90 || formData.latitude > 90) {
@@ -120,6 +141,7 @@ const AddStoreDialog = () => {
     formData.storeAddress.trim() &&
     formData.phone.trim() &&
     formData.businessNumber.trim() &&
+    isLocationSelected &&
     formData.latitude !== 0 &&
     formData.longitude !== 0;
 
@@ -197,7 +219,7 @@ const AddStoreDialog = () => {
                   <Input
                     id="storeAddress"
                     type="text"
-                    placeholder="예: 서울특별시 마포구 홍익로 15"
+                    placeholder="지도에서 위치를 선택하면 자동으로 입력됩니다"
                     value={formData.storeAddress}
                     onChange={e =>
                       handleInputChange('storeAddress', e.target.value)
@@ -337,52 +359,35 @@ const AddStoreDialog = () => {
                   위치 정보 *
                 </h3>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label htmlFor="latitude" className="text-sm font-medium">
-                      위도 *
-                    </label>
-                    <Input
-                      id="latitude"
-                      type="number"
-                      step="any"
-                      min="-90"
-                      max="90"
-                      placeholder="37.5563"
-                      value={formData.latitude || ''}
-                      onChange={e =>
-                        handleInputChange(
-                          'latitude',
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
-                      className="h-10"
-                      required
+                <div className="space-y-4">
+                  <p className="text-muted-foreground text-sm">
+                    지도에서 가게 위치를 클릭하여 선택해주세요. 주소가 자동으로 입력됩니다.
+                  </p>
+                  
+                  <div className="rounded-lg border">
+                    <LocationPicker
+                      onLocationSelect={handleLocationSelect}
+                      initialLatitude={formData.latitude || 37.5563}
+                      initialLongitude={formData.longitude || 126.922}
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="longitude" className="text-sm font-medium">
-                      경도 *
-                    </label>
-                    <Input
-                      id="longitude"
-                      type="number"
-                      step="any"
-                      min="-180"
-                      max="180"
-                      placeholder="126.922"
-                      value={formData.longitude || ''}
-                      onChange={e =>
-                        handleInputChange(
-                          'longitude',
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
-                      className="h-10"
-                      required
-                    />
-                  </div>
+                  {isLocationSelected && formData.latitude && formData.longitude && (
+                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-green-50 p-3">
+                      <div>
+                        <span className="text-xs text-green-700">위도</span>
+                        <p className="text-sm font-medium text-green-900">
+                          {formData.latitude.toFixed(6)}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-green-700">경도</span>
+                        <p className="text-sm font-medium text-green-900">
+                          {formData.longitude.toFixed(6)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </form>
