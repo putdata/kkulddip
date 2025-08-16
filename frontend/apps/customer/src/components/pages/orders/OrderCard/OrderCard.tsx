@@ -4,6 +4,7 @@ import { formatPrice } from '@/utils/priceFormat';
 import { formatDate } from '@/utils/dateFormat';
 import { type OrderCardProps } from '@/types/orderFood';
 import { ROUTE_PATH } from '@/router/route-path';
+import { useReviewStore } from '@/store/useReviewStore';
 
 const OrderCard = ({ item }: OrderCardProps) => {
   const {
@@ -16,6 +17,7 @@ const OrderCard = ({ item }: OrderCardProps) => {
   } = item;
 
   const navigate = useNavigate();
+  const { setReviewData } = useReviewStore();
 
   // 할인 금액 계산
   const discountAmount = originalPrice - finalPrice;
@@ -94,15 +96,16 @@ const OrderCard = ({ item }: OrderCardProps) => {
 
         {(orderStatus === 'CONFIRMED' || orderStatus === 'PICKED_UP') && (
           <button
-            className="border-1 mt-2 w-full rounded-lg border-gray-400 bg-white py-2 text-xs font-semibold text-gray-700 transition-colors active:bg-gray-100"
-            onClick={() =>
-              navigate(
-                ROUTE_PATH.REVIEW_CREATE.replace(
-                  ':storeId',
-                  String(item.storeId),
-                ),
-              )
-            }
+            className="border-1 mt-2 w-full cursor-pointer rounded-lg border-gray-400 bg-white py-2 text-xs font-semibold text-gray-700 transition-colors active:bg-gray-100"
+            onClick={() => {
+              setReviewData({
+                storeId: item.storeId,
+                orderId: item.orderId,
+                storeName: item.storeName,
+                orderItems: item.orderItems,
+              });
+              navigate(ROUTE_PATH.REVIEW_CREATE);
+            }}
           >
             리뷰 작성하기
           </button>
