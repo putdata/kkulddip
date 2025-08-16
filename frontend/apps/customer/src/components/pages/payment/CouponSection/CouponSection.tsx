@@ -5,6 +5,8 @@ interface CouponSectionProps {
 }
 
 export default function CouponSection({ discountAmount }: CouponSectionProps) {
+  const hasDiscount = discountAmount > 0;
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-gray-900">할인 혜택</h3>
@@ -14,9 +16,13 @@ export default function CouponSection({ discountAmount }: CouponSectionProps) {
           <span className="text-sm text-gray-900">쿠폰 사용</span>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-xs text-green-600">
-            {discountAmount.toLocaleString()}원 할인
-          </span>
+          {hasDiscount ? (
+            <span className="text-xs text-green-600">
+              {discountAmount.toLocaleString()}원 할인
+            </span>
+          ) : (
+            <span className="text-xs text-gray-500">쿠폰 없음</span>
+          )}
           <span className="text-gray-400">
             <ChevronRight />
           </span>
