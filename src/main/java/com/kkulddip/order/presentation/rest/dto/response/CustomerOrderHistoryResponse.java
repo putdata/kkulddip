@@ -10,6 +10,7 @@ public record CustomerOrderHistoryResponse(
     String orderId,
     Long storeId,
     String storeName,
+    boolean hasReview,
     List<OrderItemResponse> orderItems,
     Long originalPrice,
     Long finalPrice,

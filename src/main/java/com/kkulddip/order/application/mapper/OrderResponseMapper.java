@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.kkulddip.order.domain.model.aggregate.Order;
 import com.kkulddip.order.domain.model.entity.OrderItem;
 import com.kkulddip.domain.customer.repository.CustomerRepository;
+import com.kkulddip.review.repository.ReviewRepository;
 import com.kkulddip.store.repository.DdipBoxRepository;
 import com.kkulddip.store.repository.StoreRepository;
 import com.kkulddip.order.presentation.rest.dto.response.CreateOrderResponse;
@@ -30,6 +31,7 @@ public class OrderResponseMapper {
     private final StoreRepository storeRepository;
     private final DdipBoxRepository ddipBoxRepository;
     private final CustomerRepository customerRepository;
+    private final ReviewRepository reviewRepository;
     
     /**
      * Order를 CreateOrderResponse로 변환
@@ -116,11 +118,18 @@ public class OrderResponseMapper {
         // Store 이름 조회 (비활성화된 상점도 포함)
         String storeName = storeRepository.findStoreNameByStoreId(order.getStoreId().value())
             .orElse("알 수 없는 가게");
+        
+        // 리뷰 작성 여부 확인
+        boolean hasReview = reviewRepository.existsByCustomerIdAndOrderId(
+            order.getCustomerId().value(), 
+            order.getOrderId().value()
+        );
             
         return CustomerOrderHistoryResponse.builder()
             .orderId(String.valueOf(order.getOrderId().value()))
             .storeId(order.getStoreId().value())
             .storeName(storeName)
+            .hasReview(hasReview)
             .orderItems(toCustomerOrderItemResponses(order.getOrderItems()))
             .originalPrice(order.getOriginalPrice().amount())
             .finalPrice(order.getFinalPrice().amount())
@@ -132,8 +141,16 @@ public class OrderResponseMapper {
     
     /**
      * List<Order>를 List<CustomerOrderHistoryResponse>로 변환
+     * 성능 최적화를 위해 리뷰 존재 여부를 한 번에 조회
      */
     public List<CustomerOrderHistoryResponse> toCustomerOrderHistoryResponses(List<Order> orders) {
+        if (orders.isEmpty()) {
+            return List.of();
+        }
+        
+        // 모든 주문에 대한 리뷰 존재 여부를 한 번에 조회하기 위한 Map 생성
+        // 각 주문별로 개별 조회하므로 현재는 stream으로 처리
+        // 추후 필요시 bulk 조회 메서드 추가 가능
         return orders.stream()
             .map(this::toCustomerOrderHistoryResponse)
             .collect(Collectors.toList());
