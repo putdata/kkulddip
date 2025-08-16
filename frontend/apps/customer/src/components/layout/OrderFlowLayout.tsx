@@ -30,7 +30,7 @@ const OrderFlowLayout = ({
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white pb-20">
+    <div className="flex min-h-dvh flex-col bg-white pb-20">
       {/* 헤더 */}
       <div className="relative flex w-full flex-row items-center p-3">
         <button onClick={handleBack} className="rounded-full p-2">
