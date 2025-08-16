@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Crown, AlertTriangle } from 'lucide-react';
-import { useSalesAnalytics, useDailyAnalytics } from '@/queries/analytics';
+import { TrendingUp, Crown } from 'lucide-react';
+import { useDailyAnalytics } from '@/queries/analytics';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface SalesAnalyticsSectionProps {
@@ -9,12 +9,7 @@ interface SalesAnalyticsSectionProps {
 }
 
 const SalesAnalyticsSection = ({ storeId }: SalesAnalyticsSectionProps) => {
-  const { data: salesData, isLoading: salesLoading } =
-    useSalesAnalytics(storeId);
-  const { data: dailyData, isLoading: dailyLoading } =
-    useDailyAnalytics(storeId);
-
-  const isLoading = salesLoading || dailyLoading;
+  const { data: dailyData, isLoading } = useDailyAnalytics(storeId);
 
   if (isLoading) {
     return (
@@ -48,7 +43,7 @@ const SalesAnalyticsSection = ({ storeId }: SalesAnalyticsSectionProps) => {
   }
 
   const topSellingDdipBoxes = dailyData?.topSellingDdipBoxes || [];
-  const highInventoryDdipBoxes = dailyData?.highInventoryDdipBoxes || [];
+  const inventoryStatus = dailyData?.inventoryStatus;
 
   // 도넛 차트용 데이터 준비
   const pieChartData = topSellingDdipBoxes.slice(0, 5).map((item, index) => ({
@@ -58,6 +53,27 @@ const SalesAnalyticsSection = ({ storeId }: SalesAnalyticsSectionProps) => {
   }));
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+  // 재고 소진율 색상 결정
+  const getInventoryColor = (percentage: number) => {
+    if (percentage <= 30) {
+      return 'text-green-600'; // 재고 많이 소진됨 (좋음)
+    }
+    if (percentage <= 60) {
+      return 'text-blue-600'; // 중간
+    }
+    return 'text-orange-600'; // 재고 많이 남음 (주의)
+  };
+
+  const getInventoryBgColor = (percentage: number) => {
+    if (percentage <= 30) {
+      return 'bg-green-50';
+    }
+    if (percentage <= 60) {
+      return 'bg-blue-50';
+    }
+    return 'bg-orange-50';
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -143,82 +159,71 @@ const SalesAnalyticsSection = ({ storeId }: SalesAnalyticsSectionProps) => {
         </CardContent>
       </Card>
 
-      {/* 3개월 매출 트렌드 - 1컬럼 */}
+      {/* 재고 소진 현황 - 1컬럼 */}
       <Card className="lg:col-span-1">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-500" />
-            3개월 매출 트렌드
+            재고 소진 현황
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {salesData ? (
+          {inventoryStatus ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-3">
-                <div className="rounded-lg bg-blue-50 p-3 text-center">
-                  <div className="text-lg font-semibold text-blue-600">
-                    ₩{salesData.totalRevenue?.toLocaleString() || '0'}
-                  </div>
-                  <div className="text-muted-foreground text-sm">
-                    총 매출 (3개월)
-                  </div>
+              {/* 재고 소진율 표시 */}
+              <div
+                className={`rounded-lg p-4 text-center ${getInventoryBgColor(inventoryStatus.remainingPercentage)}`}
+              >
+                <div
+                  className={`text-3xl font-bold ${getInventoryColor(inventoryStatus.remainingPercentage)}`}
+                >
+                  {(100 - inventoryStatus.remainingPercentage).toFixed(1)}%
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-lg bg-green-50 p-3 text-center">
-                    <div className="text-lg font-semibold text-green-600">
-                      {salesData.totalOrders?.toLocaleString() || '0'}건
-                    </div>
-                    <div className="text-muted-foreground text-sm">총 주문</div>
-                  </div>
-                  <div className="rounded-lg bg-purple-50 p-3 text-center">
-                    <div className="text-lg font-semibold text-purple-600">
-                      {salesData.totalWeight
-                        ? `${salesData.totalWeight}kg`
-                        : '0kg'}
-                    </div>
-                    <div className="text-muted-foreground text-sm">총 중량</div>
-                  </div>
+                <div className="text-muted-foreground text-sm">폐기 방지율</div>
+                <div className="text-muted-foreground mt-1 text-xs">
+                  (재고 {inventoryStatus.remainingPercentage.toFixed(1)}% 남음)
                 </div>
               </div>
 
-              {/* 높은 재고 알림 */}
-              {highInventoryDdipBoxes.length > 0 && (
-                <div className="border-t pt-3">
-                  <div className="mb-2 flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-orange-500" />
-                    <span className="text-sm font-medium">높은 재고 알림</span>
+              {/* 재고 현황 */}
+              <div className="grid grid-cols-1 gap-3">
+                <div className="rounded-lg border p-3">
+                  <div className="text-muted-foreground text-xs">
+                    판매된 재고
                   </div>
-                  <div className="space-y-2">
-                    {highInventoryDdipBoxes.slice(0, 2).map(ddipBox => (
-                      <div
-                        key={ddipBox.ddipBoxId}
-                        className="flex items-center justify-between rounded border bg-orange-50 p-2"
-                      >
-                        <div>
-                          <div className="text-sm font-medium">
-                            {ddipBox.ddipBoxName}
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            재고: {ddipBox.remainingCount}개
-                          </div>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className="text-xs text-orange-600"
-                        >
-                          재고 많음
-                        </Badge>
-                      </div>
-                    ))}
+                  <div className="text-lg font-semibold text-green-600">
+                    {(
+                      inventoryStatus.totalDailyCount -
+                      inventoryStatus.totalRemainingCount
+                    ).toLocaleString()}
+                    개
                   </div>
                 </div>
-              )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-lg border p-2">
+                    <div className="text-muted-foreground text-xs">
+                      전체 재고
+                    </div>
+                    <div className="text-sm font-medium">
+                      {inventoryStatus.totalDailyCount.toLocaleString()}개
+                    </div>
+                  </div>
+                  <div className="rounded-lg border p-2">
+                    <div className="text-muted-foreground text-xs">
+                      남은 재고
+                    </div>
+                    <div className="text-sm font-medium">
+                      {inventoryStatus.totalRemainingCount.toLocaleString()}개
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center py-8">
               <div className="text-muted-foreground text-center">
-                <AlertTriangle className="mx-auto mb-2 h-8 w-8 text-red-500" />
-                <p>매출 데이터를 불러올 수 없습니다</p>
+                <TrendingUp className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                <p>재고 데이터가 없습니다</p>
               </div>
             </div>
           )}
