@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { SearchIcon, Loader2 } from 'lucide-react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { StoreService } from '@/services/storeService';
 import useGeolocation from '@/hooks/useGeolocation';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import type { Store, StoreListResponse } from '@/types/store';
 import { Card } from '@/components/ui/card';
 import { priceUtils } from '@/utils/priceFormat';
@@ -32,7 +33,6 @@ const Search = () => {
   const latitude = location.coordinate?.latitude;
   const longitude = location.coordinate?.longitude;
   const navigate = useNavigate();
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const {
     data,
@@ -63,28 +63,13 @@ const Search = () => {
     staleTime: 5 * 60 * 1000, // 5분
   });
 
-  // 무한 스크롤 구현
-  const lastElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoading || isFetchingNextPage) {
-        return;
-      }
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-
-      observerRef.current = new IntersectionObserver(entries => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetching) {
-          fetchNextPage();
-        }
-      });
-
-      if (node) {
-        observerRef.current.observe(node);
-      }
-    },
-    [isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching],
-  );
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    isFetching,
+    fetchNextPage,
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

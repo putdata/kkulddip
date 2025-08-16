@@ -1,7 +1,7 @@
-import { useCallback, useRef } from 'react';
 import FilterBar from '@/components/pages/home/FilterBar';
 import HomeMainContainer from '@/components/pages/home/HomeMainContainer';
 import { useStores } from '@/hooks/useStores';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { Loader2 } from 'lucide-react';
 import type { Store, StoreListResponse } from '@/types/store';
 
@@ -16,30 +16,13 @@ const Home = () => {
     isError,
   } = useStores();
 
-  const observerRef = useRef<IntersectionObserver | null>(null);
-
-  // 무한 스크롤 구현
-  const lastElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoading || isFetchingNextPage) {
-        return;
-      }
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-
-      observerRef.current = new IntersectionObserver(entries => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetching) {
-          fetchNextPage();
-        }
-      });
-
-      if (node) {
-        observerRef.current.observe(node);
-      }
-    },
-    [isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching],
-  );
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    isFetching,
+    fetchNextPage,
+  });
 
   if (isLoading) {
     return (
