@@ -105,7 +105,7 @@ const PaymentInfoCard = ({ paymentInfo }: PaymentInfoCardProps) => {
       </div>
 
       {/* 문의 버튼 */}
-      <button className="w-full rounded-2xl border border-gray-200 bg-white py-4 text-center text-sm font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+      <button className="mt-2 w-full rounded-2xl border border-gray-200 bg-white py-4 text-center text-sm font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
         주문에 문제가 있나요?
         <div className="text-xs text-gray-400">고객센터에 문의하기</div>
       </button>
