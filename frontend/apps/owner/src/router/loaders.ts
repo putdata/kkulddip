@@ -13,7 +13,7 @@ export const indexLoader = async () => {
 
   const storeList = await queryClient
     .ensureQueryData({
-      queryKey: storeQueryKeys.list(),
+      queryKey: storeQueryKeys.lists(),
       queryFn: storeService.getMyStores,
     })
     .catch(() => {

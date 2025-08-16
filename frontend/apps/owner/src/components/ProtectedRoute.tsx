@@ -12,6 +12,11 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const prevTokenRef = useRef<string | null>(accessToken);
 
   useEffect(() => {
+    // 초기 인증 상태 체크 - 토큰이 없으면 리다이렉트 URL 설정
+    if (!accessToken) {
+      setRedirectUrl(location.pathname + location.search);
+    }
+
     // 이전 토큰 값 업데이트
     prevTokenRef.current = accessToken;
 
@@ -40,7 +45,6 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   // 초기 인증 상태 체크
   if (!accessToken) {
-    setRedirectUrl(location.pathname + location.search);
     return <Navigate to={ROUTE_PATH.LOGIN} replace />;
   }
 

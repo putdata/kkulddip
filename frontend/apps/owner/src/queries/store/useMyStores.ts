@@ -10,7 +10,7 @@ import { storeQueryKeys } from './storeQueryKeys';
  */
 export const useMyStores = () => {
   return useQuery<StoreListResponse>({
-    queryKey: storeQueryKeys.list(),
+    queryKey: storeQueryKeys.lists(),
     queryFn: storeService.getMyStores,
   });
 };
