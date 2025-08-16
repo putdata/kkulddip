@@ -141,7 +141,6 @@ export const useOpenVidu = ({
         }
 
         setConnectionStatus('connected');
-        toast.success(SUCCESS_MESSAGES.SESSION_CONNECTED);
         onSessionConnected?.();
       } catch (err) {
         const error =
@@ -227,7 +226,6 @@ export const useOpenVidu = ({
         await sessionRef.current.publish(publisher);
 
         onPublishingStarted?.();
-        toast.success(SUCCESS_MESSAGES.BROADCAST_STARTED);
       } catch (err) {
         const error =
           err instanceof Error
@@ -258,7 +256,6 @@ export const useOpenVidu = ({
       publisherRef.current = null;
       setPublisherStatus('stopped');
 
-      toast.success(SUCCESS_MESSAGES.BROADCAST_ENDED);
       onPublishingStopped?.();
     } catch (err) {
       const error =
