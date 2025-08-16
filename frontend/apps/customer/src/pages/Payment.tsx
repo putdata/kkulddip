@@ -4,27 +4,12 @@ import PickupInfo from '@/components/pages/payment/PickupInfo/PickupInfo';
 import CouponSection from '@/components/pages/payment/CouponSection/CouponSection';
 import FinalPrice from '@/components/pages/payment/FinalPrice/FinalPrice';
 import PaymentMethod from '@/components/pages/payment/PaymentMethod/PaymentMethod';
-import { dummyDiscountAmount } from '@/dummies/paymentDummy';
 import type { OrderData } from '@/types/orderflow';
 
 import { PAYMENT_MESSAGES } from '@/constants/payment';
 import { formatPrice } from '@/utils/priceFormat';
 import OrderFlowLayout from '@/components/layout/OrderFlowLayout';
 import { useCartStore } from '@/store/useCartStore';
-
-// Props용 주문 데이터 인터페이스 (기존)
-// interface OrderData {
-//   quantity: number;
-//   total: number;
-//   productId?: number;
-//   customerId?: number;
-//   storeId?: number;
-//   appliedCouponId?: string;
-//   discountAmount?: number;
-//   finalAmount?: number;
-//   orderNumber?: string;
-//   orderDate?: Date;
-// }
 
 interface PaymentProps {
   onNext: () => void;
@@ -38,7 +23,8 @@ const Payment = ({ onNext, onBack, orderData }: PaymentProps) => {
   const { storeInfo } = useCartStore(); // 가게 정보 가져오기
 
   const baseAmount = orderData.total;
-  const finalAmount = baseAmount - dummyDiscountAmount;
+  const discountAmount = 0; // 쿠폰 없음으로 설정
+  const finalAmount = baseAmount - discountAmount;
 
   const handleNext = async () => {
     if (isProcessing) {
@@ -101,14 +87,11 @@ const Payment = ({ onNext, onBack, orderData }: PaymentProps) => {
       </div>
 
       <div className="rounded-2xl bg-white p-4 shadow-sm">
-        <CouponSection discountAmount={dummyDiscountAmount} />
+        <CouponSection discountAmount={discountAmount} />
       </div>
 
       <div className="rounded-2xl bg-white p-4 shadow-sm">
-        <FinalPrice
-          orderAmount={orderData.total}
-          discount={dummyDiscountAmount}
-        />
+        <FinalPrice orderAmount={orderData.total} discount={discountAmount} />
       </div>
 
       <div className="rounded-2xl bg-white p-4 shadow-sm">
