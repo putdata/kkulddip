@@ -170,6 +170,7 @@ public enum ErrorCode {
     DUPLICATE_REVIEW(CONFLICT, "DUPLICATE_REVIEW", "이미 해당 주문에 대한 리뷰가 존재합니다."),
     UPDATE_TIME_EXPIRED(BAD_REQUEST, "UPDATE_TIME_EXPIRED", "리뷰는 작성 후 24시간 내에만 수정 가능합니다."),
     REVIEW_UNAUTHORIZED_ACCESS(FORBIDDEN, "REVIEW_UNAUTHORIZED_ACCESS", "본인이 작성한 리뷰만 접근 가능합니다."),
+    INVALID_ORDER_STATUS_FOR_REVIEW(BAD_REQUEST, "INVALID_ORDER_STATUS_FOR_REVIEW", "리뷰는 주문 확정 또는 픽업 완료된 주문에 대해서만 작성할 수 있습니다."),
 
     // 리뷰 이미지 에러
     REVIEW_IMAGE_TOO_MANY(BAD_REQUEST, "REVIEW_IMAGE_TOO_MANY", "한 번에 업로드할 수 있는 이미지 수를 초과했습니다."),
