@@ -42,13 +42,19 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
     storeImageUrl: store.storeProfileImage,
   };
 
+  const isUnavailable = !ddipbox.isActive || ddipbox.remainingQuantity === 0;
+
   // 장바구니에 추가하기
   const handleAddtoCart = () => {
-    console.log(
-      '🔥 버튼 클릭된 ddipbox:',
-      ddipbox.ddipboxName,
-      ddipbox.ddipboxId,
-    );
+    if (isUnavailable) {
+      if (!ddipbox.isActive) {
+        toast.error('현재 판매중이지 않습니다');
+      } else {
+        toast.error('재고가 없습니다');
+      }
+      return;
+    }
+
     const result = addToCart(ddipbox, storeInfo);
 
     if (result.success) {
@@ -58,10 +64,6 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
 
   // 확인 버튼 클릭 시 함수
   const handleConfirmStoreChange = () => {
-    console.log(
-      '✅ 확인 버튼 클릭 - pending ddipbox:',
-      storeChangeInfo.pendingDdipbox?.ddipboxName,
-    );
     clearAndAddNewStore(); // 매개변수 제거
     toast('새로운 가게 상품으로 교체되었습니다!');
   };
@@ -108,13 +110,30 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
             {formatPrice(ddipbox.salePrice)}
           </p>
         </div>
-        <Button
-          className="bg-amber-500 hover:bg-amber-500 data-[state=on]:bg-amber-600"
-          onClick={handleAddtoCart}
-        >
-          {message.RESERVE_BUTTON_TEXT}
-        </Button>
+        <div className="flex flex-col items-end gap-2">
+          {!isUnavailable && (
+            <span className="text-xs text-gray-500">
+              재고 {ddipbox.remainingQuantity}개
+            </span>
+          )}
+          <Button
+            className={`${
+              isUnavailable
+                ? 'cursor-not-allowed bg-gray-400 hover:bg-gray-400'
+                : 'bg-amber-500 hover:bg-amber-500 data-[state=on]:bg-amber-600'
+            }`}
+            onClick={handleAddtoCart}
+            disabled={isUnavailable}
+          >
+            {!ddipbox.isActive
+              ? '판매 중지'
+              : ddipbox.remainingQuantity === 0
+                ? '품절'
+                : message.RESERVE_BUTTON_TEXT}
+          </Button>
+        </div>
       </CardFooter>
+
       {storeChangeInfo.show && (
         <Dialog
           open={storeChangeInfo.show}
