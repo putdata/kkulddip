@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useNavigate, useLocation, generatePath } from 'react-router-dom';
 import { useNumberParam } from 'common';
 import { useMyStores } from '@/queries/store';
@@ -8,13 +8,14 @@ import type { Store } from '@/types/store';
 /**
  * 매장 선택 및 라우팅을 관리하는 커스텀 훅
  *
- * @returns 매장 목록, 선택된 매장, 매장 변경 함수, 현재 매장 ID
+ * @returns 매장 목록, 선택된 매장, 매장 변경 함수, 현재 매장 ID, 에러 상태
  */
 export const useStoreSelection = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const storeId = useNumberParam('storeId');
   const { data: storeListData } = useMyStores();
+  const [hasError, setHasError] = useState(false);
 
   /**
    * 사용 가능한 스토어 목록
@@ -28,7 +29,7 @@ export const useStoreSelection = () => {
    */
   useEffect(() => {
     if (storeId === null || isNaN(storeId) || storeId <= 0) {
-      navigate('/not-found', { replace: true });
+      setHasError(true);
       return;
     }
 
@@ -41,7 +42,11 @@ export const useStoreSelection = () => {
           storeId: firstStore.storeId.toString(),
         });
         navigate(newPath, { replace: true });
+      } else {
+        setHasError(true);
       }
+    } else {
+      setHasError(false);
     }
   }, [storeId, stores, navigate, location.pathname]);
 
@@ -69,5 +74,6 @@ export const useStoreSelection = () => {
     selectedStore,
     selectStore,
     storeId: storeId || 0,
+    hasError,
   };
 };
