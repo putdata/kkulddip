@@ -45,7 +45,7 @@ public class OrderSavingsCalculationService {
             Money totalSavedMoney = calculateTotalSavedMoney(order);
             Double totalSavedCo2 = calculateTotalSavedCo2(order);
             
-            log.debug("주문 절약 값 계산 완료 - orderId: {}, savedMoney: {}, savedCo2: {}g", 
+            log.debug("주문 절약 값 계산 완료 - orderId: {}, savedMoney: {}, savedCo2: {}kg", 
                 order.getOrderId().value(), totalSavedMoney.amount(), totalSavedCo2);
             
             return SavingsResult.of(totalSavedMoney, totalSavedCo2);
@@ -90,7 +90,7 @@ public class OrderSavingsCalculationService {
      * 총 CO2 절약량을 계산합니다.
      * 
      * @param order 주문
-     * @return 총 CO2 절약량 (g 단위)
+     * @return 총 CO2 절약량 (kg 단위)
      */
     private Double calculateTotalSavedCo2(Order order) {
         double totalCo2Saved = 0.0;
@@ -107,6 +107,8 @@ public class OrderSavingsCalculationService {
             }
         }
         
-        return Math.round(totalCo2Saved * 100.0) / 100.0;
+        // g 단위를 kg 단위로 변환 (1kg = 1000g)
+        double co2InKg = totalCo2Saved / 1000.0;
+        return Math.round(co2InKg * 100.0) / 100.0;
     }
 }
