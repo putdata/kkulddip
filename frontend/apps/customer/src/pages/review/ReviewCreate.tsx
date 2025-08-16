@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 import ReviewCreateHeader from '@/components/pages/reviewCreate/ReviewCreateHeader';
 import ReviewCreatePhotoInput from '@/components/pages/reviewCreate/ReviewCreatePhotoInput';
 import ReviewCreateTextInput from '@/components/pages/reviewCreate/ReviewCreateTextInput';
 import { useCreateReviewMutation } from '@/services/reviewService';
 import type { ReviewCreateRequest } from '@/types/review';
-import { useParams } from 'react-router-dom';
-import { useStoreDetail } from '@/hooks/useStoreDetail';
 import { useCustomerProfile } from '@/hooks/useProfile';
+import { useReviewStore } from '@/store/useReviewStore';
+import { useStoreDetail } from '@/hooks/useStoreDetail';
+import { ROUTE_PATH } from '@/router';
 
 interface ReviewFormState {
   rating: number;
@@ -19,10 +22,18 @@ interface ReviewFormState {
 }
 
 const ReviewCreate = () => {
-  const params = useParams();
-  const storeId = params.storeId!;
+  const navigate = useNavigate();
+  const { reviewData, clearReviewData } = useReviewStore();
 
-  // customerId 받기
+  console.log(reviewData);
+
+  useEffect(() => {
+    if (!reviewData) {
+      toast.error('잘못된 접근입니다.');
+      navigate(ROUTE_PATH.ORDER);
+    }
+  }, [reviewData, navigate]);
+
   const { data: profile } = useCustomerProfile();
   const customerId = profile?.customerId;
 
@@ -30,7 +41,7 @@ const ReviewCreate = () => {
     data: store,
     isLoading: storeLoading,
     error: storeError,
-  } = useStoreDetail(storeId);
+  } = useStoreDetail(reviewData!.storeId.toString());
 
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({
     rating: 0,
@@ -43,7 +54,6 @@ const ReviewCreate = () => {
 
   const onSetRating = (rating: number) => {
     console.log('Rating updated:', rating); // 디버깅용
-
     setReviewForm({
       ...reviewForm,
       rating: rating,
@@ -70,6 +80,11 @@ const ReviewCreate = () => {
 
   // 전송 부분
   const handleSubmit = async () => {
+    if (!reviewData || !customerId) {
+      toast.error('필요한 정보가 없습니다.');
+      return;
+    }
+
     // 유효성 검사
     if (reviewForm.rating === 0) {
       toast.error('별점을 선택해주세요.');
@@ -82,12 +97,11 @@ const ReviewCreate = () => {
       return;
     }
 
-    const reviewData: ReviewCreateRequest = {
-      storeId: storeId,
-      customerId: customerId!,
+    const requestData: ReviewCreateRequest = {
+      storeId: String(reviewData.storeId),
+      customerId: customerId,
       content: trimmedContent,
-      // TODO: 실제 주문 ID로 변경 필요 (주문 연동 시)
-      orderId: 119,
+      orderId: Number(reviewData.orderId), // string → number 변환
       rating: reviewForm.rating,
       images: reviewForm.selectedImages,
     };
@@ -97,8 +111,8 @@ const ReviewCreate = () => {
     );
 
     console.log('전송할 리뷰 데이터:', {
-      ...reviewData,
-      images: reviewData.images.map(img => ({
+      ...requestData,
+      images: requestData.images.map(img => ({
         name: img.name,
         size: img.size,
         type: img.type,
@@ -106,7 +120,7 @@ const ReviewCreate = () => {
     });
 
     try {
-      const result = await createReviewMutation.mutateAsync(reviewData);
+      const result = await createReviewMutation.mutateAsync(requestData);
 
       toast.success('리뷰가 성공적으로 등록되었습니다! 🎉');
 
@@ -121,6 +135,10 @@ const ReviewCreate = () => {
         selectedImages: [],
         imagePreviewUrls: [],
       });
+
+      // 리뷰 데이터 정리 및 페이지 이동
+      clearReviewData();
+      navigate(ROUTE_PATH.ORDER);
 
       console.log('등록된 리뷰 정보:', {
         reviewId: result.reviewId,
@@ -141,8 +159,6 @@ const ReviewCreate = () => {
           toast.error('네트워크 연결을 확인해주세요.');
         } else if (error.message.includes('400')) {
           toast.error('입력 정보를 다시 확인해주세요.');
-        } else if (error.message.includes('401')) {
-          toast.error('로그인이 필요합니다.');
         } else if (error.message.includes('500')) {
           toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         } else {
@@ -154,9 +170,20 @@ const ReviewCreate = () => {
     }
   };
 
+  if (!reviewData) {
+    return null;
+  }
+
   // 둘 중 하나라도 로딩 중이면 로딩 표시
   if (storeLoading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+          <div className="text-gray-500">가게 정보를 가져오고 있어요...</div>
+        </div>
+      </div>
+    );
   }
 
   // 에러 처리
