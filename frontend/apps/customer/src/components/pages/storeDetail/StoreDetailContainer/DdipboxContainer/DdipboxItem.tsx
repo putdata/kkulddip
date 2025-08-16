@@ -30,8 +30,8 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
   const {
     addToCart,
     clearAndAddNewStore,
-    showStoreChangeModal,
-    setShowStoreChangeModal,
+    storeChangeInfo,
+    setStoreChangeModal,
   } = useCartStore();
 
   const storeInfo: StoreInfo = {
@@ -44,6 +44,11 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
 
   // 장바구니에 추가하기
   const handleAddtoCart = () => {
+    console.log(
+      '🔥 버튼 클릭된 ddipbox:',
+      ddipbox.ddipboxName,
+      ddipbox.ddipboxId,
+    );
     const result = addToCart(ddipbox, storeInfo);
 
     if (result.success) {
@@ -53,7 +58,11 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
 
   // 확인 버튼 클릭 시 함수
   const handleConfirmStoreChange = () => {
-    clearAndAddNewStore(ddipbox, storeInfo);
+    console.log(
+      '✅ 확인 버튼 클릭 - pending ddipbox:',
+      storeChangeInfo.pendingDdipbox?.ddipboxName,
+    );
+    clearAndAddNewStore(); // 매개변수 제거
     toast('새로운 가게 상품으로 교체되었습니다!');
   };
 
@@ -106,10 +115,10 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
           {message.RESERVE_BUTTON_TEXT}
         </Button>
       </CardFooter>
-      {showStoreChangeModal && (
+      {storeChangeInfo.show && (
         <Dialog
-          open={showStoreChangeModal}
-          onOpenChange={setShowStoreChangeModal}
+          open={storeChangeInfo.show}
+          onOpenChange={open => setStoreChangeModal(open)}
         >
           <DialogContent>
             <DialogHeader>
@@ -122,7 +131,7 @@ export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
             <div className="mt-4 flex justify-end gap-2">
               <Button
                 variant="outline"
-                onClick={() => setShowStoreChangeModal(false)}
+                onClick={() => setStoreChangeModal(false)}
               >
                 아니오
               </Button>

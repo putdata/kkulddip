@@ -7,13 +7,21 @@ import type { DdipBox } from '@/types/store';
 interface CartStore {
   storeInfo: StoreInfo | null;
   items: CartItem[];
-  showStoreChangeModal: boolean;
+  storeChangeInfo: {
+    show: boolean;
+    pendingDdipbox: DdipBox | null;
+    pendingStoreInfo: StoreInfo | null;
+  };
 
   addToCart: (ddipbox: DdipBox, storeInfo: StoreInfo) => AddToCartResult;
   updateQuantity: (ddipboxId: number, quantity: number) => void;
   clearCart: () => void;
-  clearAndAddNewStore: (ddipbox: DdipBox, storeInfo: StoreInfo) => void;
-  setShowStoreChangeModal: (show: boolean) => void;
+  clearAndAddNewStore: () => void; // 매개변수 제거
+  setStoreChangeModal: (
+    show: boolean,
+    ddipbox?: DdipBox,
+    storeInfo?: StoreInfo,
+  ) => void;
 }
 
 // DdipBox -> CartItem 변환 헬퍼 함수
@@ -34,15 +42,27 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       storeInfo: null,
-      showStoreChangeModal: false, // 모달 초기값 : 닫힌 상태
 
+      storeChangeInfo: {
+        show: false,
+
+        pendingDdipbox: null,
+
+        pendingStoreInfo: null,
+      },
       // 장바구니에 아이템 추가
       addToCart: (ddipbox: DdipBox, storeInfo: StoreInfo) => {
         const state = get();
 
         // 다른 가게 상품인지 체크
         if (state.storeInfo && state.storeInfo.storeId !== storeInfo.storeId) {
-          set({ showStoreChangeModal: true });
+          set({
+            storeChangeInfo: {
+              show: true,
+              pendingDdipbox: ddipbox,
+              pendingStoreInfo: storeInfo,
+            },
+          });
 
           return {
             success: false,
@@ -100,8 +120,14 @@ export const useCartStore = create<CartStore>()(
             return {
               items: newItems,
               storeInfo: newItems.length === 0 ? null : state.storeInfo,
-              showStoreChangeModal:
-                newItems.length === 0 ? false : state.showStoreChangeModal,
+              storeChangeInfo:
+                newItems.length === 0
+                  ? {
+                      show: false,
+                      pendingDdipbox: null,
+                      pendingStoreInfo: null,
+                    }
+                  : state.storeChangeInfo,
             };
           });
         } else {
@@ -119,22 +145,45 @@ export const useCartStore = create<CartStore>()(
         set({
           items: [],
           storeInfo: null,
-          showStoreChangeModal: false,
+          storeChangeInfo: {
+            show: false,
+            pendingDdipbox: null,
+            pendingStoreInfo: null,
+          },
         }),
 
       // 장바구니 초기화 후 새 가게 상품 추가
-      clearAndAddNewStore: (ddipbox: DdipBox, storeInfo: StoreInfo) => {
-        const newCartItem = convertDdipBoxToCartItem(ddipbox);
-        set({
-          storeInfo: storeInfo,
-          items: [newCartItem],
-          showStoreChangeModal: false,
-        });
+      clearAndAddNewStore: () => {
+        const state = get();
+        const { pendingDdipbox, pendingStoreInfo } = state.storeChangeInfo;
+
+        if (pendingDdipbox && pendingStoreInfo) {
+          const newCartItem = convertDdipBoxToCartItem(pendingDdipbox);
+          set({
+            storeInfo: pendingStoreInfo,
+            items: [newCartItem],
+            storeChangeInfo: {
+              show: false,
+              pendingDdipbox: null,
+              pendingStoreInfo: null,
+            },
+          });
+        }
       },
 
       // 모달 제어 함수
-      setShowStoreChangeModal: (show: boolean) =>
-        set({ showStoreChangeModal: show }),
+      setStoreChangeModal: (
+        show: boolean,
+        ddipbox?: DdipBox,
+        storeInfo?: StoreInfo,
+      ) =>
+        set({
+          storeChangeInfo: {
+            show,
+            pendingDdipbox: ddipbox || null,
+            pendingStoreInfo: storeInfo || null,
+          },
+        }),
     }),
     {
       name: 'cart-storage',
