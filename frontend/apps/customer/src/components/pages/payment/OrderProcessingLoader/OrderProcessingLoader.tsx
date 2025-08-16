@@ -2,28 +2,34 @@ import { useEffect } from 'react';
 import { useOrderFlowStore } from '@/store/useOrderFlowStore';
 import { useOrderState } from '@/hooks/useOrderState';
 import { useTossPayment } from '@/hooks/useTossPayment';
+import { useCartStore } from '@/store/useCartStore';
+import { useCustomerProfile } from '@/hooks/useProfile';
 
 const OrderProcessingLoader = () => {
   const { orderData } = useOrderFlowStore();
   const { handlePendingToPayment } = useOrderState();
   const { processPayment } = useTossPayment();
+  const { storeInfo } = useCartStore();
+  const { data: profile } = useCustomerProfile();
 
   useEffect(() => {
     let isCancelled = false;
-    
+
     const handlePayment = async () => {
       if (isCancelled) {
         console.log('=== 중복 실행 방지: 이미 취소됨 ===');
         return;
       }
-      
+
       try {
         console.log('=== 결제 처리 시작 ===');
         console.log('isCancelled 상태:', isCancelled);
-        
+
         await processPayment({
-          productId: orderData.productId,
-          quantity: orderData.quantity,
+          orderItems: orderData.orderItems,
+          customerId: profile.customerId,
+          storeId: storeInfo!.storeId,
+          customerName: profile?.name || `고객 ${profile?.customerId || 6}`,
         });
       } catch (error) {
         if (!isCancelled) {
@@ -39,13 +45,13 @@ const OrderProcessingLoader = () => {
         handlePayment();
       }
     }, 0);
-    
+
     return () => {
       isCancelled = true;
       clearTimeout(timeoutId);
       console.log('=== 클린업 실행: isCancelled = true ===');
     };
-  }, [])
+  }, [profile?.customerId, orderData.orderItems, storeInfo?.storeId, processPayment, handlePendingToPayment])
 
   return (
     <div className="flex min-h-screen items-center justify-center">

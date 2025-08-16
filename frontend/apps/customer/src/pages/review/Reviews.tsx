@@ -1,15 +1,13 @@
 import ReviewsContainer from '@/components/pages/review/ReviewsContainer';
 import ReviewStoreInfoCard from '@/components/pages/review/ReviewStoreInfoCard';
-import { mockReviews } from '@/dummies/reviewDummy';
 import { useStoreDetail } from '@/hooks/useStoreDetail';
+import { useStoreReviews } from '@/hooks/useStoreReviews';
+import { Loader2 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 const ReviewsPage = () => {
   const params = useParams();
   const storeId = params.storeId!;
-
-  // TODO: 데이터 API 요청 추가 필요
-  const reviews = mockReviews[Number(storeId)];
 
   const {
     data: store,
@@ -17,26 +15,45 @@ const ReviewsPage = () => {
     error: storeError,
   } = useStoreDetail(storeId);
 
-  // 둘 중 하나라도 로딩 중이면 로딩 표시
-  if (storeLoading) {
-    return <div>로딩 중...</div>;
-  }
+  const {
+    data: reviewResponse,
+    isLoading: reviewsLoading,
+    error: reviewsError,
+  } = useStoreReviews(storeId);
 
-  // 에러 처리
-  if (storeError || !store) {
-    return <div>에러가 발생했습니다.</div>;
-  }
-
-  if (reviews) {
-    const totalReviews = reviews.length;
-
+  if (storeLoading || reviewsLoading) {
     return (
-      <div>
-        <ReviewStoreInfoCard store={store} totalReviews={totalReviews} />
-        <ReviewsContainer reviews={reviews} />
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+          <div className="text-gray-500">가게의 리뷰를 불러오고 있어요...</div>
+        </div>
       </div>
     );
   }
+
+  // 에러 상태 추가
+  if (storeError || reviewsError) {
+    return <div>에러가 발생했습니다.</div>;
+  }
+
+  // store 데이터가 없는 경우 처리
+  if (!store) {
+    return <div>가게 정보를 불러올 수 없습니다.</div>;
+  }
+
+  const reviews = reviewResponse?.reviewList || []; // 기본값 설정
+
+  const totalReviews = reviews.length;
+
+  console.log(reviews);
+
+  return (
+    <div>
+      <ReviewStoreInfoCard store={store} totalReviews={totalReviews} />
+      <ReviewsContainer reviews={reviews} />
+    </div>
+  );
 };
 
 export default ReviewsPage;

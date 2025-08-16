@@ -11,10 +11,10 @@ const ReviewStoreInfoCard = ({ store, totalReviews }: StoreInfoProps) => {
   return (
     <Card
       key={store.storeId}
-      className="w-full flex-row justify-between gap-2 rounded-none bg-white p-4"
+      className="w-full flex-row justify-between gap-2 rounded-none bg-white p-5"
     >
-      <div className="flex flex-col justify-center">
-        <CardTitle>{store.storeName}</CardTitle>
+      <div className="flex flex-col justify-center gap-2">
+        <CardTitle className="text-lg">{store.storeName}</CardTitle>
         <div className="flex items-center gap-1">
           {/* 평점 */}
           <div className="flex items-center justify-start gap-2 text-lg font-bold text-amber-500">

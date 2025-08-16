@@ -1,12 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { useNumberParam } from 'common';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import { ArrowLeft, Video, AlertCircle } from 'lucide-react';
 
 import { useStreamDetails } from '@/queries/stream';
 import { useStreamFlowManager } from '@/hooks/useStreamFlowManager';
-import { StreamStatusCard } from '@/components/stream/StreamStatusCard';
-import { StreamFlowControls } from '@/components/stream/StreamFlowControls';
+import {
+  StreamStatusCard,
+  StreamFlowControls,
+  EndStreamAlertDialog,
+} from '@/components/pages/streaming';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,7 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { EndStreamAlertDialog } from '@/components/stream/EndStreamAlertDialog';
 import {
   mapApiStatusToFlowStatus,
   validateStreamStatus,
@@ -36,7 +39,7 @@ import { ROUTE_PATH } from '@/router/route-path';
 
 const StreamingLive = () => {
   const navigate = useNavigate();
-  const storeId = useNumberParam('storeId');
+  const { storeId } = useStoreSelection();
   const streamId = useNumberParam('streamId');
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
@@ -167,11 +170,18 @@ const StreamingLive = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={handleGoBack}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-2xl font-bold">라이브 스트림</h1>
+        <div className="flex items-center justify-between px-4">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" onClick={handleGoBack}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">라이브 스트림</h1>
+              <p className="text-muted-foreground">
+                실시간 방송을 시작하고 관리하세요
+              </p>
+            </div>
+          </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-2">
           <Skeleton className="h-[400px]" />
@@ -184,11 +194,18 @@ const StreamingLive = () => {
   if (error || !stream) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={handleGoBack}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-2xl font-bold">라이브 스트림</h1>
+        <div className="flex items-center justify-between px-4">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" onClick={handleGoBack}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">라이브 스트림</h1>
+              <p className="text-muted-foreground">
+                실시간 방송을 시작하고 관리하세요
+              </p>
+            </div>
+          </div>
         </div>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -204,11 +221,18 @@ const StreamingLive = () => {
   if (stream.status === 'ENDED') {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={handleGoBack}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-2xl font-bold">라이브 스트림</h1>
+        <div className="flex items-center justify-between px-4">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" onClick={handleGoBack}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">라이브 스트림</h1>
+              <p className="text-muted-foreground">
+                실시간 방송을 시작하고 관리하세요
+              </p>
+            </div>
+          </div>
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
@@ -229,12 +253,17 @@ const StreamingLive = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={handleGoBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">라이브 스트림</h1>
+          <div>
+            <h1 className="text-2xl font-bold">라이브 스트림</h1>
+            <p className="text-muted-foreground">
+              실시간 방송을 시작하고 관리하세요
+            </p>
+          </div>
         </div>
       </div>
 

@@ -1,8 +1,8 @@
 import { redirect, generatePath } from 'react-router-dom';
 import { useAuthStore, queryClient } from 'common';
 import { ROUTE_PATH } from './route-path';
-import { storeQueryKeys } from '@/queries/storeQueryKeys';
 import { storeService } from '@/services/storeService';
+import { storeQueryKeys } from '@/queries/store';
 
 export const indexLoader = async () => {
   const accessToken = useAuthStore.getState().accessToken;
@@ -11,10 +11,14 @@ export const indexLoader = async () => {
     throw redirect(ROUTE_PATH.LOGIN);
   }
 
-  const storeList = await queryClient.ensureQueryData({
-    queryKey: storeQueryKeys.list(),
-    queryFn: storeService.getMyStores,
-  });
+  const storeList = await queryClient
+    .ensureQueryData({
+      queryKey: storeQueryKeys.list(),
+      queryFn: storeService.getMyStores,
+    })
+    .catch(() => {
+      throw redirect(ROUTE_PATH.LOGIN);
+    });
 
   if (storeList.stores.length === 0) {
     throw redirect(ROUTE_PATH.WELCOME);

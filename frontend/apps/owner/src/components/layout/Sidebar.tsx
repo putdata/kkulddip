@@ -1,9 +1,4 @@
-import {
-  NavLink,
-  useLocation,
-  useParams,
-  generatePath,
-} from 'react-router-dom';
+import { NavLink, useLocation, generatePath } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -15,19 +10,32 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { sidebarItems } from '@/constants/sidebarItems';
-import StoreSwitcher from '@/components/StoreSelector';
-import UserSwitcher from '@/components/UserSwitcher';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
+import StoreSwitcher from '@/components/layout/StoreSwitcher';
+import UserSwitcher from '@/components/layout/UserSwitcher';
 
 const AppSidebar = () => {
   const location = useLocation();
-  const { storeId } = useParams();
+  const { storeId } = useStoreSelection();
+  const { state, isMobile, setOpenMobile } = useSidebar();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
-        <StoreSwitcher />
+        <div className="flex items-center gap-2">
+          {state === 'collapsed' ? (
+            <SidebarTrigger className="h-8 w-8" />
+          ) : (
+            <>
+              <StoreSwitcher />
+              <SidebarTrigger className="ml-auto hidden h-8 w-8 md:flex" />
+            </>
+          )}
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -39,6 +47,12 @@ const AppSidebar = () => {
                 const targetPath = generatePath(item.path, { storeId });
                 const isActive = location.pathname === targetPath;
 
+                const handleItemClick = () => {
+                  if (isMobile) {
+                    setOpenMobile(false);
+                  }
+                };
+
                 return (
                   <SidebarMenuItem key={item.key}>
                     <SidebarMenuButton
@@ -46,7 +60,7 @@ const AppSidebar = () => {
                       tooltip={item.tooltip}
                       isActive={isActive}
                     >
-                      <NavLink to={targetPath}>
+                      <NavLink to={targetPath} onClick={handleItemClick}>
                         <item.icon />
                         <span>{item.label}</span>
                       </NavLink>

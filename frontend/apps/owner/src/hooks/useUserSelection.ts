@@ -1,6 +1,6 @@
 import { useAuthStore, useUserStore } from 'common';
-import { useNavigate } from 'react-router-dom';
-import { User, CreditCard, Bell } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { User, CreditCard, Bell, Settings } from 'lucide-react';
 import { ROUTE_PATH } from '@/router/route-path';
 
 export interface MenuItemConfig {
@@ -9,37 +9,62 @@ export interface MenuItemConfig {
   onClick: () => void;
 }
 
+export interface UseUserSelectionOptions {
+  onSettings?: () => void;
+  onBilling?: () => void;
+  onNotifications?: () => void;
+}
+
 /**
- * 사용자 메뉴 선택 및 처리를 위한 훅
- * 메뉴 아이템과 로그아웃 기능을 제공합니다
+ * 사용자 메뉴 선택 및 처리를 위한 커스텀 훅
+ *
+ * @description
+ * 헤더의 사용자 드롭다운 메뉴 항목들과 로그아웃 처리를 관리합니다.
  */
-export const useUserSelection = () => {
+export const useUserSelection = (options: UseUserSelectionOptions = {}) => {
   const { clearAuth } = useAuthStore();
   const { clearUser } = useUserStore();
   const navigate = useNavigate();
+  const { storeId } = useParams<{ storeId: string }>();
 
   /**
-   * 계정 페이지로 이동
+   * 설정 처리
    */
-  const handleAccount = () => {
-    // TODO: 계정 관리 페이지 구현 후 경로 추가
-    console.log('계정 페이지로 이동');
+  const handleSettings = () => {
+    if (options.onSettings) {
+      options.onSettings();
+    } else {
+      console.log('설정 페이지로 이동');
+    }
   };
 
   /**
-   * 정산 페이지로 이동
+   * 정산 처리
    */
   const handleBilling = () => {
-    // TODO: 정산 관리 페이지 구현 후 경로 추가
-    console.log('정산 페이지로 이동');
+    if (options.onBilling) {
+      options.onBilling();
+    } else {
+      navigate(
+        ROUTE_PATH.STORE.OWNER_SETTLEMENT.replace(':storeId', storeId || '1'),
+      );
+    }
   };
 
   /**
-   * 알림 페이지로 이동
+   * 알림 처리
    */
   const handleNotifications = () => {
-    // TODO: 알림 관리 페이지 구현 후 경로 추가
-    console.log('알림 페이지로 이동');
+    if (options.onNotifications) {
+      options.onNotifications();
+    } else {
+      navigate(
+        ROUTE_PATH.STORE.OWNER_NOTIFICATIONS.replace(
+          ':storeId',
+          storeId || '1',
+        ),
+      );
+    }
   };
 
   /**
@@ -55,9 +80,9 @@ export const useUserSelection = () => {
    * 메뉴 아이템 설정 배열
    */
   const menuItems: MenuItemConfig[] = [
-    { icon: User, label: '계정', onClick: handleAccount },
-    { icon: CreditCard, label: '정산', onClick: handleBilling },
+    { icon: Settings, label: '설정', onClick: handleSettings },
     { icon: Bell, label: '알림', onClick: handleNotifications },
+    { icon: CreditCard, label: '정산', onClick: handleBilling },
   ];
 
   return {

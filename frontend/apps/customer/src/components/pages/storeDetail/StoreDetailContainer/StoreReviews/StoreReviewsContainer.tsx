@@ -1,4 +1,4 @@
-import type { ReviewResponse } from '@/types/review';
+import type { ReviewListResponse } from '@/types/review';
 import { Button } from '@/components/ui/button'; // Button 컴포넌트 import 추가
 import StoreReviewItem from './StoreReviewItem';
 import { generatePath, useNavigate } from 'react-router-dom';
@@ -6,15 +6,17 @@ import { ROUTE_PATH } from '@/router';
 
 interface StoreReviewsProps {
   storeId: string;
-  reviews?: ReviewResponse[];
+  reviewResponse?: ReviewListResponse;
   reviewTotalCount: number;
 }
 
 export const StoreReviewsContainer = ({
   storeId,
-  reviews,
+  reviewResponse,
   reviewTotalCount,
 }: StoreReviewsProps) => {
+  const reviews = reviewResponse?.reviewList || [];
+
   const navigate = useNavigate();
 
   const handleLoadAllReviews = () => {

@@ -1,0 +1,137 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import type { TopDiscountRange } from '@/types/analytics';
+
+interface DiscountRangeChartProps {
+  discountRanges: TopDiscountRange[];
+}
+
+const DiscountRangeChart = ({ discountRanges }: DiscountRangeChartProps) => {
+  // 데이터 변환
+  const chartData = discountRanges.map(range => ({
+    range: range.discountRange,
+    count: range.count,
+    percentage: range.percentage,
+  }));
+
+  // 커스텀 툴팁
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<{ payload: { count: number; percentage: number } }>;
+    label?: string;
+  }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0]?.payload;
+      if (!data) {
+        return null;
+      }
+      return (
+        <div className="bg-background rounded-lg border p-3 shadow-md">
+          <p className="font-medium">{label}</p>
+          <p className="text-sm text-blue-600">
+            판매 건수: {data.count}건 ({data.percentage.toFixed(2)}%)
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle>할인율별 판매 현황</CardTitle>
+        <CardDescription>
+          각 할인 구간별 판매 실적을 확인해보세요
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {chartData.length > 0 ? (
+          <>
+            {/* 차트 */}
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="range"
+                    fontSize={12}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis fontSize={12} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* 상위 할인 구간 요약 */}
+            <div className="mt-4 space-y-3">
+              <h4 className="text-sm font-semibold">주요 할인 구간</h4>
+              <div className="bg-muted/20 space-y-2 rounded-lg p-3">
+                {chartData.slice(0, 3).map((item, index) => (
+                  <div
+                    key={item.range}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{
+                          backgroundColor:
+                            index === 0
+                              ? '#3b82f6'
+                              : index === 1
+                                ? '#10b981'
+                                : '#f59e0b',
+                        }}
+                      />
+                      <span className="text-sm font-medium">{item.range}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold">
+                        {item.count}건
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        {item.percentage.toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="text-muted-foreground flex min-h-80 flex-1 items-center justify-center">
+            할인별 판매 데이터가 없습니다
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default DiscountRangeChart;

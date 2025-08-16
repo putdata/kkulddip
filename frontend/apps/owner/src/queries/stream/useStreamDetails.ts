@@ -4,7 +4,7 @@ import { streamService } from '@/services/streamService';
 import { streamQueryKeys } from './streamQueryKeys';
 
 /**
- * 특정 스트림 상세 정보 조회
+ * 특정 스트림 상세 정보를 조회하는 쿼리 훅
  */
 export const useStreamDetails = (streamId: number | null) => {
   return useQuery<Stream>({

@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { type Stream, type CreateStreamRequest, useNumberParam } from 'common';
+import { type Stream, type CreateStreamRequest } from 'common';
+import { useStoreSelection } from '@/hooks/useStoreSelection';
 import type { StreamFlowStatus, StreamFlow } from '@/types/stream';
 import {
   useCreateStream,
@@ -28,14 +29,16 @@ interface UseStreamFlowManagerProps {
 
 /**
  * 스트림 플로우를 관리하는 커스텀 훅
- * OpenVidu와 백엔드 API를 연동하여 스트림 생성부터 종료까지의 전체 플로우를 관리
+ *
+ * @description
+ * OpenVidu와 백엔드 API를 연동하여 스트림 생성부터 종료까지의 전체 플로우를 관리합니다.
  */
 export const useStreamFlowManager = ({
   initialStream,
   onStreamEnded,
 }: UseStreamFlowManagerProps = {}) => {
   const navigate = useNavigate();
-  const storeId = useNumberParam('storeId');
+  const { storeId } = useStoreSelection();
 
   const [streamFlow, setStreamFlow] = useState<StreamFlow>({
     id: initialStream?.id,

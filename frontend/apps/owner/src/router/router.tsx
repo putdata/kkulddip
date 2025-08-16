@@ -7,9 +7,13 @@ import Welcome from '@/pages/Welcome';
 import Dashboard from '@/pages/main/Dashboard';
 import StreamingDashboard from '@/pages/main/StreamingDashboard';
 import StreamingLive from '@/pages/main/StreamingLive';
-import MenuManagement from '@/pages/main/MenuManagement';
+import DdipboxManagement from '@/pages/main/DdipboxManagement';
 import OrdersManagement from '@/pages/main/OrdersManagement';
 import Analytics from '@/pages/main/Analytics';
+import StoreSettlement from '@/pages/main/StoreSettlement';
+import StoreNotifications from '@/pages/main/StoreNotifications';
+import OwnerSettlement from '@/pages/main/OwnerSettlement';
+import Notifications from '@/pages/main/Notifications';
 import Settings from '@/pages/main/Settings';
 import NotFound from '@/pages/NotFound';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -25,6 +29,7 @@ export const router = createBrowserRouter([
       {
         index: true,
         loader: indexLoader,
+        element: <GlobalSuspenseFallback />,
         hydrateFallbackElement: <GlobalSuspenseFallback />,
       },
       {
@@ -53,7 +58,7 @@ export const router = createBrowserRouter([
           },
           {
             path: ROUTE_PATH.STORE.MENU,
-            element: <MenuManagement />,
+            element: <DdipboxManagement />,
           },
           {
             path: ROUTE_PATH.STORE.ORDERS,
@@ -62,6 +67,22 @@ export const router = createBrowserRouter([
           {
             path: ROUTE_PATH.STORE.ANALYTICS,
             element: <Analytics />,
+          },
+          {
+            path: ROUTE_PATH.STORE.SETTLEMENT,
+            element: <StoreSettlement />,
+          },
+          {
+            path: ROUTE_PATH.STORE.NOTIFICATIONS,
+            element: <StoreNotifications />,
+          },
+          {
+            path: ROUTE_PATH.STORE.OWNER_SETTLEMENT,
+            element: <OwnerSettlement />,
+          },
+          {
+            path: ROUTE_PATH.STORE.OWNER_NOTIFICATIONS,
+            element: <Notifications />,
           },
           {
             path: ROUTE_PATH.STORE.SETTINGS,

@@ -3,21 +3,55 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import {
+  useAddHelpfulMutation,
+  useRemoveHelpfulMutation,
+} from '@/services/reviewService';
 import type { ReviewResponse } from '@/types/review';
 import { formatDate } from '@/utils/dateFormat';
 import { MessageCircleMore, ThumbsUpIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface ReviewProps {
   review: ReviewResponse;
 }
 
 const ReviewItem = ({ review }: ReviewProps) => {
+  const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
+  const [isHelpful, setIsHelpful] = useState(review.isHelpful);
+
+  // 사장님 댓글 유무 확인
+  // let isReply = false;
+  // if (review.reply != null) {
+  //   isReply = true;
+  // }
+
+  const addHelpfulMutation = useAddHelpfulMutation(review.reviewId.toString());
+
+  const removeHelpfulMutation = useRemoveHelpfulMutation(
+    review.reviewId.toString(),
+  );
+
+  const handleHelpfulClick = async () => {
+    // if (addHelpfulMutation.isLoading || removeHelpfulMutation.isLoading) {return};
+
+    if (isHelpful) {
+      // 즉시 UI 업데이트
+      setHelpfulCount(prev => prev - 1);
+      setIsHelpful(false);
+      removeHelpfulMutation.mutate(); // API 호출
+    } else {
+      setHelpfulCount(prev => prev + 1);
+      setIsHelpful(true);
+      addHelpfulMutation.mutate(); // API 호출
+    }
+  };
+
   return (
     <Card key={review.reviewId} className="w-full rounded-none bg-white">
       <CardContent className="flex flex-col items-start gap-3 px-5">
         <div className="flex w-full items-start justify-between">
           <div className="inline-flex items-center gap-3">
-            {/* TODO: 유저 프로필 사진 어떻게 할 것 인지 논의 필요... */}
             <Avatar className="h-10 w-10 bg-amber-500">
               <AvatarFallback className="bg-amber-500 text-sm font-bold text-white">
                 {review.userName.charAt(0)}
@@ -59,7 +93,7 @@ const ReviewItem = ({ review }: ReviewProps) => {
                 key={index}
                 className="flex h-20 w-20 items-center justify-center overflow-hidden rounded bg-gray-100"
               >
-                <img src={review.profileImage} alt="" />
+                <img src={image.imageUrl} alt={image.originalName} />
               </div>
             ))}
           </div>
@@ -68,17 +102,34 @@ const ReviewItem = ({ review }: ReviewProps) => {
         {/* 도움, 사장님 댓글 */}
         <Separator />
         <div className="flex h-5 w-full items-center justify-end gap-2 text-sm text-gray-400">
-          <div className="flex">
-            <ThumbsUpIcon className="h-5" />
-            {/* TODO: 도움 수 임시로 rating 사용 - 변경 필요 */}
-            <span>도움돼요 {review.rating}</span>
-          </div>
+          <button
+            onClick={handleHelpfulClick}
+            className={`flex cursor-pointer items-center gap-1 transition-colors hover:text-amber-500 ${
+              isHelpful ? 'text-amber-500' : 'text-gray-400'
+            }`}
+          >
+            <div className="flex">
+              <ThumbsUpIcon
+                className={`h-5 w-5 ${isHelpful ? 'fill-amber-500' : ''}`}
+              />
+              <span>도움돼요 {helpfulCount}</span>
+            </div>
+          </button>
           {/* TODO: 사장님 댓글 여부 확인 및 동작 추가 필요 */}
-          <div className="flex">
-            <MessageCircleMore className="h-5" />
-            <span>사장님 댓글</span>
+          <div className="gap flex items-center">
+            <MessageCircleMore className={'h-5'} />
+            <span className={'text-gray-400'}>사장님 댓글</span>
           </div>
         </div>
+        {review.reply && (
+          <div className="border-1 flex w-full flex-col rounded-lg p-2 text-xs">
+            <div className="flex justify-between text-gray-400">
+              <div>사장님의 답글: </div>
+              <div>{formatDate(review.reply.createdAt)}</div>
+            </div>
+            <div className="p-2">{review.reply.content}</div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

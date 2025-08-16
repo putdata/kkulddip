@@ -4,7 +4,7 @@ import { streamService } from '@/services/streamService';
 import { streamQueryKeys } from './streamQueryKeys';
 
 /**
- * 내 스트림 목록을 조회
+ * 내 스트림 목록을 조회하는 쿼리 훅
  */
 export const useMyStreams = () => {
   return useQuery<Stream[]>({

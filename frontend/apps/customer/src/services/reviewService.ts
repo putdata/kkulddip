@@ -1,5 +1,9 @@
 import { API_PATH } from '@/constants/api-path';
-import type { ReviewCreateRequest, ReviewResponse } from '@/types/review';
+import type {
+  ReviewCreateRequest,
+  ReviewListResponse,
+  ReviewResponse,
+} from '@/types/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from 'common';
 
@@ -17,7 +21,7 @@ export class ReviewService {
       size?: number;
       sort?: string;
     },
-  ): Promise<ReviewResponse[]> {
+  ): Promise<ReviewListResponse> {
     return apiClient.get(API_PATH.STORE_REVIEWS(storeId), params);
   }
 
@@ -27,16 +31,54 @@ export class ReviewService {
    * @param data - 등록할 리뷰 정보
    * @returns 등록된 리뷰 정보
    */
-  static async create(data: ReviewCreateRequest): Promise<ReviewResponse> {
+  static async createReview(
+    data: ReviewCreateRequest,
+  ): Promise<ReviewResponse> {
     const formData = new FormData();
-    formData.append('rating', data.rating.toString());
-    formData.append('reviewText', data.reviewText);
 
+    // request 객체를 JSON 문자열로 변환하여 추가
+    const request = {
+      customerId: data.customerId,
+      content: data.content,
+      orderId: data.orderId,
+      rating: data.rating,
+    };
+
+    formData.append(
+      'request',
+      new Blob([JSON.stringify(request)], {
+        type: 'application/json',
+      }),
+    );
+
+    // 이미지 파일을 추가
     data.images.forEach(image => {
       formData.append('images', image);
     });
 
-    return apiClient.post(`/stores/${data.storeId}/reviews`, formData);
+    formData.forEach((value, key) => {
+      console.log(`${key} =>`, value);
+    });
+
+    return apiClient.post(API_PATH.STORE_REVIEWS(data.storeId), formData);
+  }
+
+  /**
+   * 리뷰에 도움돼요 추가
+   */
+  static async addHelpful(reviewId: string): Promise<void> {
+    return apiClient.post(API_PATH.REVIEW_HELPFUL(reviewId));
+  }
+
+  /**
+   * 리뷰에서 도움돼요 제거
+   */
+  static async removeHelpful(reviewId: string): Promise<void> {
+    return apiClient.delete(API_PATH.REVIEW_HELPFUL(reviewId));
+  }
+
+  static async checkHelpful(reviewId: number): Promise<boolean> {
+    return apiClient.get(`/v1/reviews/${reviewId}/helpful/check`);
   }
 }
 
@@ -49,7 +91,7 @@ export const useCreateReviewMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ReviewService.create,
+    mutationFn: ReviewService.createReview,
     onSuccess: data => {
       // 사용자 관련 쿼리들을 무효화하여 최신 데이터로 업데이트
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
@@ -59,6 +101,39 @@ export const useCreateReviewMutation = () => {
     },
     onError: error => {
       console.error('리뷰 등록 실패:', error);
+    },
+  });
+};
+
+/**
+ * 리뷰 Helpful POST 뮤테이션
+ *
+ * @returns 리뷰 Helpful POST 뮤테이션 객체
+ */
+export const useAddHelpfulMutation = (reviewId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => ReviewService.addHelpful(reviewId),
+    onSuccess: () => {
+      // 요청 성공 시, 최신 리뷰 목록 다시 불러오기
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
+};
+
+/**
+ * 리뷰 Helpful DELETE 뮤테이션
+ *
+ * @returns 리뷰 Helpful DELETE 뮤테이션 객체
+ */
+export const useRemoveHelpfulMutation = (reviewId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => ReviewService.removeHelpful(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
     },
   });
 };

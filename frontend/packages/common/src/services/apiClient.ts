@@ -23,7 +23,7 @@ class ApiClient {
   constructor(baseURL = import.meta.env.VITE_API_BASE_URL) {
     this.instance = axios.create({
       baseURL: `${baseURL}`,
-      timeout: 10000,
+      timeout: 30000, // Increased from 10s to 30s for streaming operations
       headers: {
         'Content-Type': 'application/json',
       },
@@ -58,7 +58,9 @@ class ApiClient {
       },
       error => {
         if (error.response?.status === 401) {
-          useAuthStore.getState().clearAuth();
+          // 인증 실패 시 토큰 제거만 수행
+          const { clearAuth } = useAuthStore.getState();
+          clearAuth();
         }
 
         if (error.isAxiosError) {
@@ -90,8 +92,22 @@ class ApiClient {
    * @param data - 요청 본문 데이터
    * @returns 응답 데이터
    */
-  async post<T>(url: string, data?: object): Promise<T> {
-    const response = await this.instance.post<ApiResponse<T>>(url, data);
+  async post<T>(url: string, data?: object | FormData): Promise<T> {
+    // FormData인 경우 Content-Type 헤더 제거 (브라우저가 자동 설정하도록)
+    let config = {};
+    if (data instanceof FormData) {
+      config = {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 또는 delete 사용
+        },
+      };
+    }
+
+    const response = await this.instance.post<ApiResponse<T>>(
+      url,
+      data,
+      config,
+    );
     return (response.data as ApiSuccessResponse<T>).body;
   }
 
@@ -105,6 +121,19 @@ class ApiClient {
    */
   async put<T>(url: string, data?: object): Promise<T> {
     const response = await this.instance.put<ApiResponse<T>>(url, data);
+    return (response.data as ApiSuccessResponse<T>).body;
+  }
+
+  /**
+   * PATCH 요청 수행
+   *
+   * @template T - 응답 데이터의 타입
+   * @param url - 요청할 URL
+   * @param data - 요청 본문 데이터
+   * @returns 응답 데이터
+   */
+  async patch<T>(url: string, data?: object): Promise<T> {
+    const response = await this.instance.patch<ApiResponse<T>>(url, data);
     return (response.data as ApiSuccessResponse<T>).body;
   }
 

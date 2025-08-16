@@ -64,16 +64,15 @@ export interface FinalPriceProps {
 export interface OrderData {
   customerId: number;
   storeId: number;
-  pickupTime?: string;  // 픽업 시간 추가
-  orderItems: Array<{
+  orderItems: {
     productId: number;
     quantity: number;
     unitPrice: number;
-    discountInfos: {
+    discountInfos?: {
       discountCode: number;
       discountAmount: number;
     }[];
-  }>;
+  }[];
 }
 
 /**
@@ -93,7 +92,7 @@ export interface OrderResponse {
  * 결제 주문 ID 요청 데이터
  */
 export interface PaymentOrderIdRequest {
-  orderId: string | number;
+  orderId: string;
 }
 
 /**
@@ -137,9 +136,17 @@ export interface TossPaymentRequest {
  * useTossPayment 훅 매개변수
  */
 export interface TossPaymentParams {
-  productId?: number;
-  quantity: number;
-  customerId?: number;
-  storeId?: number;
+  orderItems: {
+    productId: number;
+    quantity: number;
+    unitPrice: number;
+    discountInfos?: {
+      discountCode: number;
+      discountAmount: number;
+    }[];
+  }[];
+  customerId: number;
+  storeId: number;
+  customerName: string; // 추가
   baseUrl?: string;
 }

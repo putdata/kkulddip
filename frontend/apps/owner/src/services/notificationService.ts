@@ -1,4 +1,9 @@
 import { apiClient } from 'common';
+import type {
+  NotificationListResponse,
+  SubscriberType,
+} from '@/types/notification';
+import { API_PATH } from '@/constants/api-path';
 
 interface NotificationRequest {
   title: string;
@@ -22,8 +27,35 @@ export const registerFCMToken = async (fcmToken: string): Promise<void> => {
     deviceType: 'WEB',
   };
 
-  await apiClient.post('/v1/fcm-tokens', tokenData);
+  await apiClient.post(API_PATH.FCM_TOKENS.REGISTER, tokenData);
   console.log('FCM Token registered with server');
+};
+
+export const deactivateFCMToken = async (userId: number): Promise<void> => {
+  await apiClient.post(API_PATH.FCM_TOKENS.DEACTIVATE(userId));
+  console.log('FCM Token deactivated for user:', userId);
+};
+
+/**
+ * 알림 목록 조회
+ */
+export const getNotifications = async (
+  subscriberId: number,
+  subscriberType: SubscriberType,
+  page = 0,
+  size = 50,
+): Promise<NotificationListResponse> => {
+  const params = {
+    subscriberId,
+    subscriberType,
+    page,
+    size,
+  };
+
+  return apiClient.get<NotificationListResponse>(
+    API_PATH.NOTIFICATIONS.LIST,
+    params,
+  );
 };
 
 export const sendTestNotification = async (
@@ -41,5 +73,5 @@ export const sendTestNotification = async (
   };
 
   const finalData = { ...defaultData, ...testData };
-  await apiClient.post('/v1/notifications', finalData);
+  await apiClient.post(API_PATH.NOTIFICATIONS.SEND, finalData);
 };

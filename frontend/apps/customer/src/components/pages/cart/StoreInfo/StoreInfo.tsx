@@ -1,5 +1,11 @@
-import { MapPin, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import type { StoreInfo as StoreInfoType } from '@/types/cart';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from '@/components/ui/card';
 
 export interface StoreInfoProps {
   Store: StoreInfoType;
@@ -8,22 +14,25 @@ export interface StoreInfoProps {
 
 const StoreInfo = ({ Store, pickupTimePrefix }: StoreInfoProps) => {
   return (
-    <div className="rounded-lg bg-gray-50 p-4">
-      <div className="mb-2 text-sm font-medium text-gray-900">{Store.name}</div>
-      <div className="flex items-center space-x-4 text-xs text-gray-500">
-        <div className="flex items-center space-x-1">
-          <Clock className="h-4 w-4" />
-          <div className="flex flex-col text-xs">
-            <span className="text-xs">{pickupTimePrefix}</span>
-            <span className="text-xs">{Store.pickupTime}</span>
-          </div>
-        </div>
-        <div className="flex items-center space-x-1">
-          <MapPin className="h-4 w-4" />
-          <span>{Store.pickupType}</span>
-        </div>
+    <Card className="gap-3 rounded-lg border-0 bg-white py-0 shadow-none">
+      <div className="flex justify-between pr-3">
+        <CardContent className="flex flex-col justify-around">
+          <CardTitle>{Store.name}</CardTitle>
+          <CardDescription>
+            <div className="flex items-center gap-1 text-xs">
+              <Clock className="h-3 w-3" />
+              <span>{pickupTimePrefix}</span>
+              <span>{Store.pickupTime}</span>
+            </div>
+          </CardDescription>
+        </CardContent>
+        <img
+          className="h-15 w-15"
+          src={Store.storeImageUrl}
+          alt={`${Store.name}의 이미지`}
+        />
       </div>
-    </div>
+    </Card>
   );
 };
 
