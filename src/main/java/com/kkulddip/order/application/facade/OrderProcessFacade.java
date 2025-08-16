@@ -180,7 +180,7 @@ public class OrderProcessFacade {
                 order.getOrderId().value());
             
             // 6. 푸시 알림 요청 (system → owner)
-            notificationService.sendNotificationToOwner(
+            notificationService.sendNotificationToStore(
                 order.getStoreId().value(),
                 "새로운 주문이 들어왔습니다. 주문번호: " + order.getOrderId().value()
             );
