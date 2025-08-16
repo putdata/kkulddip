@@ -6,15 +6,9 @@ const meta: Meta<typeof OrderSummary> = {
   component: OrderSummary,
   tags: ['autodocs'],
   argTypes: {
-    productName: {
-      control: 'text',
-      defaultValue: '[으뜸] 김치삼겹구이',
-      description: '상품 이름',
-    },
-    quantity: {
-      control: { type: 'number', min: 1 },
-      defaultValue: 1,
-      description: '상품 수량',
+    orderItems: {
+      control: 'object',
+      description: '주문 아이템 배열',
     },
   },
 };
@@ -25,22 +19,78 @@ type Story = StoryObj<typeof OrderSummary>;
 
 export const Default: Story = {
   args: {
-    productName: '[으뜸] 김치삼겹구이',
-    quantity: 1,
+    orderItems: [
+      {
+        productId: 1,
+        quantity: 1,
+        unitPrice: 8900,
+      },
+    ],
   },
 };
 
 export const MultipleItems: Story = {
   args: {
-    productName: '최고집 불고기 정식',
-    quantity: 3,
+    orderItems: [
+      {
+        productId: 1,
+        quantity: 2,
+        unitPrice: 8900,
+      },
+      {
+        productId: 2,
+        quantity: 1,
+        unitPrice: 12500,
+      },
+      {
+        productId: 3,
+        quantity: 3,
+        unitPrice: 6800,
+      },
+    ],
   },
 };
 
-export const LongName: Story = {
+export const LargeQuantity: Story = {
   args: {
-    productName:
-      '불타는 불맛 매운 김치 삼겹불고기와 백김치 우동 콤보 정식 세트 (매운맛 주의)',
-    quantity: 2,
+    orderItems: [
+      {
+        productId: 1,
+        quantity: 10,
+        unitPrice: 8900,
+      },
+    ],
+  },
+};
+
+export const ManyItems: Story = {
+  args: {
+    orderItems: [
+      {
+        productId: 1,
+        quantity: 1,
+        unitPrice: 8900,
+      },
+      {
+        productId: 2,
+        quantity: 2,
+        unitPrice: 12500,
+      },
+      {
+        productId: 3,
+        quantity: 1,
+        unitPrice: 6800,
+      },
+      {
+        productId: 4,
+        quantity: 1,
+        unitPrice: 15000,
+      },
+      {
+        productId: 5,
+        quantity: 2,
+        unitPrice: 9800,
+      },
+    ],
   },
 };

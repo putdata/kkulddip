@@ -10,20 +10,52 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { STORE_DETAIL_MESSAGES } from '@/constants/storeDetail';
-import { ROUTE_PATH } from '@/router';
-import type { DdipBox } from '@/types/store';
+import { useCartStore } from '@/store/useCartStore';
+import type { StoreInfo } from '@/types/cart';
+import type { DdipBox, StoreDetail } from '@/types/store';
 import { formatPrice } from '@/utils/priceFormat';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface RandomItemProps {
+  store: StoreDetail;
   ddipbox: DdipBox;
 }
 
-export const DdipboxItem = ({ ddipbox }: RandomItemProps) => {
-  const navigate = useNavigate();
+export const DdipboxItem = ({ store, ddipbox }: RandomItemProps) => {
+  const {
+    addToCart,
+    clearAndAddNewStore,
+    showStoreChangeModal,
+    setShowStoreChangeModal,
+  } = useCartStore();
+
+  const storeInfo: StoreInfo = {
+    storeId: store.storeId,
+    name: store.storeName,
+    pickupTime: store.operatingHours,
+    address: store.storeAddress,
+    storeImageUrl: store.storeProfileImage,
+  };
+
+  // 장바구니에 추가하기
+  const handleAddtoCart = () => {
+    const result = addToCart(ddipbox, storeInfo);
+
+    if (result.success) {
+      toast(result.message);
+    }
+  };
+
+  // 확인 버튼 클릭 시 함수
+  const handleConfirmStoreChange = () => {
+    clearAndAddNewStore(ddipbox, storeInfo);
+    toast('새로운 가게 상품으로 교체되었습니다!');
+  };
 
   const message = STORE_DETAIL_MESSAGES;
 
@@ -69,11 +101,36 @@ export const DdipboxItem = ({ ddipbox }: RandomItemProps) => {
         </div>
         <Button
           className="bg-amber-500 hover:bg-amber-500 data-[state=on]:bg-amber-600"
-          onClick={() => navigate(ROUTE_PATH.PAY)}
+          onClick={handleAddtoCart}
         >
           {message.RESERVE_BUTTON_TEXT}
         </Button>
       </CardFooter>
+      {showStoreChangeModal && (
+        <Dialog
+          open={showStoreChangeModal}
+          onOpenChange={setShowStoreChangeModal}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>가게 변경 확인</DialogTitle>
+              <DialogDescription>
+                동일한 가게의 띱박스만 장바구니에 담을 수 있어요! 기존
+                장바구니를 초기화하고 새로운 가게의 띱박스를 추가할까요?
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowStoreChangeModal(false)}
+              >
+                아니오
+              </Button>
+              <Button onClick={handleConfirmStoreChange}>네</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Card>
   );
 };
