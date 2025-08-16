@@ -10,6 +10,22 @@ interface OrderFlowState {
   orderData: OrderData;
   completedOrderData: OrderResponse | null;
   isCompleted: boolean;
+  // 장바구니 백업 데이터
+  backupCartItems: Array<{
+    name: string;
+    price: number;
+    description: string;
+    quantity: number;
+    ddipboxId: number;
+    discountRate: number;
+    storeId: number;
+  }> | null;
+  backupStoreInfo: {
+    storeId: number;
+    name: string;
+    address: string;
+    pickupTime: string;
+  } | null;
 
   // 액션들
   updateOrderData: (data: Partial<OrderData>) => void;
@@ -35,6 +51,8 @@ export const useOrderFlowStore = create<OrderFlowState>()(
       orderData: initialOrderData,
       completedOrderData: null,
       isCompleted: false,
+      backupCartItems: null,
+      backupStoreInfo: null,
 
       // 장바구니/결제 데이터 업데이트
       updateOrderData: data =>
@@ -46,23 +64,35 @@ export const useOrderFlowStore = create<OrderFlowState>()(
       completeOrder: paymentData => {
         const { orderData } = get();
 
-        // 실제 데이터 가져오기
+        // 장바구니 데이터 백업 (장바구니가 비워지기 전에)
         const cartStore = useCartStore.getState();
         const userStore = useUserStore.getState();
 
-        const completedOrderResponse: OrderResponse = {
-          orderId: `ORDER-${Date.now()}`,
-          customerId: userStore.user?.userId || 0,
-          storeId: cartStore.storeInfo?.storeId || 0,
-          originalPrice: orderData.total,
-          finalPrice: paymentData.finalAmount,
-          orderStatus: 'COMPLETED',
-          orderDate: new Date().toISOString(),
-        };
+        // 실제 서버 응답 데이터가 있으면 사용, 없으면 더미 데이터 생성
+        let completedOrderResponse: OrderResponse;
+        
+        if (paymentData.orderResponse) {
+          // 실제 서버 응답 데이터 사용
+          completedOrderResponse = paymentData.orderResponse;
+        } else {
+          // 더미 데이터 (fallback)
+          completedOrderResponse = {
+            orderId: `ORDER-${Date.now()}`,
+            customerId: userStore.user?.userId || 0,
+            storeId: cartStore.storeInfo?.storeId || 0,
+            originalPrice: orderData.total,
+            finalPrice: paymentData.finalAmount,
+            orderStatus: 'PENDING',
+            orderDate: new Date().toISOString(),
+          };
+        }
 
         set({
-          completedOrderData: completedOrderResponse, // OrderResponse 타입으로 저장
+          completedOrderData: completedOrderResponse,
           isCompleted: true,
+          // 장바구니 데이터 백업
+          backupCartItems: cartStore.items || [],
+          backupStoreInfo: cartStore.storeInfo || null,
         });
         // 뒤로가기 차단
         window.history.replaceState(null, '', window.location.pathname);
@@ -74,6 +104,8 @@ export const useOrderFlowStore = create<OrderFlowState>()(
           orderData: initialOrderData,
           completedOrderData: null,
           isCompleted: false,
+          backupCartItems: null,
+          backupStoreInfo: null,
         });
       },
 
@@ -94,6 +126,8 @@ export const useOrderFlowStore = create<OrderFlowState>()(
       partialize: state => ({
         isCompleted: state.isCompleted,
         completedOrderData: state.completedOrderData,
+        backupCartItems: state.backupCartItems,
+        backupStoreInfo: state.backupStoreInfo,
       }),
     },
   ),

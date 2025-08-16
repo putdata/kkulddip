@@ -22,4 +22,6 @@ export const API_PATH = {
   STREAMS_LIVE: '/v1/streams/live',
   STREAMS_JOIN: (streamId: number) => `/v1/streams/${streamId}/join`,
   STREAMS_DETAIL: (streamId: number) => `/v1/streams/${streamId}`,
+
+  STORES_SEARCH: '/v1/stores/search',
 };
