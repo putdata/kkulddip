@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   Plus,
   Store,
@@ -62,8 +63,44 @@ const AddStoreDialog = () => {
     });
   };
 
+  const validateForm = (): boolean => {
+    if (!formData.storeName.trim()) {
+      toast.error('가게명을 입력해주세요.');
+      return false;
+    }
+    if (!formData.storeAddress.trim()) {
+      toast.error('주소를 입력해주세요.');
+      return false;
+    }
+    if (!formData.phone.trim()) {
+      toast.error('전화번호를 입력해주세요.');
+      return false;
+    }
+    if (!formData.businessNumber.trim()) {
+      toast.error('사업자등록번호를 입력해주세요.');
+      return false;
+    }
+    if (formData.latitude === 0 || formData.longitude === 0) {
+      toast.error('위치 정보(위도/경도)를 입력해주세요.');
+      return false;
+    }
+    if (formData.latitude < -90 || formData.latitude > 90) {
+      toast.error('위도는 -90도에서 90도 사이의 값이어야 합니다.');
+      return false;
+    }
+    if (formData.longitude < -180 || formData.longitude > 180) {
+      toast.error('경도는 -180도에서 180도 사이의 값이어야 합니다.');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     createStoreMutation.mutate(formData, {
       onSuccess: () => {

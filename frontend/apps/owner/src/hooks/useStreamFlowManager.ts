@@ -229,7 +229,6 @@ export const useStreamFlowManager = ({
 
       const parsedError = parseStreamError(error);
       setStatus('ERROR', parsedError.message);
-      toast.error(parsedError.message);
     }
   }, [
     streamFlow.id,

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { Package, Tag, DollarSign, Hash } from 'lucide-react';
 import {
   Dialog,
@@ -51,7 +52,12 @@ const EditDdipboxDialog = ({
   }, [open, resetForm]);
 
   const handleSubmit = () => {
-    if (!validateForm() || !hasChanges()) {
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!hasChanges()) {
+      toast.error('변경된 내용이 없습니다.');
       return;
     }
 

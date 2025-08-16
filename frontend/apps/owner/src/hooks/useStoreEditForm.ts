@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useUpdateStore } from '@/queries/store';
 import type { UpdateStoreRequest, Store } from '@/types/store';
 
@@ -46,8 +47,33 @@ export const useStoreEditForm = ({
       }));
     };
 
+  const validateForm = (): boolean => {
+    // 위도 검증
+    if (formData.latitude !== undefined) {
+      if (formData.latitude < -90 || formData.latitude > 90) {
+        toast.error('위도는 -90도에서 90도 사이의 값이어야 합니다.');
+        return false;
+      }
+    }
+
+    // 경도 검증
+    if (formData.longitude !== undefined) {
+      if (formData.longitude < -180 || formData.longitude > 180) {
+        toast.error('경도는 -180도에서 180도 사이의 값이어야 합니다.');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = () => {
     if (!store) {
+      toast.error('매장 정보를 불러올 수 없습니다.');
+      return;
+    }
+
+    if (!validateForm()) {
       return;
     }
 

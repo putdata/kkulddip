@@ -1,12 +1,7 @@
-import { useEffect } from 'react';
 import { useAuthCallback } from '@/hooks/useAuthCallback';
 
 const AuthCallback = () => {
-  const { processCallback } = useAuthCallback();
-
-  useEffect(() => {
-    processCallback();
-  }, [processCallback]);
+  useAuthCallback();
 
   return (
     <div className="flex min-h-full items-center justify-center">

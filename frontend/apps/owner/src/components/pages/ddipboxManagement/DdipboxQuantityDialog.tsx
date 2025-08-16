@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { RefreshCw, Package, Hash, RotateCcw } from 'lucide-react';
 import {
   Dialog,
@@ -54,10 +55,12 @@ const DdipboxQuantityDialog = ({
   const validateForm = () => {
     if (operationType === 'direct') {
       if (remainingQuantity < 0) {
+        toast.error('남은 재고 수량은 0개 이상이어야 합니다.');
         return false;
       }
     } else {
       if (dailyQuantity < 1) {
+        toast.error('일일 수량은 1개 이상이어야 합니다.');
         return false;
       }
     }

@@ -109,6 +109,8 @@ const StoreEditDialog = ({
                 id="latitude"
                 type="number"
                 step="any"
+                min="-90"
+                max="90"
                 value={formData.latitude || ''}
                 onChange={e =>
                   updateField('latitude')(parseFloat(e.target.value) || 0)
@@ -124,6 +126,8 @@ const StoreEditDialog = ({
                 id="longitude"
                 type="number"
                 step="any"
+                min="-180"
+                max="180"
                 value={formData.longitude || ''}
                 onChange={e =>
                   updateField('longitude')(parseFloat(e.target.value) || 0)

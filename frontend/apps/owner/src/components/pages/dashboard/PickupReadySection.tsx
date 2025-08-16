@@ -57,9 +57,9 @@ const PickupReadySection = ({ storeId }: PickupReadySectionProps) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>주문번호</TableHead>
+                  <TableHead className="text-center">주문번호</TableHead>
                   <TableHead className="text-center">상품수</TableHead>
-                  <TableHead className="text-right">금액</TableHead>
+                  <TableHead className="text-center">금액</TableHead>
                   <TableHead className="text-center">픽업시간</TableHead>
                   <TableHead className="text-center">액션</TableHead>
                 </TableRow>
@@ -67,20 +67,22 @@ const PickupReadySection = ({ storeId }: PickupReadySectionProps) => {
               <TableBody>
                 {[1, 2, 3, 4, 5].map(i => (
                   <TableRow key={i}>
-                    <TableCell>
-                      <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <TableCell className="text-center">
+                      <div className="mx-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="mx-auto h-4 w-8 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="ml-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <TableCell className="text-center">
+                      <div className="mx-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="mx-auto h-4 w-12 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="h-7 w-16 animate-pulse rounded bg-gray-200"></div>
+                      <div className="flex justify-center">
+                        <div className="h-7 w-16 animate-pulse rounded bg-gray-200"></div>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -130,9 +132,9 @@ const PickupReadySection = ({ storeId }: PickupReadySectionProps) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>주문번호</TableHead>
+                  <TableHead className="text-center">주문번호</TableHead>
                   <TableHead className="text-center">상품수</TableHead>
-                  <TableHead className="text-right">금액</TableHead>
+                  <TableHead className="text-center">금액</TableHead>
                   <TableHead className="text-center">픽업시간</TableHead>
                   <TableHead className="text-center">액션</TableHead>
                 </TableRow>
@@ -140,13 +142,13 @@ const PickupReadySection = ({ storeId }: PickupReadySectionProps) => {
               <TableBody>
                 {confirmedOrders.slice(0, 5).map((order: Order) => (
                   <TableRow key={order.orderId}>
-                    <TableCell className="font-medium">
+                    <TableCell className="text-center font-medium">
                       {order.orderId.slice(-6)}
                     </TableCell>
                     <TableCell className="text-center">
                       {order.orderItems?.length}개
                     </TableCell>
-                    <TableCell className="text-right font-semibold">
+                    <TableCell className="text-center font-semibold">
                       ₩{order.originalPrice?.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-center text-sm">
@@ -166,29 +168,31 @@ const PickupReadySection = ({ storeId }: PickupReadySectionProps) => {
                       )}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Button
-                        size="sm"
-                        onClick={() => handlePickupClick(order)}
-                        disabled={
-                          processingIds.has(order.orderId) ||
-                          pickupOrderMutation.isPending
-                        }
-                        className="h-7 px-3 text-xs"
-                      >
-                        {processingIds.has(order.orderId) ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : completedIds.has(order.orderId) ? (
-                          <>
-                            <CheckCircle className="mr-1 h-3 w-3 text-green-600" />
-                            완료
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-1 h-3 w-3" />
-                            완료
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex justify-center">
+                        <Button
+                          size="sm"
+                          onClick={() => handlePickupClick(order)}
+                          disabled={
+                            processingIds.has(order.orderId) ||
+                            pickupOrderMutation.isPending
+                          }
+                          className="h-7 px-3 text-xs"
+                        >
+                          {processingIds.has(order.orderId) ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : completedIds.has(order.orderId) ? (
+                            <>
+                              <CheckCircle className="mr-1 h-3 w-3 text-green-600" />
+                              완료
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="mr-1 h-3 w-3" />
+                              완료
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

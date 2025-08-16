@@ -51,9 +51,9 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>주문번호</TableHead>
+                  <TableHead className="text-center">주문번호</TableHead>
                   <TableHead className="text-center">상품수</TableHead>
-                  <TableHead className="text-right">금액</TableHead>
+                  <TableHead className="text-center">금액</TableHead>
                   <TableHead className="text-center">시간</TableHead>
                   <TableHead className="text-center">액션</TableHead>
                 </TableRow>
@@ -61,20 +61,20 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
               <TableBody>
                 {[1, 2, 3, 4, 5].map(i => (
                   <TableRow key={i}>
-                    <TableCell>
-                      <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <TableCell className="text-center">
+                      <div className="mx-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="mx-auto h-4 w-8 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="ml-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <TableCell className="text-center">
+                      <div className="mx-auto h-4 w-16 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="mx-auto h-4 w-10 animate-pulse rounded bg-gray-200"></div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex gap-1">
+                      <div className="flex justify-center gap-1">
                         <div className="h-7 w-7 animate-pulse rounded bg-gray-200"></div>
                         <div className="h-7 w-7 animate-pulse rounded bg-gray-200"></div>
                       </div>
@@ -129,9 +129,9 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>주문번호</TableHead>
+                  <TableHead className="text-center">주문번호</TableHead>
                   <TableHead className="text-center">상품수</TableHead>
-                  <TableHead className="text-right">금액</TableHead>
+                  <TableHead className="text-center">금액</TableHead>
                   <TableHead className="text-center">시간</TableHead>
                   <TableHead className="text-center">액션</TableHead>
                 </TableRow>
@@ -139,13 +139,13 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
               <TableBody>
                 {pendingOrders.slice(0, 5).map((order: Order) => (
                   <TableRow key={order.orderId}>
-                    <TableCell className="font-medium">
+                    <TableCell className="text-center font-medium">
                       {order.orderId.slice(-6)}
                     </TableCell>
                     <TableCell className="text-center">
                       {order.orderItems?.length}개
                     </TableCell>
-                    <TableCell className="text-right font-semibold">
+                    <TableCell className="text-center font-semibold">
                       ₩{order.originalPrice?.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-center text-sm">
@@ -155,7 +155,7 @@ const PendingOrdersSection = ({ storeId }: PendingOrdersSectionProps) => {
                       })}
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex gap-1">
+                      <div className="flex justify-center gap-1">
                         <Button
                           size="sm"
                           onClick={() => handleAcceptOrder(order)}
