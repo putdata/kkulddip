@@ -13,8 +13,10 @@ import com.kkulddip.order.domain.model.entity.OrderItem;
 import com.kkulddip.order.domain.model.enums.OrderStatus;
 import com.kkulddip.order.domain.model.vo.StoreId;
 import com.kkulddip.order.domain.repository.OrderRepository;
+import com.kkulddip.store.entity.DailyDdipBoxInventory;
 import com.kkulddip.store.entity.DdipBox;
 import com.kkulddip.store.entity.DdipBoxItem;
+import com.kkulddip.store.repository.DailyDdipBoxInventoryRepository;
 import com.kkulddip.store.repository.DdipBoxItemRepository;
 import com.kkulddip.store.repository.DdipBoxRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final OrderRepository orderRepository;
     private final DdipBoxRepository ddipBoxRepository;
     private final DdipBoxItemRepository ddipBoxItemRepository;
+    private final DailyDdipBoxInventoryRepository inventoryRepository;
     private final PythonAnalyticsClient pythonAnalyticsClient;
     
     // Java 21 Virtual Thread Executor for parallel processing
@@ -246,27 +249,72 @@ public class AnalyticsServiceImpl implements AnalyticsService {
      * 추후 수정 필요
      */
     private List<DailyInventoryDataDto> collectDailyInventoryData(Long storeId, LocalDate startDate, LocalDate endDate) {
-        // 한 번만 DB 조회
-        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
 
+        // 재고 관리 안 될 경우
+        List<DdipBox> ddipBoxes = ddipBoxRepository.findByStore_StoreId(storeId);
+        if (ddipBoxes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // 현재 총 판매 가능 양(이걸 이용해서 임의 값 넣어줄 것)
         long totalDailyQuantity = ddipBoxes.stream()
             .mapToLong(DdipBox::getDailyQuantity)
             .sum();
 
-        long totalRemainingQuantity = ddipBoxes.stream()
-            .mapToLong(DdipBox::getRemainingQuantity)
-            .sum();
+        //------------------------------------------------------------------------
+
+        // 재고 관리 될 경우
+        //스토어 아이디에 해당하는 띱박스 아이디들 찾기
+        List<Long> ddipboxIds = ddipBoxes.stream()
+            .map(DdipBox::getDdipboxId)
+            .collect(Collectors.toList());
+
+        // 띱박스 아이디 들에 포함되면서, startDate, endDate 사이에 있는 재고들 찾기
+        List<DailyDdipBoxInventory> inventories = inventoryRepository.findByDdipboxIdInAndCreateAtBetween(ddipboxIds, startDate, endDate);
+
+        //같은 날짜 dailyQuantity, remainingQuantity 합산
+        Map<LocalDate, Long> dailyQuantitySum = inventories.stream()
+            .collect(Collectors.groupingBy(
+                DailyDdipBoxInventory::getCreateAt,
+                Collectors.summingLong(DailyDdipBoxInventory::getDailyQuantity)
+            ));
+
+        Map<LocalDate, Long> remainingQuantitySum = inventories.stream()
+            .collect(Collectors.groupingBy(
+                DailyDdipBoxInventory::getCreateAt,
+                Collectors.summingLong(DailyDdipBoxInventory::getRemainingQuantity)
+            ));
 
         List<DailyInventoryDataDto> dailyInventoryList = new ArrayList<>();
 
-        // 각 날짜에 동일한 재고 총합 적용 (현재는 일별로 판매할 양, 남은 양을 저장하는 테이블이 없음)
         LocalDate currentDate = startDate;
+        Random random = new Random();
+
         while (!currentDate.isAfter(endDate)) {
-            dailyInventoryList.add(DailyInventoryDataDto.builder()
-                .date(currentDate)
-                .totalDailyQuantity(totalDailyQuantity)
-                .totalRemainingQuantity(totalRemainingQuantity)
-                .build());
+            Long dailyQty = dailyQuantitySum.get(currentDate);
+            if (!inventories.isEmpty() && dailyQty != null) {
+                // 재고 관리 추적 될 때
+                dailyInventoryList.add(DailyInventoryDataDto.builder()
+                    .date(currentDate)
+                    .totalDailyQuantity(dailyQty)
+                    .totalRemainingQuantity(remainingQuantitySum.get(currentDate))
+                    .build());
+            } else if(inventories.isEmpty()){
+                // 재고 관리 아예 추적 안 될 때
+                // 현재 재고량 기준 ±20% 랜덤
+                long randomDailyQty = (long) (totalDailyQuantity * (0.8 + random.nextDouble() * 0.4));
+
+                // 리메이닝은 재고량보다 낮게 (0 ~ randomDailyQty 범위)
+                long randomRemainingQty = (long) (random.nextDouble() * randomDailyQty);
+
+                dailyInventoryList.add(DailyInventoryDataDto.builder()
+                    .date(currentDate)
+                    .totalDailyQuantity(randomDailyQty)
+                    .totalRemainingQuantity(randomRemainingQty)
+                    .build());
+            } else {
+                // 해당 날짜에 재고 데이터 없는 경우
+                log.debug("Skipping date {} - partial inventory data", currentDate);
+            }
             currentDate = currentDate.plusDays(1);
         }
 
