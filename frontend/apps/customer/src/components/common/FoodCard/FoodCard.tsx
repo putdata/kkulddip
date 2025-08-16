@@ -14,6 +14,8 @@ export interface FoodCardProps {
  * @returns Card
  */
 const FoodCard = ({ store, onClick }: FoodCardProps) => {
+  console.log('유저와의 거리: ', store.distanceFromUser);
+
   return (
     <Card onClick={onClick} className="flex-row gap-1 overflow-hidden p-0">
       {/* 왼쪽 이미지 */}
@@ -80,7 +82,7 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
             {/* 거리 */}
             <span className="text-gray-400">📍</span>
             <span className="text-sm text-gray-600">
-              {store.distanceFromUser}km
+              {store.distanceFromUser.toFixed(2)}km
             </span>
           </div>
 

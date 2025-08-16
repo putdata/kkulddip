@@ -16,7 +16,7 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <GlobalErrorBoundary>
         <App />
-        <Toaster position="top-center" />
+        <Toaster position="top-center" offset={80} />
         <ReactQueryDevtools initialIsOpen={false} />
       </GlobalErrorBoundary>
     </QueryClientProvider>
