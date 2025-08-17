@@ -27,7 +27,7 @@ const HomeMainContainer = ({
   }
 
   return (
-    <div className="flex flex-col gap-3 p-5">
+    <div className="flex flex-col gap-4 p-4 pb-20">
       {stores.map((store, index) => (
         <div
           key={`${store.storeId}-${index}`}

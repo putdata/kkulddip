@@ -10,7 +10,7 @@ const BaseBadge = ({
 }) => {
   return (
     <div
-      className={`inline-block rounded px-2 py-1 text-xs font-medium ${className}`}
+      className={`inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-semibold ${className}`}
     >
       {children}
     </div>
@@ -32,7 +32,7 @@ export const DiscountBadge = ({
   );
 
   return (
-    <BaseBadge className="bg-yellow-100 text-yellow-800">
+    <BaseBadge className="bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm">
       {discountPercent}% 할인
     </BaseBadge>
   );
@@ -44,7 +44,11 @@ export interface TimeBadgeProps {
 }
 
 export const TimeBadge = ({ timeText }: TimeBadgeProps) => {
-  return <BaseBadge className="bg-red-500 text-white">{timeText}</BaseBadge>;
+  return (
+    <BaseBadge className="bg-red-500 text-white shadow-sm">
+      {timeText}
+    </BaseBadge>
+  );
 };
 
 // 재고 뱃지
@@ -54,7 +58,7 @@ export interface StockBadgeProps {
 
 export const StockBadge = ({ remainingCount }: StockBadgeProps) => {
   return (
-    <BaseBadge className="bg-red-100 text-red-500">
+    <BaseBadge className="border border-red-200 bg-red-50 text-red-600">
       남은 수량 {remainingCount}개
     </BaseBadge>
   );
