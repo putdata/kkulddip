@@ -28,7 +28,7 @@ import {
 const Welcome = () => {
   const navigate = useNavigate();
   const user = useUserStore(state => state.user);
-  const { clearAuth } = useAuthStore();
+  const { accessToken, clearAuth } = useAuthStore();
   const { clearUser } = useUserStore();
   const isScrolled = useScrollHeader();
 
@@ -36,6 +36,16 @@ const Welcome = () => {
     clearAuth();
     clearUser();
     navigate(ROUTE_PATH.LOGIN);
+  };
+
+  const handleStartClick = () => {
+    if (accessToken) {
+      // 토큰이 있으면 INDEX로 가서 indexLoader가 스토어 유무 판단
+      navigate(ROUTE_PATH.INDEX);
+    } else {
+      // 토큰이 없으면 로그인 페이지로
+      navigate(ROUTE_PATH.LOGIN);
+    }
   };
 
   const heroSection = useIntersectionObserver();
@@ -84,7 +94,7 @@ const Welcome = () => {
             <Button
               size="sm"
               className="bg-gradient-to-r from-amber-500 to-orange-500 font-semibold text-white shadow-md transition-all duration-300 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg"
-              onClick={() => navigate(ROUTE_PATH.INDEX)}
+              onClick={handleStartClick}
             >
               지금 시작하기
               <ArrowRight className="ml-1 h-4 w-4" />
@@ -166,7 +176,7 @@ const Welcome = () => {
               <Button
                 size="lg"
                 className="group transform bg-gradient-to-r from-amber-500 to-orange-500 px-10 py-6 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:from-amber-600 hover:to-orange-600 hover:shadow-2xl"
-                onClick={() => navigate(ROUTE_PATH.INDEX)}
+                onClick={handleStartClick}
               >
                 지금 시작하기
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -880,7 +890,7 @@ const Welcome = () => {
                 <Button
                   size="lg"
                   className="bg-white px-10 py-4 text-lg font-bold text-amber-600 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-xl"
-                  onClick={() => navigate(ROUTE_PATH.INDEX)}
+                  onClick={handleStartClick}
                 >
                   지금 시작하기
                   <Package className="ml-2 h-5 w-5" />
