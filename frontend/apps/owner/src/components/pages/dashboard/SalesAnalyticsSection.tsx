@@ -168,7 +168,7 @@ const SalesAnalyticsSection = ({ storeId }: SalesAnalyticsSectionProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {inventoryStatus ? (
+          {inventoryStatus && inventoryStatus.totalDailyCount > 0 ? (
             <div className="space-y-4">
               {/* 재고 소진율 표시 */}
               <div
