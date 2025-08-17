@@ -8,8 +8,6 @@ interface HomeMainProps {
   lastElementRef?: (node: HTMLDivElement | null) => void;
   isFetchingNextPage?: boolean;
   hasNextPage?: boolean;
-  hasLocationError?: boolean;
-  onRequestLocation?: () => void;
 }
 
 const HomeMainContainer = ({

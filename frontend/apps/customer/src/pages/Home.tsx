@@ -14,8 +14,6 @@ const Home = () => {
     isFetchingNextPage,
     isLoading,
     isError,
-    requestLocation,
-    hasLocationError,
   } = useStores();
 
   const { lastElementRef } = useInfiniteScroll({
@@ -56,8 +54,6 @@ const Home = () => {
         lastElementRef={lastElementRef}
         isFetchingNextPage={isFetchingNextPage}
         hasNextPage={hasNextPage}
-        hasLocationError={hasLocationError}
-        onRequestLocation={requestLocation}
       />
     </div>
   );
