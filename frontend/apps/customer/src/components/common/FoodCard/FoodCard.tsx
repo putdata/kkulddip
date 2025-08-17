@@ -80,10 +80,14 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
             </span>
 
             {/* 거리 */}
-            <span className="text-gray-400">📍</span>
-            <span className="text-sm text-gray-600">
-              {store.distanceFromUser.toFixed(2)}km
-            </span>
+            {store.distanceFromUser !== undefined && store.distanceFromUser !== null && (
+              <>
+                <span className="text-gray-400">📍</span>
+                <span className="text-sm text-gray-600">
+                  {store.distanceFromUser.toFixed(2)}km
+                </span>
+              </>
+            )}
           </div>
 
           {/* TODO: 남은 재고 수 합의 필요 */}
