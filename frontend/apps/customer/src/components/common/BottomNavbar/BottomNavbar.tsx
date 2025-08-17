@@ -2,6 +2,7 @@ import { Heart, Package, User, Home, Search } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTE_PATH } from '@/router';
+import { cloneElement } from 'react';
 
 interface GnbPropsInterface {
   icon: ReactElement;
@@ -21,31 +22,31 @@ function BottomNavbar() {
 
   const gnbProps: GnbPropsInterface[] = [
     {
-      icon: <Home className="h-5 w-5" />,
+      icon: <Home className="h-6 w-6" />,
       onClick: onHomeClickHandler,
       label: '홈',
       path: ROUTE_PATH.HOME,
     },
     {
-      icon: <Search className="h-5 w-5" />,
+      icon: <Search className="h-6 w-6" />,
       onClick: onSearchClickHandler,
       label: '검색',
       path: ROUTE_PATH.SEARCH,
     },
     {
-      icon: <Heart className="h-5 w-5" />,
+      icon: <Heart className="h-6 w-6" />,
       onClick: onLikeClickHandler,
       label: '찜',
       path: ROUTE_PATH.LIKE,
     },
     {
-      icon: <Package className="h-5 w-5" />,
+      icon: <Package className="h-6 w-6" />,
       onClick: onOrderClickHandler,
       label: '주문내역',
       path: ROUTE_PATH.ORDER,
     },
     {
-      icon: <User className="h-5 w-5" />,
+      icon: <User className="h-6 w-6" />,
       onClick: onMyPageClickHandler,
       label: '마이',
       path: ROUTE_PATH.MY,
@@ -53,26 +54,46 @@ function BottomNavbar() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 h-14 border-t bg-white">
-      <div className="flex items-center justify-evenly text-xs text-gray-500">
+    <div className="fixed bottom-0 left-0 right-0 z-50 h-16 border-t bg-white shadow-lg">
+      <div className="flex h-full items-center justify-around">
         {gnbProps.map(item => {
           const isActive = location.pathname === item.path;
 
           return (
-            <div
+            <button
               key={item.label}
               onClick={item.onClick}
-              className={`flex flex-1 flex-col items-center p-1 py-2 ${
-                isActive ? 'bg-yellow-50' : ''
+              className={`flex h-full flex-1 flex-col items-center justify-center gap-1 transition-all duration-200 ${
+                isActive
+                  ? 'text-amber-600'
+                  : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              {item.icon}
               <div
-                className={`mt-1 text-xs ${isActive ? 'font-semibold text-black' : ''}`}
+                className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'scale-100'}`}
+              >
+                {cloneElement(
+                  item.icon as ReactElement<{
+                    className?: string;
+                    fill?: string;
+                  }>,
+                  {
+                    className: `h-6 w-6 ${isActive ? 'stroke-2' : 'stroke-1.5'}`,
+                    fill: isActive ? 'currentColor' : 'none',
+                  },
+                )}
+              </div>
+              <span
+                className={`text-[10px] transition-all duration-200 ${
+                  isActive ? 'font-semibold' : 'font-normal'
+                }`}
               >
                 {item.label}
-              </div>
-            </div>
+              </span>
+              {isActive && (
+                <div className="absolute bottom-0 h-0.5 w-12 rounded-full bg-amber-600" />
+              )}
+            </button>
           );
         })}
       </div>

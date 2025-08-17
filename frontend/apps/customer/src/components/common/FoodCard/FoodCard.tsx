@@ -17,43 +17,65 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
   console.log('유저와의 거리: ', store.distanceFromUser);
 
   return (
-    <Card onClick={onClick} className="flex-row gap-1 overflow-hidden p-0">
+    <Card
+      onClick={onClick}
+      className="h-[140px] cursor-pointer flex-row overflow-hidden border-gray-100 p-0 shadow-md transition-all duration-300 hover:shadow-lg"
+    >
       {/* 왼쪽 이미지 */}
-      <div className="h-48 w-32">
-        <img
-          src={store.storeProfileImage}
-          alt={`${store.storeName}의 가게 이미지`}
-          className="h-full w-full object-cover"
-        />
+      <div className="h-[140px] w-36 flex-shrink-0 overflow-hidden bg-gray-100">
+        {store.storeProfileImage ? (
+          <img
+            src={store.storeProfileImage}
+            alt={`${store.storeName}의 가게 이미지`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+            onError={e => {
+              const img = e.currentTarget;
+              img.style.display = 'none';
+              const fallback = document.createElement('div');
+              fallback.className =
+                'flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100';
+              fallback.innerHTML = '<span class="text-4xl">🍽️</span>';
+              img.parentElement?.appendChild(fallback);
+            }}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100">
+            <span className="text-4xl">🍽️</span>
+          </div>
+        )}
       </div>
       {/* 오른쪽 내용 */}
-      <div className="flex flex-1 flex-col justify-between p-3">
+      <div className="flex h-[140px] flex-1 flex-col justify-between p-4">
         {/* 상단: 제목, 설명, 시간 배지 */}
         <div className="flex justify-between">
           <div className="flex-1">
-            <h3 className="mb-1 text-lg font-bold text-gray-900">
+            <h3 className="mb-1 line-clamp-1 text-sm font-semibold text-gray-900">
               {store.storeName}
             </h3>
-            <p className="mb-3 text-sm text-gray-500">{store.description}</p>
+            <p className="mb-2 line-clamp-1 text-xs text-gray-600">
+              {store.description}
+            </p>
 
             {/* 가격 정보 */}
-            <div className="mb-0.5">
-              <span className="text-sm text-gray-400 line-through">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-gray-900">
+                {store.representativeSalePrice.toLocaleString()}원
+              </span>
+              <span className="text-xs text-gray-400 line-through">
                 {store.representativeOriginalPrice.toLocaleString()}원
               </span>
             </div>
-            <span className="text-xl font-bold text-green-600">
-              {store.representativeSalePrice.toLocaleString()}원
-            </span>
           </div>
 
           {/* 오른쪽 배지들 */}
-          <div className="flex flex-col-reverse items-end gap-1">
+          <div className="flex flex-col items-end gap-2">
             {/* 할인율 배지 */}
-            <div className="bg-linear-to-r mb-1 rounded from-red-400 to-yellow-400 px-1.5 py-0.5 text-xs font-bold text-white">
+            <div className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm">
               {/* TODO: Badge 컴포넌트로 전환 */}
               {Math.round(
-                (store.representativeSalePrice /
+                ((store.representativeOriginalPrice -
+                  store.representativeSalePrice) /
                   store.representativeOriginalPrice) *
                   100,
               )}
@@ -71,23 +93,27 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
         </div>
 
         {/* 하단: 별점, 거리, 남은 수량 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
+        <div className="mt-1 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             {/* 별점 */}
-            <span className="text-gray-600">★</span>
-            <span className="text-sm font-medium text-gray-700">
-              {store.ratingAverage}
-            </span>
+            <div className="flex items-center gap-0.5">
+              <span className="text-amber-400">★</span>
+              <span className="text-sm font-medium text-gray-700">
+                {store.ratingAverage.toFixed(1)}
+              </span>
+            </div>
 
             {/* 거리 */}
             {store.distanceFromUser !== undefined &&
               store.distanceFromUser !== null && (
-                <>
-                  <span className="text-gray-400">📍</span>
+                <div className="flex items-center gap-0.5">
+                  <span className="text-xs text-gray-400">📍</span>
                   <span className="text-sm text-gray-600">
-                    {store.distanceFromUser.toFixed(2)}km
+                    {store.distanceFromUser < 1
+                      ? `${(store.distanceFromUser * 1000).toFixed(0)}m`
+                      : `${store.distanceFromUser.toFixed(1)}km`}
                   </span>
-                </>
+                </div>
               )}
           </div>
 
@@ -97,14 +123,14 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
               {store.remainingQuantity}개 남음
             </div>
           )} */}
-          {/* TODO: 픽업 가능 유무 배지로 대체 */}
+          {/* 픽업 가능 유무 배지 */}
           {store.isActive ? (
-            <div className="rounded border border-red-200 bg-white px-2 py-0.5 text-xs text-red-500">
+            <div className="rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
               픽업 가능
             </div>
           ) : (
-            <div className="rounded border border-red-200 bg-white px-2 py-0.5 text-xs text-red-500">
-              픽업 불가
+            <div className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-500">
+              픽업 마감
             </div>
           )}
         </div>
