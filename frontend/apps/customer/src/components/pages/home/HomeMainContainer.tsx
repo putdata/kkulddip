@@ -23,7 +23,19 @@ const HomeMainContainer = ({
   };
 
   if (stores.length === 0) {
-    return <div className="p-5">표시할 매장이 없습니다.</div>;
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center p-8">
+        <div className="mb-4 text-6xl">📍</div>
+        <h3 className="mb-2 text-lg font-semibold text-gray-800">
+          위치 권한을 허용해 주세요!
+        </h3>
+        <p className="text-center text-sm text-gray-500">
+          내 주변 맛집을 찾기 위해
+          <br />
+          위치 권한이 필요해요
+        </p>
+      </div>
+    );
   }
 
   return (

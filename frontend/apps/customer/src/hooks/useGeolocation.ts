@@ -12,10 +12,6 @@ export interface LocationType {
 const useGeolocation = () => {
   const [location, setLocation] = useState<LocationType>({
     isLoaded: false,
-    coordinate: {
-      latitude: 0,
-      longitude: 0,
-    },
   });
 
   const onSuccess = (location: {
