@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, RefreshCw, Home, Store } from 'lucide-react';
+import { RefreshCw, Home, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -68,18 +68,6 @@ const GlobalErrorFallback = ({
                   꿀띱
                 </span>
               </h1>
-            </div>
-
-            {/* Error Icon */}
-            <div className="mx-auto">
-              <div className="relative">
-                <div className="animate-pulse rounded-full bg-red-100 p-6">
-                  <AlertTriangle className="h-16 w-16 text-red-500" />
-                </div>
-                <div className="absolute -right-2 -top-2 animate-bounce rounded-full bg-amber-500 p-1">
-                  <div className="h-3 w-3 rounded-full bg-white"></div>
-                </div>
-              </div>
             </div>
 
             {/* Error Message */}

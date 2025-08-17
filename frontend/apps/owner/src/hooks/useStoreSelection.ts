@@ -14,7 +14,7 @@ export const useStoreSelection = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const storeId = useNumberParam('storeId');
-  const { data: storeListData } = useMyStores();
+  const { data: storeListData, isLoading, isError } = useMyStores();
   const [hasError, setHasError] = useState(false);
 
   /**
@@ -28,7 +28,25 @@ export const useStoreSelection = () => {
    * storeId 파라미터 유효성 검증 및 자동 리다이렉트
    */
   useEffect(() => {
+    // 스토어 목록 로딩 중이거나 API 에러인 경우는 검증하지 않음
+    if (isLoading || isError) {
+      return;
+    }
+
+    // storeId가 유효하지 않은 경우
     if (storeId === null || isNaN(storeId) || storeId <= 0) {
+      // 스토어 목록이 있으면 첫 번째 스토어로 리다이렉트
+      if (stores.length > 0) {
+        const firstStore = stores[0];
+        if (firstStore) {
+          const currentRoutePath = getCurrentPageRoute(location.pathname);
+          const newPath = generatePath(currentRoutePath, {
+            storeId: firstStore.storeId.toString(),
+          });
+          navigate(newPath, { replace: true });
+          return;
+        }
+      }
       setHasError(true);
       return;
     }
@@ -42,13 +60,15 @@ export const useStoreSelection = () => {
           storeId: firstStore.storeId.toString(),
         });
         navigate(newPath, { replace: true });
-      } else {
-        setHasError(true);
+        return;
       }
-    } else {
-      setHasError(false);
+      setHasError(true);
+      return;
     }
-  }, [storeId, stores, navigate, location.pathname]);
+
+    // 모든 검증 통과
+    setHasError(false);
+  }, [storeId, stores, navigate, location.pathname, isLoading, isError]);
 
   /**
    * 현재 선택된 스토어
@@ -75,5 +95,7 @@ export const useStoreSelection = () => {
     selectStore,
     storeId: storeId || 0,
     hasError,
+    isLoading,
+    isError,
   };
 };

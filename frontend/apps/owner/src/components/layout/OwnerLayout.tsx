@@ -10,9 +10,10 @@ import { useStoreSelection } from '@/hooks/useStoreSelection';
 
 const OwnerLayout = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { hasError } = useStoreSelection();
+  const { hasError, isError } = useStoreSelection();
 
-  if (hasError) {
+  // API 에러인 경우 NotFound 표시
+  if (isError || hasError) {
     return <NotFound />;
   }
 

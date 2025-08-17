@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useRedirectStore } from 'common';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Store, Package, Bell } from 'lucide-react';
 import { useOnboardingStore } from '@/stores/onboardingStore';
@@ -9,9 +10,15 @@ import { ROUTE_PATH } from '@/router/route-path';
 const AdaptiveOnboardingLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { clearRedirectUrl } = useRedirectStore();
   const { completedSteps, currentStep, setCurrentStep, setCurrentMobileStep } =
     useOnboardingStore();
   const isMobile = useIsMobile();
+
+  // 온보딩 진입 시 redirectStore 초기화
+  useEffect(() => {
+    clearRedirectUrl();
+  }, [clearRedirectUrl]);
 
   // Define desktop and mobile route mappings
   const desktopRoutes = useMemo(
