@@ -1,14 +1,9 @@
 import OrderCard from '@/components/pages/orders/OrderCard/OrderCard';
-import { useOrdersWithReviews } from '@/hooks/useOrdersWithReviews';
+import { useOrders } from '@/hooks/useOrders';
 import { Loader2 } from 'lucide-react';
 
 const Orders = () => {
-  const {
-    data: orders,
-    isLoading,
-    isFetching,
-    isSuccess,
-  } = useOrdersWithReviews();
+  const { data: orders, isLoading, isFetching, isSuccess } = useOrders();
   if (isLoading || isFetching) {
     return (
       <div className="flex flex-1 items-center justify-center">
