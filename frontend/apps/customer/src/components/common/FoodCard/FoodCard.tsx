@@ -19,7 +19,7 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
   return (
     <Card
       onClick={onClick}
-      className="h-[140px] cursor-pointer flex-row overflow-hidden border-gray-100 p-0 shadow-md transition-all duration-300 hover:shadow-lg gap-0"
+      className="h-[140px] cursor-pointer flex-row gap-0 overflow-hidden border-gray-100 p-0 shadow-md transition-all duration-300 hover:shadow-lg"
     >
       {/* 왼쪽 이미지 */}
       <div className="h-[140px] w-36 flex-shrink-0 overflow-hidden bg-gray-100">
@@ -49,7 +49,7 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
       <div className="flex h-[140px] flex-1 flex-col justify-between p-3">
         {/* 상단: 제목, 설명, 시간 배지 */}
         <div className="flex justify-between">
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="mb-1 line-clamp-1 text-sm font-semibold text-gray-900">
               {store.storeName}
             </h3>
@@ -94,7 +94,7 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
 
         {/* 하단: 별점, 거리, 남은 수량 */}
         <div className="mt-1 flex items-center justify-between">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
             {/* 별점 */}
             <div className="flex items-center gap-0.5">
               <span className="text-amber-400">★</span>
@@ -125,11 +125,11 @@ const FoodCard = ({ store, onClick }: FoodCardProps) => {
           )} */}
           {/* 픽업 가능 유무 배지 - 스마트폰에서 숨김 */}
           {store.isActive ? (
-            <div className="hidden sm:block rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+            <div className="hidden rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:block">
               픽업 가능
             </div>
           ) : (
-            <div className="hidden sm:block rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-500">
+            <div className="hidden rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-500 sm:block">
               픽업 마감
             </div>
           )}
