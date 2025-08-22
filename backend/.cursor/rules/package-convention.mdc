@@ -1,0 +1,22 @@
+---
+description: 패키지 구조 컨벤션 규칙
+alwaysApply: true
+---
+### 패키지 구조
+- 기본적으로 DDD를 사용하지만, 일부는 일반적인 레이어드 아키텍처를 적용한다. 프롬프트를 수행하기 전, 해당 도메인의 폴더 구조를 살펴서 그에 맞게 수행한다.
+
+### DDD 기반 패키지 구조
+- 각 도메인 별로 presentation, application, domain, infrastructure로 나뉜다.
+  - domain 계층에는 model, repository, service, event 폴더가 있다.
+    - model에는 entity, vo, enums, aggregate 폴더가 있다.
+  - presentation 계층에는 보통 rest 폴더가 있고, 상황에 따라 event, scheduled 폴더도 있을 수 있다.
+    - 각 폴더 안에는 dto 폴더가 있을 수 있다. dto 폴더 안에는 request와 response 폴더가 각각 있다.
+  - application 계층에는 service, facade, mapper 폴더가 있다.
+  - infrastructure 계층에는 persistence와 external 폴더가 있다.
+    - persistence/jpa, persistence/redis 등으로 성격에 따라 저장소를 분리한다.
+
+### 레이어드 아키텍처 기반 패키지 구조
+- 각 도메인 별로 기본적으로 controller, dto, service, entity, repository로 나뉜다.
+  - dto 폴더에는 request와 response 폴더가 각각 있다.
+- entity 계층에는 enum class를 저장하는 enums 폴더가 존재할 수 있다.
+- enum class를 저장하는 enums 폴더가 있을 수 있다.

@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  # 1) Prometheus (host 네트워크: 127.0.0.1:18080 스크랩을 위해)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    network_mode: host
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.size=8GB
+      - --web.enable-lifecycle
+      - --web.listen-address=127.0.0.1:9090   # 보안: 로컬에서만 열기
+    restart: unless-stopped
+
+  # 2) Grafana (일반 브리지 네트워크로 3000 노출)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=change_me_strong
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data: /home/monitoring/prometheus-data
+  grafana-data: /home/monitoring/grafana-data
