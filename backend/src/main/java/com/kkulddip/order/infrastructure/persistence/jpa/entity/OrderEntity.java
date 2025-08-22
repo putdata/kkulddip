@@ -1,0 +1,89 @@
+package com.kkulddip.order.infrastructure.persistence.jpa.entity;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import com.kkulddip.order.domain.model.enums.OrderStatus;
+
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "orders")
+public class OrderEntity {
+    
+    @Id
+    @Column(name = "order_id", nullable = false, unique = true)
+    private Long orderId;
+    
+    @Column(name = "customer_id", nullable = false)
+    private Long customerId;
+    
+    @Column(name = "store_id", nullable = false)
+    private Long storeId;
+    
+    @Column(name = "original_price", nullable = false)
+    private Long originalPrice;
+    
+    @Column(name = "final_price", nullable = false)
+    private Long finalPrice;
+
+    @Column(name = "saved_money", nullable = false)
+    private Long savedMoney;
+
+    @Column(name = "saved_co2", nullable = false)
+    private Double savedCo2;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus;
+    
+    @Column(name = "order_date", nullable = false)
+    private LocalDateTime orderDate;
+
+    @Column(name = "pickup_time", nullable = true)
+    private LocalDateTime pickupTime;
+    
+    @Builder
+    protected OrderEntity(Long orderId, Long customerId, Long storeId, Long originalPrice, 
+        Long finalPrice, Long savedMoney, Double savedCo2,
+        OrderStatus orderStatus, LocalDateTime orderDate, LocalDateTime pickupTime) {
+
+        this.orderId = orderId;
+        this.customerId = customerId;
+        this.storeId = storeId;
+        this.originalPrice = originalPrice;
+        this.finalPrice = finalPrice;
+        this.savedMoney = savedMoney;
+        this.savedCo2 = savedCo2;
+        this.orderStatus = orderStatus;
+        this.orderDate = orderDate;
+        this.pickupTime = pickupTime;
+    }
+    
+    public void updateStatus(OrderStatus newStatus) {
+        this.orderStatus = newStatus;
+    }
+    
+    public void updatePrices(Long originalPrice, Long finalPrice) {
+        this.originalPrice = originalPrice;
+        this.finalPrice = finalPrice;
+    }
+
+    public void updateSavedValues(Long savedMoney, Double savedCo2) {
+        this.savedMoney = savedMoney;
+        this.savedCo2 = savedCo2;
+    }
+}

@@ -1,0 +1,34 @@
+package com.kkulddip.common.security.oauth2.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+
+/**
+ * JWT 토큰 응답 DTO
+ *
+ * refresh token은 응답이 아닌 쿠키 설정으로 변경 필요
+ */
+@Builder
+public record OAuth2TokenResponse(
+    @JsonProperty("accessToken")
+    String accessToken,
+    
+    @JsonProperty("refreshToken")
+    String refreshToken,
+
+    @JsonProperty("expiresIn")
+    long expiresIn,
+    
+    UserInfo user
+) {
+    @Builder
+    public record UserInfo(
+        Long userId,
+        String email,
+        String name,
+        String role,
+        String profileImageUrl
+    ) {
+    }
+
+}
